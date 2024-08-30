@@ -5,7 +5,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RoleController;
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\OrderController;
