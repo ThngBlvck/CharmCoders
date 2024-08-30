@@ -13,6 +13,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+
 use App\Http\Controllers\Admin\BrandController;
 
 Route::prefix('admin')->group(function () {
