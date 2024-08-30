@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
 
 Route::prefix('admin')->group(function () {
+
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('blog', BlogController::class);
     Route::apiResource('blogcategory', BlogCategoryController::class);
