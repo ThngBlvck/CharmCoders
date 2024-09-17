@@ -29,7 +29,7 @@ class StoreBlogCategoryRequest extends FormRequest
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
-            $id = $this->route('BlogCategory');
+            $id = $this->route('blogcategory');
 
             $rules['name'] = [
                 'required',
