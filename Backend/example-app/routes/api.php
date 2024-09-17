@@ -11,3 +11,6 @@ Route::get('/user', function (Request $request) {
 Route::get('/categories', [CategoryController::class, 'index']);
 
 Route::apiResource('BlogCategory', BlogCategoryController::class);
+
+
+Route::apiResource('categories', CategoryController::class);
