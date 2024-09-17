@@ -8,6 +8,15 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-Route::get('/categories', [CategoryController::class, 'index']);
 
-Route::apiResource('BlogCategory', BlogCategoryController::class);
+use App\Http\Controllers\Admin\BrandController;
+
+Route::prefix('admin')->group(function () {
+
+    Route::apiResource('brands', BrandController::class);
+
+    Route::apiResource('blogCategory', BlogCategoryController::class);
+
+    Route::apiResource('categories', CategoryController::class);
+
+});
