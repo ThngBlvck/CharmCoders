@@ -194,16 +194,16 @@ export default function Sidebar() {
                                 <Link
                                     className={
                                         "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/maps") !== -1
+                                        (window.location.href.indexOf("/admin/blog") !== -1
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500")
                                     }
-                                    to="/admin/maps"
+                                    to="/admin/blog"
                                 >
                                     <i
                                         className={
                                             "fas fa-align-justify mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/maps") !== -1
+                                            (window.location.href.indexOf("/admin/blog") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
                                         }
@@ -216,16 +216,16 @@ export default function Sidebar() {
                                 <Link
                                     className={
                                         "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/maps") !== -1
+                                        (window.location.href.indexOf("/admin/comment") !== -1
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500")
                                     }
-                                    to="/admin/maps"
+                                    to="/admin/comment"
                                 >
                                     <i
                                         className={
                                             "fas fa-comment mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/maps") !== -1
+                                            (window.location.href.indexOf("/admin/comment") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
                                         }
@@ -238,16 +238,16 @@ export default function Sidebar() {
                                 <Link
                                     className={
                                         "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/maps") !== -1
+                                        (window.location.href.indexOf("/admin/brand") !== -1
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500")
                                     }
-                                    to="/admin/maps"
+                                    to="/admin/brand"
                                 >
                                     <i
                                         className={
                                             "fas fa-archive mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/maps") !== -1
+                                            (window.location.href.indexOf("/admin/brand") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
                                         }
@@ -260,16 +260,16 @@ export default function Sidebar() {
                                 <Link
                                     className={
                                         "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/maps") !== -1
+                                        (window.location.href.indexOf("/admin/order") !== -1
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500")
                                     }
-                                    to="/admin/maps"
+                                    to="/admin/order"
                                 >
                                     <i
                                         className={
                                             "fas fa-box-open mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/maps") !== -1
+                                            (window.location.href.indexOf("/admin/order") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
                                         }
