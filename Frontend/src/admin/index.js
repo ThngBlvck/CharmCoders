@@ -17,6 +17,11 @@ import Comment from "./Pages/Comment";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
 import AddProductCategory from "./Pages/ProductCategory/Add";
+
+import AddBlogCategory from "./Pages/BlogCategory/Add";
+import EditBlogCategory from "./Pages/BlogCategory/Edit";
+
+
 // import Maps from "views/admin/Maps.js";
 // import Settings from "views/admin/Settings.js";
 // import Tables from "views/admin/Tables.js";
@@ -40,6 +45,8 @@ export default function Admin() {
                         <Route path="product" element={<Product />} />
                         {/*<Route path="user" element={<User />} />*/}
                         <Route path="category_blog" element={<BlogCaterogy />} />
+                        <Route path="category_blog/add" element={<AddBlogCategory />} />
+                        <Route path="category_blog/edit/:id" element={<EditBlogCategory />} />
                         <Route path="blog" element={<Blog />}/>
                         <Route path="brand" element={<Brand />}/>
                         <Route path="comment" element={<Comment />}/>
