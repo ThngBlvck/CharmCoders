@@ -1,9 +1,11 @@
 <?php
+
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class StoreBrandRequest extends FormRequest
 {
@@ -14,20 +16,32 @@ class StoreBrandRequest extends FormRequest
 
     public function rules(): array
     {
-        // Kiểm tra nếu là phương thức cập nhật (PUT hoặc PATCH), bỏ qua kiểm tra với ID hiện tại
-        $brandId = $this->route('brand') ? $this->route('brand')->id : null;
-
-        return [
-            'name' => 'required|unique:brands,name,' . $brandId, // Kiểm tra tên thương hiệu không trùng
+        $rules = [
+            'name' => 'required|string|max:255|unique:brands,name',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
         ];
+
+        if ($this->isMethod('put') || $this->isMethod('patch')) {
+            $id = $this->route('brand');
+
+            $rules['name'] = [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('brands')->ignore($id),
+            ];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
     {
         return [
             'name.required' => 'Tên thương hiệu là bắt buộc.',
-            'name.unique' => 'Tên thương hiệu đã tồn tại.', // Thông báo khi tên trùng
+            'name.string' => 'Tên thương hiệu phải là một chuỗi ký tự hợp lệ.',
+            'name.max' => 'Tên thương hiệu không được vượt quá 255 ký tự.',
+            'name.unique' => 'Tên thương hiệu đã tồn tại.',
             'image.image' => 'Tệp tải lên phải là hình ảnh.',
             'image.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg, gif, svg.',
         ];
