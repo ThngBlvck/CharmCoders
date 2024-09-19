@@ -15,8 +15,9 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
+        $validatedData = $request->validated();
         // Sử dụng dữ liệu đã xác thực
-        $category = Category::create($request->validated());
+        $category = Category::create($validatedData);
         return response()->json($category, 201);
     }
 
@@ -28,10 +29,9 @@ class CategoryController extends Controller
 
     public function update(StoreCategoryRequest $request, $id)
     {
+        $validatedData = $request->validated();
         $category = Category::findOrFail($id);
-
-        // Sử dụng dữ liệu đã xác thực
-        $category->update($request->validated());
+        $category->update($validatedData);
         return response()->json($category);
     }
 
