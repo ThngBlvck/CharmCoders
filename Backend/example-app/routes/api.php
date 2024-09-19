@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\ProductController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -18,8 +19,10 @@ Route::prefix('admin')->group(function () {
 
     Route::apiResource('blogcategory', BlogCategoryController::class);
     Route::apiResource('blog', BlogController::class);
-    Route::apiResource('blogCategory', BlogCategoryController::class);
+
 
     Route::apiResource('categories', CategoryController::class);
-
+    Route::apiResource('products', ProductController::class);
 });
+
+

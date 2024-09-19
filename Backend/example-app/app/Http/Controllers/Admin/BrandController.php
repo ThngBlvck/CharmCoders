@@ -35,27 +35,19 @@ class BrandController extends Controller
 
     public function update(StoreBrandRequest $request, $id)
     {
-        // Tìm đối tượng thương hiệu dựa trên ID
         $brand = Brand::findOrFail($id);
 
-        // Lấy dữ liệu đã xác thực
         $validatedData = $request->validated();
-
-        // Kiểm tra xem có hình ảnh mới được tải lên không
         if ($request->hasFile('image')) {
-            // Lưu hình ảnh mới
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('public/images/brands', $imageName);
 
-            // Cập nhật đường dẫn hình ảnh vào mảng dữ liệu
             $validatedData['image'] = 'Backend/storage/images/brands/' . $imageName;
         }
 
-        // Cập nhật dữ liệu cho thương hiệu, bao gồm hình ảnh mới nếu có
         $brand->update($validatedData);
 
-        // Trả về phản hồi JSON với mã trạng thái 200
         return response()->json($brand, 200);
     }
 
