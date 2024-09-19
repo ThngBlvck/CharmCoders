@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getBlogCategory, deleteBlogCategory } from '../../../../services/BlogCategory';
+import { getBlogCategory, deleteBlogCategory } from '../../../../services/BlogCategory'; // Adjust the path based on your folder structure
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Swal from 'sweetalert2';
 
 export default function BlogCategory({ color }) {
     const [Blogcategories, setBlogcategories] = useState([]);
-    const navigate = useNavigate();
-    const renderStatus = (status) => (status === "1" ? "Hiển thị" : "Ẩn");
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         fetchBlogcategories();
@@ -17,39 +15,28 @@ export default function BlogCategory({ color }) {
 
     const fetchBlogcategories = async () => {
         try {
-            const result = await getBlogCategory();
-            setBlogcategories(result || []);
+            const result = await getBlogCategory(); // Fetch categories using the API
+            setBlogcategories(result || []); // Ensure that it's always an array
         } catch (err) {
             console.error('Error fetching categories:', err);
-            setBlogcategories([]);
+            setBlogcategories([]); // Set an empty array in case of an error
             toast.error('Error fetching categories. Please try again later.');
         }
     };
 
+    // Handle Edit Click
     const handleEditClick = (id) => {
-        navigate(`/admin/category_blog/edit/${id}`);
+        navigate(`/admin/category_blog/edit/${id}`); // Redirect to edit page with category ID
     };
 
-    // Handle Delete Click with SweetAlert2
+    // Handle Delete Click
     const handleDeleteClick = async (category) => {
-        const { isConfirmed } = await Swal.fire({
-            title: `Bạn có chắc chắn muốn xóa danh mục "${category.name}" không?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
-        });
-
-        if (isConfirmed) {
+        const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}" không?`); // Use browser confirm dialog
+        if (confirmDelete) {
             try {
-                await deleteBlogCategory(category.id);
-                await Swal.fire({
-                    title: 'Thành công!',
-                    text: 'Xóa danh mục bài viết thành công.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-                fetchBlogcategories();
+                await deleteBlogCategory(category.id); // Call the delete API
+                toast.success('Xóa danh mục blog thành công.');
+                fetchBlogcategories(); // Refresh the list after deletion
             } catch (err) {
                 console.error('Error deleting category:', err);
                 toast.error('Lỗi khi xóa danh mục. Vui lòng thử lại.');
@@ -87,13 +74,42 @@ export default function BlogCategory({ color }) {
                     </div>
                 </div>
                 <div className="block w-full overflow-x-auto">
+                    {/* Blog categories table */}
                     <table className="items-center w-full bg-transparent border-collapse table-fixed">
                         <thead>
                         <tr>
-                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "10%"}}>STT</th>
-                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "10%"}}>Tên danh mục</th>
-                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "10%"}}>Trạng Thái</th>
-                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "10%"}}>Hành động</th>
+                            <th className={
+                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light"
+                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                            }
+                                style={{ width: "10%" }}
+                            >STT</th>
+                            <th className={
+                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light"
+                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                            }
+                                style={{ width: "10%" }}
+                            >Tên danh mục</th>
+                            <th className={
+                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light"
+                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                            }
+                                style={{ width: "10%" }}
+                            >Trạng Thái</th>
+                            <th className={
+                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light"
+                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                            }
+                                style={{ width: "10%" }}
+                            >Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -101,13 +117,15 @@ export default function BlogCategory({ color }) {
                             Blogcategories.map((category, index) => (
                                 <tr key={category.id}>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                        <span className="ml-3 font-bold">{index + 1}</span>
+                                        <span className="ml-3 font-bold">
+                                            {index + 1}
+                                        </span>
                                     </th>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
                                         {category.name}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {renderStatus(category.status)}
+                                        {category.status}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                         <button
@@ -127,7 +145,9 @@ export default function BlogCategory({ color }) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4" className="text-center">Không có danh mục nào</td>
+                                <td colSpan="4" className="text-center">
+                                    Không có danh mục nào
+                                </td>
                             </tr>
                         )}
                         </tbody>
@@ -135,6 +155,7 @@ export default function BlogCategory({ color }) {
                 </div>
             </div>
 
+            {/* Toast Container for messages */}
             <ToastContainer />
         </>
     );
