@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 // components
 
-export default function ProductCaterogy({ color }) {
+export default function BlogCaterogy({ color }) {
     return (
         <>
             <div
@@ -112,10 +112,10 @@ export default function ProductCaterogy({ color }) {
     );
 }
 
-ProductCaterogy.defaultProps = {
+BlogCaterogy.defaultProps = {
     color: "light",
 };
 
-ProductCaterogy.propTypes = {
+BlogCaterogy.propTypes = {
     color: PropTypes.oneOf(["light", "dark"]),
 };

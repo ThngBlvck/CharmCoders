@@ -106,16 +106,16 @@ export default function Sidebar() {
                                 <Link
                                     className={
                                         "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/caterogy_product") !== -1
+                                        (window.location.href.indexOf("/admin/category_product") !== -1
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500")
                                     }
-                                    to="/admin/caterogy_product"
+                                    to="/admin/category_product"
                                 >
                                     <i
                                         className={
                                             "fas fa-list mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/caterogy_product") !== -1
+                                            (window.location.href.indexOf("/admin/category_product") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
                                         }
@@ -128,16 +128,16 @@ export default function Sidebar() {
                                 <Link
                                     className={
                                         "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/tables") !== -1
+                                        (window.location.href.indexOf("/admin/product") !== -1
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500")
                                     }
-                                    to="/admin/tables"
+                                    to="/admin/product"
                                 >
                                     <i
                                         className={
                                             "fas fa-table mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/tables") !== -1
+                                            (window.location.href.indexOf("/admin/product") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
                                         }
@@ -150,16 +150,16 @@ export default function Sidebar() {
                                 <Link
                                     className={
                                         "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/maps") !== -1
+                                        (window.location.href.indexOf("/admin/user") !== -1
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500")
                                     }
-                                    to="/admin/maps"
+                                    to="/admin/user"
                                 >
                                     <i
                                         className={
                                             "fas fa-user mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/maps") !== -1
+                                            (window.location.href.indexOf("/admin/user") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
                                         }
@@ -172,16 +172,16 @@ export default function Sidebar() {
                                 <Link
                                     className={
                                         "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/maps") !== -1
+                                        (window.location.href.indexOf("/admin/category_blog") !== -1
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500")
                                     }
-                                    to="/admin/maps"
+                                    to="/admin/category_blog"
                                 >
                                     <i
                                         className={
                                             "fas fa-blog mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/maps") !== -1
+                                            (window.location.href.indexOf("/admin/category_blog") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
                                         }
