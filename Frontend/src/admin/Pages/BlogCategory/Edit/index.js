@@ -1,19 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import Swal from 'sweetalert2';
-import { getOneBlogCategory, updateBlogCategory } from '../../../../services/BlogCategory';
+import { getOneBlogCategory, updateBlogCategory } from '../../../../services/BlogCategory'; // Adjust the path based on your folder structure
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function BlogCategoryEdit() {
-    const { id } = useParams();
-    const navigate = useNavigate();
-
-    const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
-        defaultValues: {
-            name: '',
-            status: '',
-        },
+    const { id } = useParams(); // Get the category ID from the URL
+    const [categoryData, setCategoryData] = useState({
+        name: '',
+        status: '',
     });
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchCategoryData(id);
@@ -21,34 +18,37 @@ export default function BlogCategoryEdit() {
 
     const fetchCategoryData = async (id) => {
         try {
-            const result = await getOneBlogCategory(id);
-            if (result) {
-                setValue("name", result.name || '');
-                setValue("status", result.status || '');
-            } else {
-                Swal.fire('Error', 'Không tìm thấy danh mục này.', 'error');
-                navigate('/admin/category_blog');
-            }
+            const result = await getOneBlogCategory(id); // Fetch category data by ID
+            setCategoryData({
+                name: result.name || '',
+                status: result.status || '',
+            });
         } catch (err) {
             console.error('Error fetching category data:', err);
-            Swal.fire('Error', 'Lỗi khi tải danh mục. Vui lòng thử lại.', 'error');
-            navigate('/admin/category_blog');
+            toast.error('Lỗi khi tải danh mục. Vui lòng thử lại.');
         }
     };
 
-    const onSubmit = async (data) => {
+    // Handle form input change
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setCategoryData({
+            ...categoryData,
+            [name]: value,
+        });
+    };
+
+    // Handle form submission
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
         try {
-            await updateBlogCategory(id, {
-                name: data.name,
-                status: data.status,
-            });
-            Swal.fire('Success', 'Cập nhật danh mục bài viết thành công.', 'success');
-            navigate('/admin/category_blog');
+            await updateBlogCategory(id, categoryData); // Use categoryData instead of data
+            toast.success('Cập nhật danh mục blog thành công.');
+            navigate('/admin/category_blog'); // Redirect back to the category list
         } catch (err) {
             console.error('Error updating category:', err);
-            Swal.fire('Error', 'Lỗi khi cập nhật danh mục. Vui lòng thử lại.', 'error');
+            toast.error('Lỗi khi cập nhật danh mục. Vui lòng thử lại.');
         }
-        console.log('Dữ liệu gửi đi:', { name: data.name, status: data.status });
     };
 
     return (
@@ -62,46 +62,51 @@ export default function BlogCategoryEdit() {
             </div>
 
             <div className="block w-full overflow-x-auto px-4 py-4">
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleFormSubmit}>
+                    {/* Category Name */}
                     <div className="mb-4">
                         <label className="block text-blueGray-600 text-sm font-bold mb-2">
                             Tên danh mục
                         </label>
                         <input
                             type="text"
-                            {...register("name", { required: "Tên danh mục là bắt buộc" })}
+                            name="name"
+                            value={categoryData.name}
+                            onChange={handleInputChange}
                             className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
-                            placeholder="Nhập tên danh mục"
+                            required
                         />
-                        {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
                     </div>
 
+                    {/* Category Status */}
                     <div className="mb-4">
                         <label className="block text-blueGray-600 text-sm font-bold mb-2">
                             Trạng thái
                         </label>
                         <select
-                            {...register("status", { required: "Vui lòng chọn trạng thái" })}
+                            name="status"
+                            value={categoryData.status}
+                            onChange={handleInputChange}
                             className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
+                            required
                         >
                             <option value="">Chọn trạng thái</option>
-                            <option value="1">Hiển thị</option>
-                            <option value="0">Ẩn</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
                         </select>
-                        {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                     </div>
 
+                    {/* Submit Button */}
                     <div className="flex items-center justify-between">
                         <button
                             type="submit"
-                            className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-                            disabled={isSubmitting}
+                            className="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         >
-                            {isSubmitting ? "Đang cập nhật..." : "Cập nhật"}
+                            Cập nhật
                         </button>
                         <button
                             type="button"
-                            className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className="text-red-500 hover:text-red-700"
                             onClick={() => navigate('/admin/category_blog')}
                         >
                             Hủy bỏ
@@ -109,6 +114,9 @@ export default function BlogCategoryEdit() {
                     </div>
                 </form>
             </div>
+
+            {/* Toast Container for messages */}
+            <ToastContainer />
         </div>
     );
 }
