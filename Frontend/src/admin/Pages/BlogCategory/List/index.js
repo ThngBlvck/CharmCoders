@@ -1,9 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { NavLink, useNavigate } from "react-router-dom";
+import { getBlogCategory, deleteBlogCategory } from '../../../../services/BlogCategory'; // Adjust the path based on your folder structure
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-// components
+export default function BlogCategory({ color }) {
+    const [Blogcategories, setBlogcategories] = useState([]);
+    const navigate = useNavigate(); // Initialize useNavigate
 
-export default function BlogCaterogy({ color }) {
+    useEffect(() => {
+        fetchBlogcategories();
+    }, []);
+
+    const fetchBlogcategories = async () => {
+        try {
+            const result = await getBlogCategory(); // Fetch categories using the API
+            setBlogcategories(result || []); // Ensure that it's always an array
+        } catch (err) {
+            console.error('Error fetching categories:', err);
+            setBlogcategories([]); // Set an empty array in case of an error
+            toast.error('Error fetching categories. Please try again later.');
+        }
+    };
+
+    // Handle Edit Click
+    const handleEditClick = (id) => {
+        navigate(`/admin/category_blog/edit/${id}`); // Redirect to edit page with category ID
+    };
+
+    // Handle Delete Click
+    const handleDeleteClick = async (category) => {
+        const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa danh mục "${category.name}" không?`); // Use browser confirm dialog
+        if (confirmDelete) {
+            try {
+                await deleteBlogCategory(category.id); // Call the delete API
+                toast.success('Xóa danh mục blog thành công.');
+                fetchBlogcategories(); // Refresh the list after deletion
+            } catch (err) {
+                console.error('Error deleting category:', err);
+                toast.error('Lỗi khi xóa danh mục. Vui lòng thử lại.');
+            }
+        }
+    };
+
     return (
         <>
             <div
@@ -21,101 +61,110 @@ export default function BlogCaterogy({ color }) {
                                     (color === "light" ? "text-blueGray-700" : "text-white")
                                 }
                             >
-                                Danh Mục
+                                DANH MỤC BÀI VIẾT
                             </h3>
                         </div>
+                        <NavLink
+                            to={`/admin/category_blog/add`}
+                            className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                            type="button"
+                        >
+                            Thêm danh mục
+                        </NavLink>
                     </div>
                 </div>
                 <div className="block w-full overflow-x-auto">
-                    {/* Projects table */}
+                    {/* Blog categories table */}
                     <table className="items-center w-full bg-transparent border-collapse table-fixed">
                         <thead>
                         <tr>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
+                            <th className={
+                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light"
+                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                            }
                                 style={{ width: "10%" }}
-                            >
-                                STT
-                            </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "40%" }}
-                            >
-                                Tên danh mục
-                            </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "25%" }}
-                            >
-                                Trạng Thái
-                            </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "25%" }}
-                            >
-                                Hành động
-                            </th>
+                            >STT</th>
+                            <th className={
+                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light"
+                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                            }
+                                style={{ width: "10%" }}
+                            >Tên danh mục</th>
+                            <th className={
+                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light"
+                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                            }
+                                style={{ width: "10%" }}
+                            >Trạng Thái</th>
+                            <th className={
+                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light"
+                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
+                            }
+                                style={{ width: "10%" }}
+                            >Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                    <span
-                                        className={
-                                            "ml-3 font-bold " +
-                                            (color === "light" ? "text-blueGray-600" : "text-white")
-                                        }
-                                    >
-                                        1
-                                    </span>
-                            </th>
-                            <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                Son
-                            </td>
-                            <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                <i className=""></i> pending
-                            </td>
-                            <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                <button className="text-blue-500 hover:text-blue-700 px-2">
-                                    <i className="fas fa-pen text-xl"></i>
-                                </button>
-                                <button className="text-red-500 hover:text-red-700 ml-2 px-2" >
-                                    <i className="fas fa-trash text-xl"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        {Blogcategories.length > 0 ? (
+                            Blogcategories.map((category, index) => (
+                                <tr key={category.id}>
+                                    <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+                                        <span className="ml-3 font-bold">
+                                            {index + 1}
+                                        </span>
+                                    </th>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        {category.name}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        {category.status}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                        <button
+                                            className="text-blue-500 hover:text-blue-700 px-2"
+                                            onClick={() => handleEditClick(category.id)}
+                                        >
+                                            <i className="fas fa-pen text-xl"></i>
+                                        </button>
+                                        <button
+                                            className="text-red-500 hover:text-red-700 ml-2 px-2"
+                                            onClick={() => handleDeleteClick(category)}
+                                        >
+                                            <i className="fas fa-trash text-xl"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="4" className="text-center">
+                                    Không có danh mục nào
+                                </td>
+                            </tr>
+                        )}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            {/* Toast Container for messages */}
+            <ToastContainer />
         </>
     );
 }
 
-BlogCaterogy.defaultProps = {
+BlogCategory.defaultProps = {
     color: "light",
 };
 
-BlogCaterogy.propTypes = {
+BlogCategory.propTypes = {
     color: PropTypes.oneOf(["light", "dark"]),
 };
