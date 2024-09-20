@@ -26,6 +26,7 @@ class StoreBlogCategoryRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|string|max:255|unique:blog_categories,name',
+            'status' => 'int',
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
@@ -47,6 +48,7 @@ class StoreBlogCategoryRequest extends FormRequest
             'name.required' => 'Tên danh mục là bắt buộc.',
             'name.unique' => 'Tên danh mục đã tồn tại.',
             'name.max' => 'Tên danh mục không được vượt quá 255 ký tự.',
+            'status.int' => 'Trạng thái phải là số.',
         ];
     }
 

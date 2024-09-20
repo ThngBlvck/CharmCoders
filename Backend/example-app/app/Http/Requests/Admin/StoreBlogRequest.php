@@ -31,6 +31,7 @@ class StoreBlogRequest extends FormRequest
             'user_id' => 'required|integer|exists:users,id',
             'category_id' => 'required|integer|exists:blog_categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'int',
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
@@ -61,6 +62,10 @@ class StoreBlogRequest extends FormRequest
             'user_id.exists' => 'User ID không tồn tại.',
             'category_id.required' => 'Category ID là bắt buộc.',
             'category_id.exists' => 'Category ID không tồn tại.',
+            'image.image' => 'File tải lên phải là một hình ảnh.',
+            'image.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif.',
+            'image.max' => 'Kích thước hình ảnh vượt quá 2MB.',
+            'status.int' => 'Trạng thái phải là số'
         ];
     }
 
