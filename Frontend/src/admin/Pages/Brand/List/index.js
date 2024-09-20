@@ -7,7 +7,7 @@ import Swal from 'sweetalert2'; // Import SweetAlert2
 export default function Brand({ color }) {
     const [brands, setBrands] = useState([]);
     const navigate = useNavigate(); // Initialize useNavigate
-    const renderStatus = (status) => (status == "1" ? "Hiển thị" : "Ẩn");
+    const renderStatus = (status) => (status === "1" ? "Hiển thị" : "Ẩn");
 
     useEffect(() => {
         fetchBrands();
