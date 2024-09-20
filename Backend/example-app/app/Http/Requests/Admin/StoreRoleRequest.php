@@ -27,6 +27,7 @@ class StoreRoleRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|string|max:255|unique:roles,name',
+            'status'=> 'int',
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
@@ -47,6 +48,7 @@ class StoreRoleRequest extends FormRequest
             'name.required' => 'Vui lòng nhập vai trò.',
             'name.unique' => 'Vai trò đã tồn tại.',
             'name.max' => 'Không được vượt quá 255 ký tự.',
+            'status.int' => 'Trạng thái phải là số nguyên.'
         ];
     }
 
