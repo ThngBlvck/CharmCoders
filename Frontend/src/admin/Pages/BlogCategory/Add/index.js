@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { postBlogCategory } from "../../../../services/BlogCategory"; // Import the service
+import { postBlogCategory } from "../../../../services/BlogCategory";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { toast, ToastContainer } from 'react-toastify';
@@ -14,7 +14,7 @@ export default function AddBlogCategory({ color = "light" }) {
         reset,
     } = useForm();
 
-    const navigate = useNavigate(); // Initialize hook useNavigate
+    const navigate = useNavigate();
 
     const onSubmit = async (data) => {
         if (!data.categoryName.trim()) {
@@ -34,8 +34,8 @@ export default function AddBlogCategory({ color = "light" }) {
             });
 
             toast.success('Thêm danh mục blog thành công.');
-            reset(); // Xóa dữ liệu form sau khi thành công
-            navigate('/admin/category_blog'); // Chuyển hướng về trang danh mục blog
+            reset();
+            navigate('/admin/category_blog');
 
         } catch (err) {
             console.error('Error adding blog category:', err);
@@ -45,9 +45,7 @@ export default function AddBlogCategory({ color = "light" }) {
 
     return (
         <>
-            <div
-                className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}
-            >
+            <div className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}>
                 <div className="rounded-t mb-0 px-4 py-3 border-0">
                     <div className="flex flex-wrap items-center">
                         <div className="relative w-full px-4 max-w-full flex-grow flex-1">
@@ -59,7 +57,6 @@ export default function AddBlogCategory({ color = "light" }) {
                 </div>
                 <div className="p-4">
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        {/* Tên danh mục */}
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Tên danh mục</label>
                             <input
@@ -71,7 +68,6 @@ export default function AddBlogCategory({ color = "light" }) {
                             {errors.categoryName && <p className="text-red-500 text-xs italic">{errors.categoryName.message}</p>}
                         </div>
 
-                        {/* Trạng thái */}
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
                             <select
@@ -79,13 +75,12 @@ export default function AddBlogCategory({ color = "light" }) {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             >
                                 <option value="">Chọn trạng thái</option>
-                                <option value="active">Hoạt động</option>
-                                <option value="pending">Chờ duyệt</option>
+                                <option value="1">Hiển thị</option>
+                                <option value="2">Ẩn</option>
                             </select>
                             {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                         </div>
 
-                        {/* Nút thêm */}
                         <div className="flex items-center justify-between">
                             <button
                                 type="submit"
@@ -93,6 +88,13 @@ export default function AddBlogCategory({ color = "light" }) {
                                 disabled={isSubmitting}
                             >
                                 {isSubmitting ? "Đang thêm..." : "Thêm danh mục"}
+                            </button>
+                            <button
+                                type="button"
+                                className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                                onClick={() => navigate('/admin/category_blog')}
+                            >
+                                Hủy bỏ
                             </button>
                         </div>
                     </form>
