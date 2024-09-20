@@ -44,7 +44,8 @@ class StoreImageRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => $validator->errors()
+            'message' => 'Dữ liệu không hợp lệ.',
+            'errors' => $validator->errors()
         ], 422));
     }
 }
