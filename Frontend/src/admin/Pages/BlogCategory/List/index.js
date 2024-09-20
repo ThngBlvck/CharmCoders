@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function BlogCategory({ color }) {
     const [Blogcategories, setBlogcategories] = useState([]);
     const navigate = useNavigate(); // Initialize useNavigate
-
+    const renderStatus = (status) => (status == "1" ? "Hiển thị" : "Ẩn");
     useEffect(() => {
         fetchBlogcategories();
     }, []);
@@ -125,7 +125,7 @@ export default function BlogCategory({ color }) {
                                         {category.name}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {category.status}
+                                        {renderStatus(category.status)}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                         <button
