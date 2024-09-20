@@ -84,7 +84,7 @@ export default function ProductCategory({ color = "light" }) {
                         <NavLink to={`/admin/category_product/add`}
                                  className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                  type="button">
-                            Thêm Danh Mục Sản Phẩm
+                            Thêm Sản Phẩm
                         </NavLink>
                     </div>
                 </div>
@@ -139,7 +139,7 @@ export default function ProductCategory({ color = "light" }) {
                         </tr>
                         </thead>
                         <tbody>
-                        {categories ? (
+                        {categories.length > 0 ? (
                             categories.map((category, index) => (
                                 <tr key={category.id}>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
