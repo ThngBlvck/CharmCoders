@@ -47,6 +47,7 @@ class ImageController extends Controller
         ], 200);
     }
 
+
     public function show($id)
     {
         $image = Image::findOrFail($id);
