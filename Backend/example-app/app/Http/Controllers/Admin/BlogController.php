@@ -26,7 +26,7 @@ class BlogController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('public/images/blogs', $imageName);
-            $validatedData['image'] = 'storage/images/blogs/' . $imageName;
+            $validatedData['image'] = asset('storage/images/blogs/' . $imageName);
         }
         $blog = Blog::create($validatedData);
         return response()->json($blog, 201);
