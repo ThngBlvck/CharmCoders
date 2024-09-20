@@ -21,7 +21,7 @@ class BrandController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('public/images/brands', $imageName);
-            $validatedData['image'] = 'Backend/storage/images/brands/' . $imageName;
+            $validatedData['image'] = asset('storage/images/brands/' . $imageName);
         }
         $brand = Brand::create($validatedData);
         return response()->json($brand, 201);
@@ -55,7 +55,6 @@ class BrandController extends Controller
     public function destroy($id)
     {
         $brand = Brand::findOrFail($id);
-
         // Xóa ảnh liên kết nếu có
         if ($brand->image) {
             Storage::disk('public')->delete($brand->image);
