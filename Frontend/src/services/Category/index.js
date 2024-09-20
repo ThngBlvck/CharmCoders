@@ -1,5 +1,6 @@
 import request from '../../api';
 
+
 export const getCategory = () => {
     return request({
         method: 'GET',
