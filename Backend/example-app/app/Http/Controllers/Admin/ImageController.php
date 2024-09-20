@@ -73,7 +73,7 @@ class ImageController extends Controller
 
                 // Cập nhật thông tin ảnh trong cơ sở dữ liệu
                 $image->update([
-                    'name' => $path,  // Đường dẫn ảnh mới 
+                    'name' => $path,  // Đường dẫn ảnh mới
                 ]);
             }
         }
