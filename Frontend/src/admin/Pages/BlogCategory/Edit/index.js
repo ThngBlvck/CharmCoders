@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import Swal from 'sweetalert2';
 import { getOneBlogCategory, updateBlogCategory } from '../../../../services/BlogCategory';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 export default function BlogCategoryEdit() {
     const { id } = useParams();
@@ -27,12 +26,12 @@ export default function BlogCategoryEdit() {
                 setValue("name", result.name || '');
                 setValue("status", result.status || '');
             } else {
-                toast.error('Không tìm thấy danh mục này.');
+                Swal.fire('Error', 'Không tìm thấy danh mục này.', 'error');
                 navigate('/admin/category_blog');
             }
         } catch (err) {
             console.error('Error fetching category data:', err);
-            toast.error('Lỗi khi tải danh mục. Vui lòng thử lại.');
+            Swal.fire('Error', 'Lỗi khi tải danh mục. Vui lòng thử lại.', 'error');
             navigate('/admin/category_blog');
         }
     };
@@ -43,11 +42,11 @@ export default function BlogCategoryEdit() {
                 name: data.name,
                 status: data.status,
             });
-            toast.success('Cập nhật danh mục blog thành công.');
+            Swal.fire('Success', 'Cập nhật danh mục bài viết thành công.', 'success');
             navigate('/admin/category_blog');
         } catch (err) {
             console.error('Error updating category:', err);
-            toast.error('Lỗi khi cập nhật danh mục. Vui lòng thử lại.');
+            Swal.fire('Error', 'Lỗi khi cập nhật danh mục. Vui lòng thử lại.', 'error');
         }
         console.log('Dữ liệu gửi đi:', { name: data.name, status: data.status });
     };
@@ -87,7 +86,7 @@ export default function BlogCategoryEdit() {
                         >
                             <option value="">Chọn trạng thái</option>
                             <option value="1">Hiển thị</option>
-                            <option value="2">Ẩn</option>
+                            <option value="0">Ẩn</option>
                         </select>
                         {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                     </div>
@@ -110,8 +109,6 @@ export default function BlogCategoryEdit() {
                     </div>
                 </form>
             </div>
-
-            <ToastContainer />
         </div>
     );
 }
