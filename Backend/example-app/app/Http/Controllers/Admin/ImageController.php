@@ -33,13 +33,10 @@ class ImageController extends Controller
                 // Lưu từng ảnh vào thư mục 'public/images/products'
                 $path = $image->store('public/images/products');
 
-                // Tạo đường dẫn URL cho ảnh
-                $imageUrl = asset('storage/images/products/' . basename($path));
-
                 // Lưu thông tin ảnh vào database (bảng images)
                 Image::create([
                     'product_id' => $productId,  // Liên kết với product_id
-                    'name' => $imageUrl,  // Đường dẫn ảnh
+                    'name' => $path,  // Đường dẫn ảnh
                 ]);
             }
         }
@@ -49,7 +46,6 @@ class ImageController extends Controller
             'message' => 'Hình ảnh đã được tải lên thành công.'
         ], 200);
     }
-
 
     public function show($id)
     {
@@ -77,7 +73,7 @@ class ImageController extends Controller
 
                 // Cập nhật thông tin ảnh trong cơ sở dữ liệu
                 $image->update([
-                    'name' => $path,  // Đường dẫn ảnh mới
+                    'name' => $path,  // Đường dẫn ảnh mới 
                 ]);
             }
         }
