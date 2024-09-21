@@ -19,10 +19,11 @@ class StoreBrandRequest extends FormRequest
         $rules = [
             'name' => 'required|string|max:255|unique:brands,name',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'status' => 'int',
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
-            $id = $this->route('brand');
+            $id = $this->route('brands');
 
             $rules['name'] = [
                 'required',
@@ -44,6 +45,7 @@ class StoreBrandRequest extends FormRequest
             'name.unique' => 'Tên thương hiệu đã tồn tại.',
             'image.image' => 'Tệp tải lên phải là hình ảnh.',
             'image.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg, gif, svg.',
+            'status.integer' => 'Trạng thái phải là 0 (hiện) hoặc 1 (ẩn).',
         ];
     }
 
