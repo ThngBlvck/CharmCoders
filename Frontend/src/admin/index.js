@@ -17,6 +17,7 @@ import Comment from "./Pages/Comment";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
 import AddProductCategory from "./Pages/ProductCategory/Add";
+import EditProductCaterogy from "./Pages/ProductCategory/Edit";
 
 import AddBlogCategory from "./Pages/BlogCategory/Add";
 import EditBlogCategory from "./Pages/BlogCategory/Edit";
