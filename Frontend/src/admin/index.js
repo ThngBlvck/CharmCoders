@@ -22,6 +22,7 @@ import Role from "./Pages/Role/List";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
 import AddProductCategory from "./Pages/ProductCategory/Add";
+import EditProductCaterogy from "./Pages/ProductCategory/Edit";
 
 import AddBrand from "./Pages/Brand/Add";
 import EditBrand from "./Pages/Brand/Edit";
