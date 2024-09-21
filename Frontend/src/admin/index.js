@@ -17,6 +17,7 @@ import Comment from "./Pages/Comment";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
 import AddProductCategory from "./Pages/ProductCategory/Add";
+import EditProductCaterogy from "./Pages/ProductCategory/Edit";
 
 import AddBlogCategory from "./Pages/BlogCategory/Add";
 import EditBlogCategory from "./Pages/BlogCategory/Edit";
@@ -40,7 +41,7 @@ export default function Admin() {
 
                         <Route path="category_product" element={<ProductCategory />} />
                         <Route path="category_product/add" element={<AddProductCategory />} />
-                        {/*<Route path="category_product/edit" element={<EditProductCaterogy />} />*/}
+                        <Route path="category_product/edit/:id" element={<EditProductCaterogy />} />
 
                         <Route path="product" element={<Product />} />
                         {/*<Route path="user" element={<User />} />*/}
