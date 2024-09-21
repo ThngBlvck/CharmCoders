@@ -23,8 +23,7 @@ class StoreBrandRequest extends FormRequest
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
-            $id = $this->route('brands');
-
+            $id = $this->route('brand');
             $rules['name'] = [
                 'required',
                 'string',
@@ -53,8 +52,7 @@ class StoreBrandRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'Dữ liệu không hợp lệ.',
-            'errors' => $validator->errors()
+            'message' => $validator->errors()
         ], 422));
     }
 }

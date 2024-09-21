@@ -90,8 +90,7 @@ class StoreProductRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'Dữ liệu không hợp lệ.',
-            'errors' => $validator->errors()
+            'message' => $validator->errors()
         ], 422));
     }
 }
