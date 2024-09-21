@@ -1,6 +1,7 @@
 import React from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
+import {NavLink} from "react-router-dom";
 
 
 export default function Navbar() {
@@ -18,10 +19,10 @@ export default function Navbar() {
                         </button>
                         <div className="collapse navbar-collapse bg-light py-3" id="navbarCollapse">
                             <div className="navbar-nav mx-auto border-top">
-                                <a href="#" className="nav-item nav-link active">Trang chủ</a>
-                                <a href="#" className="nav-item nav-link">Giới thiệu</a>
-                                <a href="#" className="nav-item nav-link">Sản phẩm</a>
-                                <a href="#" className="nav-item nav-link">Liên hệ</a>
+                                <NavLink to={`/home`} className="nav-item nav-link active">Trang chủ</NavLink>
+                                <NavLink to={`/`} className="nav-item nav-link">Giới thiệu</NavLink>
+                                <NavLink to={`/`} className="nav-item nav-link">Sản phẩm</NavLink>
+                                <NavLink to={`/`} className="nav-item nav-link">Liên hệ</NavLink>
                             </div>
                             <div className="d-flex align-items-center flex-nowrap pt-xl-0">
                                 <input

@@ -1,5 +1,5 @@
 import React from "react";
-import {Routes, Route} from "react-router-dom";
+import {Routes, Route, Navigate} from "react-router-dom";
 import {CartProvider} from './components/Cart';
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
@@ -24,7 +24,7 @@ export default function Client() {
                     <Route path="/contact" element={<Contact/>}/>
                     <Route path="/products" element={<Products/>}/>
                     <Route path="/products/:id" element={<ProductDetail/>}/>
-
+                    <Route path="/" element={<Navigate to="/home" />} />
                 </Routes>
             </div>
             <Footer/>
