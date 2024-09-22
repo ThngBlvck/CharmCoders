@@ -673,3 +673,17 @@
     background: var(--bs-dark) !important;
 }
 /*** copyright end ***/
+
+
+/*form regis start*/
+
+.form-control {
+    border: 1px solid #ced4da; /* Thêm border cho input */
+    border-radius: 1px; /* Bo tròn góc */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Màu nền nút */
+    border-color: #007bff; /* Màu border nút */
+}
+/*form regis end*/
