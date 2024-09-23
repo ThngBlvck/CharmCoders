@@ -19,7 +19,7 @@ use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ImageController;
-use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Client\MailController;
 use App\Http\Controllers\Admin\UserController;
@@ -49,6 +49,8 @@ Route::apiResource('productCategory', CategoryController::class);
     Route::apiResource('cart', CartController::class);
     Route::apiResource('user', UserController::class);
 });
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'Register']);
 
 Route::prefix('client')->group(function () {
     Route::get('/products/search', [ClientProductController::class, 'search']);//http://localhost:8000/api/client/products/search?query=teneanpham
@@ -58,6 +60,6 @@ Route::prefix('client')->group(function () {
 
 });
 
-});
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
