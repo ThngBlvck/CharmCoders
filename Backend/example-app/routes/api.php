@@ -8,12 +8,24 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ImageController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Client\ProductController as ClientProductController;
 
 Route::prefix('admin')->group(function () {
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('blog', BlogController::class);
     Route::apiResource('blogcategory', BlogCategoryController::class);
-    Route::apiResource('productCategory', CategoryController::class);
-    Route::apiResource('role', RoleController::class);
-    Route::apiResource('comment', CommentController::class);
+    Route::apiResource('blog', BlogController::class);
+
+
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('products', ProductController::class);
+    Route::apiResource('image', ImageController::class);
+    Route::apiResource('orders', OrderController::class);
+});
+
+Route::prefix('client')->group(function () {
+    Route::get('/products/search', [ClientProductController::class, 'search']);
 });
