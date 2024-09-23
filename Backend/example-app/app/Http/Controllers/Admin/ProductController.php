@@ -36,6 +36,8 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::findOrFail($id);
+        $product->views = $product->views + 1;
+        $product->save();
         return response()->json($product);
     }
 
