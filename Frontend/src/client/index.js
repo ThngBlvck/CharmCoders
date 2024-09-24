@@ -2,7 +2,6 @@ import React from "react";
 import {Routes, Route} from "react-router-dom";
 import {CartProvider} from './components/Cart';
 import Footer from "./components/Footer";
-import Navbar from "./components/Navbar";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Contact from "./Pages/Contact";
@@ -15,7 +14,6 @@ export default function Client() {
     return (
         <CartProvider>
             <Header/>
-            <Navbar/>
             <div className="container my-4">
 
                 <Routes>
