@@ -1,11 +1,11 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { postBlogCategory } from "../../../../services/BlogCategory";
+import { postRole } from "../../../../services/Role"; // Assuming you have a service for Role
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Swal from 'sweetalert2';
 
-export default function AddBlogCategory({ color = "light" }) {
+export default function AddRole({ color = "light" }) {
     const {
         register,
         handleSubmit,
@@ -15,8 +15,8 @@ export default function AddBlogCategory({ color = "light" }) {
     const navigate = useNavigate();
 
     const onSubmit = async (data) => {
-        if (!data.categoryName.trim()) {
-            Swal.fire('Error', 'Tên danh mục không được bỏ trống.', 'error');
+        if (!data.roleName.trim()) {
+            Swal.fire('Error', 'Tên vai trò không được bỏ trống.', 'error');
             return;
         }
 
@@ -26,18 +26,17 @@ export default function AddBlogCategory({ color = "light" }) {
         }
 
         try {
-            await postBlogCategory({
-                name: data.categoryName,
+            await postRole({
+                name: data.roleName,
                 status: data.status,
             });
 
-            // Success alert with SweetAlert2
-            Swal.fire('Thành công!', 'Thêm danh mục blog thành công.', 'success');
+            Swal.fire('Thành công!', 'Thêm vai trò thành công.', 'success');
             reset();
-            navigate('/admin/category_blog');
+            navigate('/admin/role_management');
         } catch (err) {
-            console.error('Error adding blog category:', err);
-            Swal.fire('Lỗi', 'Lỗi khi thêm danh mục blog. Vui lòng thử lại.', 'error');
+            console.error('Error adding role:', err);
+            Swal.fire('Lỗi', 'Lỗi khi thêm vai trò. Vui lòng thử lại.', 'error');
         }
     };
 
@@ -47,23 +46,23 @@ export default function AddBlogCategory({ color = "light" }) {
                 <div className="flex flex-wrap items-center">
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
                         <h3 className={`font-semibold text-lg ${color === "light" ? "text-blueGray-700" : "text-white"}`}>
-                            THÊM DANH MỤC BÀI VIẾT
+                            THÊM VAI TRÒ
                         </h3>
                     </div>
                 </div>
             </div>
             <div className="p-4">
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    {/* Tên danh mục */}
+                    {/* Tên vai trò */}
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Tên danh mục</label>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Tên vai trò</label>
                         <input
                             type="text"
-                            {...register("categoryName", { required: "Tên danh mục là bắt buộc" })}
+                            {...register("roleName", { required: "Tên vai trò là bắt buộc" })}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            placeholder="Nhập tên danh mục"
+                            placeholder="Nhập tên vai trò"
                         />
-                        {errors.categoryName && <p className="text-red-500 text-xs italic">{errors.categoryName.message}</p>}
+                        {errors.roleName && <p className="text-red-500 text-xs italic">{errors.roleName.message}</p>}
                     </div>
 
                     {/* Trạng thái */}
@@ -74,8 +73,8 @@ export default function AddBlogCategory({ color = "light" }) {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         >
                             <option value="">Chọn trạng thái</option>
-                            <option value="1">Hiển thị</option>
-                            <option value="0">Ẩn</option>
+                            <option value="1">Hoạt động</option>
+                            <option value="0">Vô hiệu hóa</option>
                         </select>
                         {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                     </div>
@@ -87,12 +86,12 @@ export default function AddBlogCategory({ color = "light" }) {
                             className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? "Đang thêm..." : "Thêm danh mục"}
+                            {isSubmitting ? "Đang thêm..." : "Thêm vai trò"}
                         </button>
                         <button
                             type="button"
                             className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-                            onClick={() => navigate('/admin/category_blog')}
+                            onClick={() => navigate('/admin/role')}
                         >
                             Hủy bỏ
                         </button>
@@ -103,6 +102,6 @@ export default function AddBlogCategory({ color = "light" }) {
     );
 }
 
-AddBlogCategory.propTypes = {
+AddRole.propTypes = {
     color: PropTypes.oneOf(["light", "dark"]),
 };
