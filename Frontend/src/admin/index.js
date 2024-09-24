@@ -55,6 +55,9 @@ export default function Admin() {
                         {/*<Route path="brand" element={<Brand />}/>*/}
                         <Route path="comment" element={<Comment />}/>
                         <Route path="order" element={<Order />}/>
+                        <Route path="role" element={<Role />}/>
+                        <Route path="role/add" element={<AddRole />}/>
+                        <Route path="role/edit/:id" element={<EditRole />}/>
                         <Route path="/" element={<Navigate to="/admin/dashboard" />} />
                     </Routes>
                     <Footer />
