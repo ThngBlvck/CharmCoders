@@ -27,14 +27,14 @@ export default function Checkout() {
             name: "Sản phẩm 1",
             price: 100000,
             quantity: 2,
-            image: "link_to_image_1.jpg",
+            image: "https://via.placeholder.com/100",
         },
         {
             id: 2,
             name: "Sản phẩm 2",
             price: 200000,
             quantity: 1,
-            image: "link_to_image_2.jpg",
+            image: "https://via.placeholder.com/100",
         },
     ];
 
@@ -47,29 +47,29 @@ export default function Checkout() {
             <div className="row">
                 {/* Hiển thị sản phẩm */}
                 <div className="col-md-6">
-                    <h2 className="mb-4">Sản phẩm của bạn</h2>
+                    <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Sản phẩm của bạn</p>
                     <div className="list-group">
                         {products.map(item => (
                             <div key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
                                     <img src={item.image} alt={item.name} className="img-thumbnail me-3" style={{ width: "100px", height: "100px" }} />
                                     <div>
-                                        <h5>{item.name}</h5>
-                                        <p className="mb-0">{item.price.toLocaleString("vi-VN")} VND x {item.quantity}</p>
+                                        <p style={{color: "#8c5e58"}}>{item.name}</p>
+                                        <p className="mb-0" style={{color: "#8c5e58"}}>{item.price.toLocaleString("vi-VN")} VND x {item.quantity}</p>
                                     </div>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <h4 className="mt-4">Tổng: {calculateTotal().toLocaleString("vi-VN")} VND</h4>
+                    <p className="mt-4 font-semibold" style={{color: "#8c5e58"}}>Tổng: {calculateTotal().toLocaleString("vi-VN")} VND</p>
                 </div>
 
                 {/* Form thông tin người dùng */}
                 <div className="col-md-6">
-                    <h2 className="mb-4">Thông tin thanh toán</h2>
+                    <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin thanh toán</p>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <label className="form-label">Họ và Tên</label>
+                            <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Họ và Tên</label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -80,7 +80,7 @@ export default function Checkout() {
                             />
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Email</label>
+                            <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Email</label>
                             <input
                                 type="email"
                                 className="form-control"
@@ -91,7 +91,7 @@ export default function Checkout() {
                             />
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Địa chỉ</label>
+                            <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Địa chỉ</label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -102,7 +102,7 @@ export default function Checkout() {
                             />
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Số điện thoại</label>
+                            <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Số điện thoại</label>
                             <input
                                 type="number"
                                 className="form-control"
@@ -114,8 +114,8 @@ export default function Checkout() {
                         </div>
 
                         {/* Phương thức thanh toán với icon */}
-                        <div className="mb-3">
-                            <label className="form-label">Phương thức thanh toán</label>
+                        <div className="mb-4">
+                            <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Phương thức thanh toán</label>
                             <div className="d-flex">
                                 <div className="form-check me-3">
                                     <input
@@ -126,7 +126,7 @@ export default function Checkout() {
                                         checked={formData.paymentMethod === "creditCard"}
                                         onChange={handleChange}
                                     />
-                                    <label className="form-check-label">
+                                    <label className="form-check-label" style={{color: "#8c5e58"}}>
                                         <i className="fas fa-credit-card fa-2x"></i> Thẻ tín dụng
                                     </label>
                                 </div>
@@ -140,7 +140,7 @@ export default function Checkout() {
                                         checked={formData.paymentMethod === "momo"}
                                         onChange={handleChange}
                                     />
-                                    <label className="form-check-label">
+                                    <label className="form-check-label" style={{color: "#8c5e58"}}>
                                         <i className="fab fa-gg-circle fa-2x"></i> Momo
                                     </label>
                                 </div>
@@ -153,7 +153,7 @@ export default function Checkout() {
                                         checked={formData.paymentMethod === "cashOnDelivery"}
                                         onChange={handleChange}
                                     />
-                                    <label className="form-check-label">
+                                    <label className="form-check-label" style={{color: "#8c5e58"}}>
                                         <i className="fas fa-money-bill fa-2x"></i> Thanh toán khi nhận hàng
                                     </label>
                                 </div>
@@ -166,14 +166,20 @@ export default function Checkout() {
                                         checked={formData.paymentMethod === "vnPay"}
                                         onChange={handleChange}
                                     />
-                                    <label className="form-check-label">
+                                    <label className="form-check-label" style={{color: "#8c5e58"}}>
                                         <i className="fab fa-cc-visa fa-2x"></i> VNPay
                                     </label>
                                 </div>
                             </div>
                         </div>
-
-                        <button type="submit" className="btn btn-primary">Xác nhận thanh toán</button>
+                        <div className="text-center">
+                            <button type="submit" className="btn btn-primary font-bold text-center" style={{
+                                padding: '14px',
+                                fontSize: '13px',
+                                color: '#442e2b'
+                            }}>Xác nhận thanh toán
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
