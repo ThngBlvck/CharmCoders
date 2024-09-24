@@ -1,6 +1,7 @@
 import React from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
+import {NavLink} from "react-router-dom";
 
 
 export default function Home() {
@@ -18,41 +19,46 @@ export default function Home() {
 
     return (
         <>
-            <div className="container-fluid services py-5">
+            <div className="container-fluid services py-1 d-flex">
                 <div className="container py-5">
                     <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
                         <p className="fs-4 text-uppercase text-center text-primary">Glow Makers</p>
-                        <h1 className="display-3">Các sản phẩm mới nhất</h1>
+                        <p className="display-3" style={{color: '#8c5e58'}}>Các sản phẩm mới nhất</p>
                     </div>
                     <div className="row g-4">
                         <div className="row">
                             {products.map((product) => (
-                                <div key={product.id} className="col-md-6 col-lg-3 mb-4">
+                                <div key={product.id} className="col-md-6 col-lg-3 mb-3">
                                     <div className="card text-center" style={{borderRadius: '15px', padding: '20px'}}>
-                                        <img
-                                            src="https://via.placeholder.com/300"
-                                            className="card-img-top img-fluid rounded"
-                                            alt="Product"
-                                            style={{maxHeight: '200px', objectFit: 'cover'}}
-                                        />
+                                        <NavLink to={`/products/:id`}>
+                                            <img
+                                                src="https://via.placeholder.com/500"
+                                                className="card-img-top img-fluid rounded"
+                                                alt="Product"
+                                                style={{maxHeight: '500px', objectFit: 'cover'}}
+                                            />
+                                        </NavLink>
                                         <div className="card-body">
-                                            <h3 className="card-title">{product.name}</h3>
-                                            <p className="card-text">{product.price}đ</p>
-                                            <div className="d-flex justify-content-between">
-                                                <button className="btn btn-primary">Mua ngay</button>
-                                                <button className="btn btn-secondary">Thêm vào giỏ</button>
-                                            </div>
+                                            <NavLink to={`/products/:id`}><p className="card-title font-semibold"
+                                                                             style={{color: '#8c5e58'}}>{product.name}</p>
+                                            </NavLink>
+                                            <p className="card-text mb-4 font-semibold"
+                                               style={{color: '#8c5e58'}}>{product.price}đ</p>
+
+                                            <NavLink to={`/products/:id`} className="w-100">
+                                                <button className="btn btn-primary mr-2 font-bold w-100" style={{
+                                                    padding: '14px',
+                                                    fontSize: '13px',
+                                                    color: '#442e2b'
+                                                }}><p>Xem chi tiết</p></button>
+                                            </NavLink>
+
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <div className="col-12">
-                            <div className="services-btn text-center">
-                                <a href="#" className="btn btn-primary btn-primary-outline-0 rounded-pill py-3 px-5">Service
-                                    More</a>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -70,11 +76,7 @@ export default function Home() {
                                     <img src="https://via.placeholder.com/200x150" className="img-fluid rounded"
                                          alt="Extra Image"/>
                                 </div>
-                                <button type="button" className="btn btn-play" data-bs-toggle="modal"
-                                        data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                        data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
+
                             </div>
                         </div>
 
@@ -82,18 +84,21 @@ export default function Home() {
                         <div className="col-lg-7">
                             <div>
                                 <p className="fs-4 text-uppercase text-primary">About Us</p>
-                                <h1 className="display-4 mb-4">Your Best Spa, Beauty & Skin Care Center</h1>
-                                <p className="mb-4">
+                                <p className="display-4 mb-4" style={{color: '#8c5e58'}}>Your Best Spa, Beauty & Skin
+                                    Care
+                                    Center</p>
+                                <p className="mb-4" style={{color: '#8c5e58'}}>
                                     Lorem Ipsum is simply dummy text of the printing and typesetting industry.
                                     Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
                                 </p>
-                                <p className="mb-4">
+                                <p className="mb-4" style={{color: '#8c5e58'}}>
                                     Lorem Ipsum is simply dummy text of the printing and typesetting industry.
                                     Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
                                 </p>
-                                <a href="#" className="btn btn-primary btn-primary-outline-0 rounded-pill py-3 px-5">
-                                    Explore More
-                                </a>
+                                <NavLink to={`/about`}
+                                         className="btn btn-primary btn-primary-outline-0 rounded-pill py-3 px-5">
+                                    Xem thêm
+                                </NavLink>
                             </div>
                         </div>
                     </div>
@@ -101,92 +106,115 @@ export default function Home() {
             </div>
 
             {/* 4 ô cam kết */}
-            <div className="container py-5">
+            <div className="container py-2 d-flex justify-content-center" style={{fontFamily: 'Roboto, sans-serif'}}>
+                {/* Container for Cam kết */}
                 <div className="row text-center">
                     {/* Cam kết 1 */}
-                    <div className="col-md-3">
-                        <div className="p-4">
-                            <img src="/mnt/data/image.png" alt="Thanh toán khi nhận hàng" className="img-fluid mb-3"
-                                 style={{width: '80px'}}/>
-                            <h5>Thanh toán khi nhận hàng</h5>
+                    <div className="col-3 d-flex justify-content-center">
+                        <div className="p-4 d-flex flex-column align-items-center" style={{
+                            backgroundColor: 'white'
+                        }}>
+                            <img src="https://via.placeholder.com/150x150" alt="Thanh toán khi nhận hàng"
+                                 className="img-fluid mb-3"
+                                 style={{width: '150px', objectFit: 'cover'}}/>
+                            <p style={{color: '#8c5e58'}} className="font-bold">Thanh toán khi nhận hàng</p>
                         </div>
                     </div>
 
                     {/* Cam kết 2 */}
-                    <div className="col-md-3">
-                        <div className="p-4">
-                            <img src="/mnt/data/image.png" alt="Giao nhanh miễn phí 2H" className="img-fluid mb-3"
-                                 style={{width: '80px'}}/>
-                            <h5>Giao nhanh miễn phí 2H</h5>
+                    <div className="col-3 d-flex justify-content-center">
+                        <div className="p-4 d-flex flex-column align-items-center" style={{
+                            backgroundColor: 'white'
+                        }}>
+                            <img src="https://via.placeholder.com/150x150" alt="Giao nhanh miễn phí 2H"
+                                 className="img-fluid mb-3"
+                                 style={{width: '150px', objectFit: 'cover'}}/>
+                            <p style={{color: '#8c5e58'}} className="font-bold">Giao nhanh miễn phí 2H</p>
                         </div>
                     </div>
 
                     {/* Cam kết 3 */}
-                    <div className="col-md-3">
-                        <div className="p-4">
-                            <img src="/mnt/data/image.png" alt="30 ngày đổi trả miễn phí" className="img-fluid mb-3"
-                                 style={{width: '80px'}}/>
-                            <h5>30 ngày đổi trả miễn phí</h5>
+                    <div className="col-3 d-flex justify-content-center">
+                        <div className="p-4 d-flex flex-column align-items-center" style={{
+                            backgroundColor: 'white'
+                        }}>
+                            <img src="https://via.placeholder.com/150x150" alt="30 ngày đổi trả miễn phí"
+                                 className="img-fluid mb-3"
+                                 style={{width: '150px', objectFit: 'cover'}}/>
+                            <p style={{color: '#8c5e58'}} className="font-bold">30 ngày đổi trả miễn phí</p>
                         </div>
                     </div>
 
-                    {/* Cam kết 4 - Tư vấn 24/7 */}
-                    <div className="col-md-3">
-                        <div className="p-4">
-                            <img src="https://via.placeholder.com/80" alt="Tư vấn 24/7" className="img-fluid mb-3"
-                                 style={{width: '80px'}}/>
-                            <h5>Tư vấn 24/7</h5>
+                    {/* Cam kết 4 */}
+                    <div className="col-3 d-flex justify-content-center">
+                        <div className="p-4 d-flex flex-column align-items-center" style={{
+                            backgroundColor: 'white'
+                        }}>
+                            <img src="https://via.placeholder.com/150x150" alt="Tư vấn 24/7" className="img-fluid mb-3"
+                                 style={{width: '150px', objectFit: 'cover'}}/>
+                            <p style={{color: '#8c5e58'}} className="font-bold">Tư vấn 24/7</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="container-fluid py-5">
+            <div className="mx-auto text-center" style={{maxWidth: "800px", marginTop: '100px'}}>
+                <p className="fs-4 text-uppercase text-center text-primary">Glow Makers</p>
+                <p className="display-3" style={{color: '#8c5e58'}}>Liên hệ</p>
+            </div>
+            <div className="container-fluid">
                 <div className="container py-5">
                     <div className="row g-4 align-items-center">
                         <div className="col-12">
                             <div className="row g-4">
-                                <div className="col-lg-4">
-                                    <div className="d-inline-flex bg-light w-100 border border-primary p-4 rounded">
-                                        <i className="fas fa-map-marker-alt fa-2x text-primary me-4"></i>
+                                {/* Ô Địa chỉ */}
+                                <div className="col-md-4 d-flex justify-content-center">
+                                    <div
+                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-primary p-4 rounded"
+                                        style={{minHeight: "200px"}}>
+                                        <i className="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
                                         <div>
-                                            <h4>Địa chỉ</h4>
-                                            <p className="mb-0">Toà nhà FPT Polytechnic, Đ. Số 22, Thường Thạnh, Cái
-                                                Răng, Cần Thơ</p>
+                                            <p className="text-center mb-3" style={{color: '#8c5e58'}}>Địa chỉ</p>
+                                            <p className="mb-0 text-center" style={{color: '#8c5e58'}}>Toà nhà FPT
+                                                Polytechnic, Đ. Số 22, Thường
+                                                Thạnh, Cái Răng, Cần Thơ</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-lg-4">
-                                    <div className="d-inline-flex bg-light w-100 border border-primary p-4 rounded">
-                                        <i className="fas fa-envelope fa-2x text-primary me-4"></i>
+
+                                {/* Ô Email */}
+                                <div className="col-md-4 d-flex justify-content-center">
+                                    <div
+                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-primary p-4 rounded"
+                                        style={{minHeight: "200px"}}>
+                                        <i className="fas fa-envelope fa-2x text-primary mb-3"></i>
                                         <div>
-                                            <h4>Email</h4>
-                                            <p className="mb-0">glowmakers@gmail.com</p>
+                                            <p className="text-center mb-3" style={{color: '#8c5e58'}}>Email</p>
+                                            <p className="mb-0 text-center"
+                                               style={{color: '#8c5e58'}}>glowmakers@gmail.com</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-lg-4">
-                                    <div className="d-inline-flex bg-light w-100 border border-primary p-4 rounded">
-                                        <i className="fa fa-phone-alt fa-2x text-primary me-4"></i>
+
+                                {/* Ô Số điện thoại */}
+                                <div className="col-md-4 d-flex justify-content-center">
+                                    <div
+                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-primary p-4 rounded"
+                                        style={{minHeight: "200px"}}>
+                                        <i className="fa fa-phone-alt fa-2x text-primary mb-3"></i>
                                         <div>
-                                            <h4>Số điện thoại</h4>
-                                            <p className="mb-0">(+012) 3456 7890 123</p>
+                                            <p className="text-center mb-3" style={{color: '#8c5e58'}}>Số điện thoại</p>
+                                            <p className="mb-0 text-center" style={{color: '#8c5e58'}}>(+012) 3456 7890
+                                                123</p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="col-12">
-                            <div className="rounded">
-                                <iframe className="rounded-top w-100"
-                                        style={{height: "450px", marginBottom: "-6px"}}
-                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31579.19291850749!2d105.76173499999999!3d10.0068791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31a0880a872e399f%3A0x6e15bcb1047b66c7!2sFPT%20Polytechnic%2C%20%C4%90.%20S%E1%BB%91%2022%2C%20Th%C6%B0%E1%BB%9Dng%20Th%E1%BA%A1nh%2C%20C%C3%A1i%20R%C4%83ng%2C%20C%E1%BA%A7n%20Th%C6%A1!5e0!3m2!1sen!2sbd!4v1694262704123!5m2!1sen!2sbd"
-                                        loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
 
         </>
     );
