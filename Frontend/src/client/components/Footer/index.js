@@ -6,13 +6,13 @@ import "../../../assets/styles/css/bootstrap.min.css";
 export default function Footer() {
     return (
         <>
-            <footer className="container-fluid footer py-5">
+            <footer className="container-fluid footer py-5" style={{backgroundColor: '#fff7f8'}}>
                 <div className="container py-5">
                     <div className="row g-5">
                         <div className="col-md-6 col-lg-6 col-xl-3">
                             <div className="footer-item">
-                                <h4 className="mb-4 text-white">Bản tin</h4>
-                                <p className="text-white">
+                                <p className="mb-2 font-bold title" style={{fontSize: '20px', color: '#8c5e58'}}>Bản tin</p>
+                                <p style={{color: '#8c5e58'}}>
                                     Mỹ phẩm là các sản phẩm dùng để làm đẹp và chăm sóc cơ thể, bao gồm kem dưỡng, son
                                     môi, phấn nền và nước hoa. Chúng giúp nâng cao vẻ đẹp tự nhiên và che khuyết điểm,
                                     đồng thời ngày càng chú trọng đến an toàn và thành phần tự nhiên, đáp ứng nhu cầu
@@ -22,90 +22,54 @@ export default function Footer() {
                         </div>
                         <div className="col-md-6 col-lg-6 col-xl-3">
                             <div className="footer-item d-flex flex-column">
-                                <h4 className="mb-4 text-white">Danh mục sản phẩm</h4>
-                                <a href="">
-                                    <i className="fas fa-angle-right me-2"></i> Nước Tẩy Trang
-                                </a>
-                                <a href="">
-                                    <i className="fas fa-angle-right me-2"></i> Sữa rửa mặt
-                                </a>
-                                <a href="">
-                                    <i className="fas fa-angle-right me-2"></i> Kem chống nắng
-                                </a>
-                                <a href="">
-                                    <i className="fas fa-angle-right me-2"></i> Kem dưỡng
-                                </a>
-                                <a href="">
-                                    <i className="fas fa-angle-right me-2"></i> Xịt khoáng
-                                </a>
-                                <a href="">
-                                    <i className="fas fa-angle-right me-2"></i> Tẩy da chết
-                                </a>
-                                <a href="">
-                                    <i className="fas fa-angle-right me-2"></i> Son dưỡng
-                                </a>
+                                <p className="mb-2 font-bold title" style={{fontSize: '20px', color: '#8c5e58'}}>Danh mục sản
+                                    phẩm</p>
+                                <a href="" style={{color: '#8c5e58'}}><i className="fas fa-angle-right me-2" style={{color: '#8c5e58'}}></i> Nước Tẩy Trang</a>
+                                <a href="" style={{color: '#8c5e58'}}><i className="fas fa-angle-right me-2" style={{color: '#8c5e58'}}></i> Sữa rửa mặt</a>
+                                <a href="" style={{color: '#8c5e58'}}><i className="fas fa-angle-right me-2" style={{color: '#8c5e58'}}></i> Kem chống nắng</a>
+                                <a href="" style={{color: '#8c5e58'}}><i className="fas fa-angle-right me-2" style={{color: '#8c5e58'}}></i> Kem dưỡng</a>
+                                <a href="" style={{color: '#8c5e58'}}><i className="fas fa-angle-right me-2" style={{color: '#8c5e58'}}></i> Xịt khoáng</a>
+                                <a href="" style={{color: '#8c5e58'}}><i className="fas fa-angle-right me-2" style={{color: '#8c5e58'}}></i> Tẩy da chết</a>
+                                <a href="" style={{color: '#8c5e58'}}><i className="fas fa-angle-right me-2" style={{color: '#8c5e58'}}></i> Son dưỡng</a>
                             </div>
                         </div>
                         <div className="col-md-6 col-lg-6 col-xl-3">
                             <div className="footer-item d-flex flex-column">
-                                <h4 className="mb-4 text-white">Giờ mở cửa</h4>
-                                <p className="text-muted mb-0">
-                                    Hằng ngày: <span className="text-white"> 08:00 am – 10:00 pm</span>
+                                <p className="mb-2 font-bold title" style={{fontSize: '20px', color: '#8c5e58'}}>Giờ mở cửa</p>
+                                <p className="text-muted mb-4" style={{color: '#8c5e58'}}>Hằng ngày: <span style={{color: '#8c5e58'}}>08:00 am – 10:00 pm</span>
                                 </p>
-                                <h4 className="my-4 text-white">Địa chỉ</h4>
-                                <p className="mb-0">
-                                    <i className="fas fa-map-marker-alt text-secondary me-2"></i> Toà nhà FPT
-                                    Polytechnic, Đ. Số 22, Thường Thạnh, Cái Răng, Cần Thơ
-                                </p>
+                                <p className="mb-2 font-bold title" style={{fontSize: '20px', color: '#8c5e58'}}>Địa chỉ</p>
+                                <p className="mb-0" style={{color: '#8c5e58'}}><i className="fas fa-map-marker-alt me-2" style={{color: '#ff7e6b'}}></i> Toà
+                                    nhà FPT Polytechnic, Đ. Số 22, Thường Thạnh, Cái Răng, Cần Thơ</p>
                             </div>
                         </div>
                         <div className="col-md-6 col-lg-6 col-xl-3">
                             <div className="footer-item d-flex flex-column">
-                                <h4 className="my-4 text-white">Liên hệ chúng tôi</h4>
-                                <p className="mb-0">
-                                    <i className="fas fa-envelope text-secondary me-2"></i> glowmakers@gmail.com
-                                </p>
-                                <p className="mb-0">
-                                    <i className="fas fa-phone text-secondary me-2"></i> (+012) 3456 7890 123
-                                </p>
+                                <p className="mb-2 font-bold title" style={{fontSize: '20px', color: '#8c5e58'}}>Liên hệ chúng
+                                    tôi</p>
+                                <p className="mb-0" style={{color: '#8c5e58'}}><i
+                                    className="fas fa-envelope me-2" style={{color: '#ff7e6b'}}></i> glowmakers@gmail.com</p>
+                                <p className="mb-0" style={{color: '#8c5e58'}}><i className="fas fa-phone me-2" style={{color: '#ff7e6b'}}></i> (+012) 3456
+                                    7890 123</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </footer>
 
-            <div className="container-fluid copyright py-4">
+            <div className="container-fluid copyright py-4" style={{backgroundColor: '#8c5e58'}}>
                 <div className="container">
-                    <div className="row g-4 align-items-center">
-                        <div className="col-md-4 text-center text-md-start mb-md-0">
-              <span className="text-light">
-                <a href="#">
-                  <i className="fas fa-copyright text-light me-2"></i>Glow Makers
-                </a>
-                , All right reserved.
-              </span>
+                    <div className="row g-4 align-items-center d-flex">
+                        <div className="col-md-6 text-center text-md-start mb-md-0">
+                          <span style={{color: '#fff7f8'}}>
+                            <a href="#" style={{color: '#fff7f8'}}>
+                              <i className="fas fa-copyright me-2"  style={{color: '#ff7e6b'}}></i>Glow Makers
+                            </a>
+                            , All right reserved.
+                          </span>
                         </div>
-                        <div className="col-md-4">
-                            <div className="d-flex justify-content-center">
-                                <a href=""
-                                   className="btn btn-light btn-light-outline-0 btn-sm-square rounded-circle me-2">
-                                    <i className="fab fa-facebook-f"></i>
-                                </a>
-                                <a href=""
-                                   className="btn btn-light btn-light-outline-0 btn-sm-square rounded-circle me-2">
-                                    <i className="fab fa-twitter"></i>
-                                </a>
-                                <a href=""
-                                   className="btn btn-light btn-light-outline-0 btn-sm-square rounded-circle me-2">
-                                    <i className="fab fa-instagram"></i>
-                                </a>
-                                <a href=""
-                                   className="btn btn-light btn-light-outline-0 btn-sm-square rounded-circle me-0">
-                                    <i className="fab fa-linkedin-in"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div className="col-md-4 text-center text-md-end text-white">
+
+                        <div className="col-md-6 text-center text-md-end"  style={{color: '#fff7f8'}}>
                             Designed By <a className="border-bottom" href="#">Glow Makers</a>
                         </div>
                     </div>
