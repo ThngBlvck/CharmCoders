@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
+import {NavLink} from "react-router-dom";
 
 export default function Profile() {
     // State quản lý thông tin người dùng
@@ -16,7 +17,7 @@ export default function Profile() {
 
     // Hàm để cập nhật thông tin người dùng
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setUser((prevUser) => ({
             ...prevUser,
             [name]: value,
@@ -30,12 +31,14 @@ export default function Profile() {
 
     return (
         <>
-            <div className="container-fluid bg-breadcrumb py-5">
+            <div className="container-fluid py-3" style={{backgroundColor: "#fff7f8"}}>
                 <div className="container text-center py-5">
-                    <h1 className="text-white display-3 mb-4">Hồ sơ người dùng</h1>
+                    <p className="display-3 mb-4" style={{color: "#ffa69e"}}>Hồ sơ người dùng</p>
                     <ol className="breadcrumb justify-content-center mb-0">
-                        <li className="breadcrumb-item"><a href="#">Trang chủ</a></li>
-                        <li className="breadcrumb-item active text-white">Hồ sơ</li>
+                        <li className="breadcrumb-item font-bold" style={{color: "#ffa69e"}}><NavLink to={`/home`}>Trang
+                            chủ</NavLink></li>
+                        <li className="breadcrumb-item active font-bold" style={{color: "#ffa69e"}}>Hồ sơ người dùng
+                        </li>
                     </ol>
                 </div>
             </div>
@@ -43,22 +46,29 @@ export default function Profile() {
             <div className="container py-5">
                 <div className="row g-4 align-items-center">
                     <div className="col-lg-4 text-center">
-                        <img
-                            src="https://iparty.vn/wp-content/uploads/2022/08/anh-profile-150x150.jpg"
-                            alt="User Avatar"
-                            className="img-fluid rounded-circle mb-3"
-                        />
-                        <h3>{user.name}</h3>
-                        <button className="btn btn-primary mt-3" onClick={toggleEdit}>
-                            {isEditing ? "Hủy bỏ" : "Chỉnh sửa hồ sơ"}
-                        </button>
+                        <div className="d-flex justify-center">
+                            <img
+                                src="https://via.placeholder.com/300"
+                                alt="User Avatar"
+                                className="img-fluid rounded-circle mb-3"
+                                style={{maxHeight: '300px', objectFit: 'cover'}}
+                            />
+                        </div>
+                        <div className="text-center">
+                            <p style={{color: "#8c5e58"}} className="font-semibold">{user.name}</p>
+                            <button className="btn btn-primary mt-3 font-semibold" onClick={toggleEdit} style={{color: '#442e2b'}}>
+                                {isEditing ? "Hủy bỏ" : "Chỉnh sửa hồ sơ"}
+                            </button>
+                        </div>
                     </div>
                     <div className="col-lg-8">
                         <div className="p-4 bg-light border rounded">
-                            <h4 className="mb-4">Thông tin cá nhân</h4>
+                            <p className="font-bold mb-4" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin cá
+                                nhân</p>
                             <form>
-                                <div className="form-group mb-3">
-                                    <label>Tên:</label>
+                                <div className="form-group mb-4">
+                                    <label style={{color: "#8c5e58", fontSize: "20px"}}
+                                           className="font-semibold mb-2">Tên:</label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -68,8 +78,9 @@ export default function Profile() {
                                         disabled={!isEditing}
                                     />
                                 </div>
-                                <div className="form-group mb-3">
-                                    <label>Email:</label>
+                                <div className="form-group mb-4">
+                                    <label style={{color: "#8c5e58", fontSize: "20px"}}
+                                           className="font-semibold mb-2">Email:</label>
                                     <input
                                         type="email"
                                         className="form-control"
@@ -79,8 +90,9 @@ export default function Profile() {
                                         disabled={!isEditing}
                                     />
                                 </div>
-                                <div className="form-group mb-3">
-                                    <label>Số điện thoại:</label>
+                                <div className="form-group mb-4">
+                                    <label style={{color: "#8c5e58", fontSize: "20px"}}
+                                           className="font-semibold mb-2">Số điện thoại:</label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -90,8 +102,9 @@ export default function Profile() {
                                         disabled={!isEditing}
                                     />
                                 </div>
-                                <div className="form-group mb-3">
-                                    <label>Địa chỉ:</label>
+                                <div className="form-group mb-4">
+                                    <label style={{color: "#8c5e58", fontSize: "20px"}}
+                                           className="font-semibold mb-2">Địa chỉ:</label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -102,7 +115,7 @@ export default function Profile() {
                                     />
                                 </div>
                                 {isEditing && (
-                                    <button className="btn btn-success w-100 mt-3" type="submit">
+                                    <button className="btn btn-primary w-100 mt-3 font-bold" type="submit" style={{color: '#442e2b', fontSize: "20px"}}>
                                         Lưu thay đổi
                                     </button>
                                 )}
