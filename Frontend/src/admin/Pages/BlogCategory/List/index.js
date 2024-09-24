@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 export default function BlogCategory({ color }) {
     const [Blogcategories, setBlogcategories] = useState([]);
     const navigate = useNavigate();
-    const renderStatus = (status) => (status === "1" ? "Hiển thị" : "Ẩn");
+    const renderStatus = (status) => (status == "1" ? "Hiển thị" : "Ẩn");
 
     useEffect(() => {
         fetchBlogcategories();
