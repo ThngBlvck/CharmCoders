@@ -92,7 +92,7 @@
 
 .topbar {
     padding: 10px 0;
-    background: var(--bs-secondary) !important;
+    background: #fff7f8;
 }
 
 /*** Topbar End ***/
@@ -114,7 +114,7 @@
 .navbar .dropdown-toggle::after {
     border: none;
     content: "\f107";
-    font-family: "Font Awesome 5 Free";
+    font-family: "Roboto";
     font-weight: 700;
     vertical-align: middle;
     margin-left: 8px;
@@ -400,7 +400,7 @@
 .counter-section .counter-item .counter-content {
     position: relative;
     margin-bottom: 60px;
-    background-image: linear-gradient(rgba(252, 152, 195, 0.3), rgba(255, 255, 255, 0.3), rgba(136, 76, 210, 0.3));
+    background-image: linear-gradient(rgb(255, 166, 158), rgba(255, 255, 255, 0.3), rgb(0, 0, 0));
     border-radius: 10px;
     z-index: 9;
 }
@@ -687,3 +687,42 @@
     border-color: #007bff; /* Màu border nút */
 }
 /*form regis end*/
+
+.pagination-custom {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-custom .page-item {
+    margin: 0 5px;
+}
+
+.pagination-custom .page-item .page-link {
+    width: 30px;          /* Chiều rộng cố định */
+    height: 30px;         /* Chiều cao cố định */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30%;   /* Tạo hình tròn. Xóa nếu muốn hình vuông */
+    background-color: #fff7f8;
+    border: 1px solid #ff7e6b;
+    color: #8c5e58;
+    font-weight: bold;
+    text-align: center;   /* Căn giữa số */
+    line-height: 1.5;     /* Chiều cao dòng để căn giữa số */
+}
+
+.pagination-custom .page-item.active .page-link {
+    background-color: #ff7e6b; /* Màu nền khi đang chọn */
+    border-color: #ff7e6b;
+    color: white;
+}
+
+.pagination-custom .page-item .page-link:hover {
+    background-color: #fff7f8; /* Màu nền khi hover */
+    color: #8c5e58;
+}
+
+.btn-submit:hover {
+    background-color: #ff7e6b !important;
+}
