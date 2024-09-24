@@ -32,7 +32,7 @@ export default function Post() {
                     <p className="display-3 mb-4" style={{ color: "#ffa69e" }}>Bài viết</p>
                     <ol className="breadcrumb justify-content-center mb-0">
                         <li className="breadcrumb-item font-bold" style={{ color: "#ffa69e" }}>
-                            <NavLink to={`/home`}>Trang chủ</NavLink>
+                            <NavLink to={`/home`} onClick={() => window.scrollTo(0, 0)}>Trang chủ</NavLink>
                         </li>
                         <li className="breadcrumb-item active font-bold" style={{ color: "#ffa69e" }}>Bài viết</li>
                     </ol>
@@ -48,7 +48,7 @@ export default function Post() {
                         {posts.map((article) => (
                             <li className="list-group-item font-semibold" key={article.id} style={{ border: "none" }}>
                                 <i className="fa fa-list-alt" aria-hidden="true" style={{ marginRight: "6px", color: "#8c5e58" }}></i>
-                                <NavLink to={`/postdetail`} style={{ color: "#8c5e58" }}>{article.category_post}</NavLink>
+                                <NavLink to={`/postdetail`} onClick={() => window.scrollTo(0, 0)} style={{ color: "#8c5e58" }}>{article.category_post}</NavLink>
                             </li>
                         ))}
                     </ul>
@@ -61,12 +61,12 @@ export default function Post() {
                     {currentPosts.map((article) => (
                         <div className="col-4 mb-4" key={article.id}>
                             <div className="card" style={{borderRadius: '15px', padding: '20px'}}>
-                                <NavLink to={`/postdetail`}>
+                                <NavLink to={`/postdetail`} onClick={() => window.scrollTo(0, 0)}>
                                     <img src={article.image} className="card-img-top" alt={article.title}
                                          style={{maxHeight: '500px', objectFit: 'cover'}}/>
                                 </NavLink>
                                 <div className="card-body">
-                                    <NavLink to={`/postdetail`}>
+                                    <NavLink to={`/postdetail`} onClick={() => window.scrollTo(0, 0)} >
                                         <p className="card-title font-semibold text-center"
                                            style={{color: "#8c5e58", fontSize: "1.2rem"}}>
                                             {article.title}
