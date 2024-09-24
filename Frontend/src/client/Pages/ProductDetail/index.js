@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
-
 
 const ProductDetail = () => {
     // State để quản lý bình luận
@@ -32,119 +31,181 @@ const ProductDetail = () => {
     };
 
     // Tăng giảm số lượng
-    const MAX_QUANTITY = 99;
-    const handleAddToCart = () => {
-        setCart((prevCart) => {
-            const currentQuantity = prevCart[product.id] || 0;
-            if (currentQuantity < MAX_QUANTITY) {
-                return {
-                    ...prevCart,
-                    [product.id]: currentQuantity + 1,
-                };
-            }
-            return prevCart;
-        });
-    };
-
-    const handleRemoveFromCart = () => {
-        setCart((prevCart) => {
-            const newCart = {...prevCart};
-            if (newCart[product.id] > 1) {
-                newCart[product.id] -= 1;
-            } else {
-                delete newCart[product.id];
-            }
-            return newCart;
-        });
+    const handleQuantityChange = (e) => {
+        const value = parseInt(e.target.value, 10);
+        if (!isNaN(value) && value >= 1 && value <= 99) {
+            setCart(prevCart => ({
+                ...prevCart,
+                [product.id]: value
+            }));
+        }
     };
 
     return (
         <div className="container my-5">
             <div className="row">
-                {/* Hình ảnh sản phẩm bên trái */}
-                <div className="col-md-6">
-                    <img
-                        src="https://via.placeholder.com/500"
-                        alt="Product"
-                        className="img-fluid"
-                    />
+                <div className="col-md-9">
+                    <div className="row">
+                        {/* Hình ảnh sản phẩm bên trái */}
+                        <div className="col-md-5">
+                            <img
+                                src="https://via.placeholder.com/500"
+                                alt="Product"
+                                className="img-fluid"
+                            />
+                        </div>
+
+                        {/* Thông tin sản phẩm ở giữa */}
+                        <div className="col-md-7 d-flex flex-column align-content-start">
+                            <p className="mb-3" style={{ fontSize: "2rem", color: "#8c5e58"}}>{product.name}</p>
+                            <p className="mb-3" style={{color: "#8c5e58"}}>{product.price}đ</p>
+                            <p className="mb-3" style={{color: "#8c5e58"}}>{product.brand}</p>
+                            <p className="mb-3" style={{color: "#8c5e58"}}>{product.weight}</p>
+
+                            {/* Số lượng */}
+                            <div className="mt-2 d-flex justify-content-start align-items-center mb-3">
+                                <span style={{color: "#8c5e58"}}>Số lượng:</span>
+                                <input
+                                    type="number"
+                                    defaultValue={0} // Thiết lập giá trị mặc định là 0
+                                    value={cart[product.id] || 1}
+                                    onChange={handleQuantityChange}
+                                    min="0"
+                                    max="99"
+                                    className="form-control mx-2"
+                                    style={{ width: "80px" }}
+                                />
+                            </div>
+
+                            <div className="d-flex justify-content-start">
+                                <button className="btn btn-primary mr-2 font-semibold" style={{ padding: '16px', fontSize: '13px', color: '#442e2b' }}>
+                                    <p><i className="fa fa-check" aria-hidden="true" style={{marginRight: "6px"}}></i>Mua
+                                        ngay</p>
+                                </button>
+                                <button className="btn btn-secondary font-semibold" style={{ fontSize: '13px'}}>
+                                    <p><i className="fa fa-shopping-cart" aria-hidden="true" style={{marginRight: "6px"}}></i>Thêm
+                                        vào giỏ</p>
+                                </button>
+                            </div>
+                        </div>
+                        {/* Thông tin chi tiết sản phẩm */}
+                        <div className="product-details" style={{marginTop: "2rem"}}>
+                            <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}} className="font-bold">Thông tin chi tiết sản phẩm:</p>
+                            <ul>
+                                <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong className="font-semibold">Tên sản phẩm:</strong> Tên sản phẩm nè</li>
+                                <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong className="font-semibold">Giá sản phẩm:</strong> Giá sản phẩm nè</li>
+                                <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong className="font-semibold">Thương hiệu:</strong> Thương hiệu nè</li>
+                                <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong className="font-semibold">Khối lượng:</strong> Khối lượng nè</li>
+                                <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong className="font-semibold">Mô tả sản phẩm:</strong> Mô tả sản phẩm nè</li>
+                                <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong className="font-semibold">Thành phần:</strong> Thành phần nè</li>
+                            </ul>
+                        </div>
+
+                        {/* Form bình luận */}
+                        <div className="row mt-5">
+                            <div className="col-12">
+                                <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}} className="font-bold">Thêm bình luận</p>
+                                <form onSubmit={handleAddComment}>
+                                    <div className="mb-3">
+                            <textarea
+                                className="form-control"
+                                rows="4"
+                                placeholder="Nhập bình luận của bạn..."
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                            ></textarea>
+                                    </div>
+                                    <button type="submit" className="btn btn-secondary">
+                                        Gửi bình luận
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        {/* Hiển thị danh sách bình luận */}
+                        <div className="row mt-4">
+                            <div className="col-12">
+                                <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}} className="font-bold">Bình luận</p>
+                                {commentsList.length > 0 ? (
+                                    <ul className="list-group">
+                                        {commentsList.map((comment, index) => (
+                                            <li key={index} className="list-group-item d-flex align-items-start">
+                                                <img src={comment.avatar} alt="Avatar" className="rounded-circle me-2"
+                                                     style={{ width: '50px', height: '50px' }} />
+                                                <div>
+                                                    <strong>{comment.name}</strong>
+                                                    <p style={{color: "#8c5e58"}}>{comment.text}</p>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p style={{color: "#8c5e58"}}>Chưa có bình luận nào.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Thông tin sản phẩm bên phải */}
-                <div className="col-md-6">
-                    <h1 className="mb-3">{product.name}</h1>
-                    <h3 className="text-success mb-3">{product.price}đ</h3>
-                    <p>{product.brand}</p>
-                    <p>{product.weight}</p>
-
-                    {cart[product.id] && (
-                        <div className="mt-2 d-flex align-items-center">
-                            <span>Số lượng:</span>
-                            <button className="btn btn-danger mx-2" onClick={handleRemoveFromCart}>-</button>
-                            <span>{cart[product.id]}</span>
-                            <button className="btn btn-success mx-2" onClick={handleAddToCart}>+</button>
+                {/* 4 ô cam kết bên phải theo chiều dọc */}
+                <div className="col-md-3">
+                    <div className="row text-center d-flex flex-column">
+                        {/* Cam kết 1 */}
+                        <div className="col mb-3">
+                            <div className="p-4 d-flex flex-column align-items-center" style={{
+                                maxWidth: "250px",
+                                backgroundColor: 'white'
+                            }}>
+                                <img src="https://via.placeholder.com/150x150" alt="Thanh toán khi nhận hàng"
+                                     className="img-fluid mb-3"
+                                     style={{ width: '150px', objectFit: 'cover' }} />
+                                <p style={{color: '#8c5e58'}} className="font-bold">Thanh toán khi nhận hàng</p>
+                            </div>
                         </div>
-                    )}
-                    <button className="btn btn-primary mb-4" onClick={handleAddToCart}>Thêm vào giỏ</button>
 
-                    {/* Thông tin chi tiết sản phẩm */}
-                    <div className="product-details">
-                        <h4>Thông tin chi tiết sản phẩm:</h4>
-                        <ul>
-                            <li><strong>Tên sản phẩm:</strong> Tên sản phẩm nè</li>
-                            <li><strong>Giá sản phẩm:</strong> Giá sản phẩm nè</li>
-                            <li><strong>Thương hiệu:</strong> Thương hiệu nè</li>
-                            <li><strong>Khối lượng:</strong> Khối lượng nè</li>
-                            <li><strong>Mô tả sản phẩm:</strong> Mô tả sản phẩm nè</li>
-                            <li><strong>Thành phần:</strong> Thành phần nè</li>
-                        </ul>
+                        {/* Cam kết 2 */}
+                        <div className="col mb-3">
+                            <div className="p-4 d-flex flex-column align-items-center" style={{
+                                maxWidth: "250px",
+                                backgroundColor: 'white'
+                            }}>
+                                <img src="https://via.placeholder.com/150x150" alt="Giao nhanh miễn phí 2H"
+                                     className="img-fluid mb-3"
+                                     style={{ width: '150px', objectFit: 'cover' }} />
+                                <p style={{color: '#8c5e58'}} className="font-bold">Giao nhanh miễn phí 2H</p>
+                            </div>
+                        </div>
+
+                        {/* Cam kết 3 */}
+                        <div className="col mb-3">
+                            <div className="p-4 d-flex flex-column align-items-center" style={{
+                                maxWidth: "250px",
+                                backgroundColor: 'white'
+                            }}>
+                                <img src="https://via.placeholder.com/150x150" alt="30 ngày đổi trả miễn phí"
+                                     className="img-fluid mb-3"
+                                     style={{ width: '150px', objectFit: 'cover' }} />
+                                <p style={{color: '#8c5e58'}} className="font-bold">30 ngày đổi trả miễn phí</p>
+                            </div>
+                        </div>
+
+                        {/* Cam kết 4 */}
+                        <div className="col">
+                            <div className="p-4 d-flex flex-column align-items-center" style={{
+                                maxWidth: "250px",
+                                backgroundColor: 'white'
+                            }}>
+                                <img src="https://via.placeholder.com/150x150" alt="Tư vấn 24/7"
+                                     className="img-fluid mb-3"
+                                     style={{ width: '150px', objectFit: 'cover' }} />
+                                <p style={{color: '#8c5e58'}} className="font-bold">Tư vấn 24/7</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Form bình luận */}
-            <div className="row mt-5">
-                <div className="col-12">
-                    <h3>Thêm bình luận</h3>
-                    <form onSubmit={handleAddComment}>
-                        <div className="mb-3">
-                            <textarea
-                                className="form-control"
-                                rows="4"
-                                placeholder="Nhập bình luận của bạn"
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                            ></textarea>
-                        </div>
-                        <button type="submit" className="btn btn-secondary">
-                            Gửi bình luận
-                        </button>
-                    </form>
-                </div>
-            </div>
 
-            {/* Hiển thị danh sách bình luận */}
-            <div className="row mt-4">
-                <div className="col-12">
-                    <h4>Bình luận</h4>
-                    {commentsList.length > 0 ? (
-                        <ul className="list-group">
-                            {commentsList.map((comment, index) => (
-                                <li key={index} className="list-group-item d-flex align-items-start">
-                                    <img src={comment.avatar} alt="Avatar" className="rounded-circle me-2"
-                                         style={{width: '50px', height: '50px'}}/>
-                                    <div>
-                                        <strong>{comment.name}</strong>
-                                        <p>{comment.text}</p>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>Chưa có bình luận nào.</p>
-                    )}
-                </div>
-            </div>
         </div>
     );
 };
