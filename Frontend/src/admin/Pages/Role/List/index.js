@@ -1,60 +1,35 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getBlogCategory, deleteBlogCategory } from '../../../../services/BlogCategory';
+import { getRole } from '../../../../services/Role';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Swal from 'sweetalert2';
 
-export default function BlogCategory({ color }) {
-    const [Blogcategories, setBlogcategories] = useState([]);
+export default function Role({ color }) {
+    const [roles, setRoles] = useState([]);
     const navigate = useNavigate();
-    const renderStatus = (status) => (status == "1" ? "Hiển thị" : "Ẩn");
 
     useEffect(() => {
-        fetchBlogcategories();
+        fetchRoles();
     }, []);
 
-    const fetchBlogcategories = async () => {
+    // Lấy danh sách vai trò từ API
+    const fetchRoles = async () => {
         try {
-            const result = await getBlogCategory();
-            setBlogcategories(result || []);
+            const result = await getRole();
+            setRoles(result || []);
         } catch (err) {
-            console.error('Error fetching categories:', err);
-            setBlogcategories([]);
-            toast.error('Error fetching categories. Please try again later.');
+            console.error('Lỗi khi lấy danh sách vai trò:', err);
+            setRoles([]);
+            toast.error('Lỗi khi lấy danh sách vai trò. Vui lòng thử lại sau.');
         }
     };
+
+    // Hàm để hiển thị trạng thái (1 = Kích hoạt, 2 = Vô hiệu hóa)
+    const renderStatus = (status) => (status == "1" ? "Hoạt động" : "Vô hiệu hóa");
 
     const handleEditClick = (id) => {
-        navigate(`/admin/category_blog/edit/${id}`);
-    };
-
-    // Handle Delete Click with SweetAlert2
-    const handleDeleteClick = async (category) => {
-        const { isConfirmed } = await Swal.fire({
-            title: `Bạn có chắc chắn muốn xóa danh mục "${category.name}" không?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
-        });
-
-        if (isConfirmed) {
-            try {
-                await deleteBlogCategory(category.id);
-                await Swal.fire({
-                    title: 'Thành công!',
-                    text: 'Xóa danh mục bài viết thành công.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-                fetchBlogcategories();
-            } catch (err) {
-                console.error('Error deleting category:', err);
-                toast.error('Lỗi khi xóa danh mục. Vui lòng thử lại.');
-            }
-        }
+        navigate(`/admin/role/edit/${id}`);
     };
 
     return (
@@ -74,15 +49,15 @@ export default function BlogCategory({ color }) {
                                     (color === "light" ? "text-blueGray-700" : "text-white")
                                 }
                             >
-                                DANH MỤC BÀI VIẾT
+                                QUẢN LÝ VAI TRÒ
                             </h3>
                         </div>
                         <NavLink
-                            to={`/admin/category_blog/add`}
+                            to={`/admin/role/add`}
                             className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                             type="button"
                         >
-                            Thêm danh mục
+                            Thêm vai trò
                         </NavLink>
                     </div>
                 </div>
@@ -91,43 +66,37 @@ export default function BlogCategory({ color }) {
                         <thead>
                         <tr>
                             <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "10%"}}>STT</th>
-                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "10%"}}>Tên danh mục</th>
-                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "10%"}}>Trạng Thái</th>
+                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "30%"}}>Tên vai trò</th>
+                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "30%"}}>Trạng thái</th>
                             <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{width: "10%"}}>Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {Blogcategories.length > 0 ? (
-                            Blogcategories.map((category, index) => (
-                                <tr key={category.id}>
+                        {roles.length > 0 ? (
+                            roles.map((role, index) => (
+                                <tr key={role.id}>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
                                         <span className="ml-3 font-bold">{index + 1}</span>
                                     </th>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {category.name}
+                                        {role.name}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {renderStatus(category.status)}
+                                        {renderStatus(role.status)}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                         <button
                                             className="text-blue-500 hover:text-blue-700 px-2"
-                                            onClick={() => handleEditClick(category.id)}
+                                            onClick={() => handleEditClick(role.id)}
                                         >
                                             <i className="fas fa-pen text-xl"></i>
-                                        </button>
-                                        <button
-                                            className="text-red-500 hover:text-red-700 ml-2 px-2"
-                                            onClick={() => handleDeleteClick(category)}
-                                        >
-                                            <i className="fas fa-trash text-xl"></i>
                                         </button>
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4" className="text-center">Không có danh mục nào</td>
+                                <td colSpan="4" className="text-center">Không có vai trò nào</td>
                             </tr>
                         )}
                         </tbody>
@@ -140,10 +109,10 @@ export default function BlogCategory({ color }) {
     );
 }
 
-BlogCategory.defaultProps = {
+Role.defaultProps = {
     color: "light",
 };
 
-BlogCategory.propTypes = {
+Role.propTypes = {
     color: PropTypes.oneOf(["light", "dark"]),
 };

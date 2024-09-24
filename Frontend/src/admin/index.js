@@ -13,7 +13,8 @@ import Product from "./Pages/Product/List";
 import ProductCategory from "./Pages/ProductCategory/List";
 import Blog from "./Pages/Blog";
 import Brand from "./Pages/Brand/List";
-import Comment from "./Pages/Comment";
+import Comment from "./Pages/Comment/List";
+import Role from "./Pages/Role/List";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
 import AddProductCategory from "./Pages/ProductCategory/Add";
@@ -24,6 +25,9 @@ import EditBlogCategory from "./Pages/BlogCategory/Edit";
 
 import EditBrand from "./Pages/Brand/Edit";
 import AddBrand from "./Pages/Brand/Add";
+
+import AddRole from "./Pages/Role/Add";
+import EditRole from "./Pages/Role/Edit";
 
 import EditProductCaterogy from "./Pages/ProductCategory/Edit";
 // import Settings from "views/admin/Settings.js";
@@ -56,6 +60,9 @@ export default function Admin() {
                         <Route path="brand/edit/:id" element={<EditBrand/>}/>
                         <Route path="comment" element={<Comment />}/>
                         <Route path="order" element={<Order />}/>
+                        <Route path="role" element={<Role />}/>
+                        <Route path="role/add" element={<AddRole />}/>
+                        <Route path="role/edit/:id" element={<EditRole />}/>
                         <Route path="/" element={<Navigate to="/admin/dashboard" />} />
                     </Routes>
                     <Footer />
