@@ -8,14 +8,14 @@ export default function Cart() {
             name: "Sản phẩm 1",
             price: 100000,
             quantity: 2,
-            image: "link-to-image-1.jpg", // Thay bằng link hình ảnh thật
+            image: "https://via.placeholder.com/100", // Thay bằng link hình ảnh thật
         },
         {
             id: 2,
             name: "Sản phẩm 2",
             price: 200000,
             quantity: 1,
-            image: "link-to-image-2.jpg", // Thay bằng link hình ảnh thật
+            image: "https://via.placeholder.com/100", // Thay bằng link hình ảnh thật
         },
     ]);
 
@@ -32,14 +32,14 @@ export default function Cart() {
     };
 
     return (
-        <div className="container py-5">
-            <h2 className="mb-4">Giỏ hàng của bạn</h2>
+        <div className="container py-3">
+            <p className="text-center display-3" style={{color: "#8c5e58", marginBottom: "60px"}}>Giỏ hàng</p>
             {cartItems.length === 0 ? (
                 <p>Giỏ hàng của bạn trống.</p>
             ) : (
-                <table className="table table-striped">
+                <table className="table">
                     <thead>
-                    <tr>
+                    <tr style={{color: "#8c5e58"}}>
                         <th>Sản phẩm</th>
                         <th>Hình ảnh</th>
                         <th>Giá</th>
@@ -50,7 +50,7 @@ export default function Cart() {
                     </thead>
                     <tbody>
                     {cartItems.map(item => (
-                        <tr key={item.id}>
+                        <tr key={item.id} className="font-semibold" style={{color: "#8c5e58"}}>
                             <td>{item.name}</td>
                             <td>
                                 <img src={item.image} alt={item.name} style={{ width: "100px", height: "100px", objectFit: "cover" }} />
@@ -67,15 +67,23 @@ export default function Cart() {
                             </td>
                             <td>{(item.price * item.quantity).toLocaleString("vi-VN")} VND</td>
                             <td>
-                                <button className="btn btn-danger" onClick={() => removeItem(item.id)}>Xóa</button>
+                                <button className="btn btn-primary font-bold" style={{
+                                    padding: '14px',
+                                    fontSize: '13px',
+                                    color: '#442e2b'
+                                }} onClick={() => removeItem(item.id)}>Xóa</button>
                             </td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
             )}
-            <h4 className="mt-4">Tổng: {calculateTotal().toLocaleString("vi-VN")} VND</h4>
-            <button className="btn btn-primary mt-3" onClick={() => window.location.href = '/checkout'}>Thanh toán</button>
+            <p className="mt-4 font-semibold" style={{color: "#8c5e58"}}>Tổng: {calculateTotal().toLocaleString("vi-VN")} VND</p>
+            <button className="btn btn-primary mt-3 font-bold" style={{
+                padding: '14px',
+                fontSize: '13px',
+                color: '#442e2b'
+            }} onClick={() => window.location.href = '/checkout'}>Thanh toán</button>
         </div>
     );
 }
