@@ -45,7 +45,7 @@ export default function Home() {
                                             <p className="card-text mb-4 font-semibold"
                                                style={{color: '#8c5e58'}}>{product.price}đ</p>
 
-                                            <NavLink to={`/products/:id`} onClick={() => window.scrollTo(0, 0)} className="w-100">
+                                            <NavLink to={`/products/:id`} className="w-100">
                                                 <button className="btn btn-primary mr-2 font-bold w-100" style={{
                                                     padding: '14px',
                                                     fontSize: '13px',
