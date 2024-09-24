@@ -47,7 +47,7 @@ export default function AddBlogCategory({ color = "light" }) {
                 <div className="flex flex-wrap items-center">
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
                         <h3 className={`font-semibold text-lg ${color === "light" ? "text-blueGray-700" : "text-white"}`}>
-                            THÊM DANH MỤC BLOG
+                            THÊM DANH MỤC BÀI VIẾT
                         </h3>
                     </div>
                 </div>
