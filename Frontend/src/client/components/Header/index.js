@@ -36,7 +36,7 @@ export default function Header() {
                 </div>
                 <div className="container-fluid px-0">
                     <nav className="navbar navbar-expand-xl bg-light">
-                        <NavLink to={`/home`} className="navbar-brand">
+                        <NavLink to={`/home`} className="navbar-brand" onClick={() => window.scrollTo(0, 0)}>
                             <p className="text-primary display-4" style={{marginLeft: "100px"}}>GlowMakers</p>
                         </NavLink>
                         <button className="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
@@ -45,11 +45,11 @@ export default function Header() {
                         </button>
                         <div className="collapse navbar-collapse py-3" id="navbarCollapse">
                             <div className="navbar-nav mx-auto border-top">
-                                <NavLink to={`/home`} className="nav-item nav-link font-semibold">Trang chủ</NavLink>
-                                <NavLink to={`/about`} className="nav-item nav-link font-semibold">Giới thiệu</NavLink>
-                                <NavLink to={`/products`} className="nav-item nav-link font-semibold">Sản phẩm</NavLink>
-                                <NavLink to={`/contact`} className="nav-item nav-link font-semibold">Liên hệ</NavLink>
-                                <NavLink to={`/post`} className="nav-item nav-link font-semibold">Bài viết</NavLink>
+                                <NavLink to={`/home`} onClick={() => window.scrollTo(0, 0)} className="nav-item nav-link font-semibold">Trang chủ</NavLink>
+                                <NavLink to={`/about`} onClick={() => window.scrollTo(0, 0)}className="nav-item nav-link font-semibold">Giới thiệu</NavLink>
+                                <NavLink to={`/products`} onClick={() => window.scrollTo(0, 0)} className="nav-item nav-link font-semibold">Sản phẩm</NavLink>
+                                <NavLink to={`/contact`} onClick={() => window.scrollTo(0, 0)} className="nav-item nav-link font-semibold">Liên hệ</NavLink>
+                                <NavLink to={`/post`} onClick={() => window.scrollTo(0, 0)} className="nav-item nav-link font-semibold">Bài viết</NavLink>
                             </div>
 
                             <div className="d-flex align-items-center flex-nowrap pt-xl-0" style={{marginRight: "100px"}}>
@@ -86,7 +86,7 @@ export default function Header() {
                                 </div>
 
                                 {/* Icon giỏ hàng */}
-                                <NavLink to={`/cart`} className="btn ms-2"
+                                <NavLink to={`/cart`}  onClick={() => window.scrollTo(0, 0)} className="btn ms-2"
                                          style={{width: "50px", height: "50px", color: "var(--bs-primary)", position: "relative"}}>
                                     <i className="fas fa-shopping-cart" style={{fontSize: "1.5rem"}}></i>
                                     <span
@@ -106,7 +106,7 @@ export default function Header() {
                                 </NavLink>
 
                                 {/* Icon profile */}
-                                <NavLink to={`/profile`} className="btn ms-2"
+                                <NavLink to={`/profile`}  onClick={() => window.scrollTo(0, 0)}className="btn ms-2"
                                          style={{width: "50px", height: "50px", color: "var(--bs-primary)"}}>
                                     <i className="fas fa-user" style={{fontSize: "1.5rem"}}></i>
                                 </NavLink>
