@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Passport::loadKeysFrom(__DIR__.'/../secrets/oauth');
+        Passport::tokensCan([
+            'admin' => 'Quản lý hệ thống',
+            'user' => 'Chỉ truy cập chức năng người dùng',
+        ]);
+        Passport::setDefaultScope([
+            'user',
+        ]);
     }
 }
