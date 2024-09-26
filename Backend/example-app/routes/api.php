@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\CartController;
@@ -55,3 +56,5 @@ Route::prefix('client')->group(function () {
     // Route để yêu cầu đặt lại mật khẩu qua API
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('client.reset-password');
 });
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'Register']);
