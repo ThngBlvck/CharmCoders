@@ -55,4 +55,3 @@ Route::prefix('client')->group(function () {
     // Route để yêu cầu đặt lại mật khẩu qua API
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('client.reset-password');
 });
-
