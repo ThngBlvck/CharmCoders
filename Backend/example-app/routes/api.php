@@ -32,10 +32,12 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('cart', CartController::class);
 });
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'Register']);
 
 Route::prefix('client')->group(function () {
     Route::get('/products/search', [ClientProductController::class, 'search']);//http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('send-mail', [ClientProductController::class, 'sendMail']);//http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::post('/contact', [MailController::class, 'sendMail']);//mail
+    Route::post('/contact/send', [MailController::class, 'send']);
 
 });
