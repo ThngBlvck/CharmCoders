@@ -16,6 +16,8 @@ class Brand extends Model
     protected $fillable = [
         'name',
         'image',
+        'status',
+
     ];
 
     // Nếu bạn muốn sử dụng các thuộc tính khác mà không phải là các thuộc tính mặc định,
