@@ -50,4 +50,3 @@ Route::prefix('client')->group(function () {
     Route::post('/contact/send', [MailController::class, 'send']);
 
 });
-
