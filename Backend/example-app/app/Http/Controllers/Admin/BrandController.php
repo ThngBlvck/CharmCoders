@@ -43,9 +43,8 @@ class BrandController extends Controller
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('public/images/brands', $imageName);
 
-            $validatedData['image'] = 'Backend/storage/images/brands/' . $imageName;
+            $validatedData['image'] = asset('storage/images/brands/' . $imageName);
         }
-
         $brand->update($validatedData);
 
         return response()->json($brand, 200);

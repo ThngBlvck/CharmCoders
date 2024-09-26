@@ -43,6 +43,7 @@ export default function EditBrand() {
             const formData = new FormData();
             formData.append("name", data.brandName);
             formData.append("status", data.status);
+            formData.append("_method", "PUT");
 
             if (data.image && data.image[0]) {
                 formData.append("image", data.image[0]); // Append the new image if selected
