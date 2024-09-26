@@ -20,7 +20,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('blog', BlogController::class);
     Route::apiResource('blogcategory', BlogCategoryController::class);
-    Route::apiResource('user', UserController::class);
+    Route::apiResource('blog', BlogController::class);
 
     Route::apiResource('roles', RoleController::class);
     Route::apiResource('comments', CommentController::class);
@@ -41,4 +41,3 @@ Route::prefix('client')->group(function () {
     Route::post('/contact/send', [MailController::class, 'send']);
 
 });
-
