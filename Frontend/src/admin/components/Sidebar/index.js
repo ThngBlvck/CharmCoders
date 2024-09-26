@@ -22,7 +22,7 @@ export default function Sidebar() {
                         className="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
                         to="/"
                     >
-                        Notus React
+                        ADMIN
                     </Link>
                     {/* User */}
                     <ul className="md:hidden items-center flex flex-wrap list-none">
@@ -48,7 +48,7 @@ export default function Sidebar() {
                                         className="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
                                         to="/"
                                     >
-                                        Notus React
+                                        ADMIN
                                     </Link>
                                 </div>
                                 <div className="w-6/12 flex justify-end">
@@ -76,12 +76,12 @@ export default function Sidebar() {
                         {/* Divider */}
                         <hr className="my-4 md:min-w-full"/>
                         {/* Heading */}
-                        <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
+                        <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline pl-4">
                             Admin Layout Pages
                         </h6>
                         {/* Navigation */}
 
-                        <ul className="md:flex-col md:min-w-full flex flex-col list-none">
+                        <ul className="md:flex-col md:min-w-full flex flex-col list-none pl-4">
                             <li className="items-center">
                                 <Link
                                     className={
@@ -94,7 +94,7 @@ export default function Sidebar() {
                                 >
                                     <i
                                         className={
-                                            "fas fa-tv mr-2 text-sm " +
+                                            "fas fa-tv mr-2 text-sm" +
                                             (window.location.href.indexOf("/admin/dashboard") !== -1
                                                 ? "opacity-75"
                                                 : "text-blueGray-300")
