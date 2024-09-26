@@ -16,6 +16,7 @@ Route::get('/user', function (Request $request) {
 
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\ProductController;
@@ -29,6 +30,10 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('blog', BlogController::class);
     Route::apiResource('blogcategory', BlogCategoryController::class);
+    Route::apiResource('productCategory', CategoryController::class);
+    Route::apiResource('role', RoleController::class);
+    Route::apiResource('comment', CommentController::class);
+    Route::put('brands/update/{id}', [BrandController::class,'update']);
     Route::apiResource('blog', BlogController::class);
 
     Route::apiResource('roles', RoleController::class);
@@ -50,3 +55,5 @@ Route::prefix('client')->group(function () {
     Route::post('/contact/send', [MailController::class, 'send']);
 
 });
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'Register']);
