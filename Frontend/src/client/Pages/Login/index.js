@@ -1,25 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../../assets/styles/css/bootstrap.min.css";
 import "../../../assets/styles/css/style.css";
-import '@fortawesome/fontawesome-free/css/all.min.css'; // Ensure FontAwesome is imported for the icon
+import { login } from "../../../services/User"; // Đảm bảo hàm login được định nghĩa đúng
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export default function Login() {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
+    const [errorMessage, setErrorMessage] = useState(""); // Trạng thái lỗi
+    const [loading, setLoading] = useState(false); // Trạng thái loading
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            window.location.href = "/home";
+        }
+    }, []);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Dữ liệu đăng nhập:", formData);
-        // Xử lý đăng nhập ở đây
-        setFormData({ email: "", password: "" });
+        setLoading(true);
+        setErrorMessage("");
+    
+        // Kiểm tra các trường nhập trước khi gửi yêu cầu
+        if (!formData.email || !formData.password) {
+            setErrorMessage("Vui lòng nhập đầy đủ email và mật khẩu.");
+            setLoading(false);
+            return;
+        }
+    
+        try {
+            const response = await login(formData);
+            console.log(response);
+            if (response && response.token) {
+                // Nếu có token trả về, lưu vào localStorage
+                console.log("Token:", response.token);
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('role', response.role);
+                window.location.href = "home"; 
+            } else {
+                setErrorMessage("Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
+            }
+        } catch (error) {
+            console.error("Đăng nhập thất bại:", error);
+            // Xử lý thông báo lỗi từ backend
+            if (error.response && error.response.data) {
+                const errorData = error.response.data;
+                if (errorData.errors) {
+                    // Nếu có lỗi xác thực từ backend
+                    const errorMessages = Object.values(errorData.errors).flat();
+                    setErrorMessage(errorMessages.join(", ")); // Hiển thị tất cả thông báo lỗi
+                } else {
+                    // Nếu không có lỗi xác thực cụ thể
+                    setErrorMessage(errorData.message || 'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.');
+                }
+            } else {
+                // Thông báo lỗi chung nếu không nhận được phản hồi từ backend
+                setErrorMessage("Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
+            }
+        } finally {
+            setLoading(false);
+            // Giữ nguyên dữ liệu form sau khi xử lý
+        }
     };
+    
 
     return (
         <div className="container py-5">
@@ -51,7 +102,17 @@ export default function Login() {
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary w-100">Đăng Nhập</button>
+                        
+                        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+                            {loading ? "Đang xử lý..." : "Đăng Nhập"}
+                        </button>
+
+                        {/* Hiển thị thông báo lỗi */}
+                        {errorMessage && (
+                            <div className="mt-3 text-danger text-center">
+                                {errorMessage}
+                            </div>
+                        )}
 
                         {/* Google Login Button */}
                         <div className="text-center mt-3">
