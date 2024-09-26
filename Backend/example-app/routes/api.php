@@ -51,4 +51,3 @@ Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->post('/checkout', [CheckoutController::class, 'checkout']);
 
 });
-
