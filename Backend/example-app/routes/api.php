@@ -36,6 +36,6 @@ Route::prefix('admin')->group(function () {
 Route::prefix('client')->group(function () {
     Route::get('/products/search', [ClientProductController::class, 'search']);//http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('send-mail', [ClientProductController::class, 'sendMail']);//http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::post('/contact/send', [MailController::class, 'send']);
+    Route::post('/contact/send', [MailController::class, 'send']);//mail
 
 });
