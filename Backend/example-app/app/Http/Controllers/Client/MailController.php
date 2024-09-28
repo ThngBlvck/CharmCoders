@@ -6,27 +6,35 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMailContact;
+
 class MailController extends Controller
 {
-    public function send(Request $request)
+    public function sendMail(Request $request)
     {
-        // Validate the form data
+        // Xác thực dữ liệu đầu vào
         $validated = $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'message' => 'required|string',
+            'phone' => 'required|string|max:15',  // Thêm xác thực cho số điện thoại
+            'message' => 'nullable|string',  // Cho phép message null
         ]);
 
-        // Prepare the contact data
-        $contactData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'message' => $validated['message'],
-        ];
+        try {
+            // Gửi email bằng Mail facade
+            Mail::to('nguyentcpc05615@fpt.edu.vn') // Địa chỉ email nhận
+                ->send(new SendMailContact(
+                    $validated['name'],
+                    $validated['email'],
+                    $validated['phone'],  // Chuyển số điện thoại
+                    $validated['message'] ?? 'No message provided' // Xử lý khi message trống
+                ));
 
-        // Send the email
-        Mail::to('tranchinguyen1307@gmail.com')->send(new SendMailContact($contactData));
-
-        return response()->json(['message' => 'Contact email sent successfully'], 200);
+            // Trả về JSON response thành công
+            return response()->json(['message' => 'Email sent successfully!'], 200);
+            //dd
+        } catch (\Exception $e) {
+            // Nếu xảy ra lỗi, trả về JSON response báo lỗi
+            return response()->json(['error' => 'Failed to send email. ' . $e->getMessage()], 500);
+        }
     }
 }
