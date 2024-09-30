@@ -19,11 +19,14 @@ export default function EditProduct({ color = "light" }) {
     const navigate = useNavigate();
     const [brands, setBrands] = useState([]); // State lưu trữ danh sách nhãn hàng
     const [categories, setCategories] = useState([]); // State lưu trữ danh sách danh mục
-
+    const [originalProduct, setOriginalProduct] = useState(null); // State lưu trữ dữ liệu sản phẩm gốc
+    const [isLoading, setIsLoading] = useState(true); // Trạng thái tải dữ liệu
+    const [selectedImage, setSelectedImage] = useState(null); // State lưu trữ hình ảnh đã chọn
 
     useEffect(() => {
         // Lấy dữ liệu sản phẩm và danh sách nhãn hàng, danh mục khi component được render
         const fetchProductData = async () => {
+            setIsLoading(true); // Bắt đầu trạng thái tải
             try {
                 const [product, brandList, categoryList] = await Promise.all([
                     getOneProduct(id), // Gọi API lấy sản phẩm theo id
@@ -33,6 +36,7 @@ export default function EditProduct({ color = "light" }) {
 
                 setBrands(brandList); // Lưu danh sách nhãn hàng vào state
                 setCategories(categoryList); // Lưu danh sách danh mục vào state
+                setOriginalProduct(product); // Lưu dữ liệu sản phẩm gốc
 
                 // Reset form với dữ liệu sản phẩm, bao gồm cả brand_id và category_id
                 reset({
@@ -40,6 +44,11 @@ export default function EditProduct({ color = "light" }) {
                     brand_id: product.brand_id || '', // Đặt giá trị mặc định cho nhãn hàng
                     category_id: product.category_id || '', // Đặt giá trị mặc định cho danh mục
                 });
+
+                // Lưu URL hình ảnh vào state
+                if (product.image) {
+                    setSelectedImage(product.image); // Lưu đường dẫn hình ảnh gốc
+                }
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu:", error);
                 Swal.fire({
@@ -48,42 +57,46 @@ export default function EditProduct({ color = "light" }) {
                     text: "Không thể tải dữ liệu.",
                     confirmButtonText: 'OK'
                 });
+            } finally {
+                setIsLoading(false); // Kết thúc trạng thái tải
             }
         };
 
         fetchProductData(); // Gọi hàm để lấy dữ liệu khi component được mount
     }, [id, reset]);
 
-
     const onSubmit = async (data) => {
-        try {
-            console.log("Dữ liệu gửi đi:", data);
+        if (!data.name || !data.quantity || !data.status || !data.unit_price) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Có lỗi xảy ra',
+                text: 'Vui lòng điền tất cả các trường bắt buộc!',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
 
-            // Tạo FormData
+        try {
             const formData = new FormData();
-            formData.append('name', data.name);
-            formData.append('brand_id', data.brand_id);
-            formData.append('category_id', data.category_id);
-            formData.append('status', data.status);
-            formData.append('unit_price', data.unit_price);
-            formData.append('sale_price', data.sale_price);
-            formData.append('quantity', data.quantity);
-            formData.append('content', data.content);
-            if (data.image[0]) {
+
+            // Thêm các trường bắt buộc
+            formData.append('name', data.name || originalProduct.name);
+            formData.append('brand_id', data.brand_id || originalProduct.brand_id);
+            formData.append('category_id', data.category_id || originalProduct.category_id);
+            formData.append('status', data.status || originalProduct.status);
+            formData.append('unit_price', data.unit_price || originalProduct.unit_price);
+            formData.append('sale_price', data.sale_price || originalProduct.sale_price);
+            formData.append('quantity', data.quantity || originalProduct.quantity);
+            formData.append('content', data.content || originalProduct.content);
+
+            // Thêm ảnh nếu có
+            if (data.image && data.image.length > 0 && data.image[0]) {
                 formData.append('image', data.image[0]);
             }
 
-            // Kiểm tra các trường bắt buộc
-            if (!data.name || !data.quantity || !data.status || !data.unit_price) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Có lỗi xảy ra',
-                    text: 'Vui lòng điền tất cả các trường bắt buộc!',
-                    confirmButtonText: 'OK'
-                });
-                return; // Dừng hàm nếu có trường thiếu
-            }
+            formData.append("_method", "PUT");
 
+            // Gửi dữ liệu cập nhật lên API
             const response = await updateProduct(id, formData);
             console.log("Phản hồi từ API:", response);
             Swal.fire({
@@ -93,16 +106,30 @@ export default function EditProduct({ color = "light" }) {
             });
             navigate('/admin/product');
         } catch (error) {
-            console.error("Lỗi khi cập nhật sản phẩm:", error);
+            console.error("Lỗi khi cập nhật sản phẩm:", error.response?.data || error.message);
             Swal.fire({
                 icon: 'error',
                 title: 'Có lỗi xảy ra',
-                text: error.message || "Lỗi không xác định",
+                text: error.response?.data.message || "Lỗi không xác định",
                 confirmButtonText: 'OK'
             });
         }
     };
 
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            // Hiển thị hình ảnh đã chọn
+            const imageUrl = URL.createObjectURL(file);
+            setSelectedImage(imageUrl); // Lưu đường dẫn hình ảnh đã chọn
+        } else {
+            setSelectedImage(originalProduct.image); // Nếu không có hình ảnh, đặt lại thành hình ảnh gốc
+        }
+    };
+
+    if (isLoading) {
+        return <div>Đang tải dữ liệu...</div>; // Hiển thị khi đang tải dữ liệu
+    }
 
     return (
         <div
@@ -112,7 +139,7 @@ export default function EditProduct({ color = "light" }) {
                 <div className="flex flex-wrap items-center">
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
                         <h3 className={`font-semibold text-lg ${color === "light" ? "text-blueGray-700" : "text-white"}`}>
-                            CẬP NHẬN SẢN PHẨM
+                            CẬP NHẬT SẢN PHẨM
                         </h3>
                     </div>
                 </div>
@@ -158,25 +185,10 @@ export default function EditProduct({ color = "light" }) {
                                 <option key={category.id} value={category.id}>{category.name}</option>
                             ))}
                         </select>
-                        {errors.category_id &&
-                            <p className="text-red-500 text-xs italic">{errors.category_id.message}</p>}
+                        {errors.category_id && <p className="text-red-500 text-xs italic">{errors.category_id.message}</p>}
                     </div>
 
-                    {/* Trạng thái */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                        <select
-                            {...register("status", {required: "Vui lòng chọn trạng thái"})}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        >
-                            <option value="">Chọn trạng thái</option>
-                            <option value="1">Hiện</option>
-                            <option value="0">Ẩn</option>
-                        </select>
-                        {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
-                    </div>
-
-                    {/* Giá sản phẩm */}
+                    {/* Giá gốc */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">Giá gốc</label>
                         <input
@@ -185,8 +197,7 @@ export default function EditProduct({ color = "light" }) {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Nhập giá gốc"
                         />
-                        {errors.unit_price &&
-                            <p className="text-red-500 text-xs italic">{errors.unit_price.message}</p>}
+                        {errors.unit_price && <p className="text-red-500 text-xs italic">{errors.unit_price.message}</p>}
                     </div>
 
                     {/* Giá sale */}
@@ -196,7 +207,7 @@ export default function EditProduct({ color = "light" }) {
                             type="number"
                             {...register("sale_price")}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            placeholder="Nhập giá sale (nếu có)"
+                            placeholder="Nhập giá sale"
                         />
                     </div>
 
@@ -212,14 +223,18 @@ export default function EditProduct({ color = "light" }) {
                         {errors.quantity && <p className="text-red-500 text-xs italic">{errors.quantity.message}</p>}
                     </div>
 
-                    {/* Hình ảnh */}
+                    {/* Trạng thái */}
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh</label>
-                        <input
-                            type="file"
-                            {...register("image")}
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
+                        <select
+                            {...register("status", {required: "Vui lòng chọn trạng thái"})}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        />
+                        >
+                            <option value="">Chọn trạng thái</option>
+                            <option value="0">An</option>
+                            <option value="1">Ngừng hoạt động</option>
+                        </select>
+                        {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                     </div>
 
                     {/* Nội dung */}
@@ -228,17 +243,33 @@ export default function EditProduct({ color = "light" }) {
                         <textarea
                             {...register("content")}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            placeholder="Nhập nội dung mô tả sản phẩm"
+                            placeholder="Nhập nội dung"
                         />
+                    </div>
+
+                    {/* Hình ảnh */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            {...register("image")}
+                            onChange={handleImageChange}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                        {/* Hiển thị hình ảnh đã chọn hoặc hình ảnh gốc */}
+                        {selectedImage && (
+                            <img src={selectedImage} alt="Selected" className="mt-2 h-32 object-cover" />
+                        )}
                     </div>
 
                     <div className="flex items-center justify-between">
                         <button
                             type="submit"
-                            className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                             disabled={isSubmitting}
+                            className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
-                            {isSubmitting ? "Đang cập nhật..." : "Cập nhật sản phẩm"}
+                            {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật'}
                         </button>
                     </div>
                 </form>
@@ -246,7 +277,3 @@ export default function EditProduct({ color = "light" }) {
         </div>
     );
 }
-
-EditProduct.propTypes = {
-    color: PropTypes.oneOf(["light", "dark"]),
-};
