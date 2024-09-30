@@ -139,7 +139,7 @@ export default function ProductCategory({ color = "light" }) {
                         </tr>
                         </thead>
                         <tbody>
-                        {categories.length > 0 ? (
+                        {categories ? (
                             categories.map((category, index) => (
                                 <tr key={category.id}>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
