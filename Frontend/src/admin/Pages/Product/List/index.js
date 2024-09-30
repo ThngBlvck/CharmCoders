@@ -80,7 +80,7 @@ export default function ProductCategoryList() {
                     </tr>
                     </thead>
                     <tbody>
-                    {products.length > 0 ? (
+                    {products ? (
                         products.map((product, index) => (
                             <tr key={product.id}>
                                 <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">

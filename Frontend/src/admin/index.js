@@ -10,10 +10,14 @@ import Footer from "./components/Footer";
 // views
 import Dashboard from "./Pages/Dashboard";
 import Product from "./Pages/Product/List";
+import ProductDetail from "./Pages//Product/ProductDetail";
+import AddProduct from "./Pages/Product/Add";
+import EditProduct from "./Pages/Product/Edit";
+
 import ProductCategory from "./Pages/ProductCategory/List";
 import Blog from "./Pages/Blog";
 import Brand from "./Pages/Brand/List";
-import Comment from "./Pages/Comment/List";
+// import Comment from "./Pages/Comment/List";
 import Role from "./Pages/Role/List";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
@@ -50,7 +54,12 @@ export default function Admin() {
                         <Route path="category_product/edit/:id" element={<EditProductCaterogy />} />
 
                         <Route path="product" element={<Product />} />
+                        <Route path="product/add" element={<AddProduct />} />
+                        <Route path="product/edit/:id" element={<EditProduct />} />
+                        <Route path="product/detail/:id" element={<ProductDetail />} />
+
                         {/*<Route path="user" element={<User />} />*/}
+
                         <Route path="category_blog" element={<BlogCaterogy />} />
                         <Route path="category_blog/add" element={<AddBlogCategory />} />
                         <Route path="category_blog/edit/:id" element={<EditBlogCategory />} />
@@ -58,7 +67,7 @@ export default function Admin() {
                         <Route path="brand" element={<Brand/>}/>
                         <Route path="brand/add" element={<AddBrand/>}/>
                         <Route path="brand/edit/:id" element={<EditBrand/>}/>
-                        <Route path="comment" element={<Comment />}/>
+                        {/*<Route path="comment" element={<Comment />}/>*/}
                         <Route path="order" element={<Order />}/>
                         <Route path="role" element={<Role />}/>
                         <Route path="role/add" element={<AddRole />}/>

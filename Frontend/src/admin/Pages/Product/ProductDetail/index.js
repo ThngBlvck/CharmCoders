@@ -48,7 +48,6 @@ export default function ProductDetail() {
                             <div className="bg-white shadow-md rounded-lg p-5 m-5">
                                 <img
                                     src={product.image}
-                                    alt={product.name}
                                     className="h-64 w-64 object-cover rounded"
                                 />
                             </div>

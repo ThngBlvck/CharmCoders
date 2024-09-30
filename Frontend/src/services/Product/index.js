@@ -25,8 +25,8 @@ export const postProduct = (data) => {
 
 export const updateProduct = (id, data) => {
     return request({
-        method: 'PUT',
-        path: `products/${id}`,
+        method: 'POST',
+        path: `products/${id}?_method=PUT`,
         data
     });
 };

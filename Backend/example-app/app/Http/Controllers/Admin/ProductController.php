@@ -27,7 +27,7 @@ class ProductController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('public/images/products', $imageName);
-            $validatedData['image'] = asset('Backend/storage/images/products/') . $imageName;
+            $validatedData['image'] = asset('storage/images/products/' . $imageName);
         }
 
         $product = Product::create($validatedData);
@@ -54,7 +54,7 @@ class ProductController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('public/images/products', $imageName);
-            $validatedData['image'] = asset('Backend/storage/images/products/') . $imageName;
+            $validatedData['image'] = asset('storage/images/products/' . $imageName);
         }
 
         $product->update($validatedData);
