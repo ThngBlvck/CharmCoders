@@ -22,8 +22,10 @@ use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Client\MailController;
+use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
+use App\Http\Controllers\Admin\AuthController;
 
 Route::prefix('admin')->group(function () {
 
