@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Client\MailController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
+use App\Http\Controllers\Admin\AuthController;
 
 Route::prefix('admin')->group(function () {
 
@@ -34,8 +35,7 @@ Route::prefix('admin')->group(function () {
 Route::apiResource('productCategory', CategoryController::class);
     Route::apiResource('role', RoleController::class);
     Route::apiResource('comment', CommentController::class);
-Route::apiResource('productCategory', CategoryController::class);
-    Route::apiResource('role', RoleController::class);
+    Route::apiResource('productCategory', CategoryController::class);
     Route::apiResource('comment', CommentController::class);
 
     Route::apiResource('roles', RoleController::class);
@@ -47,7 +47,11 @@ Route::apiResource('productCategory', CategoryController::class);
     Route::apiResource('image', ImageController::class);
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('cart', CartController::class);
-    Route::apiResource('user', UserController::class);
+
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('products', ProductController::class);
+    Route::apiResource('image', ImageController::class);
+    Route::apiResource('orders', OrderController::class);
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
@@ -59,4 +63,5 @@ Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->post('/checkout', [CheckoutController::class, 'checkout']);
 
 });
-
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'Register']);
