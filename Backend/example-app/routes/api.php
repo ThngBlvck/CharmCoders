@@ -63,5 +63,4 @@ Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->post('/checkout', [CheckoutController::class, 'checkout']);
 
 });
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'Register']);
+
