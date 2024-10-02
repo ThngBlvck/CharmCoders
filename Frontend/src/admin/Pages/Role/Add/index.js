@@ -33,7 +33,7 @@ export default function AddRole({ color = "light" }) {
 
             Swal.fire('Thành công!', 'Thêm vai trò thành công.', 'success');
             reset();
-            navigate('/admin/role_management');
+            navigate('/admin/role');
         } catch (err) {
             console.error('Error adding role:', err);
             Swal.fire('Lỗi', 'Lỗi khi thêm vai trò. Vui lòng thử lại.', 'error');
