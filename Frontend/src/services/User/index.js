@@ -7,9 +7,24 @@ export const login = async (credentials) => {
             path: 'login',
             data: credentials,
         });
-        return response; // Đảm bảo trả về response đúng
+        return response; 
     } catch (error) {
-        throw error; // Ném lỗi để frontend có thể xử lý
+        throw error; 
     }
 };
+
+export const register = async (userData) => {
+    try {
+        const response = await request({
+            method: 'POST',
+            path: 'register',
+            data: userData,
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 
