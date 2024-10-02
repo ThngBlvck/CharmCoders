@@ -29,6 +29,10 @@ class Order extends Model
      * Quan hệ với model `User`.
      * Một đơn hàng thuộc về một người dùng.
      */
+    public function details()
+    {
+        return $this->hasMany(Order_Detail::class);
+    }
     public function user()
     {
         return $this->belongsTo(User::class);
