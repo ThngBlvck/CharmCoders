@@ -30,6 +30,12 @@ import EditEmployee from "./Pages/User/Edit";
 // Blog and BlogCategory
 import Blog from "./Pages/Blog/List";
 import BlogCaterogy from "./Pages/BlogCategory/List";
+import AddProductCategory from "./Pages/ProductCategory/Add";
+import EditProductCaterogy from "./Pages/ProductCategory/Edit";
+
+import AddBrand from "./Pages/Brand/Add";
+import EditBrand from "./Pages/Brand/Edit";
+
 import AddBlogCategory from "./Pages/BlogCategory/Add";
 import EditBlogCategory from "./Pages/BlogCategory/Edit";
 import AddBlog from "./Pages/Blog/Add";
