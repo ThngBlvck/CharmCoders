@@ -15,27 +15,34 @@ use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Client\MailController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
+use App\Http\Controllers\Admin\AuthController;
 
 Route::prefix('admin')->group(function () {
+
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('blog', BlogController::class);
     Route::apiResource('blogcategory', BlogCategoryController::class);
-    Route::apiResource('user', UserController::class);
-
-    Route::apiResource('roles', RoleController::class);
+    Route::apiResource('productCategory', CategoryController::class);
+    Route::apiResource('comment', CommentController::class);
+    Route::put('brands/update/{id}', [BrandController::class,'update']);
+    Route::apiResource('blog', BlogController::class);
+    Route::apiResource('role', RoleController::class);
     Route::apiResource('comments', CommentController::class);
-
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('products', ProductController::class);
     Route::get('/search', [ProductController::class, 'search']);//http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('cart', CartController::class);
+    Route::apiResource('orders', OrderController::class);
 });
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'Register']);
 
 Route::prefix('client')->group(function () {
     Route::get('/products/search', [ClientProductController::class, 'search']);//http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('send-mail', [ClientProductController::class, 'sendMail']);//http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::post('/contact', [MailController::class, 'sendMail']);//mail
+    Route::post('/contact/send', [MailController::class, 'send']);
 
 });
+
