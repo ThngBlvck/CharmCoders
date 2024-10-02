@@ -1,24 +1,25 @@
 import request from '../../api';
 
+const Ad = 'admin/';
 
 export const getRole = () => {
     return request({
         method: 'GET',
-        path: 'role'
+        path: `${Ad}role`
     });
 };
 
 export const getOneRole = (id) => {
     return request({
         method: 'GET',
-        path: `role/${id}`
+        path: `${Ad}role/${id}`
     });
 };
 
 export const postRole = (data) => {
     return request({
         method: 'POST',
-        path: 'role',
+        path: `${Ad}role`,
         data
     });
 };
@@ -26,7 +27,7 @@ export const postRole = (data) => {
 export const updateRole = (id, data) => {
     return request({
         method: 'PUT',
-        path: `role/${id}`,
+        path: `${Ad}role/${id}`,
         data
     });
 };
@@ -34,6 +35,6 @@ export const updateRole = (id, data) => {
 export const deleteRole = (id) => {
     return request({
         method: 'DELETE',
-        path: `role/${id}`
+        path: `${Ad}role/${id}`
     });
 };

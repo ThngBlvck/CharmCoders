@@ -16,9 +16,8 @@ import EditProduct from "./Pages/Product/Edit";
 
 import ProductCategory from "./Pages/ProductCategory/List";
 import Blog from "./Pages/Blog";
-import Brand from "./Pages/Brand/List";
-// import Comment from "./Pages/Comment/List";
-import Role from "./Pages/Role/List";
+// import Brand from "./Pages/Brand";
+import Comment from "./Pages/Comment";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
 import AddProductCategory from "./Pages/ProductCategory/Add";
