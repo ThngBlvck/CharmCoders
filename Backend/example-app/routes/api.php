@@ -45,6 +45,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('image', ImageController::class);
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('cart', CartController::class);
+    Route::apiResource('user', UserController::class);
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
