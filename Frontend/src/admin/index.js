@@ -53,8 +53,15 @@ export default function Admin() {
                         <Route path="category_blog" element={<BlogCaterogy />} />
                         <Route path="category_blog/add" element={<AddBlogCategory />} />
                         <Route path="category_blog/edit/:id" element={<EditBlogCategory />} />
+
                         <Route path="blog" element={<Blog />}/>
+
                         <Route path="brand" element={<Brand />}/>
+                        <Route path="brand/add" element={<AddBrand />}/>
+                        <Route path="brand/edit/:id" element={<EditBrand />}/>
+
+
+
                         <Route path="comment" element={<Comment />}/>
                         <Route path="order" element={<Order />}/>
                         <Route path="role" element={<Role />}/>
