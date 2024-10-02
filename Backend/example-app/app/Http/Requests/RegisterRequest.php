@@ -34,7 +34,7 @@ class RegisterRequest extends FormRequest
             'password.required' => 'Vui lòng nhập mật khẩu.',
             'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
-            'address.required' => 'Vui lòng nhập địa chỉ.', 
+            'address.required' => 'Vui lòng nhập địa chỉ.',
         ];
     }
 
@@ -46,5 +46,5 @@ class RegisterRequest extends FormRequest
             'errors' => $validator->errors(), // Chuyển đổi lỗi thành một mảng
         ], 422));
     }
-    
+
 }
