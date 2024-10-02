@@ -1,23 +1,24 @@
 import request from '../../api';
 
+const Ad = 'admin/'
 export const getBrand = () => {
     return request({
         method: 'GET',
-        path: 'admin/brands'
+        path: `${Ad}brands`
     });
 };
 
 export const getOneBrand = (id) => {
     return request({
         method: 'GET',
-        path: `admin/brands/${id}`
+        path: `${Ad}brands/${id}`
     });
 };
 
 export const postBrand = (data) => {
     return request({
         method: 'POST',
-        path: 'admin/brands',
+        path: `${Ad}brands`,
         data
     });
 };
@@ -25,7 +26,7 @@ export const postBrand = (data) => {
 export const updateBrand = (id, data) => {
     return request({
         method: 'POST',
-        path: `admin/brands/${id}`,
+        path: `${Ad}brands/${id}`,
         data
     });
 };
@@ -33,6 +34,6 @@ export const updateBrand = (id, data) => {
 export const deleteBrand = (id) => {
     return request({
         method: 'DELETE',
-        path: `admin/brands/${id}`
+        path: `${Ad}brands/${id}`
     });
 };
