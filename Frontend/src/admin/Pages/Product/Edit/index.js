@@ -24,7 +24,6 @@ export default function EditProduct({ color = "light" }) {
     const [selectedImage, setSelectedImage] = useState(null); // State lưu trữ hình ảnh đã chọn
 
     useEffect(() => {
-        // Lấy dữ liệu sản phẩm và danh sách nhãn hàng, danh mục khi component được render
         const fetchProductData = async () => {
             setIsLoading(true); // Bắt đầu trạng thái tải
             try {
@@ -38,14 +37,12 @@ export default function EditProduct({ color = "light" }) {
                 setCategories(categoryList); // Lưu danh sách danh mục vào state
                 setOriginalProduct(product); // Lưu dữ liệu sản phẩm gốc
 
-                // Reset form với dữ liệu sản phẩm, bao gồm cả brand_id và category_id
                 reset({
                     ...product,
                     brand_id: product.brand_id || '', // Đặt giá trị mặc định cho nhãn hàng
                     category_id: product.category_id || '', // Đặt giá trị mặc định cho danh mục
                 });
 
-                // Lưu URL hình ảnh vào state
                 if (product.image) {
                     setSelectedImage(product.image); // Lưu đường dẫn hình ảnh gốc
                 }
@@ -88,15 +85,17 @@ export default function EditProduct({ color = "light" }) {
             formData.append('sale_price', data.sale_price || originalProduct.sale_price);
             formData.append('quantity', data.quantity || originalProduct.quantity);
             formData.append('content', data.content || originalProduct.content);
+            formData.append("_method", "PUT");
 
-            // Thêm ảnh nếu có
-            if (data.image && data.image.length > 0 && data.image[0]) {
-                formData.append('image', data.image[0]);
+            // Thêm ảnh nếu người dùng chọn mới, nếu không thì giữ nguyên ảnh cũ
+            if (data.image && data.image[0]) {
+                formData.append('image', data.image[0]); // Hình ảnh mới được chọn
+            } else if (originalProduct.image) {
+                formData.append('image', originalProduct.image); // Hình ảnh cũ từ CSDL
             }
 
             formData.append("_method", "PUT");
 
-            // Gửi dữ liệu cập nhật lên API
             const response = await updateProduct(id, formData);
             console.log("Phản hồi từ API:", response);
             Swal.fire({
@@ -119,13 +118,26 @@ export default function EditProduct({ color = "light" }) {
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            // Hiển thị hình ảnh đã chọn
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+
+            // Kiểm tra định dạng file
+            if (!validImageTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File không hợp lệ',
+                    text: 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
             const imageUrl = URL.createObjectURL(file);
-            setSelectedImage(imageUrl); // Lưu đường dẫn hình ảnh đã chọn
+            setSelectedImage(imageUrl); // Hiển thị hình ảnh đã chọn
         } else {
-            setSelectedImage(originalProduct.image); // Nếu không có hình ảnh, đặt lại thành hình ảnh gốc
+            setSelectedImage(originalProduct.image); // Nếu không có hình ảnh mới, đặt lại hình ảnh gốc
         }
     };
+
 
     if (isLoading) {
         return <div>Đang tải dữ liệu...</div>; // Hiển thị khi đang tải dữ liệu
@@ -166,7 +178,7 @@ export default function EditProduct({ color = "light" }) {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         >
                             <option value="">Chọn nhãn hàng</option>
-                            {brands.map((brand) => (
+                            {brands?.map((brand) => (
                                 <option key={brand.id} value={brand.id}>{brand.name}</option>
                             ))}
                         </select>
@@ -181,16 +193,29 @@ export default function EditProduct({ color = "light" }) {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         >
                             <option value="">Chọn danh mục</option>
-                            {categories.map((category) => (
+                            {categories?.map((category) => (
                                 <option key={category.id} value={category.id}>{category.name}</option>
                             ))}
                         </select>
                         {errors.category_id && <p className="text-red-500 text-xs italic">{errors.category_id.message}</p>}
                     </div>
 
+                    {/* Trạng thái */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
+                        <select
+                            {...register("status", {required: "Vui lòng chọn trạng thái"})}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        >
+                            <option value="0">Còn hàng</option>
+                            <option value="1">Hết hàng</option>
+                        </select>
+                        {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
+                    </div>
+
                     {/* Giá gốc */}
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Giá gốc</label>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Giá gốc (VND)</label>
                         <input
                             type="number"
                             {...register("unit_price", {required: "Giá gốc là bắt buộc"})}
@@ -202,13 +227,35 @@ export default function EditProduct({ color = "light" }) {
 
                     {/* Giá sale */}
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Giá sale</label>
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Giá sale (VND)</label>
                         <input
                             type="number"
                             {...register("sale_price")}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Nhập giá sale"
                         />
+                    </div>
+
+                    {/* Hình ảnh */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh</label>
+                        {selectedImage && <img src={selectedImage} alt="Hình ảnh sản phẩm" className="mb-4 w-40 h-40 object-cover"/>}
+                        <input
+                            type="file"
+                            {...register("image")}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            onChange={handleImageChange}
+                        />
+                    </div>
+
+                    {/* Nội dung */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Nội dung</label>
+                        <textarea
+                            {...register("content")}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            placeholder="Nhập nội dung sản phẩm"
+                        ></textarea>
                     </div>
 
                     {/* Số lượng */}
@@ -223,53 +270,14 @@ export default function EditProduct({ color = "light" }) {
                         {errors.quantity && <p className="text-red-500 text-xs italic">{errors.quantity.message}</p>}
                     </div>
 
-                    {/* Trạng thái */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                        <select
-                            {...register("status", {required: "Vui lòng chọn trạng thái"})}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        >
-                            <option value="">Chọn trạng thái</option>
-                            <option value="0">An</option>
-                            <option value="1">Ngừng hoạt động</option>
-                        </select>
-                        {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
-                    </div>
-
-                    {/* Nội dung */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Nội dung</label>
-                        <textarea
-                            {...register("content")}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            placeholder="Nhập nội dung"
-                        />
-                    </div>
-
-                    {/* Hình ảnh */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            {...register("image")}
-                            onChange={handleImageChange}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        />
-                        {/* Hiển thị hình ảnh đã chọn hoặc hình ảnh gốc */}
-                        {selectedImage && (
-                            <img src={selectedImage} alt="Selected" className="mt-2 h-32 object-cover" />
-                        )}
-                    </div>
-
+                    {/* Nút Submit */}
                     <div className="flex items-center justify-between">
                         <button
                             type="submit"
-                            disabled={isSubmitting}
                             className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                            disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật'}
+                            Cập nhật sản phẩm
                         </button>
                     </div>
                 </form>
@@ -277,3 +285,7 @@ export default function EditProduct({ color = "light" }) {
         </div>
     );
 }
+
+EditProduct.propTypes = {
+    color: PropTypes.oneOf(["light", "dark"]),
+};

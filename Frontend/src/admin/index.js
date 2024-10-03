@@ -31,15 +31,9 @@ import AddBlogCategory from "./Pages/BlogCategory/Add";
 import EditBlogCategory from "./Pages/BlogCategory/Edit";
 
 
-import EditBrand from "./Pages/Brand/Edit";
-import AddBrand from "./Pages/Brand/Add";
-
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
 
-import EditProductCaterogy from "./Pages/ProductCategory/Edit";
-// import Settings from "views/admin/Settings.js";
-// import Tables from "views/admin/Tables.js";
 
 export default function Admin() {
     return (
@@ -55,7 +49,7 @@ export default function Admin() {
 
                         <Route path="category_product" element={<ProductCategory />} />
                         <Route path="category_product/add" element={<AddProductCategory />} />
-                        {/*<Route path="category_product/edit" element={<EditProductCaterogy />} />*/}
+                        <Route path="category_product/edit/:id" element={<EditProductCaterogy />} />
 
                         <Route path="product" element={<Product />} />
                         <Route path="product/add" element={<AddProduct />} />
