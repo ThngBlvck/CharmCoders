@@ -1,24 +1,25 @@
 import request from '../../api';
 
+const URL_Product = 'admin/products'
 
 export const getProduct = () => {
     return request({
         method: 'GET',
-        path: 'products'
+        path: `${URL_Product}`
     });
 };
 
 export const getOneProduct = (id) => {
     return request({
         method: 'GET',
-        path: `products/${id}`
+        path: `${URL_Product}/${id}`
     });
 };
 
 export const postProduct = (data) => {
     return request({
         method: 'POST',
-        path: 'products',
+        path: `${URL_Product}`,
         data
     });
 };
@@ -26,7 +27,7 @@ export const postProduct = (data) => {
 export const updateProduct = (id, data) => {
     return request({
         method: 'POST',
-        path: `products/${id}?_method=PUT`,
+        path: `${URL_Product}/${id}?_method=PUT`,
         data
     });
 };
@@ -34,6 +35,6 @@ export const updateProduct = (id, data) => {
 export const deleteProduct = (id) => {
     return request({
         method: 'DELETE',
-        path: `products/${id}`
+        path: `${URL_Product}/${id}`
     });
 };
