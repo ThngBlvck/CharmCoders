@@ -42,7 +42,9 @@ class RegisterRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => $validator->errors(),
+            'message' => 'Dữ liệu không hợp lệ.',
+            'errors' => $validator->errors(), // Chuyển đổi lỗi thành một mảng
         ], 422));
     }
+    
 }
