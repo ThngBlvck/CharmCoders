@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ImageController;
-use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Client\MailController;
 use App\Http\Controllers\Admin\UserController;

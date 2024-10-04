@@ -12,6 +12,7 @@ export default function ProductCategoryList() {
         fetchProducts();  // Gọi lại API mỗi khi searchTerm thay đổi
     }, [searchTerm]);
 
+
     const removeVietnameseTones = (str) => {
         const accents = {
             a: 'áàảãạâấầẩẫậăắằẳẵặ',
@@ -34,25 +35,31 @@ export default function ProductCategoryList() {
         try {
             let result;
             if (searchTerm.trim() === "") {
-                // Nếu không có từ khóa tìm kiếm, lấy tất cả sản phẩm
                 result = await getProduct();
             } else {
-                // Nếu có từ khóa tìm kiếm, gọi API tìm kiếm
-                const sanitizedSearchTerm = removeVietnameseTones(searchTerm);  // Loại bỏ dấu nếu cần
-                result = await searchProduct(sanitizedSearchTerm);  // Gọi API tìm kiếm
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm);
+                result = await searchProduct(sanitizedSearchTerm);
             }
 
-            console.log("Search result:", result);  // Kiểm tra kết quả từ API
+            console.log("Full API result:", result);
 
-            if (result.success) {
-                setProduct(result.products);  // Cập nhật danh sách sản phẩm
+            // Giả định result là mảng sản phẩm
+            if (Array.isArray(result)) {
+                setProduct(result);
+            } else if (result && result.products && Array.isArray(result.products)) {
+                setProduct(result.products);
             } else {
-                setProduct([]);  // Nếu không thành công, set sản phẩm là mảng rỗng
+                setProduct([]);
             }
+
         } catch (error) {
             console.error("Lỗi khi lấy danh mục sản phẩm:", error);
+            setProduct([]);
         }
     };
+
+
+    console.log("Products after fetch:", products);
 
     const handleDelete = async (id) => {
         const result = await Swal.fire({
@@ -108,7 +115,7 @@ export default function ProductCategoryList() {
                     className="border border-gray-300 rounded px-3 py-2 w-full"
                     placeholder="Tìm kiếm sản phẩm..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}  // Cập nhật searchTerm khi người dùng nhập
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
@@ -118,10 +125,18 @@ export default function ProductCategoryList() {
                     <tr>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình ảnh</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá gốc</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá sale</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao tác</th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình
+                            ảnh
+                        </th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
+                            gốc
+                        </th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
+                            sale
+                        </th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
+                            tác
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
@@ -135,7 +150,7 @@ export default function ProductCategoryList() {
                                 </th>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.name}</td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                    <img src={product.image} alt={product.name} className="h-12 w-12 rounded" />
+                                    <img src={product.image} alt={product.name} className="h-12 w-12 rounded"/>
                                 </td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.unit_price.toLocaleString()} VND</td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.sale_price.toLocaleString()} VND</td>
