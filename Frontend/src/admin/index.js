@@ -30,11 +30,10 @@ import EditBrand from "./Pages/Brand/Edit";
 import AddBlogCategory from "./Pages/BlogCategory/Add";
 import EditBlogCategory from "./Pages/BlogCategory/Edit";
 
+
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
 
-// import Settings from "views/admin/Settings.js";
-// import Tables from "views/admin/Tables.js";
 
 export default function Admin() {
     return (
