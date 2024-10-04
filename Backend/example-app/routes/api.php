@@ -5,12 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\RoleController;
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
+use App\Http\Controllers\Admin\RoleController;
 
 
 
@@ -36,22 +32,14 @@ Route::apiResource('productCategory', CategoryController::class);
     Route::apiResource('role', RoleController::class);
     Route::apiResource('comment', CommentController::class);
     Route::apiResource('productCategory', CategoryController::class);
-    Route::apiResource('comment', CommentController::class);
 
-    Route::apiResource('roles', RoleController::class);
-    Route::apiResource('comments', CommentController::class);
 
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('products', ProductController::class);
     Route::get('/search', [ProductController::class, 'search']);//http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);
     Route::apiResource('orders', OrderController::class);
-    Route::apiResource('cart', CartController::class);
-
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('products', ProductController::class);
-    Route::apiResource('image', ImageController::class);
-    Route::apiResource('orders', OrderController::class);
+    Route::apiResource('cart', CartController::class);;
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
