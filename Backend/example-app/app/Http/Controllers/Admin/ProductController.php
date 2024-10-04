@@ -86,19 +86,16 @@ class ProductController extends Controller
         // Lấy từ khóa tìm kiếm từ request
         $query = $request->input('query');
 
-        // Nếu không có từ khóa tìm kiếm, trả về lỗi
+        // Nếu không có từ khóa tìm kiếm, hiển thị tất cả sản phẩm
         if (!$query) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Vui lòng cung cấp từ khóa tìm kiếm.',
-            ], 400);
+            $products = Product::all();
+        } else {
+            // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
+            $products = Product::where('name', 'LIKE', "%{$query}%")
+                ->orWhere('content', 'LIKE', "%{$query}%")
+                ->orWhere('unit_price', 'LIKE', "%{$query}%")
+                ->get();
         }
-
-        // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
-        $products = Product::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('content', 'LIKE', "%{$query}%")
-            ->orWhere('unit_price', 'LIKE', "%{$query}%")
-            ->get();
 
         // Nếu không tìm thấy sản phẩm
         if ($products->isEmpty()) {
@@ -108,11 +105,12 @@ class ProductController extends Controller
             ], 404);
         }
 
-        // Trả về danh sách sản phẩm phù hợp
+        // Trả về danh sách sản phẩm phù hợp hoặc tất cả sản phẩm
         return response()->json([
             'success' => true,
             'products' => $products,
         ], 200);
     }
+
 
 }
