@@ -1,21 +1,54 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getProduct, deleteProduct } from "../../../../services/Product";
+import { getProduct, deleteProduct, searchProduct } from "../../../../services/Product";  // Gọi API hỗ trợ tìm kiếm qua từ khóa
 import Swal from 'sweetalert2';
 
 export default function ProductCategoryList() {
-    const [products, setProduct] = useState([]);
+    const [products, setProduct] = useState([]);  // State để lưu danh sách sản phẩm
+    const [searchTerm, setSearchTerm] = useState("");  // State lưu từ khóa tìm kiếm
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchProducts();
-    }, []);
+        fetchProducts();  // Gọi lại API mỗi khi searchTerm thay đổi
+    }, [searchTerm]);
+
+    const removeVietnameseTones = (str) => {
+        const accents = {
+            a: 'áàảãạâấầẩẫậăắằẳẵặ',
+            e: 'éèẻẽẹêếềểễệ',
+            i: 'íìỉĩị',
+            o: 'óòỏõọôốồổỗộơớờởỡợ',
+            u: 'úùủũụưứừửữự',
+            y: 'ýỳỷỹỵ',
+            d: 'đ'
+        };
+
+        for (let nonAccent in accents) {
+            const accent = accents[nonAccent];
+            str = str.replace(new RegExp(`[${accent}]`, 'g'), nonAccent);
+        }
+        return str;
+    };
 
     const fetchProducts = async () => {
         try {
-            const result = await getProduct();
-            setProduct(result);
-            console.log("kiểm tra: ",result);
+            let result;
+            if (searchTerm.trim() === "") {
+                // Nếu không có từ khóa tìm kiếm, lấy tất cả sản phẩm
+                result = await getProduct();
+            } else {
+                // Nếu có từ khóa tìm kiếm, gọi API tìm kiếm
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm);  // Loại bỏ dấu nếu cần
+                result = await searchProduct(sanitizedSearchTerm);  // Gọi API tìm kiếm
+            }
+
+            console.log("Search result:", result);  // Kiểm tra kết quả từ API
+
+            if (result.success) {
+                setProduct(result.products);  // Cập nhật danh sách sản phẩm
+            } else {
+                setProduct([]);  // Nếu không thành công, set sản phẩm là mảng rỗng
+            }
         } catch (error) {
             console.error("Lỗi khi lấy danh mục sản phẩm:", error);
         }
@@ -36,7 +69,7 @@ export default function ProductCategoryList() {
         if (result.isConfirmed) {
             try {
                 await deleteProduct(id);
-                setProduct(products.filter(product => product.id !== id));
+                setProduct(products.filter(product => product.id !== id));  // Cập nhật lại danh sách sản phẩm
                 Swal.fire('Đã xóa!', 'Sản phẩm đã được xóa.', 'success');
             } catch (error) {
                 console.error("Lỗi khi xóa sản phẩm:", error);
@@ -67,6 +100,18 @@ export default function ProductCategoryList() {
                     </NavLink>
                 </div>
             </div>
+
+            {/* Input tìm kiếm sản phẩm */}
+            <div className="mb-4 px-4">
+                <input
+                    type="text"
+                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                    placeholder="Tìm kiếm sản phẩm..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}  // Cập nhật searchTerm khi người dùng nhập
+                />
+            </div>
+
             <div className="block w-full overflow-x-auto">
                 <table className="items-center w-full bg-transparent border-collapse table-fixed">
                     <thead>
@@ -80,7 +125,7 @@ export default function ProductCategoryList() {
                     </tr>
                     </thead>
                     <tbody>
-                    {products ? (
+                    {products && products.length > 0 ? (
                         products.map((product, index) => (
                             <tr key={product.id}>
                                 <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
@@ -90,8 +135,7 @@ export default function ProductCategoryList() {
                                 </th>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.name}</td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                    <img src={product.image} className="h-12 w-12 rounded"/>
-
+                                    <img src={product.image} alt={product.name} className="h-12 w-12 rounded" />
                                 </td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.unit_price.toLocaleString()} VND</td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.sale_price.toLocaleString()} VND</td>
