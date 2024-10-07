@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CommentController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Client\MailController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 Route::prefix('admin')->group(function () {
 
@@ -23,7 +25,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('blogcategory', BlogCategoryController::class);
     Route::apiResource('productCategory', CategoryController::class);
     Route::apiResource('comment', CommentController::class);
-    Route::put('brands/update/{id}', [BrandController::class,'update']);
+    Route::put('brands/update/{id}', [BrandController::class, 'update']);
     Route::apiResource('blog', BlogController::class);
     Route::apiResource('role', RoleController::class);
     Route::apiResource('comments', CommentController::class);
@@ -35,8 +37,9 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('cart', CartController::class);
     Route::apiResource('orders', OrderController::class);
 });
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'Register']);
+Route::post('/register', [AuthController::class, ' Register']);
 
 Route::prefix('client')->group(function () {
     Route::get('/products/search', [ClientProductController::class, 'search']);//http://localhost:8000/api/client/products/search?query=teneanpham
