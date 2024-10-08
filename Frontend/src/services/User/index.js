@@ -27,5 +27,37 @@ export const register = async (userData) => {
     }
 };
 
+export const logout = async () => {
+    try {
+        // Lấy token từ localStorage
+        const token = localStorage.getItem('token');
+        console.log(token);
+        
+        // Kiểm tra xem token có tồn tại hay không
+        if (!token) {
+            throw new Error('Chưa có token để đăng xuất');
+        }
+
+        // Gửi yêu cầu đăng xuất
+        const response = await request({
+            method: 'POST',
+            path: 'logout',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Gửi token trong tiêu đề Authorization
+                'Content-Type': 'application/json', 
+            },
+        });
+
+        // Xóa token khỏi localStorage sau khi đăng xuất thành công
+        localStorage.removeItem('token');
+
+        return response;
+    } catch (error) {
+        console.log('Đăng xuất không thành công:', error); // Log lỗi để kiểm tra
+        throw error; 
+    }
+};
+
+
 
 

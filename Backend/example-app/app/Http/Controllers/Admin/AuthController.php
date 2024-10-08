@@ -16,6 +16,9 @@ class AuthController extends Controller
     {
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
+            $user->tokens->each(function ($token, $key) {
+                $token->delete();
+            });
             if ($user->role_id == 2) {
                 // Admin
                 $token = $user->createToken('AdminToken', ['admin'])->accessToken;
@@ -43,13 +46,13 @@ class AuthController extends Controller
     public function Register(RegisterRequest $request)
     {
         try {
-            
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password), 
-                'address' => $request->address, 
-                'role_id' => 1, 
+                'password' => Hash::make($request->password),
+                'address' => $request->address,
+                'role_id' => 1,
             ]);
             $token = $user->createToken('app')->accessToken;
             return response([
@@ -61,5 +64,24 @@ class AuthController extends Controller
                 'message' => $exception->getMessage()
             ], 400);
         }
+    }
+
+    public function logout(Request $request)
+    {
+        // Tìm người dùng hiện tại dựa trên token đã gửi
+        $user = Auth::user();
+
+        if ($user) {
+            // Hủy token hiện tại của người dùng
+            $user->token()->revoke();
+
+            return response()->json([
+                'message' => 'Đăng xuất thành công',
+            ], 200);
+        }
+
+        return response()->json([
+            'message' => 'Không tìm thấy người dùng hoặc người dùng chưa đăng nhập',
+        ], 401);
     }
 }

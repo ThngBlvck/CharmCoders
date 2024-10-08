@@ -43,6 +43,8 @@ Route::prefix('admin')->group(function () {
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
+
 
 Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->post('/checkout', [CheckoutController::class, 'checkout']);//http://localhost:8000/api/client/products/search?query=teneanpham

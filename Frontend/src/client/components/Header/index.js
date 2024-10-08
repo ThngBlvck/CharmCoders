@@ -2,15 +2,28 @@ import React, { useState } from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
 import { NavLink, useNavigate } from "react-router-dom";
+import { logout } from "../../../services/User";
 
 export default function Header() {
     const [searchTerm, setSearchTerm] = useState("");
+    const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token")); // Kiểm tra xem đã đăng nhập chưa
     const navigate = useNavigate();
+
 
     // Hàm xử lý khi người dùng nhấn vào icon tìm kiếm
     const handleSearch = () => {
         if (searchTerm.trim()) {
             navigate(`/search?query=${searchTerm}`);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            setIsLoggedIn(false); 
+            navigate('/login'); 
+        } catch (error) {
+            console.error("Đăng xuất không thành công:", error);
         }
     };
 
