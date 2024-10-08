@@ -114,6 +114,7 @@
 .navbar .dropdown-toggle::after {
     border: none;
     content: "\f107";
+    font-family: "Roboto";
     font-weight: 700;
     vertical-align: middle;
     margin-left: 8px;
@@ -715,12 +716,10 @@
     background-color: #ff7e6b; /* Màu nền khi đang chọn */
     border-color: #ff7e6b;
     color: white;
-    cursor: default; /* Con trỏ mặc định, không phải con trỏ trỏ tay */
-    pointer-events: none; /* Vô hiệu hóa việc ấn hoặc hover */
 }
 
 .pagination-custom .page-item .page-link:hover {
-    background-color: #fdc1b8; /* Màu nền khi hover */
+    background-color: #fff7f8; /* Màu nền khi hover */
     color: #8c5e58;
 }
 
