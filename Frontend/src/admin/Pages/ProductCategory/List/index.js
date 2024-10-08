@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 
 export default function ProductCategory({ color = "light" }) {
     const [categories, setCategories] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]); // Lưu trữ các danh mục đã chọn
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -53,6 +54,47 @@ export default function ProductCategory({ color = "light" }) {
         }
     };
 
+    const handleDeleteSelected = async () => {
+        const result = await Swal.fire({
+            title: 'Bạn có chắc chắn?',
+            text: "Bạn sẽ không thể khôi phục các danh mục này!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Có!',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await Promise.all(selectedCategories.map(id => deleteCategory(id)));
+                setCategories(categories.filter(category => !selectedCategories.includes(category.id)));
+                setSelectedCategories([]); // Clear danh sách đã chọn
+                Swal.fire('Đã xóa!', 'Các danh mục đã được xóa.', 'success');
+            } catch (error) {
+                console.error("Lỗi khi xóa danh mục:", error);
+                Swal.fire('Có lỗi xảy ra!', 'Không thể xóa các danh mục này.', 'error');
+            }
+        }
+    };
+
+    const handleSelectCategory = (id) => {
+        if (selectedCategories.includes(id)) {
+            setSelectedCategories(selectedCategories.filter(categoryId => categoryId !== id));
+        } else {
+            setSelectedCategories([...selectedCategories, id]);
+        }
+    };
+
+    const handleSelectAll = () => {
+        if (selectedCategories.length === categories.length) {
+            setSelectedCategories([]);
+        } else {
+            setSelectedCategories(categories.map(category => category.id));
+        }
+    };
+
     const handleEdit = (id) => {
         navigate(`/admin/category_product/edit/${id}`);
     };
@@ -92,72 +134,35 @@ export default function ProductCategory({ color = "light" }) {
                     <table className="items-center w-full bg-transparent border-collapse table-fixed">
                         <thead>
                         <tr>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "10%" }}
-                            >
-                                STT
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                <input
+                                    type="checkbox"
+                                    onChange={handleSelectAll}
+                                    checked={selectedCategories.length === categories.length}
+                                />
                             </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "40%" }}
-                            >
-                                Tên danh mục
-                            </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "25%" }}
-                            >
-                                Trạng Thái
-                            </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "25%" }}
-                            >
-                                Hành động
-                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên danh mục</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng thái</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {categories ? (
+                        {categories.length > 0 ? (
                             categories.map((category, index) => (
                                 <tr key={category.id}>
-                                    <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                        <span
-                                            className={
-                                                "ml-3 font-bold " +
-                                                (color === "light" ? "text-blueGray-600" : "text-white")
-                                            }
-                                        >
-                                            {index + 1}
-                                        </span>
-                                    </th>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {category.name}
+                                    <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedCategories.includes(category.id)}
+                                            onChange={() => handleSelectCategory(category.id)}
+                                        />
                                     </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {getStatusText(category.status)} {/* Hiển thị trạng thái */}
+                                        {category.name.length > 30 ? category.name.substring(0, 30) + "..." : category.name}
                                     </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{getStatusText(category.status)}</td>
                                     <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                         <button
                                             className="text-blue-500 hover:text-blue-700 px-2"
@@ -176,7 +181,7 @@ export default function ProductCategory({ color = "light" }) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4" className="text-center p-4">
+                                <td colSpan="5" className="text-center p-4">
                                     Không có danh mục nào
                                 </td>
                             </tr>
@@ -184,6 +189,18 @@ export default function ProductCategory({ color = "light" }) {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Nút xóa hàng loạt */}
+                {selectedCategories.length > 0 && (
+                    <div className="mb-4 px-4">
+                        <button
+                            className="bg-red-500 text-white text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
+                            onClick={handleDeleteSelected}
+                        >
+                            Xóa các danh mục đã chọn
+                        </button>
+                    </div>
+                )}
             </div>
         </>
     );

@@ -1,4 +1,5 @@
 import request from '../../api';
+const URL_User = "admin/users"
 
 export const login = async (credentials) => {
     try {
