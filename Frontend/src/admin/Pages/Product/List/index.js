@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getProduct, deleteProduct, searchProduct } from "../../../../services/Product";  // Gọi API hỗ trợ tìm kiếm qua từ khóa
+import { getProduct, deleteProduct, searchProduct } from "../../../../services/Product";
 import Swal from 'sweetalert2';
 
 export default function ProductCategoryList() {
-    const [products, setProduct] = useState([]);  // State để lưu danh sách sản phẩm
-    const [searchTerm, setSearchTerm] = useState("");  // State lưu từ khóa tìm kiếm
+    const [products, setProduct] = useState([]);
+    const [selectedProducts, setSelectedProducts] = useState([]); // State lưu sản phẩm được chọn
+    const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchProducts();  // Gọi lại API mỗi khi searchTerm thay đổi
+        fetchProducts();
     }, [searchTerm]);
-
 
     const removeVietnameseTones = (str) => {
         const accents = {
@@ -43,7 +43,6 @@ export default function ProductCategoryList() {
 
             console.log("Full API result:", result);
 
-            // Giả định result là mảng sản phẩm
             if (Array.isArray(result)) {
                 setProduct(result);
             } else if (result && result.products && Array.isArray(result.products)) {
@@ -57,9 +56,6 @@ export default function ProductCategoryList() {
             setProduct([]);
         }
     };
-
-
-    console.log("Products after fetch:", products);
 
     const handleDelete = async (id) => {
         const result = await Swal.fire({
@@ -76,11 +72,36 @@ export default function ProductCategoryList() {
         if (result.isConfirmed) {
             try {
                 await deleteProduct(id);
-                setProduct(products.filter(product => product.id !== id));  // Cập nhật lại danh sách sản phẩm
+                setProduct(products.filter(product => product.id !== id));
                 Swal.fire('Đã xóa!', 'Sản phẩm đã được xóa.', 'success');
             } catch (error) {
                 console.error("Lỗi khi xóa sản phẩm:", error);
                 Swal.fire('Có lỗi xảy ra!', 'Không thể xóa sản phẩm này.', 'error');
+            }
+        }
+    };
+
+    const handleDeleteSelected = async () => {
+        const result = await Swal.fire({
+            title: 'Bạn có chắc chắn?',
+            text: "Bạn sẽ không thể khôi phục các sản phẩm này!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Có!',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await Promise.all(selectedProducts.map(id => deleteProduct(id)));
+                setProduct(products.filter(product => !selectedProducts.includes(product.id)));
+                setSelectedProducts([]); // Clear danh sách đã chọn
+                Swal.fire('Đã xóa!', 'Các sản phẩm đã được xóa.', 'success');
+            } catch (error) {
+                console.error("Lỗi khi xóa sản phẩm:", error);
+                Swal.fire('Có lỗi xảy ra!', 'Không thể xóa các sản phẩm này.', 'error');
             }
         }
     };
@@ -91,6 +112,22 @@ export default function ProductCategoryList() {
 
     const handleViewDetail = (id) => {
         navigate(`/admin/product/detail/${id}`);
+    };
+
+    const handleSelectProduct = (id) => {
+        if (selectedProducts.includes(id)) {
+            setSelectedProducts(selectedProducts.filter(productId => productId !== id));
+        } else {
+            setSelectedProducts([...selectedProducts, id]);
+        }
+    };
+
+    const handleSelectAll = () => {
+        if (selectedProducts.length === products.length) {
+            setSelectedProducts([]);
+        } else {
+            setSelectedProducts(products.map(product => product.id));
+        }
     };
 
     return (
@@ -123,32 +160,42 @@ export default function ProductCategoryList() {
                 <table className="items-center w-full bg-transparent border-collapse table-fixed">
                     <thead>
                     <tr>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                            <input
+                                type="checkbox"
+                                onChange={handleSelectAll}
+                                checked={selectedProducts.length === products.length}
+                            />
+                        </th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình
-                            ảnh
-                        </th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
-                            gốc
-                        </th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
-                            sale
-                        </th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
-                            tác
-                        </th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình ảnh</th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá gốc</th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá sale</th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao tác</th>
                     </tr>
                     </thead>
                     <tbody>
                     {products && products.length > 0 ? (
                         products.map((product, index) => (
                             <tr key={product.id}>
+                                <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedProducts.includes(product.id)}
+                                        onChange={() => handleSelectProduct(product.id)}
+                                    />
+                                </td>
+                                <td>
                                 <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                    <span className="ml-3 font-bold text-blueGray-600">
+                                    <span className="ml-3 text-blueGray-600">
                                         {index + 1}
                                     </span>
                                 </th>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.name}</td>
+                                </td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                    {product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}
+                                </td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
                                     <img src={product.image} alt={product.name} className="h-12 w-12 rounded"/>
                                 </td>
@@ -174,7 +221,7 @@ export default function ProductCategoryList() {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="6" className="text-center p-4">
+                            <td colSpan="7" className="text-center p-4">
                                 Không có sản phẩm nào
                             </td>
                         </tr>
@@ -182,6 +229,18 @@ export default function ProductCategoryList() {
                     </tbody>
                 </table>
             </div>
+
+            {/* Nút xóa hàng loạt */}
+            {selectedProducts.length > 0 && (
+                <div className="mb-4 px-4">
+                    <button
+                        className="bg-red-500 text-white text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
+                        onClick={handleDeleteSelected}
+                    >
+                        Xóa các sản phẩm đã chọn
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

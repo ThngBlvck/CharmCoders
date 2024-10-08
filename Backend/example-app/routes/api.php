@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\CartController;
+
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Client\MailController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
