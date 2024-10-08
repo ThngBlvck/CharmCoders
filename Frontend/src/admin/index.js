@@ -37,7 +37,10 @@ import BlogCaterogy from "./Pages/BlogCategory/List";
 
 import AddBlogCategory from "./Pages/BlogCategory/Add";
 import EditBlogCategory from "./Pages/BlogCategory/Edit";
+import EditProductCaterogy from "./Pages/ProductCategory/Edit";
 
+import EditBrand from "./Pages/Brand/Edit";
+import AddBrand from "./Pages/Brand/Add";
 
 import EditBrand from "./Pages/Brand/Edit";
 import AddBrand from "./Pages/Brand/Add";
