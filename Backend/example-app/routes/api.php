@@ -81,6 +81,8 @@ Route::get('comments/product/{productId}', [CommentController::class, 'getCommen
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
+
 
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
