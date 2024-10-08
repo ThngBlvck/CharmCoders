@@ -18,7 +18,10 @@ use App\Http\Controllers\Client\MailController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\Client\CartController as CartClient;
+
 
 Route::prefix('admin')->group(function () {
 
@@ -39,14 +42,16 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('cart', CartController::class);
     Route::apiResource('orders', OrderController::class);
 });
-Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, ' Register']);
+Route::post('/register', [AuthController::class, 'Register']);
 
 Route::prefix('client')->group(function () {
+    Route::middleware('auth:api')->post('/checkout', [CheckoutController::class, 'checkout']);//http://localhost:8000/api/client/products/search?query=teneanpham
+    Route::middleware('auth:api')->get('/getCart', [CartClient::class, 'getCart']);//http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('/products/search', [ClientProductController::class, 'search']);//http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('send-mail', [ClientProductController::class, 'sendMail']);//http://localhost:8000/api/client/products/search?query=teneanpham
     Route::post('/contact/send', [MailController::class, 'send']);
-
+    // Route để yêu cầu đặt lại mật khẩu qua API
+    Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('client.reset-password');
 });
 
