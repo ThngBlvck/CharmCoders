@@ -17,7 +17,6 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Client\MailController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
-use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\CartController as CartClient;
