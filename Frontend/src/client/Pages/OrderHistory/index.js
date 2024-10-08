@@ -10,10 +10,12 @@ export default function OrderHistory() {
             products: [
                 { name: "Sản phẩm 1", quantity: 1, price: 100000 },
                 { name: "Sản phẩm A", quantity: 1, price: 200000 },
+                { name: "Sản phẩm B", quantity: 1, price: 300000 },
+                { name: "Sản phẩm C", quantity: 1, price: 400000 },
             ],
-            total: 300000,
-            status: "Đang chờ xác nhận",
-            paymentMethod: "Thanh toán khi nhận hàng"
+            total: 1000000,
+            status: "Đã giao",
+            paymentMethod: "Thanh toán chuyển khoản"
         },
         {
             id: 2,
@@ -22,44 +24,44 @@ export default function OrderHistory() {
                 { name: "Sản phẩm B", quantity: 1, price: 400000 },
             ],
             total: 1000000,
-            status: "Đang chờ xác nhận",
-            paymentMethod: "Thanh toán chuyển khoản"
+            status: "Đã giao",
+            paymentMethod: "Thanh toán khi nhận hàng"
         },
         {
             id: 3,
             products: [
-                { name: "Sản phẩm D", quantity: 1, price: 200000 },
-                { name: "Sản phẩm E", quantity: 1, price: 400000 },
+                { name: "Sản phẩm Aaa", quantity: 1, price: 600000 },
+                { name: "Sản phẩm Bbb", quantity: 1, price: 400000 },
+                { name: "Sản phẩm Ccc", quantity: 1, price: 400000 },
             ],
-            total: 600000,
-            status: "Đang giao",
-            paymentMethod: "Thanh toán chuyển khoản"
+            total: 1400000,
+            status: "Đã hủy",
+            paymentMethod: "Thanh toán khi nhận hàng"
         },
         {
             id: 4,
             products: [
-                { name: "Sản phẩm Abc", quantity: 1, price: 100000 },
-                { name: "Sản phẩm Def", quantity: 1, price: 100000 },
+                { name: "Sản phẩm Aaa", quantity: 1, price: 600000 },
             ],
-            total: 200000,
-            status: "Đang giao",
-            paymentMethod: "Thanh toán khi nhận hàng"
+            total: 600000,
+            status: "Đã hủy",
+            paymentMethod: "Thanh toán chuyển khoản"
         },
     ];
 
     // Hàm để xác định màu của status
     const getStatusStyle = (status) => {
-        if (status === "Đang giao") {
-            return { color: "#23bb44" }; // Màu xanh lá cây
-        } else if (status === "Đang chờ xác nhận") {
-            return { color: "#ff7e6b" }; // Màu cam
+        if (status === "Đã giao") {
+            return { color: "#28a745" };
+        } else if (status === "Đã hủy") {
+            return { color: "#ff0000" };
         }
         return {};
     };
 
     return (
         <div className="container mt-5">
-            <p className="headingStyle font-semibold">Đơn đã mua</p>
+            <p className="headingStyle font-semibold">Lịch sử đơn hàng</p>
             {orders.map((order) => (
                 <div key={order.id} className="order-history-card mb-4 cardStyle">
                     <div className="headerStyle">
@@ -69,7 +71,7 @@ export default function OrderHistory() {
                         </div>
                     </div>
                     <div className="bodyStyle">
-                        {order.products.map((product, index) => (
+                    {order.products.map((product, index) => (
                             <div key={index} className="product-item productRowStyle">
                                 <div className="d-flex productDetailsStyle">
                                     <div className="imageContainerStyle">
@@ -89,7 +91,7 @@ export default function OrderHistory() {
                                         </NavLink>
 
                                         <div className="product-quantity quantityStyle">
-                                            x {product.quantity}
+                                        x {product.quantity}
                                         </div>
                                     </div>
                                 </div>

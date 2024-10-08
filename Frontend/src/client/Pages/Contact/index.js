@@ -9,7 +9,7 @@ export default function Contact() {
         <>
             <div className="container-fluid py-3" style={{backgroundColor: "#fff7f8"}}>
                 <div className="container text-center py-5">
-                    <p className="display-3 mb-4" style={{color: "#ffa69e"}}>Liên hệ</p>
+                    <p className="mb-4 font-semibold" style={{color: "#ffa69e", fontSize: "40px"}}>Liên hệ</p>
                     <ol className="breadcrumb justify-content-center mb-0">
                         <li className="breadcrumb-item font-bold" style={{color: "#ffa69e"}}><NavLink to={`/home`}>Trang
                             chủ</NavLink></li>
@@ -23,9 +23,9 @@ export default function Contact() {
                     <div className="row g-4 align-items-center">
                         <div className="col-lg-6">
                             <div className="text-center">
-                                <p className="display-4 text-white mb-4">Liên hệ với chúng tôi</p>
-                                <p className="text-white fs-4">Nếu bạn có thắc mắc hay có đóng góp, vui lòng liên hệ với
-                                    chúng tôi bang cách điền thông tin vào form bên cạnh.</p>
+                                <p className="text-white mb-4 font-bold" style={{fontSize: "2rem"}}>Liên hệ với GlowMakers</p>
+                                <p className="text-white font-semibold" style={{fontSize: "1.5rem"}}>Bạn có thắc mắc hay đóng góp, vui lòng liên hệ với
+                                    chúng tôi bằng cách điền thông tin vào form bên cạnh.</p>
                             </div>
                         </div>
                         <div className="col-lg-6">
@@ -63,8 +63,8 @@ export default function Contact() {
                 </div>
             </div>
             <div className="mx-auto text-center" style={{maxWidth: "800px", marginTop: '100px'}}>
-                <p className="fs-4 text-uppercase text-center text-primary">Glow Makers</p>
-                <p className="display-3" style={{color: '#8c5e58'}}>Liên hệ</p>
+                <p className="fs-4 text-center text-primary font-bold custom-font">GlowMakers</p>
+                <p className="font-bold" style={{color: '#8c5e58', fontSize: "30px"}}>Liên hệ</p>
             </div>
             <div className="container-fluid">
                 <div className="container py-5">
