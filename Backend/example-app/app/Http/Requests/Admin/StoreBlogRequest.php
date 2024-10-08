@@ -28,8 +28,8 @@ class StoreBlogRequest extends FormRequest
         $rule = [
             'title' => 'required|string|max:255|unique:blogs,title',
             'content' => 'required|string',
-            'user_id' => 'required|integer|exists:users,id',
-            'category_id' => 'required|integer|exists:blog_categories,id',
+            'user_id' => 'nullable|integer|exists:users,id',
+            'category_id' => 'nullable|integer|exists:blog_categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'int',
         ];
@@ -44,8 +44,8 @@ class StoreBlogRequest extends FormRequest
                     Rule::unique('blogs', 'title')->ignore($blogId),
                 ],
                 'content' => 'required|string',
-                'user_id' => 'required|integer|exists:users,id',
-                'category_id' => 'required|integer|exists:blog_categories,id',
+                'user_id' => 'nullable|integer|exists:users,id',
+                'category_id' => 'nullable|integer|exists:blog_categories,id',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ];
         }
@@ -58,10 +58,8 @@ class StoreBlogRequest extends FormRequest
             'title.required' => 'Tiêu đề là bắt buộc.',
             'title.unique' => 'Tiêu đề này đã tồn tại.',
             'content.required' => 'Nội dung là bắt buộc.',
-            'user_id.required' => 'User ID là bắt buộc.',
-            'user_id.exists' => 'User ID không tồn tại.',
-            'category_id.required' => 'Category ID là bắt buộc.',
-            'category_id.exists' => 'Category ID không tồn tại.',
+
+
             'image.image' => 'File tải lên phải là một hình ảnh.',
             'image.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif.',
             'image.max' => 'Kích thước hình ảnh vượt quá 2MB.',
