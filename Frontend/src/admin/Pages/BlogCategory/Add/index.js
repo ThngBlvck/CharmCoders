@@ -1,9 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { postBlogCategory } from "../../../../services/BlogCategory";
+import { postBlogCategory } from "../../../../services/BlogCategory"; // Import the service
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'; // Thêm thư viện sweetalert2
 
 export default function AddBlogCategory({ color = "light" }) {
     const {
@@ -12,16 +12,25 @@ export default function AddBlogCategory({ color = "light" }) {
         formState: { errors, isSubmitting },
         reset,
     } = useForm();
-    const navigate = useNavigate();
+
+    const navigate = useNavigate(); // Initialize hook useNavigate
 
     const onSubmit = async (data) => {
         if (!data.categoryName.trim()) {
-            Swal.fire('Error', 'Tên danh mục không được bỏ trống.', 'error');
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Tên danh mục không được bỏ trống.',
+            });
             return;
         }
 
         if (!data.status) {
-            Swal.fire('Error', 'Vui lòng chọn trạng thái.', 'error');
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Vui lòng chọn trạng thái.',
+            });
             return;
         }
 
@@ -31,18 +40,29 @@ export default function AddBlogCategory({ color = "light" }) {
                 status: data.status,
             });
 
-            // Success alert with SweetAlert2
-            Swal.fire('Thành công!', 'Thêm danh mục blog thành công.', 'success');
-            reset();
-            navigate('/admin/category_blog');
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công',
+                text: 'Thêm danh mục blog thành công.',
+            });
+
+            reset(); // Xóa dữ liệu form sau khi thành công
+            navigate('/admin/category_blog'); // Chuyển hướng về trang danh mục blog
+
         } catch (err) {
             console.error('Error adding blog category:', err);
-            Swal.fire('Lỗi', 'Lỗi khi thêm danh mục blog. Vui lòng thử lại.', 'error');
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Lỗi khi thêm danh mục blog. Vui lòng thử lại.',
+            });
         }
     };
 
     return (
-        <div className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}>
+        <div
+            className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}
+        >
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex flex-wrap items-center">
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
@@ -74,8 +94,8 @@ export default function AddBlogCategory({ color = "light" }) {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         >
                             <option value="">Chọn trạng thái</option>
-                            <option value="1">Hiển thị</option>
-                            <option value="0">Ẩn</option>
+                            <option value="1">Hoạt động</option>
+                            <option value="0">Chờ duyệt</option>
                         </select>
                         {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                     </div>
@@ -88,13 +108,6 @@ export default function AddBlogCategory({ color = "light" }) {
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? "Đang thêm..." : "Thêm danh mục"}
-                        </button>
-                        <button
-                            type="button"
-                            className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-                            onClick={() => navigate('/admin/category_blog')}
-                        >
-                            Hủy bỏ
                         </button>
                     </div>
                 </form>
