@@ -114,7 +114,6 @@
 .navbar .dropdown-toggle::after {
     border: none;
     content: "\f107";
-    font-family: "Roboto";
     font-weight: 700;
     vertical-align: middle;
     margin-left: 8px;
@@ -716,13 +715,290 @@
     background-color: #ff7e6b; /* Màu nền khi đang chọn */
     border-color: #ff7e6b;
     color: white;
+    cursor: default; /* Con trỏ mặc định, không phải con trỏ trỏ tay */
+    pointer-events: none; /* Vô hiệu hóa việc ấn hoặc hover */
 }
 
 .pagination-custom .page-item .page-link:hover {
-    background-color: #fff7f8; /* Màu nền khi hover */
+    background-color: #fdc1b8; /* Màu nền khi hover */
     color: #8c5e58;
 }
 
 .btn-submit:hover {
-    background-color: #ff7e6b !important;
+    background-color: #f69d90 !important;
+}
+
+.bg-hover:hover {
+    box-shadow: 0 4px 8px #fdc1b8;
+}
+
+.modal-item:hover {
+    color: #ffa69e !important;
+}
+
+.fa-trash:hover,
+.fa-eye:hover {
+    color: #ffa69e !important;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 2;
+}
+
+.modal-body {
+    overflow-y: auto;
+    max-height: 400px; /* Adjust as needed */
+}
+
+.chat-icon {
+    background-color: #ff7e6b; /* Adjust as needed */
+    color: white;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.chat-icon:hover {
+    background-color: #ff6b5b; /* Darker shade on hover */
+}
+
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Giữa các tin nhắn */
+}
+
+.chat-message {
+    display: flex;
+    align-items: center;
+}
+
+.user {
+    flex-direction: row-reverse; /* Tin nhắn người dùng bên phải */
+}
+
+.admin {
+    flex-direction: row; /* Tin nhắn admin bên trái */
+}
+
+.user-avatar, .admin-avatar {
+    width: 50px; /* Kích thước avatar */
+    height: 50px; /* Kích thước avatar */
+    border-radius: 50%; /* Đường viền tròn */
+    overflow: hidden; /* Ẩn phần thừa */
+    margin-left: 10px; /* Khoảng cách giữa tin nhắn và avatar người dùng */
+    margin-right: 10px; /* Khoảng cách giữa tin nhắn và avatar admin */
+}
+
+.user-avatar {
+    margin-left: 10px; /* Khoảng cách giữa tin nhắn và avatar người dùng */
+}
+
+.admin-avatar {
+    margin-right: 10px; /* Khoảng cách giữa tin nhắn và avatar admin */
+}
+
+.user-avatar img, .admin-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Đảm bảo ảnh không bị méo */
+}
+
+.message-content {
+    max-width: 60%; /* Giới hạn chiều rộng tin nhắn */
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.user .message-content {
+    background-color: #d4edda; /* Màu nền tin nhắn người dùng */
+}
+
+.admin .message-content {
+    background-color: #f8d7da; /* Màu nền tin nhắn admin */
+}
+
+.custom-font {
+    font-family: 'Caveat', cursive;
+}
+
+.cart-header, .cart-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-header {
+    background-color: #feeef0;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.cart-header-item {
+    color: #8c5e58;
+}
+
+.headingStyle {
+    color: #8c5e58;
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.cardStyle {
+    background-color: #fff7f8;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px;
+    padding: 20px;
+    font-size: 16px;
+    color: #8c5e58;
+}
+
+.headerStyle {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.headerRowStyle {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    color: #8c5e58;
+}
+
+.statusStyle {
+    color: #28a745;
+}
+
+.bodyStyle {
+    padding: 10px 0;
+}
+
+.productRowStyle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.productDetailsStyle {
+    display: flex;
+    align-items: center;
+}
+
+.imageContainerStyle {
+    margin-right: 15px;
+}
+
+.imageStyle {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.productNameStyle {
+    font-weight: 500;
+    font-size: 16px;
+    color: #8c5e58;
+}
+
+.quantityStyle {
+    font-weight: 500;
+    font-size: 16px;
+    color: #8c5e58;
+}
+
+.priceStyle {
+    text-align: right;
+    font-weight: 500;
+    font-size: 16px;
+    color: red;
+}
+
+.totalAmountStyle {
+    color: #ff5151;
+}
+
+.footerStyle {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    font-size: 18px;
+    color: #8c5e58;
+}
+
+.search-menu {
+    width: 100%; /* Đảm bảo dropdown search sử dụng toàn bộ chiều rộng */
+}
+
+.search-item {
+    display: flex; /* Đảm bảo các phần tử bên trong căn chỉnh theo hàng */
+    align-items: center; /* Căn giữa các phần tử dọc */
+    white-space: nowrap; /* Ngăn chặn ngắt dòng */
+    overflow: hidden; /* Ẩn phần thừa */
+    text-overflow: ellipsis; /* Hiển thị dấu ... */
+}
+
+.product-n {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; /* Hiển thị tối đa 2 dòng */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Hiển thị dấu ... */
+    margin-bottom: 0; /* Bỏ margin dưới cùng */
+    max-width: 150px; /* Giới hạn chiều rộng tối đa để ngăn cuộn ngang */
+}
+
+.brand-card:hover {
+    transform: scale(1.05); /* Hiệu ứng phóng to nhẹ khi hover */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    background-color: rgba(0, 0, 0, 0.3); /* Nền nút điều hướng */
+}
+
+.slick-arrow.slick-prev,
+.slick-arrow.slick-next {
+    display: none !important; /* Ẩn mũi tên mặc định */
+}
+
+.custom-next-arrow,
+.custom-prev-arrow {
+    display: block !important; /* Bảo đảm mũi tên tùy chỉnh được hiển thị */
+    position: absolute;
+    z-index: 2; /* Đảm bảo mũi tên nằm trên slider */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    cursor: pointer;
+}
+.custom-next-arrow {
+    right: 10px; /* Vị trí bên phải cho mũi tên next */
+}
+
+.custom-prev-arrow {
+    left: 10px; /* Vị trí bên trái cho mũi tên prev */
 }

@@ -13,7 +13,7 @@ import Product from "./Pages/Product/List";
 import ProductCategory from "./Pages/ProductCategory/List";
 import Blog from "./Pages/Blog";
 import Brand from "./Pages/Brand/List";
-import Comment from "./Pages/Comment/List";
+// import Comment from "./Pages/Comment/List";
 import Role from "./Pages/Role/List";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
@@ -58,7 +58,7 @@ export default function Admin() {
                         <Route path="brand" element={<Brand/>}/>
                         <Route path="brand/add" element={<AddBrand/>}/>
                         <Route path="brand/edit/:id" element={<EditBrand/>}/>
-                        <Route path="comment" element={<Comment />}/>
+                        {/*<Route path="comment" element={<Comment />}/>*/}
                         <Route path="order" element={<Order />}/>
                         <Route path="role" element={<Role />}/>
                         <Route path="role/add" element={<AddRole />}/>

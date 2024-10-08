@@ -63,7 +63,7 @@ export default function Profile() {
                     </div>
                     <div className="col-lg-8">
                         <div className="p-4 bg-light border rounded">
-                            <p className="font-bold mb-4" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin cá
+                            <p className="font-semibold mb-4 text-center" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin cá
                                 nhân</p>
                             <form>
                                 <div className="form-group mb-4">
@@ -115,7 +115,7 @@ export default function Profile() {
                                     />
                                 </div>
                                 {isEditing && (
-                                    <button className="btn btn-primary w-100 mt-3 font-bold" type="submit" style={{color: '#442e2b', fontSize: "20px"}}>
+                                    <button className="btn btn-primary w-100 mt-3 font-semibold" type="submit" style={{color: '#442e2b', fontSize: "20px"}}>
                                         Lưu thay đổi
                                     </button>
                                 )}
