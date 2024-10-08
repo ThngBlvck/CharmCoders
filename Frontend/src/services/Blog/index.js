@@ -1,38 +1,38 @@
 import request from '../../api';
 
 const Ad = 'admin/'
-export const getBrand = () => {
+export const getBlog = () => {
     return request({
         method: 'GET',
-        path: `${Ad}brands`
+        path: `${Ad}blog`
     });
 };
 
-export const getOneBrand = (id) => {
+export const getOneBlog = (id) => {
     return request({
         method: 'GET',
-        path: `${Ad}brands/${id}`
+        path: `${Ad}blog/${id}`
     });
 };
 
-export const postBrand = (data) => {
+export const postBlog = (data) => {
     return request({
         method: 'POST',
-        path: `${Ad}brands`,
+        path: `${Ad}blog`,
         data
     });
 };
-export const updateBrand = (id, data) => {
+export const updateBlog = (id, data) => {
     return request({
         method: 'POST',
-        path: `${Ad}brands/${id}`,
+        path: `${Ad}blog/${id}?_method=put`,
         data
     });
 };
 
-export const deleteBrand = (id) => {
+export const deleteBlog = (id) => {
     return request({
         method: 'DELETE',
-        path: `${Ad}brands/${id}`
+        path: `${Ad}blog/${id}`
     });
 };

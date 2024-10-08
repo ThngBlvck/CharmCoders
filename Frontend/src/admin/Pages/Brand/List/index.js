@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getBrand, deleteBrand } from '../../../../services/Brand'; // Adjust the path based on your folder structure
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import { getBrand, deleteBrand } from '../../../../services/Brand';
+import Swal from 'sweetalert2';
 
 export default function Brand({ color }) {
     const [brands, setBrands] = useState([]);
-    const navigate = useNavigate(); // Initialize useNavigate
+    const [selectedBrands, setSelectedBrands] = useState(new Set()); // Track selected brands
+    const navigate = useNavigate();
     const renderStatus = (status) => (status == "1" ? "Hiển thị" : "Ẩn");
 
     useEffect(() => {
@@ -15,21 +16,19 @@ export default function Brand({ color }) {
 
     const fetchBrands = async () => {
         try {
-            const result = await getBrand(); // Fetch brands using the API
-            setBrands(result || []); // Ensure that it's always an array
+            const result = await getBrand();
+            setBrands(result || []);
         } catch (err) {
             console.error('Error fetching brands:', err);
-            setBrands([]); // Set an empty array in case of an error
+            setBrands([]);
             Swal.fire('Lỗi', 'Lỗi khi tải danh sách nhãn hàng. Vui lòng thử lại.', 'error');
         }
     };
 
-    // Handle Edit Click
     const handleEditClick = (id) => {
         navigate(`/admin/brand/edit/${id}`);
     };
 
-    // Handle Delete Click
     const handleDeleteClick = async (brand) => {
         const confirmDelete = await Swal.fire({
             title: `Bạn có chắc chắn muốn xóa nhãn hàng "${brand.name}" không?`,
@@ -41,14 +40,52 @@ export default function Brand({ color }) {
 
         if (confirmDelete.isConfirmed) {
             try {
-                await deleteBrand(brand.id); // Call the delete API
+                await deleteBrand(brand.id);
                 Swal.fire('Thành công', 'Xóa nhãn hàng thành công.', 'success');
-                fetchBrands(); // Refresh the list after deletion
+                fetchBrands();
             } catch (err) {
                 console.error('Error deleting brand:', err);
                 Swal.fire('Lỗi', 'Lỗi khi xóa nhãn hàng. Vui lòng thử lại.', 'error');
             }
         }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedBrands.size === 0) {
+            Swal.fire('Lỗi', 'Chưa chọn nhãn hàng nào để xóa.', 'warning');
+            return;
+        }
+
+        const confirmBulkDelete = await Swal.fire({
+            title: `Bạn có chắc chắn muốn xóa ${selectedBrands.size} nhãn hàng đã chọn không?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Có',
+            cancelButtonText: 'Không',
+        });
+
+        if (confirmBulkDelete.isConfirmed) {
+            for (let brandId of selectedBrands) {
+                try {
+                    await deleteBrand(brandId);
+                } catch (err) {
+                    console.error('Error deleting brand:', err);
+                }
+            }
+            Swal.fire('Thành công', 'Đã xóa nhãn hàng đã chọn.', 'success');
+            fetchBrands(); // Refresh the list after deletion
+            setSelectedBrands(new Set()); // Clear selection
+        }
+    };
+
+    const handleSelectBrand = (id) => {
+        const updatedSelection = new Set(selectedBrands);
+        if (updatedSelection.has(id)) {
+            updatedSelection.delete(id);
+        } else {
+            updatedSelection.add(id);
+        }
+        setSelectedBrands(updatedSelection);
     };
 
     return (
@@ -78,13 +115,22 @@ export default function Brand({ color }) {
                         >
                             THÊM NHÃN HÀNG
                         </NavLink>
+                        <button
+                            className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                            type="button"
+                            onClick={handleBulkDelete}
+                        >
+                            XÓA CHỌN
+                        </button>
                     </div>
                 </div>
                 <div className="block w-full overflow-x-auto">
-                    {/* Brand table */}
                     <table className="items-center w-full bg-transparent border-collapse table-fixed">
                         <thead>
                         <tr>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"
+                                style={{ width: "10%" }}
+                            >Chọn</th>
                             <th className={
                                 "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
                                 (color === "light"
@@ -131,13 +177,20 @@ export default function Brand({ color }) {
                         {brands.length > 0 ? (
                             brands.map((brand, index) => (
                                 <tr key={brand.id}>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedBrands.has(brand.id)}
+                                            onChange={() => handleSelectBrand(brand.id)}
+                                        />
+                                    </td>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
                                             <span className="ml-3 font-bold">
                                                 {index + 1}
                                             </span>
                                     </th>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        <img src={brand.image} className="w-16 h-16 object-cover center"  />
+                                        <img src={brand.image} className="w-16 h-16 object-cover center" />
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
                                         {brand.name}
@@ -163,7 +216,7 @@ export default function Brand({ color }) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className="text-center">
+                                <td colSpan="6" className="text-center">
                                     Không có nhãn hàng nào
                                 </td>
                             </tr>
@@ -172,8 +225,6 @@ export default function Brand({ color }) {
                     </table>
                 </div>
             </div>
-
-            {/* Remove ToastContainer since we're using SweetAlert2 */}
         </>
     );
 }
