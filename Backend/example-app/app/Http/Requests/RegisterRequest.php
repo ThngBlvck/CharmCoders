@@ -19,7 +19,6 @@ class RegisterRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:5|confirmed',
-            'address' => 'required|string|max:255',
         ];
     }
 
@@ -34,7 +33,6 @@ class RegisterRequest extends FormRequest
             'password.required' => 'Vui lòng nhập mật khẩu.',
             'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
-            'address.required' => 'Vui lòng nhập địa chỉ.',
         ];
     }
 
