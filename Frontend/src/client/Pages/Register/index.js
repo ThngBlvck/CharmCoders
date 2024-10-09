@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "../../../assets/styles/css/bootstrap.min.css"; // Giữ lại nếu cần
-import "../../../assets/styles/css/style.css"
+import "../../../assets/styles/css/style.css";
+import { register } from "../../../services/User";
+
 export default function Register() {
     const [formData, setFormData] = useState({
         fullName: "",
@@ -8,22 +10,58 @@ export default function Register() {
         password: "",
         confirmPassword: ""
     });
+    const [errors, setErrors] = useState({});
+    const [successMessage, setSuccessMessage] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false); 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Kiểm tra và xử lý đăng ký ở đây
-        console.log("Dữ liệu đăng ký:", formData);
-        setFormData({
-            fullName: "",
-            email: "",
-            password: "",
-            confirmPassword: ""
-        });
+        setErrors({});
+        setSuccessMessage("");
+        setIsSubmitting(true);
+
+        if (formData.password !== formData.confirmPassword) {
+            setErrors({ confirmPassword: ["Mật khẩu không khớp"] });
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const dataToSend = {
+                name: formData.fullName,
+                email: formData.email,
+                password: formData.password,
+                password_confirmation: formData.confirmPassword,
+            };
+
+            const data = await register(dataToSend);
+            console.log("Đăng ký thành công:", data);
+            setSuccessMessage("Đăng ký thành công!");
+
+            // Reset form data
+            setFormData({
+                fullName: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+                phoneNumber: "",
+            });
+        } catch (error) {
+            // Xử lý lỗi từ backend
+            if (error.errors) {
+                setErrors(error.errors); // Giả định backend trả về các lỗi theo định dạng này
+            } else {
+                setErrors({ message: error.message }); // Lỗi khác
+            }
+            console.error("Error during registration:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -43,21 +81,31 @@ export default function Register() {
                                 name="fullName"
                                 value={formData.fullName}
                                 onChange={handleChange}
-                                required
+                                
                             />
+                            {errors.name && (
+                                    <div className="text-danger mt-2" role="alert">
+                                        {errors.name[0]}
+                                    </div>
+                                )}
                         </div>
                         <div className="mb-3">
                             <label htmlFor="email" className="form-label font-semibold"
                                    style={{color: '#8c5e58'}}>Email</label>
                             <input
-                                type="email"
+                                type="text"
                                 className="form-control border-0 shadow-sm"
                                 id="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                required
+                               
                             />
+                             {errors.email && (
+                                    <div className="text-danger mt-2" role="alert">
+                                        {errors.email[0]}
+                                    </div>
+                                )}
                         </div>
                         <div className="mb-3">
                             <label htmlFor="password" className="form-label font-semibold"
@@ -69,8 +117,13 @@ export default function Register() {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                required
                             />
+                            {errors.password && (
+                                    <div className="text-danger mt-2" role="alert">
+                                        {errors.password[0]}
+                                    </div>
+                                )}
+                            
                         </div>
                         <div className="mb-3">
                             <label htmlFor="confirmPassword" className="form-label font-semibold"
@@ -82,8 +135,13 @@ export default function Register() {
                                 name="confirmPassword"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
-                                required
+                                
                             />
+                            {errors.password_confirmation && (
+                                    <div className="text-danger mt-2" role="alert">
+                                        {errors.password_confirmation[0]}
+                                    </div>
+                                )}
                         </div>
                         <button type="submit" className="btn btn-primary w-100 font-semibold mt-1"
                                 style={{color: '#442e2b'}}><a href="/login">Đăng Ký</a>
