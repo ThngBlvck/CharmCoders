@@ -8,7 +8,7 @@ export default function Brand({ color }) {
     const [brands, setBrands] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState(new Set()); // Track selected brands
     const navigate = useNavigate();
-    const renderStatus = (status) => (status == "1" ? "Hiển thị" : "Ẩn");
+    const renderStatus = (status) => (status === "1" ? "Hiển thị" : "Ẩn");
 
     useEffect(() => {
         fetchBrands();
@@ -88,6 +88,15 @@ export default function Brand({ color }) {
         setSelectedBrands(updatedSelection);
     };
 
+    const handleSelectAll = (event) => {
+        if (event.target.checked) {
+            const allBrandIds = brands.map(brand => brand.id);
+            setSelectedBrands(new Set(allBrandIds));
+        } else {
+            setSelectedBrands(new Set());
+        }
+    };
+
     return (
         <>
             <div
@@ -115,13 +124,6 @@ export default function Brand({ color }) {
                         >
                             THÊM NHÃN HÀNG
                         </NavLink>
-                        <button
-                            className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                            onClick={handleBulkDelete}
-                        >
-                            XÓA CHỌN
-                        </button>
                     </div>
                 </div>
                 <div className="block w-full overflow-x-auto">
@@ -129,46 +131,33 @@ export default function Brand({ color }) {
                         <thead>
                         <tr>
                             <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"
-                                style={{ width: "10%" }}
-                            >Chọn</th>
-                            <th className={
-                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                            }
+                                style={{width: "15%"}}
+                            >
+                                <input
+                                    type="checkbox"
+                                    onChange={handleSelectAll}
+                                    checked={selectedBrands.size === brands.length}
+                                />
+                                <span className="ml-2">Chọn tất cả</span>
+                            </th>
+                            <th className={ "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700") }
                                 style={{ width: "10%" }}
                             >STT</th>
-                            <th className={
-                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                            }
+                            <th className={ "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700") }
                                 style={{ width: "15%" }}
                             >Hình ảnh</th>
-                            <th className={
-                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                            }
+                            <th className={ "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700") }
                                 style={{ width: "25%" }}
                             >Tên nhãn hàng</th>
-                            <th className={
-                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                            }
+                            <th className={ "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700") }
                                 style={{ width: "10%" }}
                             >Trạng Thái</th>
-                            <th className={
-                                "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                            }
+                            <th className={ "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700") }
                                 style={{ width: "10%" }}
                             >Hành động</th>
                         </tr>
@@ -185,9 +174,9 @@ export default function Brand({ color }) {
                                         />
                                     </td>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                            <span className="ml-3 font-bold">
-                                                {index + 1}
-                                            </span>
+                                        <span className="ml-3 font-bold">
+                                            {index + 1}
+                                        </span>
                                     </th>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
                                         <img src={brand.image} className="w-16 h-16 object-cover center" />
@@ -223,6 +212,17 @@ export default function Brand({ color }) {
                         )}
                         </tbody>
                     </table>
+                    {selectedBrands.size > 0 && ( // Render the delete button only if there are selected brands
+                        <div className="flex justify-end mt-4">
+                            <button
+                                className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none"
+                                type="button"
+                                onClick={handleBulkDelete}
+                            >
+                                XÓA đã CHỌN
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

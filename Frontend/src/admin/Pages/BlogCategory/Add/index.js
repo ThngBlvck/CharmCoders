@@ -94,8 +94,8 @@ export default function AddBlogCategory({ color = "light" }) {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         >
                             <option value="">Chọn trạng thái</option>
-                            <option value="1">Hoạt động</option>
-                            <option value="0">Chờ duyệt</option>
+                            <option value="1">Hiển thị</option>
+                            <option value="2">Ẩn</option>
                         </select>
                         {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                     </div>
