@@ -58,3 +58,6 @@ Route::prefix('client')->group(function () {
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
+
+Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
+Route::post('password/reset-otp', [ResetPasswordController::class, 'resetPasswordWithOtp']);
