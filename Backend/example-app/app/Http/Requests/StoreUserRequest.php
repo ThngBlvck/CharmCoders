@@ -27,7 +27,8 @@ class StoreUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:5'], 
             'phone' => ['required', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:15'], 
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], // Kích thước tối đa là 2MB
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'address' => ['nullable', 'string', 'max:255'], 
         ];
     
         // Nếu phương thức là PUT, không cần kiểm tra tính duy nhất cho email
@@ -57,6 +58,9 @@ class StoreUserRequest extends FormRequest
             'image.image' => 'Tệp phải là hình ảnh.',
             'image.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif.',
             'image.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
+            'address.string' => 'Địa chỉ phải là một chuỗi.',
+            'address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
+            
         ];
     }
 
