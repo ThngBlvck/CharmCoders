@@ -187,11 +187,11 @@ export default function ProductCategoryList() {
                                     />
                                 </td>
                                 <td>
-                                <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+                                    <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
                                     <span className="ml-3 text-blueGray-600">
                                         {index + 1}
                                     </span>
-                                </th>
+                                    </th>
                                 </td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
                                     {product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}
@@ -200,7 +200,9 @@ export default function ProductCategoryList() {
                                     <img src={product.image} alt={product.name} className="h-12 w-12 rounded"/>
                                 </td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.unit_price.toLocaleString()} VND</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.sale_price.toLocaleString()} VND</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                    {product.sale_price !== null ? product.sale_price.toLocaleString() + " VND" : "Không có"}
+                                </td>
                                 <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                     <button className="text-blue-500 hover:text-blue-700 px-2"
                                             onClick={() => handleViewDetail(product.id)}>
@@ -222,7 +224,7 @@ export default function ProductCategoryList() {
                     ) : (
                         <tr>
                             <td colSpan="7" className="text-center p-4">
-                                Không có sản phẩm nào
+                            Không có sản phẩm nào
                             </td>
                         </tr>
                     )}

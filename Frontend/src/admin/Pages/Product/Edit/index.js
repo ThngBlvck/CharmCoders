@@ -14,6 +14,8 @@ export default function EditProduct({ color = "light" }) {
         handleSubmit,
         formState: { errors, isSubmitting },
         reset,
+        setValue,
+        watch,
     } = useForm();
 
     const navigate = useNavigate();
@@ -41,6 +43,7 @@ export default function EditProduct({ color = "light" }) {
                     ...product,
                     brand_id: product.brand_id || '', // Đặt giá trị mặc định cho nhãn hàng
                     category_id: product.category_id || '', // Đặt giá trị mặc định cho danh mục
+                    status: product.quantity > 0 ? "0" : "1", // Cập nhật giá trị trạng thái ban đầu
                 });
 
                 if (product.image) {
@@ -61,6 +64,18 @@ export default function EditProduct({ color = "light" }) {
 
         fetchProductData(); // Gọi hàm để lấy dữ liệu khi component được mount
     }, [id, reset]);
+
+    const quantity = watch("quantity"); // Theo dõi số lượng
+
+    useEffect(() => {
+        // Cập nhật trạng thái dựa trên số lượng
+        if (quantity > 0) {
+            setValue("status", "0"); // Còn hàng
+        } else {
+            setValue("status", "1"); // Hết hàng
+        }
+    }, [quantity, setValue]);
+
 
     const onSubmit = async (data) => {
         if (!data.name || !data.quantity || !data.status || !data.unit_price) {
@@ -157,7 +172,9 @@ export default function EditProduct({ color = "light" }) {
                 </div>
             </div>
             <div className="p-4">
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap">
+                    {/* Cột 1 */}
+                    <div className="w-1/2 px-2">
                     {/* Tên sản phẩm */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">Tên sản phẩm</label>
@@ -199,20 +216,10 @@ export default function EditProduct({ color = "light" }) {
                         </select>
                         {errors.category_id && <p className="text-red-500 text-xs italic">{errors.category_id.message}</p>}
                     </div>
-
-                    {/* Trạng thái */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                        <select
-                            {...register("status", {required: "Vui lòng chọn trạng thái"})}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        >
-                            <option value="0">Còn hàng</option>
-                            <option value="1">Hết hàng</option>
-                        </select>
-                        {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                     </div>
 
+                    {/* Cột 2 */}
+                    <div className="w-1/2 px-2">
                     {/* Giá gốc */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">Giá gốc (VND)</label>
@@ -234,22 +241,36 @@ export default function EditProduct({ color = "light" }) {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Nhập giá sale"
                         />
-                    </div>
+                        </div>
 
-                    {/* Hình ảnh */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh</label>
-                        {selectedImage && <img src={selectedImage} alt="Hình ảnh sản phẩm" className="mb-4 w-40 h-40 object-cover"/>}
-                        <input
-                            type="file"
-                            {...register("image")}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            onChange={handleImageChange}
-                        />
+                        {/* Số lượng */}
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">Số lượng</label>
+                            <input
+                                type="number"
+                                {...register("quantity", { required: "Số lượng là bắt buộc" })}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                placeholder="Nhập số lượng"
+                            />
+                            {errors.quantity && <p className="text-red-500 text-xs italic">{errors.quantity.message}</p>}
+                        </div>
+
+                        {/* Trạng thái */}
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
+                            <select
+                                {...register("status")}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                disabled
+                            >
+                                <option value="0">Còn hàng</option>
+                                <option value="1">Hết hàng</option>
+                            </select>
+                        </div>
                     </div>
 
                     {/* Nội dung */}
-                    <div className="mb-4">
+                    <div className="mb-4 w-full w-2">
                         <label className="block text-gray-700 text-sm font-bold mb-2">Nội dung</label>
                         <textarea
                             {...register("content")}
@@ -258,17 +279,18 @@ export default function EditProduct({ color = "light" }) {
                         ></textarea>
                     </div>
 
-                    {/* Số lượng */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Số lượng</label>
+                    {/* Hình ảnh */}
+                    <div className="mb-4 w-full w-2">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh</label>
                         <input
-                            type="number"
-                            {...register("quantity", {required: "Số lượng là bắt buộc"})}
+                            type="file"
+                            {...register("image")}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            placeholder="Nhập số lượng"
+                            onChange={handleImageChange}
                         />
-                        {errors.quantity && <p className="text-red-500 text-xs italic">{errors.quantity.message}</p>}
+                        {selectedImage && <img src={selectedImage} alt="Hình ảnh sản phẩm" className="mb-4 w-40 h-40 object-cover"/>}
                     </div>
+
 
                     {/* Nút Submit */}
                     <div className="flex items-center justify-between">

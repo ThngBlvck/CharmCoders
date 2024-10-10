@@ -56,10 +56,12 @@ export default function ProductDetail() {
                         {/* Nội dung sản phẩm nằm bên phải */}
                         <div className="w-1/3 pl-12">
                             <p className="text-lg font-semibold mb-2">Giá gốc: {product.unit_price.toLocaleString()} VND</p>
-                            <p className="text-lg font-semibold mb-2">Giá sale: {product.sale_price.toLocaleString()} VND</p>
+                            <td className="text-lg font-semibold mb-2">Giá sale:
+                                {product.sale_price !== null ? product.sale_price.toLocaleString() + " VND" : " Không có"}
+                            </td>
                             <p className="text-lg font-semibold mb-2">Số lượng: {product.quantity}</p>
                             <p className="text-lg font-semibold mb-2">Lượt xem: {product.views}</p>
-                            <p className="text-lg font-semibold mb-2">Trạng thái: {product.status === 1 ? "Hiện" : "Ẩn"}</p>
+                            <p className="text-lg font-semibold mb-2">Trạng thái: {product.status === 1 ? "Còn Hàng" : "Hết Hàng"}</p>
                             <p className="text-lg font-semibold mb-2">Nhãn hàng: {brandName}</p> {/* Hiển thị tên nhãn hàng */}
                             <p className="text-lg font-semibold mb-2">Danh mục: {categoryName}</p> {/* Hiển thị tên danh mục */}
                             <p className="text-lg font-semibold mb-2">
