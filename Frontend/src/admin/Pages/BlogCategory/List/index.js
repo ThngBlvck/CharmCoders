@@ -6,8 +6,8 @@ import Swal from 'sweetalert2';
 
 export default function BlogCategory({ color }) {
     const [Blogcategories, setBlogcategories] = useState([]);
-    const [selectedCategories, setSelectedCategories] = useState([]); // State to track selected categories
-    const [selectAll, setSelectAll] = useState(false); // State to handle select all
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -126,12 +126,7 @@ export default function BlogCategory({ color }) {
                         >
                             Thêm danh mục
                         </NavLink>
-                        <button
-                            className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ml-2 mb-1 ease-linear transition-all duration-150"
-                            onClick={handleBulkDelete}
-                        >
-                            Xóa đã chọn
-                        </button>
+                        {/* Remove Xóa đã chọn button from here */}
                     </div>
                 </div>
                 <div className="block w-full overflow-x-auto">
@@ -139,7 +134,12 @@ export default function BlogCategory({ color }) {
                         <thead>
                         <tr>
                             <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
-                                chọn
+                                <input
+                                    type="checkbox"
+                                    checked={selectAll}
+                                    onChange={handleSelectAll}
+                                />
+                                <span className="ml-2">Chọn tất cả</span>
                             </th>
                             <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
                             <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên danh mục</th>
@@ -160,7 +160,9 @@ export default function BlogCategory({ color }) {
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{category.name}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{category.status}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        {category.status === 1 ? "Hiển thị" : "Ẩn"}
+                                    </td>
                                     <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                         <button
                                             className="text-blue-500 hover:text-blue-700 px-2 transition duration-150 ease-in-out"
@@ -185,11 +187,24 @@ export default function BlogCategory({ color }) {
                             </tr>
                         )}
                         </tbody>
+
                     </table>
                 </div>
+                {/* Move Xóa đã chọn button here */}
+                {selectedCategories.length > 0 && (
+                    <div className="flex justify-end mb-2">
+                        <button
+                            className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none"
+                            onClick={handleBulkDelete}
+                        >
+                            Xóa đã chọn
+                        </button>
+                    </div>
+                )}
             </div>
         </>
     );
+
 }
 
 BlogCategory.defaultProps = {
