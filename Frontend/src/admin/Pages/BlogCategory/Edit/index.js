@@ -91,8 +91,8 @@ export default function BlogCategoryEdit() {
                             required
                         >
                             <option value="">Chọn trạng thái</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                            <option value="1">Hiển thị</option>
+                            <option value="2">Ẩn</option>
                         </select>
                     </div>
 
