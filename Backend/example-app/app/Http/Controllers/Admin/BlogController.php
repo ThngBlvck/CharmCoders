@@ -9,11 +9,14 @@ use App\Http\Requests\Admin\StoreBlogRequest;
 
 class BlogController extends Controller
 {
-    public function index()
-    {
-        $blogs = Blog::all();
-        return response()->json($blogs);
-    }
+   public function index()
+   {
+       $blogs = Blog::join('blog_categories', 'blogs.category_id', '=', 'blog_categories.id')
+           ->select('blogs.*', 'blog_categories.name as category_name') // Chọn tất cả các trường từ blogs và tên danh mục từ blog_categories
+           ->get();
+
+       return response()->json($blogs);
+   }
     public function show($id)
     {
         $blog = Blog::find($id);
@@ -50,7 +53,7 @@ class BlogController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('public/images/blogs', $imageName);
-            $validatedData['image'] = 'storage/images/blogs/' . $imageName;
+            $validatedData['image'] = asset('storage/images/blogs/' . $imageName);
         } else {
             $validatedData['image'] = $blog->image;
         }
