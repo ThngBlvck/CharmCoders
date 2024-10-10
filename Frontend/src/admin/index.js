@@ -9,15 +9,25 @@ import Footer from "./components/Footer";
 
 // views
 import Dashboard from "./Pages/Dashboard";
+
+//Product
 import Product from "./Pages/Product/List";
+import ProductDetail from "./Pages/Product/ProductDetail";
+import AddProduct from "./Pages/Product/Add";
+import EditProduct from "./Pages/Product/Edit";
+
+//CategoryProduct
 import ProductCategory from "./Pages/ProductCategory/List";
+import AddProductCategory from "./Pages/ProductCategory/Add";
+import EditProductCaterogy from "./Pages/ProductCategory/Edit";
+
 import Blog from "./Pages/Blog";
 import Brand from "./Pages/Brand/List";
 // import Comment from "./Pages/Comment/List";
 import Role from "./Pages/Role/List";
 import Order from "./Pages/Order";
 import BlogCaterogy from "./Pages/BlogCategory/List";
-import AddProductCategory from "./Pages/ProductCategory/Add";
+
 
 import AddBlogCategory from "./Pages/BlogCategory/Add";
 import EditBlogCategory from "./Pages/BlogCategory/Edit";
@@ -29,9 +39,7 @@ import AddBrand from "./Pages/Brand/Add";
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
 
-import EditProductCaterogy from "./Pages/ProductCategory/Edit";
-// import Settings from "views/admin/Settings.js";
-// import Tables from "views/admin/Tables.js";
+
 
 export default function Admin() {
     return (
@@ -50,7 +58,12 @@ export default function Admin() {
                         <Route path="category_product/edit/:id" element={<EditProductCaterogy />} />
 
                         <Route path="product" element={<Product />} />
+                        <Route path="product/detail/:id" element={<ProductDetail />} />
+                        <Route path="product/add" element={<AddProduct />} />
+                        <Route path="product/edit/:id" element={<EditProduct />} />
+
                         {/*<Route path="user" element={<User />} />*/}
+
                         <Route path="category_blog" element={<BlogCaterogy />} />
                         <Route path="category_blog/add" element={<AddBlogCategory />} />
                         <Route path="category_blog/edit/:id" element={<EditBlogCategory />} />
