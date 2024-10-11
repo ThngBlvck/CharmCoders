@@ -43,7 +43,7 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::apiResource('orders', OrderController::class);
-    Route::apiResource('employee', UserController::class);
+    Route::apiResource('employee',UserController::class);
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
@@ -63,8 +63,10 @@ Route::prefix('client')->group(function () {
     // Route để yêu cầu đặt lại mật khẩu qua API
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('client.reset-password');
     Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
+    Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 });
-
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'Register']);
 
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/reset-otp', [ResetPasswordController::class, 'resetPasswordWithOtp']);
