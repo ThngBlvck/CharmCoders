@@ -9,8 +9,8 @@ const request = async ({
     data = {},
     headers = {},
 }) => {
-    const cookie = new Cookies();
-    const token = cookie.get("token");
+    const token = localStorage.getItem('token');
+    console.log('Token:', token);
 
     try {
         const res = await axios({

@@ -43,13 +43,13 @@ export const logout = async () => {
             method: 'POST',
             path: 'logout',
             headers: {
-                'Authorization': `Bearer ${token}`, // Gửi token trong tiêu đề Authorization
-                'Content-Type': 'application/json', 
+                'Content-Type': 'application/json',
             },
         });
 
         // Xóa token khỏi localStorage sau khi đăng xuất thành công
         localStorage.removeItem('token');
+        localStorage.removeItem('role');
 
         return response;
     } catch (error) {
