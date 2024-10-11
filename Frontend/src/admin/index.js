@@ -21,6 +21,9 @@ import ProductCategory from "./Pages/ProductCategory/List";
 import AddProductCategory from "./Pages/ProductCategory/Add";
 import EditProductCaterogy from "./Pages/ProductCategory/Edit";
 
+//User
+import UserList from "./Pages/User/List";
+
 import Blog from "./Pages/Blog/List";
 import Brand from "./Pages/Brand/List";
 import Comment from "./Pages/Comment/List";
@@ -65,7 +68,7 @@ export default function Admin() {
                         <Route path="product/edit/:id" element={<EditProduct />} />
                         <Route path="product/detail/:id" element={<ProductDetail />} />
 
-                        {/*<Route path="user" element={<User />} />*/}
+                        <Route path="user" element={<UserList />} />
 
                         <Route path="category_blog" element={<BlogCaterogy />} />
                         <Route path="category_blog/add" element={<AddBlogCategory />} />
