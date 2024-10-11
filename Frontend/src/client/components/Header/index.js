@@ -91,24 +91,24 @@ export default function Header() {
             <div className="container-fluid sticky-top px-0">
                 <div className="container-fluid px-0">
                     <nav className="navbar navbar-expand-xl bg-light">
-                        <NavLink to={`/home`} className="navbar-brand">
+                        <NavLink to={`/home`} className="navbar-brand"  onClick={() => window.scrollTo(0, 0)}>
                             <p className="text-primary display-5" style={{ marginLeft: "100px" }}>GlowMakers</p>
                         </NavLink>
                         <button className="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#navbarCollapse">
+                                data-bs-target="#navbarCollapse">
                             <span className="fa fa-bars text-primary"></span>
                         </button>
                         <div className="collapse navbar-collapse py-3" id="navbarCollapse">
                             <div className="navbar-nav mx-auto border-top">
-                                <NavLink to={`/home`} className="nav-item nav-link font-semibold">Trang chủ</NavLink>
-                                <NavLink to={`/about`} className="nav-item nav-link font-semibold">Giới thiệu</NavLink>
-                                <NavLink to={`/products`} className="nav-item nav-link font-semibold">Sản phẩm</NavLink>
-                                <NavLink to={`/contact`} className="nav-item nav-link font-semibold">Liên hệ</NavLink>
-                                <NavLink to={`/post`} className="nav-item nav-link font-semibold">Bài viết</NavLink>
+                                <NavLink to={`/home`} className="nav-item nav-link font-semibold"  onClick={() => window.scrollTo(0, 0)}>Trang chủ</NavLink>
+                                <NavLink to={`/about`} className="nav-item nav-link font-semibold"  onClick={() => window.scrollTo(0, 0)}>Giới thiệu</NavLink>
+                                <NavLink to={`/products`} className="nav-item nav-link font-semibold"  onClick={() => window.scrollTo(0, 0)}>Sản phẩm</NavLink>
+                                <NavLink to={`/contact`} className="nav-item nav-link font-semibold"  onClick={() => window.scrollTo(0, 0)}>Liên hệ</NavLink>
+                                <NavLink to={`/post`} className="nav-item nav-link font-semibold"  onClick={() => window.scrollTo(0, 0)}>Bài viết</NavLink>
                             </div>
 
                             <div className="d-flex align-items-center flex-nowrap pt-xl-0"
-                                style={{ marginRight: "100px" }}>
+                                 style={{ marginRight: "100px" }}>
                                 {/* Tìm kiếm sản phẩm */}
                                 <div className="input-group" style={{ maxWidth: "400px", position: "relative" }}>
                                     <input
@@ -159,7 +159,8 @@ export default function Header() {
                                                     key={product.id}
                                                     to={`/products/:id`}
                                                     className="dropdown-item search-item"
-                                                    onClick={() => setSearchTerm("")} // Reset lại thanh tìm kiếm khi click
+                                                    onClick={() => setSearchTerm("")}
+                                                    // Reset lại thanh tìm kiếm khi click
                                                 >
                                                     <img
                                                         src={product.image}
@@ -184,13 +185,13 @@ export default function Header() {
                                 </div>
 
                                 {/* Icon giỏ hàng */}
-                                <NavLink to={`/cart`} className="btn ms-2"
-                                    style={{
-                                        width: "50px",
-                                        height: "50px",
-                                        color: "var(--bs-primary)",
-                                        position: "relative"
-                                    }}>
+                                <NavLink to={`/cart`} className="btn ms-2"  onClick={() => window.scrollTo(0, 0)}
+                                         style={{
+                                             width: "50px",
+                                             height: "50px",
+                                             color: "var(--bs-primary)",
+                                             position: "relative"
+                                         }}>
                                     <i className="fas fa-shopping-basket" style={{ fontSize: "1.5rem" }}></i>
                                     <span
                                         className="font-bold"
@@ -206,14 +207,14 @@ export default function Header() {
                                             fontSize: "0.8rem",
                                         }}
                                     >
-                                        3
+                                         3
                                     </span>
                                 </NavLink>
 
                                 {/* Dropdown tài khoản */}
                                 <div className="dropdown ms-2"
-                                    onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
-                                    onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
+                                     onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
+                                     onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
                                 >
                                     <button
                                         className="btn"
@@ -228,21 +229,21 @@ export default function Header() {
                                     {isDropdownOpen && (
                                         <ul className="dropdown-menu show" aria-labelledby="dropdownMenuButton" style={{ left: "-68px", top: "40px" }}>
                                             <li>
-                                                <NavLink to="/profile" onClick={() => setIsDropdownOpen(false)}>
+                                                <NavLink to="/profile" onClick={() => {setIsDropdownOpen(false); window.scrollTo(0, 0)}} >
                                                     <button className="dropdown-item modal-item" style={{ color: "#8c5e58" }}>
                                                         <i className="fas fa-user me-2"></i>Tài khoản của bạn
                                                     </button>
                                                 </NavLink>
                                             </li>
                                             <li>
-                                                <NavLink to="/order-detail" onClick={() => setIsDropdownOpen(false)}>
+                                                <NavLink to="/order-detail" onClick={() => {setIsDropdownOpen(false); window.scrollTo(0, 0)}}>
                                                     <button className="dropdown-item modal-item" style={{ color: "#8c5e58" }}>
                                                         <i className="fas fa-file-alt me-2"></i>Quản lý đơn hàng
                                                     </button>
                                                 </NavLink>
                                             </li>
                                             <li>
-                                                <NavLink to="/order-history" onClick={() => setIsDropdownOpen(false)}>
+                                                <NavLink to="/order-history" onClick={() => {setIsDropdownOpen(false); window.scrollTo(0, 0)}}>
                                                     <button className="dropdown-item modal-item" style={{ color: "#8c5e58" }}>
                                                         <i className="fas fa-clock-rotate-left me-2"></i>Lịch sử đơn hàng
                                                     </button>
