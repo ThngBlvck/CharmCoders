@@ -40,7 +40,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('cart', CartController::class);
     Route::apiResource('orders', OrderController::class);
-    Route::apiResource('employee', UserController::class);
+    Route::apiResource('employee',UserController::class);
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
@@ -58,7 +58,8 @@ Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
     Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 });
-
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'Register']);
 
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/reset-otp', [ResetPasswordController::class, 'resetPasswordWithOtp']);
