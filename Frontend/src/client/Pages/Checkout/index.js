@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../../../assets/styles/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import axios from 'axios';
 
 export default function Checkout() {
     const [formData, setFormData] = useState({
@@ -18,7 +19,21 @@ export default function Checkout() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Thông tin thanh toán:", formData);
+
+        if (formData.paymentMethod === "vnPay") {
+            // Call API for VNPay payment processing
+            axios.post('/api/payment/vnpay', formData)
+                .then(response => {
+                    // Redirect to VNPay payment gateway or handle the response
+                    window.location.href = response.data.paymentUrl;
+                })
+                .catch(error => {
+                    console.error('Error processing VNPay:', error);
+                });
+        } else {
+            // Handle other payment methods like Credit Card, Momo, etc.
+            console.log("Thông tin thanh toán:", formData);
+        }
     };
 
     const products = [
@@ -166,8 +181,9 @@ export default function Checkout() {
                                         checked={formData.paymentMethod === "vnPay"}
                                         onChange={handleChange}
                                     />
-                                    <label className="form-check-label" style={{color: "#8c5e58"}}>
-                                        <i className="fab fa-cc-visa fa-2x"></i> VNPay
+                                    <label className="form-check-label d-flex align-items-center"
+                                           style={{color: "#8c5e58"}}>
+                                        <i className="fab fa-cc-visa fa-2x me-2"></i> VNPay
                                     </label>
                                 </div>
                             </div>
