@@ -211,7 +211,10 @@ export default function Cart() {
                                         fontSize: "16px",
                                         borderRadius: "5px"
                                     }}
-                                    onClick={() => window.location.href = '/checkout'}>
+                                    onClick={() => {
+                                        window.location.href = '/checkout';
+                                        window.scrollTo(0, 0);
+                                    }}>
                                 Thanh toán
                             </button>
                         </div>
