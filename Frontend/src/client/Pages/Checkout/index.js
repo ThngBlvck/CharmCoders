@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import { useLocation } from "react-router-dom"; // Import useLocation để lấy thông tin từ URL
 import "../../../assets/styles/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import axios from 'axios';
@@ -9,8 +11,47 @@ export default function Checkout() {
         email: "",
         address: "",
         phone: "",
-        paymentMethod: "creditCard",
+        paymentMethod: "cashOnDelivery",
     });
+    const [products, setProducts] = useState([]);
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // Thêm trạng thái đăng nhập
+
+    // Lấy productId từ URL
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const productId = queryParams.get('productId');
+
+    const selectedProducts = JSON.parse(localStorage.getItem("selectedProducts")) || [];
+    if (productId) {
+        // Đảm bảo rằng sản phẩm đã tải và tồn tại trong products
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            selectedProducts.push(product);
+            localStorage.setItem("selectedProducts", JSON.stringify(selectedProducts));
+        }
+    }
+
+    useEffect(() => {
+        const userToken = localStorage.getItem("token"); // Kiểm tra token trong localStorage
+        console.log("User Token:", userToken); // Kiểm tra giá trị token
+        setIsLoggedIn(!!userToken); // Cập nhật trạng thái đăng nhập
+
+        const selectedProducts = JSON.parse(localStorage.getItem("selectedProducts"));
+
+        console.log("Product ID from URL:", productId);
+        console.log("Selected Products from LocalStorage:", selectedProducts);
+
+        if (productId) {
+            const product = selectedProducts?.find(item => item.id === productId);
+            if (product) {
+                setProducts([product]); // Hiển thị sản phẩm đã chọn
+            }
+        } else {
+            if (selectedProducts && selectedProducts.length > 0) {
+                setProducts(selectedProducts); // Hiển thị tất cả sản phẩm đã chọn
+            }
+        }
+    }, [productId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
