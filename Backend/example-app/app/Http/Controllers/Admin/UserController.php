@@ -92,15 +92,4 @@ class UserController extends Controller
 
         return response()->json($user);
     }
-
-    public function getUser(Request $request)
-    {
-        return response()->json([
-            'user_id' => $request->user()->id,
-            'name' => $request->user()->name,
-            'email' => $request->user()->email,
-            'address' => $request->user()->address, // Nếu có
-            'phone' => $request->user()->phone, // Nếu có
-        ]);
-    }
 }
