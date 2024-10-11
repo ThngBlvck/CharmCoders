@@ -1,5 +1,5 @@
 import request from '../../api';
-const URL_User = "admin/users"
+const URL_User = "admin/employee"
 
 export const login = async (credentials) => {
     try {
@@ -58,6 +58,41 @@ export const logout = async () => {
     }
 };
 
+export const getUser = async () => {
+    return await request({
+        method: 'GET',
+        path: `${URL_User}`,
+    })
+}
 
+export const getOneUser = (id) => {
+    return request({
+        method: 'GET',
+        path: `${URL_User}/${id}`
+    });
+};
+
+export const postUser = (data) => {
+    return request({
+        method: 'POST',
+        path: `${URL_User}`,
+        data
+    });
+};
+
+export const updateUser = (id, data) => {
+    return request({
+        method: 'POST',
+        path: `${URL_User}/${id}?_method=PUT`,
+        data
+    });
+};
+
+export const deleteUser = (id) => {
+    return request({
+        method: 'DELETE',
+        path: `${URL_User}/${id}`
+    });
+};
 
 
