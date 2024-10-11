@@ -13,7 +13,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::where('role_id', 3)->get();
+        $users = User::whereIn('role_id', [1, 3])->get();
         return response()->json($users);
     }
 
@@ -91,5 +91,16 @@ class UserController extends Controller
         $user->update($validatedData);
 
         return response()->json($user);
+    }
+
+    public function getUser(Request $request)
+    {
+        return response()->json([
+            'user_id' => $request->user()->id,
+            'name' => $request->user()->name,
+            'email' => $request->user()->email,
+            'address' => $request->user()->address, // Nếu có
+            'phone' => $request->user()->phone, // Nếu có
+        ]);
     }
 }

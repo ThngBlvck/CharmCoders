@@ -68,11 +68,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Tìm người dùng hiện tại dựa trên token đã gửi
+        
         $user = Auth::user();
 
         if ($user) {
-            // Hủy token hiện tại của người dùng
             $user->token()->revoke();
 
             return response()->json([
