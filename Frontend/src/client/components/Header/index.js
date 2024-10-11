@@ -95,7 +95,7 @@ export default function Header() {
                             <p className="text-primary display-5" style={{ marginLeft: "100px" }}>GlowMakers</p>
                         </NavLink>
                         <button className="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#navbarCollapse">
+                            data-bs-target="#navbarCollapse">
                             <span className="fa fa-bars text-primary"></span>
                         </button>
                         <div className="collapse navbar-collapse py-3" id="navbarCollapse">
@@ -108,7 +108,7 @@ export default function Header() {
                             </div>
 
                             <div className="d-flex align-items-center flex-nowrap pt-xl-0"
-                                 style={{ marginRight: "100px" }}>
+                                style={{ marginRight: "100px" }}>
                                 {/* Tìm kiếm sản phẩm */}
                                 <div className="input-group" style={{ maxWidth: "400px", position: "relative" }}>
                                     <input
@@ -185,12 +185,12 @@ export default function Header() {
 
                                 {/* Icon giỏ hàng */}
                                 <NavLink to={`/cart`} className="btn ms-2"
-                                         style={{
-                                             width: "50px",
-                                             height: "50px",
-                                             color: "var(--bs-primary)",
-                                             position: "relative"
-                                         }}>
+                                    style={{
+                                        width: "50px",
+                                        height: "50px",
+                                        color: "var(--bs-primary)",
+                                        position: "relative"
+                                    }}>
                                     <i className="fas fa-shopping-basket" style={{ fontSize: "1.5rem" }}></i>
                                     <span
                                         className="font-bold"
@@ -206,14 +206,14 @@ export default function Header() {
                                             fontSize: "0.8rem",
                                         }}
                                     >
-                                         3
+                                        3
                                     </span>
                                 </NavLink>
 
                                 {/* Dropdown tài khoản */}
                                 <div className="dropdown ms-2"
-                                     onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
-                                     onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
+                                    onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
+                                    onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
                                 >
                                     <button
                                         className="btn"
@@ -249,11 +249,13 @@ export default function Header() {
                                                 </NavLink>
                                             </li>
                                             <li>
-                                                <NavLink to="/login" onClick={() => {
+                                                <NavLink to="" onClick={() => {
                                                     // Logic cho nút thoát
                                                     toggleDropdown();
                                                 }}>
-                                                    <button className="dropdown-item modal-item" style={{ color: "#8c5e58" }}>
+                                                    <button className="dropdown-item modal-item"
+                                                        onClick={handleLogout}
+                                                        style={{ color: "#8c5e58" }}>
                                                         <i className="fas fa-sign-out-alt me-2"></i>Đăng xuất
                                                     </button>
                                                 </NavLink>
