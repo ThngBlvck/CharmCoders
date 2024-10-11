@@ -184,7 +184,7 @@ export default function BlogList({ color }) {
                                         {blog.category_name}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {blog.status === 1 ? 'Hiển thị' : 'Ẩn'}
+                                        {blog.status == 1 ? 'Hiển thị' : 'Ẩn'}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                         <button
