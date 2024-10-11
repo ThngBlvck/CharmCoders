@@ -9,14 +9,18 @@ use App\Http\Requests\Admin\StoreBlogRequest;
 
 class BlogController extends Controller
 {
-   public function index()
-   {
-       $blogs = Blog::join('blog_categories', 'blogs.category_id', '=', 'blog_categories.id')
-           ->select('blogs.*', 'blog_categories.name as category_name') // Chọn tất cả các trường từ blogs và tên danh mục từ blog_categories
-           ->get();
+    public function index()
+    {
+        $blogs = Blog::leftJoin('blog_categories', 'blogs.category_id', '=', 'blog_categories.id')
+            ->select('blogs.*', 'blog_categories.name as category_name')
+            ->get();
+        $blogs->transform(function ($blog) {
+            $blog->category_name = $blog->category_name ?? 'Chưa phân loại';
+            return $blog;
+        });
 
-       return response()->json($blogs);
-   }
+        return response()->json($blogs);
+    }
     public function show($id)
     {
         $blog = Blog::find($id);
