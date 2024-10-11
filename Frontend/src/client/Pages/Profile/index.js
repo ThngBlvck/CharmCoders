@@ -71,7 +71,7 @@ export default function Profile() {
                                            className="font-semibold mb-2">Tên:</label>
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className="form-control rounded"
                                         name="name"
                                         value={user.name}
                                         onChange={handleChange}
@@ -83,7 +83,7 @@ export default function Profile() {
                                            className="font-semibold mb-2">Email:</label>
                                     <input
                                         type="email"
-                                        className="form-control"
+                                        className="form-control rounded"
                                         name="email"
                                         value={user.email}
                                         onChange={handleChange}
@@ -94,7 +94,7 @@ export default function Profile() {
                                     <label style={{color: "#8c5e58", fontSize: "20px"}}
                                            className="font-semibold mb-2">Số điện thoại:</label>
                                     <input
-                                        type="text"
+                                        type="tel"
                                         className="form-control"
                                         name="phone"
                                         value={user.phone}
@@ -107,7 +107,7 @@ export default function Profile() {
                                            className="font-semibold mb-2">Địa chỉ:</label>
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className="form-control rounded"
                                         name="address"
                                         value={user.address}
                                         onChange={handleChange}
