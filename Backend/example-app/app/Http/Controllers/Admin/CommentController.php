@@ -24,18 +24,41 @@ class CommentController extends Controller
     public function store(StoreCommentRequest $request)
     {
         $validatedData = $request->validated();
+
+        // Gán user_id bằng ID của người dùng đang đăng nhập
+        $validatedData['user_id'] = auth()->id();
+
         $comment = Comment::create($validatedData);
         return response()->json($comment, 201);
     }
+
     public function update(StoreCommentRequest $request, $id)
     {
         $validatedData = $request->validated();
         $comment = Comment::find($id);
+
+        // Kiểm tra xem người dùng có quyền cập nhật bình luận không
+        if ($comment->user_id !== auth()->id()) {
+            return response()->json([
+                'error' => 'Bạn không có quyền sửa bình luận này.'
+            ], 403); // 403 Forbidden
+        }
+
         $comment->update($validatedData);
         return response()->json($comment);
     }
+
     public function destroy($id)
     {
+        $comment = Comment::find($id);
+
+        // Kiểm tra xem người dùng có quyền xóa bình luận không
+        if ($comment->user_id !== auth()->id()) {
+            return response()->json([
+                'error' => 'Bạn không có quyền xóa bình luận này.'
+            ], 403); // 403 Forbidden
+        }
+
         Comment::destroy($id);
         return response()->json([
             'success' => true,

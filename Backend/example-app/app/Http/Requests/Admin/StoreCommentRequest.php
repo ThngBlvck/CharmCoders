@@ -26,7 +26,6 @@ class StoreCommentRequest extends FormRequest
     {
         $rules = [
             'product_id' => 'required|exists:products,id',
-            'user_id' => 'required|exists:users,id',
             'content' => 'required|string|max:255',
             'status' => 'int',
         ];
