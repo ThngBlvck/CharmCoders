@@ -8,7 +8,7 @@ export default function Brand({ color }) {
     const [brands, setBrands] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState(new Set()); // Track selected brands
     const navigate = useNavigate();
-    const renderStatus = (status) => (status === "1" ? "Hiển thị" : "Ẩn");
+    const renderStatus = (status) => (status == "1" ? "Hiển thị" : "Ẩn");
 
     useEffect(() => {
         fetchBrands();
