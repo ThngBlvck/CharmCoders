@@ -19,6 +19,7 @@ import Post from "./Pages/Post";
 import PostDetail from "./Pages/PostDetail";
 import OrderManagement from "./Pages/OrderManagement";
 import OrderHistory from "./Pages/OrderHistory";
+import Page404 from "./Pages/404";
 
 
 export default function Client() {
@@ -43,6 +44,7 @@ export default function Client() {
                     <Route path="/order-history" element={<OrderHistory/>} />
                     <Route path="/post" element={<Post/>} />
                     <Route path="/postdetail" element={<PostDetail/>} />
+                    <Route path="/404" element={<Page404/>} />
 
                     <Route path="/" element={<Navigate to="/home" />} />
                 </Routes>
