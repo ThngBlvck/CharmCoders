@@ -1,55 +1,122 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
-import { NavLink } from "react-router-dom";
+import {NavLink, useNavigate, useParams} from "react-router-dom";
+import { getProduct, searchProduct } from "../../../services/Product";
+import { getCategory } from "../../../services/Category";
+import { getBrand } from '../../../services/Brand';
+import Swal from "sweetalert2";
+import {jwtDecode} from "jwt-decode";
 
 export default function Products() {
+    const { id } = useParams();
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [priceFilter, setPriceFilter] = useState("all");
     const [brandFilter, setBrandFilter] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [userId, setUserId] = useState(null);
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token'); // Lấy token từ localStorage
 
-    const products = [
-        { id: 1, name: "Product 1", price: 500000, category: "Skin Care", brand: "Brand A" },
-        { id: 2, name: "Product 2", price: 150000, category: "Hair Care", brand: "Brand B" },
-        { id: 3, name: "Product 3", price: 800000, category: "Body Care", brand: "Brand C" },
-        { id: 4, name: "Product 4", price: 120000, category: "Nail Care", brand: "Brand A" },
-        { id: 5, name: "Product 5", price: 400000, category: "Skin Care", brand: "Brand B" },
-        { id: 6, name: "Product 6", price: 300000, category: "Hair Care", brand: "Brand C" },
-        { id: 7, name: "Product 7", price: 90000, category: "Body Care", brand: "Brand A" },
-        { id: 8, name: "Product 8", price: 200000, category: "Nail Care", brand: "Brand B" },
-        { id: 9, name: "Product 9", price: 130000, category: "Skin Care", brand: "Brand A" },
-        { id: 10, name: "Product 10", price: 170000, category: "Hair Care", brand: "Brand B" },
-        { id: 11, name: "Product 11", price: 500000, category: "Body Care", brand: "Brand C" },
-        { id: 12, name: "Product 12", price: 130000, category: "Nail Care", brand: "Brand A" },
-        { id: 13, name: "Product 13", price: 450000, category: "Skin Care", brand: "Brand B" },
-        { id: 14, name: "Product 14", price: 350000, category: "Hair Care", brand: "Brand C" },
-        { id: 15, name: "Product 15", price: 920000, category: "Body Care", brand: "Brand A" },
-        { id: 16, name: "Product 16", price: 230000, category: "Nail Care", brand: "Brand B" }
-    ];
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = jwtDecode(token);
+            setUserId(decoded.userId);
+        }
+
+        // Nếu id có giá trị và khác 'all', cập nhật selectedCategory
+        if (id && id !== "all") {
+            setSelectedCategory(id);
+        }
+
+        fetchProducts();
+        fetchCategories();
+        fetchBrands();
+    }, [searchTerm, selectedCategory, priceFilter, brandFilter, id]); // Thêm id vào dependencies
+
+    const fetchProducts = async () => {
+        try {
+            let result;
+            // Chỉ lấy sản phẩm theo category_id khi selectedCategory không phải "all"
+            if (searchTerm.trim() === "" && selectedCategory === "all" && priceFilter === "all" && brandFilter === "all") {
+                result = await getProduct();
+            } else {
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm);
+                result = await searchProduct(sanitizedSearchTerm, selectedCategory);
+            }
+
+            if (Array.isArray(result)) {
+                setProducts(result);
+            } else if (result && result.products && Array.isArray(result.products)) {
+                setProducts(result.products);
+            } else {
+                setProducts([]);
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy danh mục sản phẩm:", error);
+            setProducts([]);
+        }
+    };
+
+    const fetchBrands = async () => {
+        try {
+            const result = await getBrand();
+            setBrands(result || []);
+        } catch (err) {
+            console.error('Error fetching brands:', err);
+            setBrands([]);
+            Swal.fire('Lỗi', 'Lỗi khi tải danh sách nhãn hàng. Vui lòng thử lại.', 'error');
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const result = await getCategory();
+            setCategories(result);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh mục sản phẩm:", error);
+        }
+    };
 
     const productsPerPage = 12;
 
-    // Bộ lọc sản phẩm
     const filteredProducts = products
-        .filter(product => selectedCategory === "all" || product.category === selectedCategory)
+        .filter(product => selectedCategory === "all" || product.category_id === parseInt(selectedCategory)) // Lọc theo category_id
         .filter(product => {
-            if (priceFilter === "low") return product.price < 100000;
-            if (priceFilter === "high") return product.price >= 100000;
+            const productPrice = parseFloat(product.unit_price); // Chuyển giá sản phẩm sang dạng số
+            if (priceFilter === "low") return productPrice < 100000;
+            if (priceFilter === "high") return productPrice >= 100000;
             return true;
         })
-        .filter(product => brandFilter === "all" || product.brand === brandFilter);
+        .filter(product => brandFilter === "all" || product.brand_id === parseInt(brandFilter))
 
-    // Tính toán pagination
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
-    // Khi thay đổi bộ lọc, đặt lại currentPage về 1 để tránh lỗi không hiển thị đúng sản phẩm
     const handleFilterChange = (setter) => (e) => {
         setter(e.target.value);
         setCurrentPage(1);
+    };
+
+    const handleBuyNow = (selectedProduct) => {
+        if (!token) {
+            alert('Bạn cần đăng nhập để mua ngay sản phẩm!');
+            return; // Dừng lại nếu không có token
+        }
+
+        if (selectedProduct && selectedProduct.id) {
+            // Chuyển đến trang thanh toán chỉ với productId
+            navigate(`/checkout?productId=${selectedProduct.id}`);
+        } else {
+            console.error("Sản phẩm không tồn tại hoặc không có productId.");
+        }
     };
 
     return (
@@ -87,18 +154,17 @@ export default function Products() {
                             <option value="all" style={{ color: "#8c5e58" }}>
                                 Tất cả
                             </option>
-                            <option value="Skin Care" style={{ color: "#8c5e58" }}>
-                                Skin Care
-                            </option>
-                            <option value="Hair Care" style={{ color: "#8c5e58" }}>
-                                Hair Care
-                            </option>
-                            <option value="Body Care" style={{ color: "#8c5e58" }}>
-                                Body Care
-                            </option>
-                            <option value="Nail Care" style={{ color: "#8c5e58" }}>
-                                Nail Care
-                            </option>
+                            {categories.length > 0 ? (
+                                categories.map((category) => (
+                                    <option key={category.id} value={category.id} style={{ color: "#8c5e58" }}>
+                                        {category.name.length > 30 ? category.name.substring(0, 30) + "..." : category.name}
+                                    </option>
+                                ))
+                            ) : (
+                                <option value="none" style={{color: "#8c5e58"}}>
+                                    Không có danh mục nào
+                                </option>
+                            )}
                         </select>
                     </div>
 
@@ -137,15 +203,17 @@ export default function Products() {
                             <option value="all" style={{ color: "#8c5e58" }}>
                                 Tất cả
                             </option>
-                            <option value="Brand A" style={{ color: "#8c5e58" }}>
-                                Brand A
-                            </option>
-                            <option value="Brand B" style={{ color: "#8c5e58" }}>
-                                Brand B
-                            </option>
-                            <option value="Brand C" style={{ color: "#8c5e58" }}>
-                                Brand C
-                            </option>
+                            {brands.length > 0 ? (
+                                brands.map((brand) => (
+                                    <option key={brand.id} value={brand.id} style={{ color: "#8c5e58" }}>
+                                        {brand.name}
+                                    </option>
+                                ))
+                            ) : (
+                                <option value="none" style={{ color: "#8c5e58" }}>
+                                    Không có nhãn hàng nào
+                                </option>
+                            )}
                         </select>
                     </div>
                 </div>
@@ -154,60 +222,66 @@ export default function Products() {
             {/* Hiển thị sản phẩm */}
             <div className="container">
                 <div className="row">
-                    {currentProducts.map((product) => (
-                        <div key={product.id} className="col-md-6 col-lg-3 mb-4">
-                            <div className="card text-center bg-hover" style={{ borderRadius: "15px", padding: "20px" }}>
-                                <NavLink to={`/products/${product.id}`}>
-                                    <img
-                                        src="https://via.placeholder.com/500"
-                                        className="card-img-top img-fluid rounded"
-                                        alt="Product"
-                                        style={{ maxHeight: "500px", objectFit: "cover" }}
-                                    />
-                                </NavLink>
-                                <div className="card-body">
-                                    <NavLink to={`/products/${product.id}`} className="text-decoration-none">
-                                        <p className="card-title font-semibold" style={{ color: '#8c5e58' }}>
-                                            {product.name}
+                    {currentProducts && currentProducts.length > 0 ? (
+                        currentProducts.map((product) => (
+                            <div key={product.id} className="col-md-6 col-lg-3 mb-4">
+                                <div className="card text-center bg-hover" style={{ borderRadius: "15px", padding: "20px" }}>
+                                    <NavLink to={`/products/${product.id}`}>
+                                        <img
+                                            src={product.image}
+                                            className="card-img-top img-fluid rounded"
+                                            alt="Product"
+                                            style={{ maxHeight: "500px", objectFit: "cover" }}
+                                        />
+                                    </NavLink>
+                                    <div className="card-body">
+                                        <NavLink to={`/products/${product.id}`} className="text-decoration-none">
+                                            <p className="card-title font-semibold" style={{color: '#8c5e58'}}>
+                                                {product.name}
+                                            </p>
+                                        </NavLink>
+                                        <p className="card-text mb-4 font-semibold" style={{color: '#8c5e58'}}>
+                                            {product.unit_price ? product.unit_price.toLocaleString("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                            }) : "Không có giá"}
                                         </p>
-                                    </NavLink>
-                                    <p className="card-text mb-4 font-semibold" style={{ color: '#8c5e58' }}>
-                                        {product.price.toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                        })}
-                                    </p>
 
-                                    <NavLink to={`/products/${product.id}`} className="w-100">
-                                        <button className="btn btn-primary mr-2 font-bold w-100" style={{
-                                            padding: '14px',
-                                            fontSize: '13px',
-                                            color: '#442e2b'
-                                        }}><p>Xem chi tiết</p></button>
-                                    </NavLink>
+                                        <button
+                                            className="btn btn-primary mr-2 font-bold w-100"
+                                            style={{padding: '14px', fontSize: '13px', color: '#442e2b'}}
+                                            onClick={() => handleBuyNow(product)}
+                                        >
+                                            <p>Mua ngay</p>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p>Đang tải dữ liệu...</p>
+                    )}
                 </div>
 
-                {/* Pagination */}
-                <nav>
-                    <ul className="pagination pagination-custom">
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <li key={index + 1} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
-                                <button
-                                    className="page-link"
-                                    onClick={() => setCurrentPage(index + 1)}
-                                >
-                                    {index + 1}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
+                {/* Phân trang */}
+                <div className="d-flex justify-content-center mt-4">
+                    {Array.from({length: totalPages}, (_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => setCurrentPage(index + 1)}
+                            className={`btn mx-1 ${index + 1 === currentPage ? "btn-primary" : "btn-outline-primary"}`}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+                </div>
             </div>
-
         </>
     );
+}
+
+function removeVietnameseTones(str) {
+    str = str.replace(/[\u0300-\u036f]/g, ""); // Remove accents
+    str = str.replace(/đ/g, "d").replace(/Đ/g, "D"); // Replace Vietnamese special character
+    return str;
 }

@@ -49,7 +49,6 @@ export default function Register() {
                 email: "",
                 password: "",
                 confirmPassword: "",
-                phoneNumber: "",
             });
         } catch (error) {
             // Xử lý lỗi từ backend
@@ -81,13 +80,13 @@ export default function Register() {
                                 name="fullName"
                                 value={formData.fullName}
                                 onChange={handleChange}
-                                
+
                             />
                             {errors.name && (
-                                    <div className="text-danger mt-2" role="alert">
-                                        {errors.name[0]}
-                                    </div>
-                                )}
+                                <div className="text-danger mt-2" role="alert">
+                                    {errors.name[0]}
+                                </div>
+                            )}
                         </div>
                         <div className="mb-3">
                             <label htmlFor="email" className="form-label font-semibold"
@@ -99,13 +98,13 @@ export default function Register() {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                               
+
                             />
-                             {errors.email && (
-                                    <div className="text-danger mt-2" role="alert">
-                                        {errors.email[0]}
-                                    </div>
-                                )}
+                            {errors.email && (
+                                <div className="text-danger mt-2" role="alert">
+                                    {errors.email[0]}
+                                </div>
+                            )}
                         </div>
                         <div className="mb-3">
                             <label htmlFor="password" className="form-label font-semibold"
@@ -119,11 +118,11 @@ export default function Register() {
                                 onChange={handleChange}
                             />
                             {errors.password && (
-                                    <div className="text-danger mt-2" role="alert">
-                                        {errors.password[0]}
-                                    </div>
-                                )}
-                            
+                                <div className="text-danger mt-2" role="alert">
+                                    {errors.password[0]}
+                                </div>
+                            )}
+
                         </div>
                         <div className="mb-3">
                             <label htmlFor="confirmPassword" className="form-label font-semibold"
@@ -135,13 +134,13 @@ export default function Register() {
                                 name="confirmPassword"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
-                                
+
                             />
                             {errors.password_confirmation && (
-                                    <div className="text-danger mt-2" role="alert">
-                                        {errors.password_confirmation[0]}
-                                    </div>
-                                )}
+                                <div className="text-danger mt-2" role="alert">
+                                    {errors.password_confirmation[0]}
+                                </div>
+                            )}
                         </div>
                         <button type="submit" className="btn btn-primary w-100 font-semibold mt-1"
                                 style={{color: '#442e2b'}}><a href="/login">Đăng Ký</a>
