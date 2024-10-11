@@ -38,9 +38,12 @@ Route::prefix('admin')->group(function () {
     Route::get('/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);
     Route::apiResource('orders', OrderController::class);
-    Route::apiResource('cart', CartController::class);
+    Route::middleware('auth:api')->group(function () {
+        Route::apiResource('cart', CartController::class);
+    });
+
     Route::apiResource('orders', OrderController::class);
-    Route::apiResource('employee',UserController::class);
+    Route::apiResource('employee', UserController::class);
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
@@ -48,15 +51,15 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api'
 
 
 Route::prefix('client')->group(function () {
-    Route::middleware('auth:api')->post('/checkout', [CheckoutController::class, 'checkout']); //http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::middleware('auth:api')->get('/getCart', [CartClient::class, 'getCart']); //http://localhost:8000/api/client/products/search?query=teneanpham
+    Route::middleware('auth:api')->group(function () {
+        Route::post('/checkout-buy-now', [CheckoutController::class, 'checkout']);
+        Route::get('/getCart', [CartClient::class, 'getCart']);
+        Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
+        Route::post('/checkout-all', [CheckoutController::class, 'checkoutCart']);
+    });
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::post('/contact/send', [MailController::class, 'send']);
-    // Route để yêu cầu đặt lại mật khẩu qua API
-    Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('client.reset-password');
-    Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
-    Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 });
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cart;
+use App\Models\Product;
 use App\Http\Requests\Admin\StoreCartRequest;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -16,45 +18,48 @@ class CartController extends Controller
         return response()->json($carts);
     }
 
-
     public function store(StoreCartRequest $request)
     {
-        try {
-            // Ghi log để kiểm tra dữ liệu trước khi xác thực
-            Log::info('Request data:', $request->all());
-
-            // Lấy dữ liệu đã được xác thực
-            $validatedData = $request->validated();
-
-            // Ghi log để kiểm tra dữ liệu sau khi xác thực
-            Log::info('Validated data:', $validatedData);
-
-            // Tính tổng tiền
-            $totalAmount = $validatedData['price'] * $validatedData['quantity'];
-
-            // Gộp dữ liệu đã xác thực với 'total_amount'
-            $dataToInsert = array_merge($validatedData, ['total_amount' => $totalAmount]);
-
-            // Ghi log để kiểm tra dữ liệu trước khi lưu
-            Log::info('Data to insert:', $dataToInsert);
-
-            // Lưu bản ghi vào cơ sở dữ liệu
-            $cart = Cart::create($dataToInsert);
-
-            // Trả về phản hồi thành công
-            return response()->json(['success' => true, 'cart' => $cart], 201);
-
-        } catch (Exception $e) {
-            // Bắt các lỗi khác không phải lỗi xác thực
-            Log::error('Error occurred:', ['error' => $e->getMessage()]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Đã xảy ra lỗi trong quá trình xử lý.',
-                'error' => $e->getMessage(),
-            ], 500);
+        $userId = auth()->id();
+        if (!$userId) {
+            return response()->json(['error' => 'Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng.'], 401);
         }
+
+        // Lấy product_id và số lượng từ request
+        $productId = $request->input('product_id');
+        $quantity = $request->input('quantity', 1); // Mặc định số lượng là 1 nếu không được cung cấp
+
+        if (!$productId) {
+            return response()->json(['error' => 'Bạn cần cung cấp product_id!'], 400);
+        }
+
+        // Lấy thông tin sản phẩm
+        $product = Product::find($productId);
+        if (!$product) {
+            return response()->json(['error' => 'Sản phẩm không tồn tại!'], 404);
+        }
+
+        // Kiểm tra số lượng có hợp lệ hay không
+        if ($quantity < 1) {
+            return response()->json(['error' => 'Số lượng phải lớn hơn hoặc bằng 1!'], 400);
+        }
+
+        // Tính giá trị cho giỏ hàng dựa trên giá sản phẩm
+        $price = $product->getPrice(); // Gọi phương thức getPrice để lấy giá
+        $totalAmount = $price * $quantity; // Tính tổng số tiền
+
+        // Lưu vào giỏ hàng
+        Cart::create([
+            'user_id' => $userId,
+            'product_id' => $productId,
+            'quantity' => $quantity,
+            'price' => $price, // Lưu giá vào cột price của bảng cart
+            'total_amount' => $totalAmount, // Lưu tổng tiền vào cột total_amount
+        ]);
+
+        return response()->json(['success' => 'Sản phẩm đã được thêm vào giỏ hàng.'], 200);
     }
+
 
 
     public function show($id)
