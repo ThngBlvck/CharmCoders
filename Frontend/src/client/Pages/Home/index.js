@@ -23,14 +23,22 @@ export default function Home() {
     useEffect(() => {
         const token = localStorage.getItem('token'); // Lấy token từ localStorage
         if (token) {
-            const decoded = jwtDecode(token); // Giải mã token
-            setUserId(decoded.userId); // Lưu userId vào state
-            console.log("userId:", userId);
+            try {
+                const decoded = jwtDecode(token);
+                if (decoded && decoded.userId) {
+                    setUserId(decoded.userId);
+                    console.log("userId:", decoded.userId);
+                } else {
+                    console.error("Token không hợp lệ.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi giải mã token:", error);
+            }
         }
 
         fetchProducts();
         fetchBrands();
-    }, [searchTerm, id]);
+    }, [searchTerm, id, userId]);
 
     const fetchProducts = async () => {
         try {
@@ -100,10 +108,12 @@ export default function Home() {
 
         if (selectedProduct && selectedProduct.id) {
             // Chuyển đến trang thanh toán chỉ với productId
-            navigate(`/checkout?productId=${selectedProduct.id}`);
+            navigate(`/checkout?product_id=${selectedProduct.id}`);
         } else {
-            console.error("Sản phẩm không tồn tại hoặc không có productId.");
+            console.error("Sản phẩm không tồn tại hoặc không có product_id.");
         }
+
+        console.log("selectedProduct:", selectedProduct);
     };
 
     return (
