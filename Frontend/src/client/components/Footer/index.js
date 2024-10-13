@@ -117,9 +117,96 @@ export default function Footer() {
             </div>
 
             {/* Back to top button */}
-            <a href="#" className="btn btn-primary back-to-top" style={{display: 'none'}}>
-                <i className="fas fa-angle-up"></i>
-            </a>
+            <button style={{position: 'fixed', bottom: '20px', right: '80px', zIndex: 1000}}>
+                <a href="#" className="btn btn-primary btn-md-square rounded-circle back-to-top" style={{
+                    color: '#442e2b',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'center'
+                }}>
+                    <i className="fa fa-arrow-up"></i>
+                </a>
+            </button>
+
+            {/* Chat Icon */}
+            <button
+                className="btn btn-primary btn-md-square rounded-circle chat-icon"
+                style={{position: 'fixed', bottom: '30px', right: '80px', zIndex: 1000, color: '#442e2b'}}
+                onClick={toggleChatModal}
+            >
+                <i className="fas fa-comments"></i>
+            </button>
+
+            {/* Chat Modal */}
+            {showChatModal && (
+                <div className="modal fade show" style={{display: 'block'}} tabIndex="-1" role="dialog">
+                    <div className="modal-dialog" role="document" style={{bottom: "-160px", right: "-380px"}}>
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <p className="modal-title text-primary font-semibold"
+                                   style={{fontSize: "16px"}}>GlowMakers</p>
+                                <p className="modal-title" style={{fontSize: "16px", color: "#8c5e58"}}>Giờ hoạt động:
+                                    08:00 - 22:00</p>
+                                <i className="fa fa-times" aria-hidden="true" onClick={toggleChatModal}
+                                   style={{fontSize: "20px", color: "#8c5e58", cursor: "pointer"}}></i>
+                            </div>
+                            <div className="modal-body" style={{maxHeight: '400px', overflowY: 'auto'}}>
+                                <div className="chat-window" style={{
+                                    maxHeight: '250px',  // Điều chỉnh chiều cao để phù hợp với 4 tin nhắn
+                                    overflowY: 'auto',   // Thêm thuộc tính overflow-y để tạo scroll khi có nhiều tin nhắn
+                                    height: "250px"
+                                }}>
+                                    {/* User Message */}
+                                    <div className="chat-message user">
+                                        <div className="user-avatar">
+                                            <img src="https://via.placeholder.com/50" alt="User Avatar"/>
+                                        </div>
+                                        <div className="message-content">
+                                            <span className="message">Sốp ơi, sốp à cho em hỏi sản phẩm này còn hong sốp ơi, mua nhiều có được giảm giá hay có chương rình mua 1 tặng 100 gì hong sốp ơi, có thì em mua liền nè sốp...</span>
+                                        </div>
+                                    </div>
+                                    {/* Admin Message */}
+                                    <div className="chat-message admin">
+                                        <div className="admin-avatar">
+                                            <img src="https://via.placeholder.com/50" alt="Admin Avatar"/>
+                                        </div>
+                                        <div className="message-content">
+                                            <span className="message">Hong bé ơi...</span>
+                                        </div>
+                                    </div>
+                                    {/* Các tin nhắn khác */}
+                                </div>
+
+                                <textarea
+                                    className="form-control mt-3"
+                                    rows="4" // Giới hạn số hàng hiển thị là 4
+                                    style={{
+                                        resize: "none", // Không cho phép thay đổi kích thước của textarea
+                                        maxHeight: "100px", // Chiều cao tối đa
+                                        overflow: "auto", // Hiển thị thanh cuộn nếu vượt quá chiều cao
+                                        width: "100%", // Giới hạn chiều rộng
+                                        padding: "10px",
+                                        fontSize: "14px" // Điều chỉnh kích thước chữ
+                                    }}
+                                    placeholder="Nhập nội dung tin nhắn..."
+                                ></textarea>
+                            </div>
+                            <div className="modal-footer d-flex justify-content-between align-items-center"
+                                 style={{margin: "0 10px"}}>
+                                <div>
+                                    <i className="fa-solid fa-image me-3" aria-hidden="true"
+                                       style={{fontSize: "20px", color: "#8c5e58", cursor: "pointer"}}></i>
+                                    <i className="fa fa-link" aria-hidden="true"
+                                       style={{fontSize: "20px", color: "#8c5e58", cursor: "pointer"}}></i>
+                                </div>
+                                <i className="fa fa-paper-plane" aria-hidden="true"
+                                   style={{fontSize: "20px", color: "#8c5e58", cursor: "pointer"}}></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
