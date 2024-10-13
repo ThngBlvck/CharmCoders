@@ -89,10 +89,10 @@ const ProductDetail = () => {
                 <div className="row">
                     <div className="col-md-9 d-flex justify-start">
                         <div className="row">
-                            <div className="col-md-5">
+                            <div className="col-5">
                                 <img src={product.image} alt="Product" className="img-fluid rounded" />
                             </div>
-                            <div className="col-md-7 d-flex flex-column align-content-start">
+                            <div className="col-7 d-flex flex-column align-content-start">
                                 <p className="mb-3" style={{ fontSize: "26px", color: "#8c5e58" }}>{product.name}</p>
                                 <p className="mb-3" style={{ color: "#8c5e58" }}>{product.unit_price.toLocaleString("vi-VN", {
                                     style: "currency",
@@ -132,7 +132,7 @@ const ProductDetail = () => {
                                 </div>
                             </div>
 
-                            <div className="product-details" style={{ marginTop: "2rem" }}>
+                            <div className="product-details">
                                 <p style={{ color: "#8c5e58", fontSize: "20px", marginBottom: "1rem" }} className="font-bold">Thông tin chi tiết sản phẩm:</p>
                                 <ul>
                                     <li style={{ color: "#8c5e58", marginBottom: "2px" }}><strong className="font-semibold">Tên sản phẩm:</strong> {product.name}</li>
@@ -144,41 +144,57 @@ const ProductDetail = () => {
                         </div>
                     </div>
 
-                    <div className="col-md-3 d-flex justify-end">
+                    <div className="col-3 d-flex justify-end">
                         <div className="row text-center d-flex flex-column">
                             <div className="col mb-3">
-                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100" style={{
-                                    maxWidth: "200px",
-                                    backgroundColor: '#fff7f8'
-                                }}>
+                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
+                                     style={{
+                                         maxWidth: "200px",
+                                         backgroundColor: '#fff7f8'
+                                     }}>
                                     <img src="https://via.placeholder.com/150x150" alt="Thanh toán khi nhận hàng"
                                          className="img-fluid mb-3 rounded"
-                                         style={{ width: '100px', objectFit: 'cover' }} />
-                                    <p style={{ color: '#8c5e58' }} className="font-bold">Thanh toán khi nhận hàng</p>
+                                         style={{width: '100px', objectFit: 'cover'}}/>
+                                    <p style={{color: '#8c5e58'}} className="font-bold">Thanh toán khi nhận hàng</p>
                                 </div>
                             </div>
 
                             <div className="col mb-3">
-                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100" style={{
-                                    maxWidth: "200px",
-                                    backgroundColor: '#fff7f8'
-                                }}>
+                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
+                                     style={{
+                                         maxWidth: "200px",
+                                         backgroundColor: '#fff7f8'
+                                     }}>
                                     <img src="https://via.placeholder.com/150x150" alt="Thương hiệu uy tín toàn cầu"
                                          className="img-fluid mb-3 rounded"
-                                         style={{ width: '100px', objectFit: 'cover' }} />
-                                    <p style={{ color: '#8c5e58' }} className="font-bold">Thương hiệu uy tín toàn cầu</p>
+                                         style={{width: '100px', objectFit: 'cover'}}/>
+                                    <p style={{color: '#8c5e58'}} className="font-bold">Thương hiệu uy tín toàn cầu</p>
                                 </div>
                             </div>
 
                             <div className="col mb-3">
-                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100" style={{
-                                    maxWidth: "200px",
-                                    backgroundColor: '#fff7f8'
-                                }}>
-                                    <img src="https://via.placeholder.com/150x150" alt="Miễn phí vận chuyển"
+                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
+                                     style={{
+                                         maxWidth: "200px",
+                                         backgroundColor: '#fff7f8'
+                                     }}>
+                                    <img src="https://via.placeholder.com/150x150" alt="30 ngày đổi trả miễn phí"
                                          className="img-fluid mb-3 rounded"
-                                         style={{ width: '100px', objectFit: 'cover' }} />
-                                    <p style={{ color: '#8c5e58' }} className="font-bold">Miễn phí vận chuyển</p>
+                                         style={{width: '100px', objectFit: 'cover'}}/>
+                                    <p style={{color: '#8c5e58'}} className="font-bold">30 ngày đổi trả miễn phí</p>
+                                </div>
+                            </div>
+
+                            <div className="col mb-3">
+                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
+                                     style={{
+                                         maxWidth: "200px",
+                                         backgroundColor: '#fff7f8'
+                                     }}>
+                                    <img src="https://via.placeholder.com/150x150" alt="Sản phẩm chính hãng 100%"
+                                         className="img-fluid mb-3 rounded"
+                                         style={{width: '100px', objectFit: 'cover'}}/>
+                                    <p style={{color: '#8c5e58'}} className="font-bold">Sản phẩm chính hãng 100%</p>
                                 </div>
                             </div>
                         </div>

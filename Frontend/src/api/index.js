@@ -10,7 +10,6 @@ const request = async ({
     headers = {},
 }) => {
     const token = localStorage.getItem('token');
-    console.log('Token:', token);
 
     try {
         const res = await axios({
