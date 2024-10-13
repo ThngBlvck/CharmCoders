@@ -2,11 +2,12 @@ import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
-import { getProduct, searchProduct } from "../../../services/Product";
+import {getCheckoutData, getProduct, searchProduct} from "../../../services/Product";
 import { getCategory } from "../../../services/Category";
 import { getBrand } from '../../../services/Brand';
 import Swal from "sweetalert2";
 import {jwtDecode} from "jwt-decode";
+import axios from 'axios';
 
 export default function Products() {
     const { id } = useParams();
@@ -19,14 +20,26 @@ export default function Products() {
     const [brands, setBrands] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [userId, setUserId] = useState(null);
+    const [productId, setProductId] = useState(null);
     const navigate = useNavigate();
     const token = localStorage.getItem('token'); // Lấy token từ localStorage
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            const decoded = jwtDecode(token);
-            setUserId(decoded.userId);
+            try {
+                const decoded = jwtDecode(token);
+                if (decoded && decoded.userId) {
+                    setUserId(decoded.userId);
+                    console.log("userId:", decoded.userId);
+                } else {
+                    console.error("Token không hợp lệ hoặc không có userId.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi giải mã token:", error);
+            }
+        } else {
+            console.warn("Token không tồn tại.");
         }
 
         // Nếu id có giá trị và khác 'all', cập nhật selectedCategory
@@ -37,18 +50,19 @@ export default function Products() {
         fetchProducts();
         fetchCategories();
         fetchBrands();
-    }, [searchTerm, selectedCategory, priceFilter, brandFilter, id]); // Thêm id vào dependencies
+    }, [productId, searchTerm, selectedCategory, priceFilter, brandFilter, id, userId]); // Thêm id vào dependencies
 
     const fetchProducts = async () => {
         try {
             let result;
-            // Chỉ lấy sản phẩm theo category_id khi selectedCategory không phải "all"
             if (searchTerm.trim() === "" && selectedCategory === "all" && priceFilter === "all" && brandFilter === "all") {
                 result = await getProduct();
             } else {
                 const sanitizedSearchTerm = removeVietnameseTones(searchTerm);
                 result = await searchProduct(sanitizedSearchTerm, selectedCategory);
             }
+
+            console.log("Products fetched:", result); // In ra danh sách sản phẩm đã lấy
 
             if (Array.isArray(result)) {
                 setProducts(result);
@@ -62,6 +76,7 @@ export default function Products() {
             setProducts([]);
         }
     };
+
 
     const fetchBrands = async () => {
         try {
@@ -105,18 +120,34 @@ export default function Products() {
         setCurrentPage(1);
     };
 
-    const handleBuyNow = (selectedProduct) => {
+    const handleBuyNow = (product) => {
         if (!token) {
-            alert('Bạn cần đăng nhập để mua ngay sản phẩm!');
-            return; // Dừng lại nếu không có token
+            Swal.fire('Lỗi', 'Bạn cần đăng nhập để mua ngay sản phẩm!', 'error');
+            return;
         }
 
-        if (selectedProduct && selectedProduct.id) {
-            // Chuyển đến trang thanh toán chỉ với productId
-            navigate(`/checkout?productId=${selectedProduct.id}`);
-        } else {
-            console.error("Sản phẩm không tồn tại hoặc không có productId.");
+        if (!product || !product.id) {
+            console.error("Sản phẩm không tồn tại hoặc không có product_id.");
+            Swal.fire('Lỗi', 'Sản phẩm không hợp lệ!', 'error');
+            return;
         }
+
+        const product_id = product.id;
+        const quantity = 1; // Đặt số lượng mặc định là 1
+
+        getCheckoutData(token, product_id, quantity)
+            .then(response => {
+                if (response && response.success) {
+                    navigate(`/checkout?product_id=${productId}&quantity=${quantity}`);
+                } else {
+                    const errorMessage = response?.message || 'Không thể thực hiện thanh toán. Vui lòng thử lại.';
+                    Swal.fire('Lỗi', errorMessage, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi lấy dữ liệu thanh toán:', error);
+                Swal.fire('Lỗi', 'Đã xảy ra lỗi khi thực hiện thanh toán. Vui lòng thử lại.', 'error');
+            });
     };
 
     return (
@@ -250,7 +281,9 @@ export default function Products() {
                                         <button
                                             className="btn btn-primary mr-2 font-bold w-100"
                                             style={{padding: '14px', fontSize: '13px', color: '#442e2b'}}
-                                            onClick={() => handleBuyNow(product)}
+                                            onClick={() => {
+                                                handleBuyNow(product); // Tiếp tục với việc mua ngay
+                                            }}
                                         >
                                             <p>Mua ngay</p>
                                         </button>
