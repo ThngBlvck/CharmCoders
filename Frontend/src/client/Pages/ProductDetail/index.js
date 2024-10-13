@@ -215,6 +215,8 @@ const ProductDetail = () => {
                             <div className="product-details" style={{marginTop: "2rem"}}>
                                 <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}}
                                    className="font-bold">Thông tin chi tiết sản phẩm:</p>
+                            <div className="product-details">
+                                <p style={{ color: "#8c5e58", fontSize: "20px", marginBottom: "1rem" }} className="font-bold">Thông tin chi tiết sản phẩm:</p>
                                 <ul>
                                     <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
                                         className="font-semibold">Tên sản phẩm:</strong> {product.name}</li>
@@ -252,6 +254,23 @@ const ProductDetail = () => {
                                                         <strong>{comment.user_name || "Bạn"}:</strong> {comment.content}
                                                     </div>
                                                     {/* Only show the delete icon if the logged-in user is the comment owner */}
+                        </div>
+                    </div>
+
+                    <div className="col-3 d-flex justify-end">
+                        <div className="row text-center d-flex flex-column">
+                            <div className="col mb-3">
+                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
+                                     style={{
+                                         maxWidth: "200px",
+                                         backgroundColor: '#fff7f8'
+                                     }}>
+                                    <img src="https://via.placeholder.com/150x150" alt="Thanh toán khi nhận hàng"
+                                         className="img-fluid mb-3 rounded"
+                                         style={{width: '100px', objectFit: 'cover'}}/>
+                                    <p style={{color: '#8c5e58'}} className="font-bold">Thanh toán khi nhận hàng</p>
+                                </div>
+                            </div>
 
                                                         <button
                                                             className="btn btn-sm"
@@ -268,8 +287,44 @@ const ProductDetail = () => {
                                         <p>Chưa có bình luận nào.</p>
                                     )
                                 )}
+                            <div className="col mb-3">
+                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
+                                     style={{
+                                         maxWidth: "200px",
+                                         backgroundColor: '#fff7f8'
+                                     }}>
+                                    <img src="https://via.placeholder.com/150x150" alt="Thương hiệu uy tín toàn cầu"
+                                         className="img-fluid mb-3 rounded"
+                                         style={{width: '100px', objectFit: 'cover'}}/>
+                                    <p style={{color: '#8c5e58'}} className="font-bold">Thương hiệu uy tín toàn cầu</p>
+                                </div>
                             </div>
 
+                            <div className="col mb-3">
+                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
+                                     style={{
+                                         maxWidth: "200px",
+                                         backgroundColor: '#fff7f8'
+                                     }}>
+                                    <img src="https://via.placeholder.com/150x150" alt="30 ngày đổi trả miễn phí"
+                                         className="img-fluid mb-3 rounded"
+                                         style={{width: '100px', objectFit: 'cover'}}/>
+                                    <p style={{color: '#8c5e58'}} className="font-bold">30 ngày đổi trả miễn phí</p>
+                                </div>
+                            </div>
+
+                            <div className="col mb-3">
+                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
+                                     style={{
+                                         maxWidth: "200px",
+                                         backgroundColor: '#fff7f8'
+                                     }}>
+                                    <img src="https://via.placeholder.com/150x150" alt="Sản phẩm chính hãng 100%"
+                                         className="img-fluid mb-3 rounded"
+                                         style={{width: '100px', objectFit: 'cover'}}/>
+                                    <p style={{color: '#8c5e58'}} className="font-bold">Sản phẩm chính hãng 100%</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
