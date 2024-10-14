@@ -149,7 +149,7 @@ export default function ProductCategoryList() {
             <div className="mb-4 px-4">
                 <input
                     type="text"
-                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                    className="border border-gray-300 rounded px-3 py-2 w-full shadow appearance-none focus:outline-none focus:shadow-outline"
                     placeholder="Tìm kiếm sản phẩm..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
