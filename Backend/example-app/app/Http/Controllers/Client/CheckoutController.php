@@ -187,7 +187,6 @@ class CheckoutController extends Controller
     {
         // Nhận thông tin người dùng đã đăng nhập
         $userId = auth()->id();
-        \Log::info('Auth user ID: ' . $userId);
 
         // Kiểm tra xem `user_id` có tồn tại hay không
         if (!$userId) {
@@ -200,26 +199,22 @@ class CheckoutController extends Controller
             return response()->json(['error' => 'Không tìm thấy người dùng!'], 404);
         }
 
-        // Lấy product_id và số lượng từ request
-        $productId = $request->input('product_id');
-        $quantity = $request->input('quantity', 1); // Mặc định số lượng là 1 nếu không được cung cấp
-
-        if (!$productId) {
-            return response()->json(['error' => 'Bạn cần cung cấp product_id!'], 400);
-        }
-
-        // Lấy thông tin sản phẩm
-        $product = Product::find($productId);
-        if (!$product) {
+        // Bắt `product_id` từ request và tìm sản phẩm
+        try {
+            $product = Product::findOrFail($request->input('product_id')); // Tìm product bằng product_id
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['error' => 'Sản phẩm không tồn tại!'], 404);
         }
 
-        // Kiểm tra số lượng có hợp lệ hay không
+        // Lấy số lượng từ request (hoặc mặc định là 1)
+        $quantity = $request->input('quantity', 1);
+
+        // Kiểm tra số lượng hợp lệ
         if ($quantity < 1) {
             return response()->json(['error' => 'Số lượng phải lớn hơn hoặc bằng 1!'], 400);
         }
 
-        // Tính tổng tiền dựa trên giá sản phẩm và số lượng
+        // Tính tổng tiền
         $totalAmount = $product->getPrice() * $quantity;
 
         // Trả về thông tin thanh toán
@@ -233,12 +228,14 @@ class CheckoutController extends Controller
             'product' => [
                 'id' => $product->id,
                 'name' => $product->name,
-                'price' => $product->getPrice(), // Gọi phương thức getPrice
+                'price' => $product->getPrice(),
             ],
             'quantity' => $quantity,
             'total_amount' => $totalAmount,
         ], 200);
     }
+
+
 
     //TÍnh toàn bộ giỏ hàng
     public function checkoutCart(Request $request)
