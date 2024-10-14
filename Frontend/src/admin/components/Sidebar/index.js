@@ -1,14 +1,14 @@
-/*eslint-disable*/
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
     const [collapseShow, setCollapseShow] = React.useState("hidden");
+    const location = useLocation(); // Lấy đường dẫn hiện tại
+
     return (
         <>
             <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
-                <div
-                    className="md:flex-col md:items-stretch md:min-h-full md:flex-nowrap px-0 flex flex-wrap items-center justify-between w-full mx-auto">
+                <div className="md:flex-col md:items-stretch md:min-h-full md:flex-nowrap px-0 flex flex-wrap items-center justify-between w-full mx-auto">
                     {/* Toggler */}
                     <button
                         className="cursor-pointer text-black opacity-50 md:hidden px-3 py-1 text-xl leading-none bg-transparent rounded border border-solid border-transparent"
@@ -24,24 +24,12 @@ export default function Sidebar() {
                     >
                         ADMIN GLOWMAKER
                     </Link>
-                    {/* User */}
-                    <ul className="md:hidden items-center flex flex-wrap list-none">
-                        <li className="inline-block relative">
-                        </li>
-                        <li className="inline-block relative">
-
-                        </li>
-                    </ul>
                     {/* Collapse */}
                     <div
-                        className={
-                            "md:flex md:flex-col md:items-stretch md:opacity-100 md:relative md:mt-4 md:shadow-none shadow absolute top-0 left-0 right-0 z-40 overflow-y-auto overflow-x-hidden h-auto items-center flex-1 rounded " +
-                            collapseShow
-                        }
+                        className={`md:flex md:flex-col md:items-stretch md:opacity-100 md:relative md:mt-4 md:shadow-none shadow absolute top-0 left-0 right-0 z-40 overflow-y-auto overflow-x-hidden h-auto items-center flex-1 rounded ${collapseShow}`}
                     >
                         {/* Collapse header */}
-                        <div
-                            className="md:min-w-full md:hidden block pb-4 mb-4 border-b border-solid border-blueGray-200">
+                        <div className="md:min-w-full md:hidden block pb-4 mb-4 border-b border-solid border-blueGray-200">
                             <div className="flex flex-wrap">
                                 <div className="w-6/12">
                                     <Link
@@ -62,309 +50,177 @@ export default function Sidebar() {
                                 </div>
                             </div>
                         </div>
-                        {/* Form */}
-                        <form className="mt-6 mb-4 md:hidden">
-                            <div className="mb-3 pt-0">
-                                <input
-                                    type="text"
-                                    placeholder="Search"
-                                    className="border-0 px-3 py-2 h-12 border border-solid  border-blueGray-500 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-base leading-snug shadow-none outline-none focus:outline-none w-full font-normal"
-                                />
-                            </div>
-                        </form>
-
-                        {/* Divider */}
-                        <hr className="my-4 md:min-w-full"/>
-                        {/* Heading */}
-                        <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline pl-4">
-                            Admin Layout Pages
-                        </h6>
                         {/* Navigation */}
-
                         <ul className="md:flex-col md:min-w-full flex flex-col list-none pl-4">
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/dashboard") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/dashboard"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/dashboard"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-tv mr-2 text-sm" +
-                                            (window.location.href.indexOf("/admin/dashboard") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-tv mr-2 text-sm ${location.pathname === "/admin/dashboard" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Dashboard
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/category_product") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/category_product"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/category_product"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-list mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/category_product") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-list mr-2 text-sm ${location.pathname === "/admin/category_product" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Danh Mục Sản Phẩm
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/product") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/product"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/product"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-table mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/product") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-table mr-2 text-sm ${location.pathname === "/admin/product" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Sản Phẩm
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/user") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/user"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/user"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-user mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/user") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-user mr-2 text-sm ${location.pathname === "/admin/user" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Người Dùng
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/category_blog") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/category_blog"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/category_blog"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-blog mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/category_blog") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-blog mr-2 text-sm ${location.pathname === "/admin/category_blog" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Danh Mục Bài Viết
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/blog") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/blog"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/blog"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-align-justify mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/blog") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-align-justify mr-2 text-sm ${location.pathname === "/admin/blog" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Bài Viết
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/comment") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/comment"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/comment"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-comment mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/comment") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-comment mr-2 text-sm ${location.pathname === "/admin/comment" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Bình Luận
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/brand") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/brand"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/brand"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-archive mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/brand") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-archive mr-2 text-sm ${location.pathname === "/admin/brand" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Nhãn Hàng
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/order") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/order"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/order"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-box-open mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/order") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-box-open mr-2 text-sm ${location.pathname === "/admin/order" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Đơn Hàng
                                 </Link>
                             </li>
+
                             <li className="items-center">
                                 <Link
-                                    className={
-                                        "text-xs uppercase py-3 font-bold block " +
-                                        (window.location.href.indexOf("/admin/role") !== -1
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/role"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500")
-                                    }
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
                                     to="/admin/role"
                                 >
-                                    <i
-                                        className={
-                                            "fas fa-box-open mr-2 text-sm " +
-                                            (window.location.href.indexOf("/admin/role") !== -1
-                                                ? "opacity-75"
-                                                : "text-blueGray-300")
-                                        }
-                                    ></i>{" "}
+                                    <i className={`fas fa-user-tag mr-2 text-sm ${location.pathname === "/admin/role" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Vai trò
                                 </Link>
                             </li>
                         </ul>
 
-                        {/* Divider */}
+                        {/* Auth Layout Pages */}
                         <hr className="my-4 md:min-w-full"/>
-                        {/* Heading */}
                         <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
                             Auth Layout Pages
                         </h6>
-                        {/* Navigation */}
-
-                        <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
+                        <ul className="md:flex-col md:min-w-full flex flex-col list-none pl-4">
                             <li className="items-center">
                                 <Link
-                                    className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
+                                    className="text-xs uppercase py-3 font-bold block text-blueGray-700 hover:text-blueGray-500"
                                     to="/auth/login"
                                 >
-                                    <i className="fas fa-fingerprint text-blueGray-400 mr-2 text-sm"></i>{" "}
-                                    Login
+                                    <i className="fas fa-fingerprint mr-2 text-sm text-blueGray-300"></i>
+                                    Đăng Nhập
                                 </Link>
                             </li>
-
                             <li className="items-center">
                                 <Link
-                                    className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                                to="/auth/register"
-                            >
-                                <i className="fas fa-clipboard-list text-blueGray-300 mr-2 text-sm"></i>{" "}
-                                Register
-                            </Link>
-                        </li>
-                    </ul>
-
-                    {/* Divider */}
-                    <hr className="my-4 md:min-w-full"/>
-                    {/* Heading */}
-                    <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-                        No Layout Pages
-                    </h6>
-                    {/* Navigation */}
-
-                    <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-                        <li className="items-center">
-                            <Link
-                                className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                                to="/landing"
-                            >
-                                <i className="fas fa-newspaper text-blueGray-400 mr-2 text-sm"></i>{" "}
-                                Landing Page
-                            </Link>
-                        </li>
-
-                        <li className="items-center">
-                            <Link
-                                className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                                to="/profile"
-                            >
-                                <i className="fas fa-user-circle text-blueGray-400 mr-2 text-sm"></i>{" "}
-                                Profile Page
-                            </Link>
-                        </li>
-                    </ul>
+                                    className="text-xs uppercase py-3 font-bold block text-blueGray-700 hover:text-blueGray-500"
+                                    to="/auth/register"
+                                >
+                                    <i className="fas fa-clipboard mr-2 text-sm text-blueGray-300"></i>
+                                    Đăng Ký
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
-</>
-)
-    ;
+            </nav>
+        </>
+    );
 }
