@@ -13,6 +13,6 @@ class Comment extends Model
         'content',
         'user_id',
         'product_id',
-        'status' 
+        'status'
     ];
 }

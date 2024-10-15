@@ -1,5 +1,20 @@
 import request from '../../api';
-const URL_User = "admin/employee"
+const URL_User = "admin/employee";
+const URL_SEND_OTP = 'password/send-otp'; // Thay đổi đường dẫn cho yêu cầu gửi OTP
+
+// Phương thức gửi OTP
+export const sendOtp = async (email) => {
+    try {
+        const response = await request({
+            method: 'POST',
+            path: URL_SEND_OTP,
+            data: { email }, // Gửi email dưới dạng dữ liệu
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
 
 export const login = async (credentials) => {
     try {
@@ -8,9 +23,9 @@ export const login = async (credentials) => {
             path: 'login',
             data: credentials,
         });
-        return response; 
+        return response;
     } catch (error) {
-        throw error; 
+        throw error;
     }
 };
 
@@ -32,7 +47,7 @@ export const logout = async () => {
         // Lấy token từ localStorage
         const token = localStorage.getItem('token');
         console.log(token);
-        
+
         // Kiểm tra xem token có tồn tại hay không
         if (!token) {
             throw new Error('Chưa có token để đăng xuất');
@@ -54,7 +69,7 @@ export const logout = async () => {
         return response;
     } catch (error) {
         console.log('Đăng xuất không thành công:', error); // Log lỗi để kiểm tra
-        throw error; 
+        throw error;
     }
 };
 
@@ -62,8 +77,8 @@ export const getUser = async () => {
     return await request({
         method: 'GET',
         path: `${URL_User}`,
-    })
-}
+    });
+};
 
 export const getOneUser = (id) => {
     return request({
@@ -94,5 +109,3 @@ export const deleteUser = (id) => {
         path: `${URL_User}/${id}`
     });
 };
-
-

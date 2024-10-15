@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
+
 import { useLocation } from "react-router-dom"; // Import useLocation để lấy thông tin từ URL
 import "../../../assets/styles/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -77,22 +77,7 @@ export default function Checkout() {
         }
     };
 
-    const products = [
-        {
-            id: 1,
-            name: "Sản phẩm 1",
-            price: 100000,
-            quantity: 2,
-            image: "https://via.placeholder.com/100",
-        },
-        {
-            id: 2,
-            name: "Sản phẩm 2",
-            price: 200000,
-            quantity: 1,
-            image: "https://via.placeholder.com/100",
-        },
-    ];
+
 
     const calculateTotal = () => {
         return products.reduce((total, item) => total + item.price * item.quantity, 0);

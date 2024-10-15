@@ -9,11 +9,16 @@ use App\Http\Requests\Admin\StoreCommentRequest;
 
 class CommentController extends Controller
 {
-    public function index()
-    {
-        $comments = Comment::all();
-        return response()->json($comments);
-    }
+   public function index()
+       {
+           // Giả sử bảng comments có khóa ngoại product_id và user_id để liên kết với bảng products và users
+           $comments = Comment::join('products', 'comments.product_id', '=', 'products.id')
+               ->join('users', 'comments.user_id', '=', 'users.id')
+               ->select('comments.*', 'products.name as product_name', 'users.name as user_name')
+               ->get();
+
+           return response()->json($comments);
+       }
 
     public function show($id)
     {
@@ -65,4 +70,16 @@ class CommentController extends Controller
             'message' => 'Xóa thành công.',
         ], 200);
     }
+
+public function getCommentsByProductId($productId)
+{
+    // Retrieve comments associated with the given product ID
+    $comments = Comment::where('product_id', $productId)
+                ->join('users', 'comments.user_id', '=', 'users.id')
+                ->select('comments.*', 'users.name as user_name')
+                ->get();
+
+    return response()->json($comments);
+}
+
 }

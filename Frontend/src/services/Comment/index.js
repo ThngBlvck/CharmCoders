@@ -1,12 +1,34 @@
 import request from '../../api';
+import axios from 'axios';
 
 const URL_Product = 'admin/products';
 const URL_Search = 'admin/search';  // Change URL if needed
-const URL_Comments = 'admin/comments'; // Make sure this matches your API
-const URL_User = "admin/users";
+const URL_Comments = 'client/comments'; // Ensure this matches your API
+const URL_User = "client/users";
 
+// Fetch a user by ID
+export const getUser = async (id) => {
+    return request({
+        method: 'GET',
+        path: `${URL_User}/${id}`,
+    });
+};
 
+// Fetch comments for a specific product ID
+export const getCommentsByProductId = async (productId) => {
+    return request({
+        method: 'GET',
+        path: `client/comments/product/${productId}`, // Update path to match the new route
+    });
+};
 
+export const addComment = async (data) => {
+    return request({
+        method: 'POST',
+        path: URL_Comments,
+        data,
+    });
+};
 
 // Fetch all comments
 export const getComments = async () => {
@@ -17,12 +39,13 @@ export const getComments = async () => {
 };
 
 // Delete a comment by ID
-export const deleteComment = async (id) => {
+export const deleteComment = async (commentId) => {
     return request({
         method: 'DELETE',
-        path: `${URL_Comments}/${id}`,
+        path: `${URL_Comments}/${commentId}`, // Ensure this matches your API route
     });
 };
+
 // Function to search for products
 export const searchProduct = (query) => {
     return request({
@@ -90,5 +113,3 @@ export const getProductWithUserNames = async () => {
         throw error;  // Re-throw error after logging
     }
 };
-
-
