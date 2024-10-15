@@ -4,26 +4,16 @@ import { getOneProduct } from "../../../services/Product";
 import { getOneBrand } from "../../../services/Brand";
 import { getOneCategory } from "../../../services/Category";
 import { addToCart } from "../../../services/Cart";
-import { jwtDecode } from 'jwt-decode';
 
-const ProductDetail = () => {
+export default function ProductDetail() {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [brandName, setBrandName] = useState("");
     const [categoryName, setCategoryName] = useState("");
     const [cart, setCart] = useState({});
-    const [userId, setUserId] = useState(null);
-    const token = localStorage.getItem('token'); // Lấy token từ localStorage
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('token'); // Lấy token từ localStorage
-        if (token) {
-            const decoded = jwtDecode(token); // Giải mã token
-            setUserId(decoded.userId); // Lưu userId vào state
-            console.log("userId:", userId);
-        }
-
         fetchOneProduct();
     }, [id]);
 
@@ -56,29 +46,17 @@ const ProductDetail = () => {
         }
     };
 
-    const handleAddToCart = async () => {
-        if (!token) {
-            alert('Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!');
-            return; // Dừng lại nếu không có token
-        }
-
+    const handleAddToCart = async (productId, quantity) => {
+        console.log(`Adding to cart with data: {product_id: ${productId}, quantity: ${quantity}}`); // Kiểm tra giá trị
         try {
-            const quantity = cart[product.id] || 1;
-            await addToCart(userId, product.id, quantity); // Sử dụng userId từ state
-            alert('Sản phẩm đã được thêm vào giỏ hàng!');
-            navigate('/cart'); // Chuyển đến trang giỏ hàng
+            const response = await addToCart(productId, quantity);
+            console.log('Thêm vào giỏ hàng thành công:', response);
         } catch (error) {
-            console.error("Lỗi khi thêm vào giỏ hàng:", error);
-            alert('Không thể thêm sản phẩm vào giỏ hàng.');
+            console.error('Lỗi khi thêm vào giỏ hàng:', error);
         }
     };
 
     const handleBuyNow = () => {
-        if (!token) {
-            alert('Bạn cần đăng nhập để mua ngay sản phẩm!');
-            return; // Dừng lại nếu không có token
-        }
-
         // Chuyển đến trang thanh toán chỉ với productId
         navigate(`/checkout?productId=${product.id}`); // Chuyển đến trang thanh toán
     };
@@ -93,7 +71,7 @@ const ProductDetail = () => {
                                 <img src={product.image} alt="Product" className="img-fluid rounded" />
                             </div>
                             <div className="col-7 d-flex flex-column align-content-start">
-                                <p className="mb-3" style={{ fontSize: "26px", color: "#8c5e58" }}>{product.name}</p>
+                                <p className="mb-3" style={{ fontSize: "20px", color: "#8c5e58" }}>{product.name}</p>
                                 <p className="mb-3" style={{ color: "#8c5e58" }}>{product.unit_price.toLocaleString("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
@@ -124,7 +102,7 @@ const ProductDetail = () => {
                                     </button>
                                     <button className="btn btn-primary font-semibold"
                                             style={{ fontSize: '13px' }}
-                                            onClick={handleAddToCart}>
+                                            onClick={() => handleAddToCart(product.id, cart[product.id] || 1)}>
                                         <p><i className="fa fa-shopping-basket" aria-hidden="true"
                                               style={{ marginRight: "6px" }}></i>Thêm
                                             vào giỏ</p>
@@ -212,12 +190,11 @@ const ProductDetail = () => {
                     {/*        </form>*/}
                     {/*    </div>*/}
                     {/*</div>*/}
+
                 </div>
             ) : (
-                <p>Loading...</p>
+                <p>Đang tải dữ liệu...</p>
             )}
         </div>
     );
 };
-
-export default ProductDetail;

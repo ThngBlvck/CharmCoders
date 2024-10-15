@@ -1,20 +1,29 @@
 import request from '../../api';
 
-const URL_Cart = 'client/carts'
+const URL_Cart = 'admin/cart';
+const URL_CartId = 'client/checkout-buy-now';
 
-export const addToCart = async (userId, productId, quantity) => {
-    const response = await fetch(`${URL_Cart}`, {
+export const addToCart = (productId, quantity) => {
+    return request({
         method: 'POST',
-        body: JSON.stringify({
-            user_id: userId,
+        path: `${URL_Cart}`, // Sửa từ `path` thành `url`
+        data: { // Sử dụng `data` thay vì `body`
             product_id: productId,
             quantity: quantity,
-        }),
+        },
     });
+};
 
-    if (!response.ok) {
-        throw new Error('Failed to add to cart');
-    }
+export const getCart = (query = '') => {
+    return request({
+        method: 'GET',
+        path: `${URL_Cart}`,
+    });
+};
 
-    return await response.json();
+export const getCartById = (id) => {
+    return request({
+        method: 'POST',
+        path: `${URL_CartId}/${id}`,
+    });
 };

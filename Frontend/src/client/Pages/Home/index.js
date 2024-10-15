@@ -142,7 +142,7 @@ export default function Home() {
                                             <div className="card-body">
                                                 <NavLink to={`/products/${product.id}`}>
                                                     <p className="card-title font-semibold"
-                                                       style={{color: '#8c5e58'}}>{product.name}</p>
+                                                       style={{color: '#8c5e58'}}>{product.name.length > 30 ? product.name.substring(0, 20) + "..." : product.name}</p>
                                                 </NavLink>
                                                 <p className="card-text mb-4 font-semibold"
                                                    style={{color: '#8c5e58'}}>{product.unit_price ? product.unit_price.toLocaleString("vi-VN", {
