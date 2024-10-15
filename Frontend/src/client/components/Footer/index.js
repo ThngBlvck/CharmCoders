@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
-import { getCategory } from "../../../services/Category";
+import {getCategory} from "../../../services/Category";
 import {jwtDecode} from "jwt-decode";
 
 export default function Footer() {
@@ -73,18 +73,11 @@ export default function Footer() {
                         </div>
                         <div className="col-md-6 col-lg-6 col-xl-3">
                             <div className="footer-item d-flex flex-column">
-                                <p className="font-bold title" style={{fontSize: '16px', color: '#8c5e58'}}>Danh
-                                    mục sản phẩm</p>
-                                {categories.length > 0 ? (
-                                    categories.map((category) => (
-                                        <a href={`/products?category_id=${category.id}`} key={category.id} style={{color: '#8c5e58', fontSize: '14px'}}>
-                                            <i className="fas fa-angle-right me-2" style={{color: '#8c5e58', fontSize: '14px'}}></i>
-                                            {category.name}
-                                        </a>
-                                    ))
-                                ) : (
-                                    <p style={{color: '#8c5e58', fontSize: '14px'}}>Chưa có danh mục nào.</p>
-                                )}
+                                <p className="font-bold title" style={{fontSize: '16px', color: '#8c5e58'}}>Vị trí</p>
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31433.785631967043!2d105.75011124306938!3d9.99841296682619!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31a08906415c355f%3A0x416815a99ebd841e!2zVHLGsOG7nW5nIENhbyDEkeG6s25nIEZQVCBQb2x5dGVjaG5pYw!5e0!3m2!1svi!2s!4v1728871294789!5m2!1svi!2s"
+                                    width="300" height="300" style={{border: "0"}} allowFullScreen="" loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"></iframe>
                             </div>
                         </div>
                         <div className="col-md-6 col-lg-6 col-xl-3">

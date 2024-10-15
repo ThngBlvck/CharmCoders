@@ -19,38 +19,20 @@ export default function Products() {
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [userId, setUserId] = useState(null);
     const [productId, setProductId] = useState(null);
     const navigate = useNavigate();
-    const token = localStorage.getItem('token'); // Lấy token từ localStorage
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                if (decoded && decoded.userId) {
-                    setUserId(decoded.userId);
-                    console.log("userId:", decoded.userId);
-                } else {
-                    console.error("Token không hợp lệ hoặc không có userId.");
-                }
-            } catch (error) {
-                console.error("Lỗi khi giải mã token:", error);
-            }
-        } else {
-            console.warn("Token không tồn tại.");
-        }
-
         // Nếu id có giá trị và khác 'all', cập nhật selectedCategory
         if (id && id !== "all") {
             setSelectedCategory(id);
         }
-
         fetchProducts();
         fetchCategories();
         fetchBrands();
-    }, [productId, searchTerm, selectedCategory, priceFilter, brandFilter, id, userId]); // Thêm id vào dependencies
+    }, [productId, searchTerm, selectedCategory, priceFilter, brandFilter, id]); // Không cần giải mã token, chỉ cần kiểm tra xem token có trong localStorage hay không
+
+
 
     const fetchProducts = async () => {
         try {
@@ -121,31 +103,28 @@ export default function Products() {
     };
 
     const handleBuyNow = (product) => {
-        if (!token) {
-            Swal.fire('Lỗi', 'Bạn cần đăng nhập để mua ngay sản phẩm!', 'error');
-            return;
-        }
-
         if (!product || !product.id) {
             console.error("Sản phẩm không tồn tại hoặc không có product_id.");
             Swal.fire('Lỗi', 'Sản phẩm không hợp lệ!', 'error');
             return;
         }
 
-        const product_id = product.id;
+        const productId = product.id; // Lấy product_id từ product
         const quantity = 1; // Đặt số lượng mặc định là 1
 
-        getCheckoutData(token, product_id, quantity)
+        // Thực hiện gọi API /buy-now
+        axios.post('/buy-now', { product_id: productId, quantity: quantity })
             .then(response => {
-                if (response && response.success) {
-                    navigate(`/checkout?product_id=${productId}&quantity=${quantity}`);
+                if (response.status === 200 && response.data.success) {
+                    // Điều hướng đến trang checkout với productId
+                    navigate(`/checkout?productId=${productId}`);
                 } else {
-                    const errorMessage = response?.message || 'Không thể thực hiện thanh toán. Vui lòng thử lại.';
+                    const errorMessage = response.data.error || 'Không thể thực hiện thanh toán. Vui lòng thử lại.';
                     Swal.fire('Lỗi', errorMessage, 'error');
                 }
             })
             .catch(error => {
-                console.error('Lỗi khi lấy dữ liệu thanh toán:', error);
+                console.error('Lỗi khi gọi API thanh toán:', error);
                 Swal.fire('Lỗi', 'Đã xảy ra lỗi khi thực hiện thanh toán. Vui lòng thử lại.', 'error');
             });
     };
@@ -268,7 +247,7 @@ export default function Products() {
                                     <div className="card-body">
                                         <NavLink to={`/products/${product.id}`} className="text-decoration-none">
                                             <p className="card-title font-semibold" style={{color: '#8c5e58'}}>
-                                                {product.name}
+                                                {product.name.length > 30 ? product.name.substring(0, 20) + "..." : product.name}
                                             </p>
                                         </NavLink>
                                         <p className="card-text mb-4 font-semibold" style={{color: '#8c5e58'}}>
@@ -281,9 +260,9 @@ export default function Products() {
                                         <button
                                             className="btn btn-primary mr-2 font-bold w-100"
                                             style={{padding: '14px', fontSize: '13px', color: '#442e2b'}}
-                                            onClick={() => {
-                                                handleBuyNow(product); // Tiếp tục với việc mua ngay
-                                            }}
+                                            onClick={() =>
+                                                handleBuyNow(product) // Tiếp tục với việc mua ngay
+                                            }
                                         >
                                             <p>Mua ngay</p>
                                         </button>

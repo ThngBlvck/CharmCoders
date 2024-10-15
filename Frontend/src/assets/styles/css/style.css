@@ -957,8 +957,6 @@
     display: flex; /* Đảm bảo các phần tử bên trong căn chỉnh theo hàng */
     align-items: center; /* Căn giữa các phần tử dọc */
     white-space: nowrap; /* Ngăn chặn ngắt dòng */
-    overflow: hidden; /* Ẩn phần thừa */
-    text-overflow: ellipsis; /* Hiển thị dấu ... */
 }
 
 .product-n {
@@ -968,7 +966,7 @@
     overflow: hidden;
     text-overflow: ellipsis; /* Hiển thị dấu ... */
     margin-bottom: 0; /* Bỏ margin dưới cùng */
-    max-width: 150px; /* Giới hạn chiều rộng tối đa để ngăn cuộn ngang */
+    max-width: 300px; /* Giới hạn chiều rộng tối đa để ngăn cuộn ngang */
 }
 
 .brand-card:hover {

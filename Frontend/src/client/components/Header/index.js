@@ -1,24 +1,61 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../../../services/User";
-
-// Danh sách sản phẩm mẫu (thay thế bằng API hoặc dữ liệu thực tế)
-const mockProducts = [
-    { id: 1, name: "Sản phẩm 1 Sản phẩm 1 Sản phẩm 1", price: 100000, image: "https://via.placeholder.com/50" },
-    { id: 2, name: "Sản phẩm 2", price: 200000, image: "https://via.placeholder.com/50" },
-    { id: 3, name: "Sản phẩm 3", price: 150000, image: "https://via.placeholder.com/50" },
-    { id: 4, name: "Sản phẩm 4", price: 150000, image: "https://via.placeholder.com/50" },
-    { id: 5, name: "Sản phẩm 5", price: 150000, image: "https://via.placeholder.com/50" },
-];
+import {getProduct, searchProduct} from "../../../services/Product";
 
 export default function Header() {
     const [searchTerm, setSearchTerm] = useState("");
     const [suggestions, setSuggestions] = useState([]); // Gợi ý sản phẩm
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Thêm trạng thái cho dropdown
+    const [products, setProducts] = useState([]);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const navigate = useNavigate();
+
+    const fetchProducts = async () => {
+        try {
+            let result;
+            if (searchTerm.trim() === "") {
+                result = await getProduct();
+            } else {
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm);
+                result = await searchProduct(sanitizedSearchTerm);
+            }
+
+            console.log("Products fetched:", result); // In ra danh sách sản phẩm đã lấy
+
+            if (Array.isArray(result)) {
+                setProducts(result);
+                return result; // Trả về danh sách sản phẩm
+            } else if (result && result.products && Array.isArray(result.products)) {
+                setProducts(result.products);
+                return result.products; // Trả về danh sách sản phẩm
+            } else {
+                setProducts([]);
+                return []; // Trả về mảng rỗng nếu không có sản phẩm
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+            setProducts([]);
+            return []; // Trả về mảng rỗng nếu xảy ra lỗi
+        }
+    };
+
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            setIsLoggedIn(true); // Nếu có token, thiết lập là đã đăng nhập
+        }
+
+        const delayDebounceFn = setTimeout(() => {
+            fetchProducts();
+        }, 300); // 300ms để chờ trước khi fetch lại sản phẩm
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm]);
 
     // Hàm xử lý khi người dùng nhấn vào icon tìm kiếm
     const handleSearch = () => {
@@ -42,21 +79,25 @@ export default function Header() {
         const value = e.target.value;
         setSearchTerm(value);
 
-        // Lọc sản phẩm phù hợp với từ khóa tìm kiếm (không cần trùng hoàn toàn)
-        const filteredProducts = mockProducts
-            .filter(product =>
-                fuzzyMatch(value, product.name)  // Sử dụng hàm fuzzy matching
-            )
-            .slice(0, 4); // Giới hạn tối đa 4 sản phẩm
+        // Lọc sản phẩm dựa trên từ khóa tìm kiếm
+        if (value.trim()) {
+            const filteredProducts = products
+                .filter(product => fuzzyMatch(value, product.name)) // Sử dụng fuzzy matching
+                .slice(0, 4); // Giới hạn tối đa 4 sản phẩm
 
-        setSuggestions(filteredProducts);
+            setSuggestions(filteredProducts);
+        } else {
+            setSuggestions([]); // Xóa gợi ý khi từ khóa rỗng
+        }
     };
+
 
     const handleLogout = () => {
         logout()
             .then(() => {
                 localStorage.removeItem("token");
-
+                setIsLoggedIn(false); // Cập nhật trạng thái đăng nhập
+                setIsDropdownOpen(false); // Đóng dropdown
                 navigate("/login");
             })
             .catch(err => {
@@ -108,9 +149,9 @@ export default function Header() {
                             </div>
 
                             <div className="d-flex align-items-center flex-nowrap pt-xl-0"
-                                style={{ marginRight: "100px" }}>
+                                 style={{marginRight: "100px"}}>
                                 {/* Tìm kiếm sản phẩm */}
-                                <div className="input-group" style={{ maxWidth: "400px", position: "relative" }}>
+                                <div className="input-group" style={{maxWidth: "400px", position: "relative"}}>
                                     <input
                                         type="text"
                                         className="form-control rounded-pill"
@@ -122,7 +163,9 @@ export default function Header() {
                                         style={{
                                             border: "2px solid #ccc",
                                             paddingRight: "50px",
-                                            height: "40px"
+                                            height: "40px",
+                                            cursor: 'pointer',
+                                            width: '300px',
                                         }}
                                     />
                                     {/* Icon tìm kiếm */}
@@ -137,7 +180,7 @@ export default function Header() {
                                             cursor: "pointer"
                                         }}
                                     >
-                                        <i className="fas fa-search" style={{ color: "#ff7e6b", fontSize: "1.5rem" }}></i>
+                                        <i className="fas fa-search" style={{color: "#ff7e6b", fontSize: "1.5rem"}}></i>
                                     </span>
 
                                     {/* Dropdown gợi ý sản phẩm */}
@@ -150,32 +193,38 @@ export default function Header() {
                                                 left: "0",
                                                 right: "0",
                                                 maxHeight: "300px",
+                                                width: "300px",
                                                 overflowY: "auto",
-                                                zIndex: 1000
+                                                zIndex: 1000,
                                             }}
                                         >
                                             {suggestions.map((product) => (
                                                 <NavLink
                                                     key={product.id}
-                                                    to={`/products/:id`}
+                                                    to={`/products/${product.id}`}
                                                     className="dropdown-item search-item"
                                                     onClick={() => setSearchTerm("")} // Reset lại thanh tìm kiếm khi click
                                                 >
-                                                    <img
-                                                        src={product.image}
-                                                        alt={product.name}
-                                                        style={{
-                                                            width: "50px",
-                                                            height: "50px",
-                                                            objectFit: "cover",
-                                                            marginRight: "10px"
-                                                        }}
-                                                    />
-                                                    <div>
-                                                        <p className="product-n" style={{
-                                                            fontWeight: "bold"
-                                                        }}>{product.name}</p>
-                                                        <small>{product.price.toLocaleString()} VND</small>
+
+                                                    <div className="d-flex justify-start">
+                                                        <div>
+                                                            <img
+                                                                src={product.image}
+                                                                alt={product.name}
+                                                                style={{
+                                                                    width: "50px",
+                                                                    height: "50px",
+                                                                    objectFit: "cover",
+                                                                    marginRight: "10px"
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <p className="product-n" style={{
+                                                                fontWeight: "bold"
+                                                            }}>{product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}</p>
+                                                            <small>{product.unit_price.toLocaleString()} VND</small>
+                                                        </div>
                                                     </div>
                                                 </NavLink>
                                             ))}
@@ -185,13 +234,13 @@ export default function Header() {
 
                                 {/* Icon giỏ hàng */}
                                 <NavLink to={`/cart`} className="btn ms-2"
-                                    style={{
-                                        width: "50px",
-                                        height: "50px",
-                                        color: "var(--bs-primary)",
-                                        position: "relative"
-                                    }}>
-                                    <i className="fas fa-shopping-basket" style={{ fontSize: "1.5rem" }}></i>
+                                         style={{
+                                             width: "50px",
+                                             height: "50px",
+                                             color: "var(--bs-primary)",
+                                             position: "relative"
+                                         }}>
+                                    <i className="fas fa-shopping-basket" style={{fontSize: "1.5rem"}}></i>
                                     <span
                                         className="font-bold"
                                         style={{
@@ -212,57 +261,72 @@ export default function Header() {
 
                                 {/* Dropdown tài khoản */}
                                 <div className="dropdown ms-2"
-                                    onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
-                                    onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
+                                     onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
+                                     onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
                                 >
                                     <button
                                         className="btn"
                                         type="button"
                                         id="dropdownMenuButton"
                                         aria-expanded={isDropdownOpen}
-                                        style={{ width: "50px", height: "50px", color: "var(--bs-primary)" }}
+                                        style={{width: "50px", height: "50px", color: "var(--bs-primary)"}}
                                     >
-                                        <i className="fas fa-user" style={{ fontSize: "1.5rem" }}></i>
+                                        <i className="fas fa-user" style={{fontSize: "1.5rem"}}></i>
                                     </button>
                                     {/* Dropdown menu */}
                                     {isDropdownOpen && (
-                                        <ul className="dropdown-menu show" aria-labelledby="dropdownMenuButton" style={{ left: "-68px", top: "40px" }}>
+                                        <ul className="dropdown-menu show" aria-labelledby="dropdownMenuButton"
+                                            style={{left: "-68px", top: "40px"}}>
                                             <li>
                                                 <NavLink to="/profile" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item" style={{ color: "#8c5e58" }}>
+                                                    <button className="dropdown-item modal-item"
+                                                            style={{color: "#8c5e58"}}>
                                                         <i className="fas fa-user me-2"></i>Tài khoản của bạn
                                                     </button>
                                                 </NavLink>
                                             </li>
                                             <li>
                                                 <NavLink to="/order-detail" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item" style={{ color: "#8c5e58" }}>
+                                                    <button className="dropdown-item modal-item"
+                                                            style={{color: "#8c5e58"}}>
                                                         <i className="fas fa-file-alt me-2"></i>Quản lý đơn hàng
                                                     </button>
                                                 </NavLink>
                                             </li>
                                             <li>
                                                 <NavLink to="/order-history" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item" style={{ color: "#8c5e58" }}>
-                                                        <i className="fas fa-clock-rotate-left me-2"></i>Lịch sử đơn hàng
-                                                    </button>
-                                                </NavLink>
-                                            </li>
-                                            <li>
-                                                <NavLink to="" onClick={() => {
-                                                    // Logic cho nút thoát
-                                                    toggleDropdown();
-                                                }}>
                                                     <button className="dropdown-item modal-item"
-                                                        onClick={handleLogout}
-                                                        style={{ color: "#8c5e58" }}>
-                                                        <i className="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                                            style={{color: "#8c5e58"}}>
+                                                        <i className="fas fa-clock-rotate-left me-2"></i>Lịch sử đơn
+                                                        hàng
                                                     </button>
                                                 </NavLink>
                                             </li>
+                                            {isLoggedIn && (
+                                                <li>
+
+                                                        <NavLink to="" onClick={() => {
+                                                            // Logic cho nút thoát
+                                                            toggleDropdown();
+                                                        }}>
+                                                            <button className="dropdown-item modal-item"
+                                                                    onClick={handleLogout}
+                                                                    style={{color: "#8c5e58"}}>
+                                                                <i className="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                                            </button>
+                                                        </NavLink>
+                                                </li>
+                                            )}
                                         </ul>
                                     )}
                                 </div>
+                                {!isLoggedIn && (
+                                    <button className="btn btn-primary w-50 font-semibold">
+                                        <NavLink to="/login">
+                                            <p style={{ fontSize: "14px", color: '#442e2b' }}>Đăng nhập</p>
+                                        </NavLink>
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </nav>
@@ -270,4 +334,9 @@ export default function Header() {
             </div>
         </>
     );
+}
+function removeVietnameseTones(str) {
+    str = str.replace(/[\u0300-\u036f]/g, ""); // Remove accents
+    str = str.replace(/đ/g, "d").replace(/Đ/g, "D"); // Replace Vietnamese special character
+    return str;
 }

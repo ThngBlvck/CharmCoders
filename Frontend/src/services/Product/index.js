@@ -55,20 +55,14 @@ export const deleteProduct = (id) => {
     });
 };
 
-// Hàm lấy thông tin checkout bao gồm thông tin người dùng và sản phẩm dựa trên token và product_id
-export const getCheckoutData = (token, productId, quantity = 1) => {
-    console.log('Request body:', { product_id: productId, quantity }); // In ra body yêu cầu
+// Hàm lấy thông tin checkout gồm product_id
+export const getCheckoutData = (productId) => {
     return request({
         method: 'POST',
         path: `${URL_Checkout}`,
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json', // Đảm bảo gửi đúng content type
+        data: { // Sử dụng `data` thay vì `body`
+            product_id: productId,
         },
-        body: JSON.stringify({
-            product_id: productId, // Đảm bảo productId không undefined
-            quantity: quantity,
-        }),
     });
 };
 
