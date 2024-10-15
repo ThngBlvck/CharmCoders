@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from "react-router-dom";
-import { getOneProduct } from "../../../services/Product";
-import { getOneBrand } from "../../../services/Brand";
-import { getOneCategory } from "../../../services/Category";
-import { addToCart } from "../../../services/Cart";
-import { getCommentsByProductId, addComment, deleteComment } from "../../../services/Comment";
-import { ToastContainer, toast } from 'react-toastify'; // Import toast
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from "react-router-dom";
+import {getOneProduct} from "../../../services/Product";
+import {getOneBrand} from "../../../services/Brand";
+import {getOneCategory} from "../../../services/Category";
+import {addToCart} from "../../../services/Cart";
+import {getCommentsByProductId, addComment, deleteComment} from "../../../services/Comment";
+import {ToastContainer, toast} from 'react-toastify'; // Import toast
 import 'react-toastify/dist/ReactToastify.css'; // Import CSS for toast
 import '@fortawesome/fontawesome-free/css/all.css';
 
 const ProductDetail = () => {
-    const { id } = useParams();
+    const {id} = useParams();
     const [product, setProduct] = useState(null);
     const [brandName, setBrandName] = useState("");
     const [categoryName, setCategoryName] = useState("");
@@ -69,22 +69,16 @@ const ProductDetail = () => {
         }
     };
 
-    const handleAddToCart = async () => {
-        if (!token) {
-            toast.warn('Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!'); // Replace alert with toast
-            return;
-        }
-
+    const handleAddToCart = async (productId, quantity) => {
+        console.log(`Adding to cart with data: {product_id: ${productId}, quantity: ${quantity}}`); // Kiểm tra giá trị
         try {
-            const quantity = cart[product.id] || 1;
-            await addToCart(userId, product.id, quantity);
-            toast.success('Sản phẩm đã được thêm vào giỏ hàng!'); // Replace alert with toast
-            navigate('/cart');
+            const response = await addToCart(productId, quantity);
+            console.log('Thêm vào giỏ hàng thành công:', response);
         } catch (error) {
-            console.error("Error adding to cart:", error);
-            toast.error('Không thể thêm sản phẩm vào giỏ hàng.'); // Replace alert with toast
+            console.error('Lỗi khi thêm vào giỏ hàng:', error);
         }
     };
+
 
     const handleBuyNow = () => {
         if (!token) {
@@ -163,7 +157,7 @@ const ProductDetail = () => {
 
     return (
         <div className="container my-5">
-            <ToastContainer /> {/* Add ToastContainer to your component */}
+            <ToastContainer/> {/* Add ToastContainer to your component */}
             {loadingProduct ? (
                 <p>Đang tải thông tin sản phẩm...</p>
             ) : product ? (
@@ -205,131 +199,68 @@ const ProductDetail = () => {
                                     </button>
                                     <button className="btn btn-primary font-semibold"
                                             style={{fontSize: '13px'}}
-                                            onClick={handleAddToCart}>
+                                            onClick={() => handleAddToCart(product.id, cart[product.id] || 1)}>
                                         <p><i className="fa fa-shopping-basket" aria-hidden="true"
-                                              style={{marginRight: "6px"}}></i>Thêm vào giỏ</p>
+                                              style={{marginRight: "6px"}}></i>Thêm
+                                            vào giỏ</p>
                                     </button>
+
                                 </div>
                             </div>
 
                             <div className="product-details" style={{marginTop: "2rem"}}>
                                 <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}}
                                    className="font-bold">Thông tin chi tiết sản phẩm:</p>
-                            <div className="product-details">
-                                <p style={{ color: "#8c5e58", fontSize: "20px", marginBottom: "1rem" }} className="font-bold">Thông tin chi tiết sản phẩm:</p>
-                                <ul>
-                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
-                                        className="font-semibold">Tên sản phẩm:</strong> {product.name}</li>
-                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
-                                        className="font-semibold">Mô tả sản phẩm:</strong> {product.content}</li>
-                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
-                                        className="font-semibold">Thương hiệu:</strong> {brandName}</li>
-                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
-                                        className="font-semibold">Danh mục:</strong> {categoryName}</li>
-                                </ul>
+                                <div className="product-details">
+                                    <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}}
+                                       className="font-bold">Thông tin chi tiết sản phẩm:</p>
+                                    <ul>
+                                        <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                            className="font-semibold">Tên sản phẩm:</strong> {product.name}</li>
+                                        <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                            className="font-semibold">Giá:</strong> {product.unit_price.toLocaleString("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                        })}</li>
+                                        <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                            className="font-semibold">Danh mục:</strong> {categoryName}</li>
+                                    </ul>
+                                </div>
                             </div>
-
-                            <div className="comments-section" style={{marginTop: "2rem"}}>
-                                <h4 className="font-bold" style={{color: "#8c5e58"}}>Bình luận:</h4>
-                                <form onSubmit={handleSubmitComment} style={{marginBottom: '1rem'}}>
-        <textarea
-            value={newComment}
-            onChange={handleNewCommentChange}
-            rows="3"
-            placeholder="Nhập bình luận của bạn..."
-            className="form-control"
-            style={{resize: 'none', width: '100%'}}
-        />
-                                    <button type="submit" className="btn btn-primary mt-2">Gửi bình luận</button>
-                                </form>
-                                {loadingComments ? (
-                                    <p>Đang tải bình luận...</p>
-                                ) : (
-                                    comments.length > 0 ? (
-                                        <ul className="list-unstyled">
-                                            {comments.map((comment) => (
-                                                <li key={comment.id}
-                                                    className="border-bottom mb-2 pb-2 d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <strong>{comment.user_name || "Bạn"}:</strong> {comment.content}
-                                                    </div>
-                                                    {/* Only show the delete icon if the logged-in user is the comment owner */}
                         </div>
                     </div>
 
-                    <div className="col-3 d-flex justify-end">
-                        <div className="row text-center d-flex flex-column">
-                            <div className="col mb-3">
-                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
-                                     style={{
-                                         maxWidth: "200px",
-                                         backgroundColor: '#fff7f8'
-                                     }}>
-                                    <img src="https://via.placeholder.com/150x150" alt="Thanh toán khi nhận hàng"
-                                         className="img-fluid mb-3 rounded"
-                                         style={{width: '100px', objectFit: 'cover'}}/>
-                                    <p style={{color: '#8c5e58'}} className="font-bold">Thanh toán khi nhận hàng</p>
-                                </div>
+                    <div className="col-md-3">
+                        <h5 style={{color: "#8c5e58"}}>Bình luận:</h5>
+                        <form onSubmit={handleSubmitComment}>
+                            <div className="form-group">
+                                <textarea className="form-control"
+                                          value={newComment}
+                                          onChange={handleNewCommentChange}
+                                          rows="3"
+                                          placeholder="Nhập bình luận của bạn..."></textarea>
                             </div>
-
-                                                        <button
-                                                            className="btn btn-sm"
-                                                            onClick={() => handleDeleteComment(comment.id)}
-                                                            title="Xóa bình luận" // Tooltip for accessibility
-                                                        >
-                                                            <i className="fas fa-trash"></i> {/* Font Awesome Trash Icon */}
-                                                        </button>
-
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p>Chưa có bình luận nào.</p>
-                                    )
-                                )}
-                            <div className="col mb-3">
-                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
-                                     style={{
-                                         maxWidth: "200px",
-                                         backgroundColor: '#fff7f8'
-                                     }}>
-                                    <img src="https://via.placeholder.com/150x150" alt="Thương hiệu uy tín toàn cầu"
-                                         className="img-fluid mb-3 rounded"
-                                         style={{width: '100px', objectFit: 'cover'}}/>
-                                    <p style={{color: '#8c5e58'}} className="font-bold">Thương hiệu uy tín toàn cầu</p>
-                                </div>
-                            </div>
-
-                            <div className="col mb-3">
-                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
-                                     style={{
-                                         maxWidth: "200px",
-                                         backgroundColor: '#fff7f8'
-                                     }}>
-                                    <img src="https://via.placeholder.com/150x150" alt="30 ngày đổi trả miễn phí"
-                                         className="img-fluid mb-3 rounded"
-                                         style={{width: '100px', objectFit: 'cover'}}/>
-                                    <p style={{color: '#8c5e58'}} className="font-bold">30 ngày đổi trả miễn phí</p>
-                                </div>
-                            </div>
-
-                            <div className="col mb-3">
-                                <div className="p-4 d-flex flex-column align-items-center border border-primary w-100"
-                                     style={{
-                                         maxWidth: "200px",
-                                         backgroundColor: '#fff7f8'
-                                     }}>
-                                    <img src="https://via.placeholder.com/150x150" alt="Sản phẩm chính hãng 100%"
-                                         className="img-fluid mb-3 rounded"
-                                         style={{width: '100px', objectFit: 'cover'}}/>
-                                    <p style={{color: '#8c5e58'}} className="font-bold">Sản phẩm chính hãng 100%</p>
-                                </div>
-                            </div>
-                        </div>
+                            <button type="submit" className="btn btn-primary">Gửi bình luận</button>
+                        </form>
+                        {loadingComments ? (
+                            <p>Đang tải bình luận...</p>
+                        ) : (
+                            <ul className="list-unstyled mt-3">
+                                {comments.map(comment => (
+                                    <li key={comment.id} className="border-bottom mb-2">
+                                        <p className="font-weight-bold">{comment.user_id}:</p>
+                                        <p>{comment.content}</p>
+                                        <button className="btn btn-danger btn-sm" onClick={() => handleDeleteComment(comment.id)}>
+                                            Xóa
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 </div>
             ) : (
-                <p>Không tìm thấy sản phẩm.</p>
+                <p>Sản phẩm không tồn tại.</p>
             )}
         </div>
     );
