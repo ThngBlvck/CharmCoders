@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getCheckoutData, makeMomoPayment } from '../../../services/Product'; // Import service
+import {useLocation, useParams} from "react-router-dom";
+import {makeMomoPayment} from '../../../services/Product'; // Import service
+import { getCartById } from '../../../services/Cart';
 import "../../../assets/styles/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -14,61 +15,24 @@ export default function Checkout() {
     });
     const { id } = useParams();
     const [product, setProduct] = useState([]);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
 
     useEffect(() => {
-        fetchProductAndUserData();
-    }, [id]);
+        const cartIds = queryParams.get('cartIds')?.split(',') || [];
+        if (cartIds.length > 0) {
+            fetchCartById(cartIds);
+        }
+    }, [location.search]);
 
-    const fetchProductAndUserData = async () => {
+    const fetchCartById = async (cartIds) => {
         try {
-            const userToken = localStorage.getItem("token");
-
-            // Kiểm tra xem có token không
-            if (!userToken) {
-                console.log("Chưa có token."); // Log nếu không có token
-                setIsLoggedIn(false);
-                return; // Không tiếp tục nếu thiếu token
-            }
-
-            // Kiểm tra xem id (product_id) có hợp lệ không
-            if (!id) {
-                console.log("Chưa có product_id."); // Log nếu không có product_id
-                return; // Không tiếp tục nếu thiếu product_id
-            }
-
-            console.log("Product ID:", id); // Kiểm tra product ID
-
-            // Gọi API lấy thông tin người dùng và sản phẩm
-            const response = await getCheckoutData(userToken, id);
-            console.log("Response từ API:", response); // In ra phản hồi từ API
-
-            // Kiểm tra phản hồi từ API
-            if (response.error) {
-                console.error("Lỗi từ API:", response.error);
-                setIsLoggedIn(false);
-                return;
-            }
-
-            const { userData, productData } = response;
-
-            if (userData && productData) {
-                setIsLoggedIn(true);
-                setFormData({
-                    ...formData,
-                    name: userData.name,
-                    email: userData.email,
-                    address: userData.address,
-                    phone: userData.phone,
-                });
-                setProduct(productData); // Hiển thị sản phẩm
-            } else {
-                setIsLoggedIn(false);
-                console.error("Không có dữ liệu người dùng hoặc sản phẩm.");
-            }
+            const result = await getCartById(cartIds);
+            console.log("Kết quả từ API:", result); // Log kết quả để kiểm tra
+            setProduct(Array.isArray(result) ? result : []); // Đảm bảo setProduct luôn nhận mảng
         } catch (error) {
-            console.error('Lỗi khi lấy dữ liệu checkout:', error);
-            setIsLoggedIn(false);
+            console.error("Lỗi khi lấy sản phẩm:", error);
+            setProduct([]); // Đặt thành mảng rỗng nếu có lỗi
         }
     };
 
@@ -104,27 +68,35 @@ export default function Checkout() {
     };
 
     const calculateTotal = () => {
+        if (!Array.isArray(product) || product.length === 0) {
+            return 0; // Trả về 0 nếu không phải là mảng hoặc mảng rỗng
+        }
         return product.reduce((total, item) => total + item.price * item.quantity, 0);
     };
+
 
     return (
         <div className="container py-5">
             <div className="row">
                 {/* Kiểm tra trạng thái đăng nhập */}
-                {isLoggedIn ? (
                     <>
                         {/* Hiển thị sản phẩm */}
                         <div className="col-md-6">
-                            <p className="mb-4 font-semibold" style={{ color: "#8c5e58", fontSize: "30px" }}>Sản phẩm của bạn</p>
+                            <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Sản phẩm của
+                                bạn</p>
                             <div className="list-group">
-                                {product.length > 0 ? (
+                                {Array.isArray(product) && product.length > 0 ? (
                                     product.map(item => (
-                                        <div key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
+                                        <div key={item.id}
+                                             className="list-group-item d-flex justify-content-between align-items-center">
                                             <div className="d-flex align-items-center">
-                                                <img src={item.image} alt={item.name} className="img-thumbnail me-3" style={{ width: "100px", height: "100px" }} />
+                                                <img src={item.image} alt={item.name} className="img-thumbnail me-3"
+                                                     style={{width: "100px", height: "100px"}}/>
                                                 <div>
-                                                    <p style={{ color: "#8c5e58" }}>{item.name}</p>
-                                                    <p className="mb-0" style={{ color: "#8c5e58" }}>{item.price.toLocaleString("vi-VN")} VND x {item.quantity}</p>
+                                                    <p style={{color: "#8c5e58"}}>{item.name}</p>
+                                                    <p className="mb-0"
+                                                       style={{color: "#8c5e58"}}>{item.price.toLocaleString("vi-VN")} VND
+                                                        x {item.quantity}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -133,15 +105,19 @@ export default function Checkout() {
                                     <p>Không có sản phẩm nào.</p>
                                 )}
                             </div>
-                            <p className="mt-4 font-semibold" style={{ color: "#8c5e58" }}>Tổng: {calculateTotal().toLocaleString("vi-VN")} VND</p>
+
+                            <p className="mt-4 font-semibold"
+                               style={{color: "#8c5e58"}}>Tổng: {calculateTotal().toLocaleString("vi-VN")} VND</p>
                         </div>
 
                         {/* Form thông tin người dùng */}
                         <div className="col-md-6">
-                            <p className="mb-4 font-semibold" style={{ color: "#8c5e58", fontSize: "30px" }}>Thông tin thanh toán</p>
+                            <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin
+                                thanh toán</p>
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-3">
-                                    <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Họ và Tên</label>
+                                    <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Họ và
+                                        Tên</label>
                                     <input
                                         type="text"
                                         className="form-control rounded"
@@ -235,9 +211,6 @@ export default function Checkout() {
                             </form>
                         </div>
                     </>
-                ) : (
-                    <p style={{color: "#8c5e58"}}>Vui lòng <a href="/login">đăng nhập</a> để tiếp tục.</p>
-                )}
             </div>
         </div>
     );
