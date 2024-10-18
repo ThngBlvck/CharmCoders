@@ -13,9 +13,18 @@ class ProductController extends Controller
     // Hiển thị danh sách sản phẩm
     public function index()
     {
-        $products = Product::all();
+        $products = Product::leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->select('products.*', 'categories.name as category_name')
+            ->get();
+
+        $products->transform(function ($product) {
+            $product->category_name = $product->category_name ?? 'Chưa phân loại';
+            return $product;
+        });
+
         return response()->json($products);
     }
+
 
     // Tạo sản phẩm mới
     public function store(StoreProductRequest $request)
@@ -64,7 +73,7 @@ class ProductController extends Controller
     // Xóa sản phẩm
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
 
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
