@@ -54,7 +54,7 @@ export default function Client() {
                     <Route path="/order-detail" element={<OrderManagement/>} />
                     <Route path="/order-history" element={<OrderHistory/>} />
                     <Route path="/post" element={<Post/>} />
-                    <Route path="/postdetail" element={<PostDetail/>} />
+                    <Route path="/postdetail/:id" element={<PostDetail/>} />
                     <Route path="/404" element={<Page404/>} />
                     
                     {/* Trang chủ khi vào đường dẫn gốc */}
