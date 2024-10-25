@@ -8,6 +8,9 @@ import {getCommentsByProductId, addComment, deleteComment} from "../../../servic
 import {ToastContainer, toast} from 'react-toastify'; // Import toast
 import 'react-toastify/dist/ReactToastify.css'; // Import CSS for toast
 import '@fortawesome/fontawesome-free/css/all.css';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
 
 const ProductDetail = () => {
     const {id} = useParams();
@@ -74,20 +77,23 @@ const ProductDetail = () => {
         try {
             const response = await addToCart(productId, quantity);
             console.log('Thêm vào giỏ hàng thành công:', response);
+            Swal.fire('Thành công', 'Thêm vào giỏ hàng thành công.', 'success');
         } catch (error) {
             console.error('Lỗi khi thêm vào giỏ hàng:', error);
         }
     };
 
-
-    const handleBuyNow = () => {
-        if (!token) {
-            toast.warn('Bạn cần đăng nhập để mua ngay sản phẩm!'); // Replace alert with toast
-            return;
+    const handleBuyNow = async (productId, quantity) => {
+        console.log(`Adding to cart with data: {product_id: ${productId}, quantity: ${quantity}}`);
+        try {
+            const response = await addToCart(productId, quantity);
+            Swal.fire('Thành công', 'Thêm vào giỏ hàng thành công.', 'success');
+            navigate(`/cart?productId=${productId}`);
+        } catch (error) {
+            console.error('Lỗi khi thêm vào giỏ hàng:', error); // Lưu ý không ghi log đối tượng toàn bộ
         }
-
-        navigate(`/checkout?productId=${product.id}`);
     };
+
 
     const handleNewCommentChange = (e) => {
         setNewComment(e.target.value);
@@ -159,7 +165,11 @@ const ProductDetail = () => {
         <div className="container my-5">
             <ToastContainer/> {/* Add ToastContainer to your component */}
             {loadingProduct ? (
-                <p>Đang tải thông tin sản phẩm...</p>
+                <div className="d-flex flex-column align-items-center"
+                     style={{marginTop: '10rem', marginBottom: '10rem'}}>
+                    <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
+                    <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
+                </div>
             ) : product ? (
                 <div className="row">
                     <div className="col-md-9 d-flex justify-start">
@@ -193,7 +203,7 @@ const ProductDetail = () => {
                                 <div className="d-flex justify-content-start">
                                     <button className="btn btn-primary mr-2 font-semibold"
                                             style={{padding: '16px', fontSize: '13px', color: '#442e2b'}}
-                                            onClick={handleBuyNow}>
+                                            onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}>
                                         <p><i className="fa fa-shopping-cart" aria-hidden="true"
                                               style={{marginRight: "6px"}}></i>Mua ngay</p>
                                     </button>

@@ -32,6 +32,14 @@ export const getOneProduct = (id) => {
     });
 };
 
+export const getProductsByIds = (ids) => {
+    return request({
+        method: 'GET',
+        path: `${URL_Product}?ids=${ids.join(',')}` // Gửi danh sách các id dưới dạng query string
+    });
+};
+
+
 export const postProduct = (data) => {
     return request({
         method: 'POST',
