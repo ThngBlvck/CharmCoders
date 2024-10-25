@@ -1,7 +1,7 @@
 import request from '../../api';
 
 const URL_Cart = 'admin/cart';
-const URL_CartId = 'client/checkout-buy-now';
+const URL_CartId = 'client/getCart';
 
 export const addToCart = (productId, quantity) => {
     return request({
@@ -21,9 +21,17 @@ export const getCart = (query = '') => {
     });
 };
 
-export const getCartById = (id) => {
+export const deleteCart = (id) => {
     return request({
-        method: 'POST',
-        path: `${URL_CartId}/${id}`,
+        method: 'DELETE',
+        path: `${URL_Cart}/${id}`
+    });
+};
+
+export const getCartsByIds = (ids) => {
+    const idsParam = ids.join(','); // nối các id thành một chuỗi, ngăn cách bằng dấu phẩy
+    return request({
+        method: 'GET',
+        path: `${URL_CartId}?ids=${idsParam}`, // truyền chuỗi các id vào query parameter
     });
 };
