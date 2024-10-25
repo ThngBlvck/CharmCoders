@@ -1,16 +1,66 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
-import {NavLink} from "react-router-dom";
+import {NavLink, useLocation} from "react-router-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {getUserInfo} from "../../../services/User";
 
 export default function Profile() {
+    const location = useLocation();
+    const [loading, setLoading] = useState(false); // Thêm state loading
+    const queryParams = new URLSearchParams(location.search);
     // State quản lý thông tin người dùng
     const [user, setUser] = useState({
-        name: "Nguyen Van A",
-        email: "nguyenvana@gmail.com",
-        phone: "0123456789",
-        address: "Số 22, Thường Thạnh, Cái Răng, Cần Thơ",
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
     });
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            console.log("Payload từ token:", payload); // Xem toàn bộ payload
+
+            // Gọi fetchUserInfo để lấy thông tin người dùng
+            fetchUserInfo().then(userInfo => {
+                console.log("Thông tin người dùng:", userInfo); // Xem thông tin người dùng đã nhận
+
+                if (userInfo && typeof userInfo === 'object' && userInfo.user_id) {
+                    // Kiểm tra userInfo có phải là một đối tượng và có user_id
+                    setUser(prevFormData => ({
+                        ...prevFormData,
+                        name: userInfo.name || "",
+                        email: userInfo.email || "",
+                        phone: userInfo.phone || "",
+                        address: userInfo.address || "",
+                    }));
+                } else {
+                    console.warn("Không có thông tin người dùng hợp lệ.");
+                }
+            });
+        } else {
+            console.error("Không tìm thấy token trong localStorage.");
+        }
+    }, []);
+
+    const fetchUserInfo = async () => {
+        try {
+            const response = await getUserInfo(); // Gọi API để lấy thông tin người dùng
+            console.log("Đáp ứng từ API:", response); // Kiểm tra dữ liệu từ API
+
+            if (response && response.user_id) {
+                return response; // Trả về dữ liệu người dùng
+            } else {
+                console.error("Không có dữ liệu người dùng từ API.");
+                return {}; // Trả về đối tượng rỗng nếu không có dữ liệu
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin người dùng:", error);
+            return {}; // Trả về đối tượng rỗng nếu có lỗi
+        }
+    };
 
     // State để quản lý trạng thái chỉnh sửa
     const [isEditing, setIsEditing] = useState(false);

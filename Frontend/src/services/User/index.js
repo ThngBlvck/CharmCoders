@@ -1,6 +1,7 @@
 import request from '../../api';
 const URL_User = "admin/employee";
 const URL_SEND_OTP = 'password/send-otp'; // Thay đổi đường dẫn cho yêu cầu gửi OTP
+const URL_User_INFO = "client/user";
 
 // Phương thức gửi OTP
 export const sendOtp = async (email) => {
@@ -84,6 +85,13 @@ export const getOneUser = (id) => {
     return request({
         method: 'GET',
         path: `${URL_User}/${id}`
+    });
+};
+
+export const getUserInfo = () => {
+    return request({
+        method: 'GET',
+        path: `${URL_User_INFO}`
     });
 };
 

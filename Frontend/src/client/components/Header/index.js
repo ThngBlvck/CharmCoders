@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
-import { NavLink, useNavigate } from "react-router-dom";
+import {Link, NavLink, useNavigate} from "react-router-dom";
 import { logout } from "../../../services/User";
+import { getCart } from "../../../services/Cart";
 import {getProduct, searchProduct} from "../../../services/Product";
 
 export default function Header() {
@@ -11,6 +12,8 @@ export default function Header() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Thêm trạng thái cho dropdown
     const [products, setProducts] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [cartCount, setCartCount] = useState(0);
+    const [cartUpdated, setCartUpdated] = useState(false);
 
     const navigate = useNavigate();
 
@@ -23,8 +26,6 @@ export default function Header() {
                 const sanitizedSearchTerm = removeVietnameseTones(searchTerm);
                 result = await searchProduct(sanitizedSearchTerm);
             }
-
-            console.log("Products fetched:", result); // In ra danh sách sản phẩm đã lấy
 
             if (Array.isArray(result)) {
                 setProducts(result);
@@ -48,6 +49,7 @@ export default function Header() {
         const token = localStorage.getItem('token');
         if (token) {
             setIsLoggedIn(true); // Nếu có token, thiết lập là đã đăng nhập
+            fetchCartCount();
         }
 
         const delayDebounceFn = setTimeout(() => {
@@ -55,7 +57,7 @@ export default function Header() {
         }, 300); // 300ms để chờ trước khi fetch lại sản phẩm
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm]);
+    }, [searchTerm, cartUpdated]);
 
     // Hàm xử lý khi người dùng nhấn vào icon tìm kiếm
     const handleSearch = () => {
@@ -91,6 +93,33 @@ export default function Header() {
         }
     };
 
+    const fetchCartCount = async () => {
+        try {
+            const cart = await getCart(); // Lấy giỏ hàng
+            console.log(cart); // Kiểm tra cấu trúc dữ liệu
+
+            // Nhóm các cart theo product_id
+            const groupedCart = cart.reduce((acc, item) => {
+                const existingItem = acc.find(i => i.product_id === item.product_id);
+                if (existingItem) {
+                    // Nếu đã tồn tại sản phẩm, chỉ cần cộng thêm số lượng
+                    existingItem.quantity += item.quantity;
+                } else {
+                    // Nếu chưa tồn tại, thêm sản phẩm mới vào nhóm
+                    acc.push({ product_id: item.product_id, quantity: item.quantity });
+                }
+                return acc;
+            }, []);
+
+            // Đếm số lượng các cart (số sản phẩm độc nhất)
+            const totalCount = groupedCart.length;
+
+            setCartCount(totalCount); // Cập nhật state
+        } catch (error) {
+            console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
+            setCartCount(0); // Đặt lại về 0 nếu có lỗi
+        }
+    };
 
     const handleLogout = () => {
         logout()
@@ -221,8 +250,12 @@ export default function Header() {
                                                         </div>
                                                         <div>
                                                             <p className="product-n" style={{
-                                                                fontWeight: "bold"
-                                                            }}>{product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}</p>
+                                                                fontWeight: "bold",
+                                                                overflow: "hidden", // Ẩn phần không hiển thị
+                                                                textOverflow: "ellipsis", // Thêm dấu ... nếu dài hơn
+                                                                whiteSpace: "normal", // Cho phép xuống dòng
+                                                                maxHeight: "3em", // Giới hạn chiều cao để hiển thị 2 dòng
+                                                            }}>{product.name.length > 50 ? product.name.substring(0, 50) + "..." : product.name}</p>
                                                             <small>{product.unit_price.toLocaleString()} VND</small>
                                                         </div>
                                                     </div>
@@ -233,33 +266,36 @@ export default function Header() {
                                 </div>
 
                                 {/* Icon giỏ hàng */}
-                                <NavLink to={`/cart`} className="btn ms-2"
-                                         style={{
-                                             width: "50px",
-                                             height: "50px",
-                                             color: "var(--bs-primary)",
-                                             position: "relative"
-                                         }}>
-                                    <i className="fas fa-shopping-basket" style={{fontSize: "1.5rem"}}></i>
-                                    <span
-                                        className="font-bold"
-                                        style={{
-                                            position: "absolute",
-                                            top: "-5px",
-                                            right: "-4px",
-                                            padding: "0.1rem 0.4rem",
-                                            backgroundColor: "#442e2b",
-                                            border: "solid 1px #ff7e6b",
-                                            borderRadius: "100%",
-                                            color: "white",
-                                            fontSize: "0.8rem",
-                                        }}
-                                    >
-                                        3
-                                    </span>
-                                </NavLink>
+                                {isLoggedIn && (
+                                    <NavLink to={`/cart`} className="btn ms-2"
+                                             style={{
+                                                 width: "50px",
+                                                 height: "50px",
+                                                 color: "var(--bs-primary)",
+                                                 position: "relative"
+                                             }}>
+                                        <i className="fas fa-shopping-basket" style={{fontSize: "1.5rem"}}></i>
+                                        <span
+                                            className="font-bold"
+                                            style={{
+                                                position: "absolute",
+                                                top: "-5px",
+                                                right: "-4px",
+                                                padding: "0.1rem 0.4rem",
+                                                backgroundColor: "#442e2b",
+                                                border: "solid 1px #ff7e6b",
+                                                borderRadius: "100%",
+                                                color: "white",
+                                                fontSize: "0.8rem",
+                                            }}
+                                        >
+                                            {cartCount}
+                                        </span>
+                                    </NavLink>
+                                )}
 
                                 {/* Dropdown tài khoản */}
+                                {isLoggedIn && (
                                 <div className="dropdown ms-2"
                                      onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
                                      onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
@@ -302,7 +338,6 @@ export default function Header() {
                                                     </button>
                                                 </NavLink>
                                             </li>
-                                            {isLoggedIn && (
                                                 <li>
 
                                                         <NavLink to="" onClick={() => {
@@ -316,15 +351,15 @@ export default function Header() {
                                                             </button>
                                                         </NavLink>
                                                 </li>
-                                            )}
-                                        </ul>
-                                    )}
-                                </div>
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
                                 {!isLoggedIn && (
-                                    <button className="btn btn-primary w-50 font-semibold">
-                                        <NavLink to="/login">
+                                    <button className="btn btn-primary w-50 font-semibold" style={{marginLeft: '20px'}}>
+                                        <Link to="/login">
                                             <p style={{ fontSize: "14px", color: '#442e2b' }}>Đăng nhập</p>
-                                        </NavLink>
+                                        </Link>
                                     </button>
                                 )}
                             </div>
