@@ -37,7 +37,6 @@ export default function Login() {
                 // Nếu có token trả về, lưu vào localStorage
                 console.log("Token:", response.token);
                 localStorage.setItem('token', response.token);
-                localStorage.setItem('role', response.role);
                 window.location.href = "/home"; 
             } else {
                 setErrorMessage("Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
