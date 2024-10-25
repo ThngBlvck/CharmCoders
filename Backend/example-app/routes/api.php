@@ -59,3 +59,7 @@ Route::prefix('client')->group(function () {
         Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
         Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
     });
+});
+Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
+Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
+Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
