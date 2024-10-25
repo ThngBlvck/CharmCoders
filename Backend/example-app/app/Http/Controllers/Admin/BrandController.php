@@ -10,9 +10,12 @@ class BrandController extends Controller
 {
     public function index()
     {
-        $brands = Brand::all();
+
+        $brands = Brand::orderBy('created_at', 'desc')->get();
+
         return response()->json($brands);
     }
+
 
     public function store(StoreBrandRequest $request)
     {
@@ -50,21 +53,34 @@ class BrandController extends Controller
         return response()->json($brand, 200);
     }
 
-
     public function destroy($id)
     {
         $brand = Brand::findOrFail($id);
-        // Xóa ảnh liên kết nếu có
+
+        // Tìm và xóa tất cả các sản phẩm thuộc nhãn hàng này
+        $products = \App\Models\Product::where('brand_id', $id)->get();
+        foreach ($products as $product) {
+            // Xóa các hình ảnh liên quan đến sản phẩm nếu có
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            // Xóa sản phẩm
+            $product->delete();
+        }
+
+        // Xóa ảnh của nhãn hàng nếu có
         if ($brand->image) {
             Storage::disk('public')->delete($brand->image);
         }
 
-        // Xóa thương hiệu
+        // Xóa nhãn hàng
         $brand->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Thương hiệu đã được xóa thành công.',
+            'message' => 'Thương hiệu và tất cả các sản phẩm liên quan đã được xóa thành công.',
         ], 200);
     }
+
+
 }
