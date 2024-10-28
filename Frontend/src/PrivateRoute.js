@@ -5,11 +5,12 @@ const PrivateRoute = ({ isAuthenticated, userRole }) => {
         return <Navigate to="/login" />;
     }
 
-    if (userRole !== "admin") {
+    // Chỉ cho phép truy cập nếu userRole là "admin" hoặc "employee"
+    if (userRole !== "admin" && userRole !== "employee") {
         return <Navigate to="/" />;
     }
 
-    return <Outlet />; 
+    return <Outlet />;
 };
 
 export default PrivateRoute;
