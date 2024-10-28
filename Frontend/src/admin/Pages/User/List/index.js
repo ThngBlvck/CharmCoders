@@ -5,24 +5,40 @@ import { getRole } from "../../../../services/Role";
 import Swal from 'sweetalert2';
 
 export default function UserList() {
-    const [users, setUser] = useState([]);
-    const [roles, setRoles] = useState([]); // Thêm state lưu trữ danh sách role
+    const [users, setUsers] = useState([]);
+    const [roles, setRoles] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    const userToken = localStorage.getItem("token");
+    let userRole = null;
+
+    if (userToken) {
+        const parts = userToken.split('.');
+        if (parts.length === 3) {
+            const payload = JSON.parse(atob(parts[1]));
+            userRole = payload.scopes.includes("admin") ? "admin" : (payload.scopes.includes("employee") ? "employee" : "user");
+            console.log("User Role:", userRole);
+        }
+    }
+
     useEffect(() => {
-        fetchUsers();
-        fetchRoles(); // Gọi API lấy danh sách role
+        const fetchData = async () => {
+            await Promise.all([fetchUsers(), fetchRoles()]);
+            setLoading(false);
+        };
+
+        fetchData();
     }, []);
 
     const fetchUsers = async () => {
         try {
             const userList = await getUser();
-            setUser(userList);
-            console.log("User List:", userList);
+            setUsers(userList);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách người dùng:", error);
-            setUser([]);
+            setUsers([]);
         }
     };
 
@@ -30,7 +46,6 @@ export default function UserList() {
         try {
             const roleList = await getRole();
             setRoles(roleList);
-            console.log("Role List:", roleList);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách quyền:", error);
         }
@@ -51,7 +66,7 @@ export default function UserList() {
         if (result.isConfirmed) {
             try {
                 await deleteUser(id);
-                setUser(users.filter(user => user.id !== id));
+                setUsers(users.filter(user => user.id !== id));
                 Swal.fire('Đã xóa!', 'Người dùng đã được xóa.', 'success');
             } catch (error) {
                 console.error("Lỗi khi xóa người dùng:", error);
@@ -75,8 +90,8 @@ export default function UserList() {
         if (result.isConfirmed) {
             try {
                 await Promise.all(selectedUsers.map(id => deleteUser(id)));
-                setUser(users.filter(user => !selectedUsers.includes(user.id)));
-                setSelectedUsers([]); // Clear danh sách đã chọn
+                setUsers(users.filter(user => !selectedUsers.includes(user.id)));
+                setSelectedUsers([]);
                 Swal.fire('Đã xóa!', 'Các người dùng đã được xóa.', 'success');
             } catch (error) {
                 console.error("Lỗi khi xóa người dùng:", error);
@@ -86,29 +101,29 @@ export default function UserList() {
     };
 
     const handleEdit = (id) => {
-        navigate(`/admin/product/edit/${id}`);
+        navigate(`/admin/user/edit/${id}`);
     };
 
-    const handleSelectProduct = (id) => {
-        if (selectedUsers.includes(id)) {
-            setSelectedUsers(selectedUsers.filter(userId => userId !== id));
-        } else {
-            setSelectedUsers([...selectedUsers, id]);
-        }
+    const handleSelectUser = (id) => {
+        setSelectedUsers(prevSelected =>
+            prevSelected.includes(id)
+                ? prevSelected.filter(userId => userId !== id)
+                : [...prevSelected, id]
+        );
     };
 
     const handleSelectAll = () => {
-        if (selectedUsers.length === users.length) {
-            setSelectedUsers([]);
-        } else {
-            setSelectedUsers(users.map(user => user.id));
-        }
+        setSelectedUsers(selectedUsers.length === users.length ? [] : users.map(user => user.id));
     };
 
     const getRoleName = (roleId) => {
         const role = roles.find(r => r.id === roleId);
-        return role ? role.name : 'Unknown'; // Hiển thị role name hoặc "Unknown" nếu không tìm thấy
+        return role ? role.name : 'Unknown';
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
@@ -117,11 +132,12 @@ export default function UserList() {
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
                         <h3 className="font-semibold text-lg text-blueGray-700">Người dùng</h3>
                     </div>
-                    <NavLink to={`/admin/product/add`}
-                             className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                             type="button">
-                        Thêm Người Dùng
-                    </NavLink>
+                    {userRole === "admin" && (
+                        <NavLink to={`/admin/user/add`}
+                                 className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150">
+                            Thêm Nhân Viên
+                        </NavLink>
+                    )}
                 </div>
             </div>
 
@@ -129,13 +145,17 @@ export default function UserList() {
                 <table className="items-center w-full bg-transparent border-collapse table-fixed">
                     <thead>
                     <tr>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
-                            <input
-                                type="checkbox"
-                                onChange={handleSelectAll}
-                                checked={selectedUsers.length === users.length}
-                            />
-                        </th>
+                        {userRole !== "admin" ? (
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"></th>
+                        ) : (
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                <input
+                                    type="checkbox"
+                                    onChange={handleSelectAll}
+                                    checked={selectedUsers.length === users.length}
+                                />
+                            </th>
+                        )}
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình ảnh</th>
@@ -143,69 +163,84 @@ export default function UserList() {
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Số điện thoại</th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Địa chỉ</th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Quyền Người Dùng</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao tác</th>
+                        {userRole !== "admin" ? (
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"></th>
+                        ):(
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
+                                tác</th>
+                        )
+                        }
                     </tr>
                     </thead>
                     <tbody>
-                    {users && users.length > 0 ? (
+                    {users.length > 0 ? (
                         users.map((user, index) => (
                             <tr key={user.id}>
                                 <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedUsers.includes(user.id)}
-                                        onChange={() => handleSelectProduct(user.id)}
-                                    />
+                                    {/* Hiển thị checkbox cho nhân viên (role_id == 2) và người dùng khác không phải là admin (role_id khác 1) */}
+                                    {user.role_id === 3 && userRole === "admin" ? (
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedUsers.includes(user.id)}
+                                            onChange={() => handleSelectUser(user.id)}
+                                        />
+                                    ) : (
+                                        <span className="w-4 h-4" />
+                                    )}
                                 </td>
                                 <td>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                    <span className="ml-3 text-blueGray-600">
-                                        {index + 1}
-                                    </span>
+                                        <span className="ml-3 text-blueGray-600">{index + 1}</span>
                                     </th>
                                 </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                    {user.name.length > 30 ? user.name.substring(0, 30) + "..." : user.name}
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.name}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
+                                    {user.avatar ? (
+                                        <img src={user.avatar} alt={user.name} className="w-12 h-12 rounded-full"/>
+                                    ) : (
+                                        <i className="fas fa-user-circle text-3xl text-gray-400"/>
+                                    )}
                                 </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                    <img src={user.image} alt={user.name} className="h-12 w-12 rounded"/>
-                                </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{user.email}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{user.phone}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{user.address}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{getRoleName(user.role_id)}</td>
-                                <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                    <button
-                                        className="text-blue-500 hover:text-blue-700 ml-2 px-2"
-                                        onClick={() => handleEdit(user.id)}
-                                    >
-                                        <i className="fas fa-pen text-xl"></i>
-                                    </button>
-                                    <button className="text-red-500 hover:text-red-700 ml-2 px-2"
-                                            onClick={() => handleDelete(user.id)}>
-                                        <i className="fas fa-trash text-xl"></i>
-                                    </button>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.email}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.phone}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.address}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{getRoleName(user.role_id)}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
+                                    {userRole === "admin" && user.role_id == 3 && (
+                                        <>
+                                            <button
+                                                onClick={() => handleEdit(user.id)}
+                                                className="text-blue-500 hover:text-blue-700 ml-2 px-2"
+                                            >
+                                                <i className="fas fa-pen text-xl"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(user.id)}
+                                                className="text-red-500 hover:text-red-700 ml-2 px-2"
+                                            >
+                                                <i className="fas fa-trash text-xl"></i>
+                                            </button>
+                                        </>
+                                    )}
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="7" className="text-center p-4">
-                                Không có người dùng nào
-                            </td>
+                            <td colSpan={9} className="text-center p-4">Không có người dùng nào.</td>
                         </tr>
                     )}
                     </tbody>
                 </table>
             </div>
 
-            {selectedUsers.length > 0 && (
-                <div className="mb-4 px-4">
+            {userRole === "admin" && selectedUsers.length > 0 && (
+                <div className="flex justify-end p-4">
                     <button
-                        className="bg-red-500 text-white text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
                         onClick={handleDeleteSelected}
+                        className="bg-red-500 text-white px-4 py-2 rounded"
                     >
-                        Xóa các người dùng đã chọn
+                        Xóa đã chọn
                     </button>
                 </div>
             )}
