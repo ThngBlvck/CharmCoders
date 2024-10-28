@@ -25,19 +25,19 @@ class StoreUserRequest extends FormRequest
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string', 'min:5'], 
-            'phone' => ['required', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:15'], 
+            'password' => ['required', 'string', 'min:5'],
+            'phone' => ['required', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:15'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            'address' => ['nullable', 'string', 'max:255'], 
+            'address' => ['nullable', 'string', 'max:255'],
         ];
-    
+
         // Nếu phương thức là PUT, không cần kiểm tra tính duy nhất cho email
         if ($this->isMethod('put')) {
             $rules['email'] = ['required', 'string', 'email', 'max:255']; // Chỉ yêu cầu định dạng email
         } else {
             $rules['email'] = ['required', 'string', 'email', 'max:255', 'unique:users']; // Kiểm tra tính duy nhất khi không phải là PUT
         }
-    
+
         return $rules;
     }
 
@@ -60,7 +60,7 @@ class StoreUserRequest extends FormRequest
             'image.max' => 'Kích thước hình ảnh không được vượt quá 2MB.',
             'address.string' => 'Địa chỉ phải là một chuỗi.',
             'address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
-            
+
         ];
     }
 

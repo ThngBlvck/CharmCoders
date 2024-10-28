@@ -23,6 +23,8 @@ import EditProductCaterogy from "./Pages/ProductCategory/Edit";
 
 //User
 import UserList from "./Pages/User/List";
+import AddEmployee from "./Pages/User/Add";
+import EditEmployee from "./Pages/User/Edit";
 
 import Blog from "./Pages/Blog/List";
 import Brand from "./Pages/Brand/List";
@@ -71,6 +73,8 @@ export default function Admin() {
                         <Route path="product/detail/:id" element={<ProductDetail />} />
 
                         <Route path="user" element={<UserList />} />
+                        <Route path="user/add" element={<AddEmployee />} />
+                        <Route path="user/edit/:id" element={<EditEmployee />} />
 
                         <Route path="category_blog" element={<BlogCaterogy />} />
                         <Route path="category_blog/add" element={<AddBlogCategory />} />
