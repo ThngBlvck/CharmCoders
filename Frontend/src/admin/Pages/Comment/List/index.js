@@ -19,7 +19,6 @@ export default function Comment({ color, userId }) {
     const fetchComments = async () => {
         try {
             const userComments = await getComments();
-
             const filteredComments = userId
                 ? userComments.filter(comment => comment.userId === userId)
                 : userComments;
@@ -27,7 +26,6 @@ export default function Comment({ color, userId }) {
         } catch (error) {
             console.error("Failed to fetch comments", error);
         }
-        console.log(setComments);
     };
 
     // Fetch product data
@@ -159,7 +157,6 @@ export default function Comment({ color, userId }) {
                     </thead>
                     <tbody>
                     {comments.map((comment, index) => {
-                        console.log(comments);
                         // Find product name using productId
                         const product = products.find(p => p.id === comment.productId);
                         const productName = product ? product.productName : 'Sản phẩm không xác định';
@@ -176,8 +173,8 @@ export default function Comment({ color, userId }) {
                                 </td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.content}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.user_name}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.product_name}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{userName}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{productName}</td>
                                 <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.status}</td>
                                 <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                     <button

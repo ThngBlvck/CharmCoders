@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
         Passport::loadKeysFrom(__DIR__.'/../secrets/oauth');
         Passport::tokensCan([
             'admin' => 'Quản lý hệ thống',
+            'employee' => 'Quản lý hệ thống',
             'user' => 'Chỉ truy cập chức năng người dùng',
         ]);
         Passport::setDefaultScope([

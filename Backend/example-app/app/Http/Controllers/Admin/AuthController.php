@@ -31,15 +31,23 @@ class AuthController extends Controller
                 // User
                 $token = $user->createToken('UserToken', ['user'])->accessToken;
                 return response([
-                    'message' => 'Đăng ký thành công',
+                    'message' => 'Đăng nhập thành công',
                     'token' => $token,
                     'role' => 'user',
+                ], 200);
+            } elseif ($user->role_id == 3) {
+                // Employee
+                $token = $user->createToken('EmployeeToken', ['employee'])->accessToken;
+                return response([
+                    'message' => 'Đăng nhập thành công',
+                    'token' => $token,
+                    'role' => 'employee',
                 ], 200);
             }
         }
 
         return response([
-            'message' => 'không thành công'
+            'message' => 'Đăng nhập không thành công'
         ], 401);
     }
 
@@ -52,7 +60,7 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'address' => $request->address,
-                'role_id' => 1,
+                'role_id' => 1, // Đặt mặc định là user
             ]);
             $token = $user->createToken('app')->accessToken;
             return response([
@@ -68,7 +76,6 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        
         $user = Auth::user();
 
         if ($user) {
