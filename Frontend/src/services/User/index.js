@@ -65,7 +65,6 @@ export const logout = async () => {
 
         // Xóa token khỏi localStorage sau khi đăng xuất thành công
         localStorage.removeItem('token');
-        localStorage.removeItem('role');
 
         return response;
     } catch (error) {
