@@ -100,7 +100,8 @@ class UserController extends Controller
             'name' => $request->user()->name,
             'email' => $request->user()->email,
             'address' => $request->user()->address, // Nếu có
-            'phone' => $request->user()->phone, // Nếu có
+            'phone' => $request->user()->phone,
+            'role' => $request->user()->role_id, // Nếu có
         ]);
     }
 }

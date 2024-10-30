@@ -47,7 +47,7 @@ export const logout = async () => {
     try {
         // Lấy token từ localStorage
         const token = localStorage.getItem('token');
-        console.log(token);
+       
 
         // Kiểm tra xem token có tồn tại hay không
         if (!token) {
@@ -117,3 +117,8 @@ export const deleteUser = (id) => {
         path: `${URL_User}/${id}`
     });
 };
+
+
+
+
+
