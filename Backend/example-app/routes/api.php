@@ -41,7 +41,6 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('image', ImageController::class);
     Route::apiResource('orders', OrderController::class);
     Route::middleware('auth:api')->group(function () {
-        Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
     });
 
@@ -87,3 +86,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api'
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
+
+
+
+
