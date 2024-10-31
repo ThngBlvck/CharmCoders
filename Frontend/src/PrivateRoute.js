@@ -20,7 +20,7 @@ const PrivateRoute = () => {
     }
 
     if (user.role !== 2 && user.role !== 3) {
-        return <Navigate to="/" />; // Nếu không phải admin, chuyển hướng về trang chính
+        return <Navigate to="/404" />; // Nếu không phải admin, chuyển hướng về trang chính
     }
 
     return <Outlet />;
