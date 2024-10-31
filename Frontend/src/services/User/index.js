@@ -1,6 +1,9 @@
 import request from '../../api';
 const URL_User = "admin/employee";
 const URL_SEND_OTP = 'password/send-otp'; // Thay đổi đường dẫn cho yêu cầu gửi OTP
+const URL_VERIFY_OTP = 'password/verify-otp';
+const URL_RESET_PASSWORD = 'password/reset'; // Đường dẫn API cho việc reset mật khẩu với OTP
+
 const URL_User_INFO = "client/user";
 
 // Phương thức gửi OTP
@@ -16,6 +19,37 @@ export const sendOtp = async (email) => {
         throw error;
     }
 };
+
+export const verifyOtp = async (email, otp) => {
+    try {
+        const response = await request({
+            method: 'POST',
+            path: URL_VERIFY_OTP,
+            data: { email, otp }, // Send email and OTP as data
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
+
+
+
+export const resetPassword = async ({ email, otp, password, password_confirmation }) => {
+    try {
+        const response = await request({
+            method: 'POST',
+            path: URL_RESET_PASSWORD,
+            data: { email, otp, password, password_confirmation },
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 
 export const login = async (credentials) => {
     try {
