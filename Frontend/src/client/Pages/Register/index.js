@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "../../../assets/styles/css/bootstrap.min.css"; // Giữ lại nếu cần
 import "../../../assets/styles/css/style.css";
 import { register } from "../../../services/User";
-import { useNavigate } from "react-router-dom";
 
 export default function Register() {
     const [formData, setFormData] = useState({
@@ -14,8 +13,6 @@ export default function Register() {
     const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false); 
-    const navigate = useNavigate();
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -27,6 +24,12 @@ export default function Register() {
         setErrors({});
         setSuccessMessage("");
         setIsSubmitting(true);
+
+        if (formData.password !== formData.confirmPassword) {
+            setErrors({ confirmPassword: ["Mật khẩu không khớp"] });
+            setIsSubmitting(false);
+            return;
+        }
 
         try {
             const dataToSend = {
@@ -47,7 +50,6 @@ export default function Register() {
                 password: "",
                 confirmPassword: "",
             });
-            navigate("/login");
         } catch (error) {
             // Xử lý lỗi từ backend
             if (error.errors) {
@@ -134,14 +136,14 @@ export default function Register() {
                                 onChange={handleChange}
 
                             />
-                            {errors.password && (
+                            {errors.password_confirmation && (
                                 <div className="text-danger mt-2" role="alert">
-                                    {errors.password[0]}
+                                    {errors.password_confirmation[0]}
                                 </div>
                             )}
                         </div>
                         <button type="submit" className="btn btn-primary w-100 font-semibold mt-1"
-                                style={{color: '#442e2b'}}>Đăng Ký
+                                style={{color: '#442e2b'}}><a href="/login">Đăng Ký</a>
                         </button>
                         {/* Google Login Button */}
                         <div className="text-center mt-3">
