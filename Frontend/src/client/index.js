@@ -1,5 +1,5 @@
 import React from "react";
-import {Routes, Route, Navigate} from "react-router-dom";
+import {Routes, Route, Navigate, useLocation} from "react-router-dom";
 import {CartProvider} from './components/Cart';
 import Footer from "./components/Footer";
 import Home from "./Pages/Home";
@@ -24,14 +24,13 @@ import VerifyOtp from "./Pages/Otp_PW";
 import ResetPassword from "./Pages/Confirm_PW";
 
 export default function Client() {
-
-    const isAuthenticated = () => {
-        return localStorage.getItem('token') !== null;
-    };
+    const isAuthenticated = () => localStorage.getItem('token') !== null;
+    const location = useLocation();
+    const is404Page = location.pathname === "/404";
 
     return (
         <CartProvider>
-            <Header/>
+            {!is404Page && <Header />}
             <div className="container my-4">
                 <Routes>
                     <Route path="/home" element={<Home/>}/>
@@ -42,11 +41,11 @@ export default function Client() {
                     <Route path="/profile" element={<Profile/>}/>
                     <Route path="/cart" element={<Cart/>}/>
                     <Route path="/checkout" element={<Checkout/>} />
-                    
+
                     {/* Chặn truy cập vào đăng ký và đăng nhập nếu đã đăng nhập */}
                     <Route path="/register" element={isAuthenticated() ? <Navigate to="/home" /> : <Register/>} />
                     <Route path="/login" element={isAuthenticated() ? <Navigate to="/home" /> : <Login/>} />
-                    
+
                     <Route path="/forgot-password" element={<ForgotPassword/>}/>
                     <Route path="/otp-password" element={<VerifyOtp/>}/>
                     <Route path="/confirm-password" element={<ResetPassword/>}/>
@@ -56,12 +55,15 @@ export default function Client() {
                     <Route path="/post" element={<Post/>} />
                     <Route path="/postdetail/:id" element={<PostDetail/>} />
                     <Route path="/404" element={<Page404/>} />
-                    
+
                     {/* Trang chủ khi vào đường dẫn gốc */}
                     <Route path="/" element={<Navigate to="/home" />} />
+
+                    {/* Chuyển hướng đến 404 khi route không tồn tại */}
+                    <Route path="*" element={<Navigate to="/404" />} />
                 </Routes>
             </div>
-            <Footer/>
+            {!is404Page && <Footer />}
         </CartProvider>
     );
 }

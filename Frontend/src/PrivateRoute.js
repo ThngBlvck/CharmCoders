@@ -6,7 +6,6 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 const PrivateRoute = () => {
     const { user, loading } = useUser();
-    console.log(user);
 
     if (loading) {
         return (
