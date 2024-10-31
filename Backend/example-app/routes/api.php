@@ -83,3 +83,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api'
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
+
+
+
+
