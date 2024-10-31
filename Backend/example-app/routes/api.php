@@ -40,7 +40,6 @@ Route::prefix('admin')->group(function () {
     Route::get('/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);
     Route::middleware('auth:api')->group(function () {
-        Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
     });
 
