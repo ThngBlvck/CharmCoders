@@ -37,9 +37,13 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('productCategory', CategoryController::class);
     Route::apiResource('comments', CommentController::class);
     Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('role', RoleController::class);
     Route::apiResource('products', ProductController::class);
     Route::get('/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);
+
+    Route::get('/search', [ProductController::class, 'search']); // http://localhost:8000/api/client/search?query=teneanpham
+
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
@@ -48,6 +52,8 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('employee', UserController::class);
 });
+
+// Authentication routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
@@ -81,6 +87,12 @@ Route::prefix('client')->group(function () {
         Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
         Route::post('/contact/send', [MailController::class, 'send']);
 });
+
+// General user route (outside of client prefix)
+Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
+Route::middleware('auth:api')->apiResource('comments', CommentController::class);
+
+// Password reset routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
 
@@ -91,6 +103,7 @@ Route::post('password/reset', [ResetPasswordController::class, 'resetPassword'])
 //login goog
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
 
 
 
