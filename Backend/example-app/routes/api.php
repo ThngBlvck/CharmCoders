@@ -29,15 +29,19 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 
 
 Route::prefix('admin')->group(function () {
+
     Route::apiResource('brands', BrandController::class);
     Route::put('brands/update/{id}', [BrandController::class, 'update']);
 
     Route::apiResource('blog', BlogController::class);
     Route::apiResource('blogcategory', BlogCategoryController::class);
     Route::apiResource('productCategory', CategoryController::class);
+    Route::apiResource('comment', CommentController::class);
+    Route::put('brands/update/{id}', [BrandController::class, 'update']);
+    Route::apiResource('blog', BlogController::class);
+    Route::apiResource('role', RoleController::class);
     Route::apiResource('comments', CommentController::class);
     Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('role', RoleController::class);
     Route::apiResource('products', ProductController::class);
     Route::get('/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);
