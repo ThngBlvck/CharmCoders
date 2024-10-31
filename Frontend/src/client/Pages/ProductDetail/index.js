@@ -1,19 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams} from "react-router-dom";
-import {getOneProduct} from "../../../services/Product";
-import {getOneBrand} from "../../../services/Brand";
-import {getOneCategory} from "../../../services/Category";
-import {addToCart} from "../../../services/Cart";
-import {getCommentsByProductId, addComment, deleteComment} from "../../../services/Comment";
-import {ToastContainer, toast} from 'react-toastify'; // Import toast
-import 'react-toastify/dist/ReactToastify.css'; // Import CSS for toast
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from "react-router-dom";
+import { getOneProduct } from "../../../services/Product";
+import { getOneBrand } from "../../../services/Brand";
+import { getOneCategory } from "../../../services/Category";
+import { addToCart } from "../../../services/Cart";
+import { getCommentsByProductId, addComment, deleteComment } from "../../../services/Comment";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '@fortawesome/fontawesome-free/css/all.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
 const ProductDetail = () => {
-    const {id} = useParams();
+    const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [brandName, setBrandName] = useState("");
     const [categoryName, setCategoryName] = useState("");
@@ -31,7 +31,6 @@ const ProductDetail = () => {
         if (storedUserId) {
             setUserId(storedUserId);
         }
-
         fetchOneProduct();
     }, [id]);
 
@@ -55,7 +54,7 @@ const ProductDetail = () => {
             setComments(commentsResult);
         } catch (error) {
             console.error("Error fetching product details:", error);
-            toast.error('Có lỗi xảy ra khi tải sản phẩm. Vui lòng thử lại sau.'); // Replace alert with toast
+            toast.error('Có lỗi xảy ra khi tải sản phẩm. Vui lòng thử lại sau.');
         } finally {
             setLoadingProduct(false);
             setLoadingComments(false);
@@ -73,7 +72,7 @@ const ProductDetail = () => {
     };
 
     const handleAddToCart = async (productId, quantity) => {
-        console.log(`Adding to cart with data: {product_id: ${productId}, quantity: ${quantity}}`); // Kiểm tra giá trị
+        console.log(`Adding to cart with data: {product_id: ${productId}, quantity: ${quantity}}`);
         try {
             const response = await addToCart(productId, quantity);
             console.log('Thêm vào giỏ hàng thành công:', response);
@@ -88,12 +87,11 @@ const ProductDetail = () => {
         try {
             const response = await addToCart(productId, quantity);
             Swal.fire('Thành công', 'Thêm vào giỏ hàng thành công.', 'success');
-            navigate(`/cart?productId=${productId}`);
+            navigate(`/checkout?productId=${productId}`);
         } catch (error) {
-            console.error('Lỗi khi thêm vào giỏ hàng:', error); // Lưu ý không ghi log đối tượng toàn bộ
+            console.error('Lỗi khi thêm vào giỏ hàng:', error);
         }
     };
-
 
     const handleNewCommentChange = (e) => {
         setNewComment(e.target.value);
@@ -103,67 +101,65 @@ const ProductDetail = () => {
         e.preventDefault();
 
         if (!newComment.trim()) {
-            toast.warn("Bình luận không thể để trống!"); // Replace alert with toast
+            toast.warn("Bình luận không thể để trống!");
             return;
         }
 
         if (!token) {
-            toast.warn('Bạn cần đăng nhập để bình luận!'); // Replace alert with toast
+            toast.warn('Bạn cần đăng nhập để bình luận!');
             return;
         }
 
-        const newCommentEntry = {
-            content: newComment,
+        const commentData = {
+            product_id: id,
             user_id: userId,
-            id: Date.now(), // For local tracking; you should use the ID from the server if available
+            content: newComment,
         };
 
         try {
-            // Add the new comment to the state first for instant UI feedback
-            setComments(prevComments => [...prevComments, newCommentEntry]);
-            setNewComment("");
-
-            const commentData = {
-                product_id: id,
-                user_id: userId,
-                content: newComment,
-            };
-
-            // Send the comment to the server
             await addComment(commentData);
+            setNewComment("");
+            toast.success('Bình luận đã được thêm thành công!');
 
-            // Notify user of success
-            toast.success('Bình luận đã được thêm thành công!'); // Replace alert with toast
-
+            const commentsResult = await getCommentsByProductId(id);
+            setComments(commentsResult);
         } catch (error) {
             console.error("Error adding comment:", error);
-            toast.error("Không thể thêm bình luận."); // Replace alert with toast
-            // Remove the comment from the local state if the add operation fails
-            setComments(prevComments => prevComments.filter(comment => comment.id !== newCommentEntry.id));
+            toast.error("Không thể thêm bình luận.");
         }
     };
 
     const handleDeleteComment = async (commentId) => {
         if (!token) {
-            toast.warn('Bạn cần đăng nhập để xóa bình luận!'); // Replace alert with toast
+            toast.warn('Bạn cần đăng nhập để xóa bình luận!');
             return;
         }
 
-        if (window.confirm("Bạn có chắc chắn muốn xóa bình luận này?")) {
+        const result = await Swal.fire({
+            title: 'Bạn có chắc chắn muốn xóa bình luận này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Có',
+            cancelButtonText: 'Không',
+        });
+
+        if (result.isConfirmed) {
             try {
                 await deleteComment(commentId);
-                setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
-                toast.success('Bình luận đã được xóa thành công'); // Replace alert with toast
+                toast.success('Bình luận đã được xóa thành công');
+
+                const commentsResult = await getCommentsByProductId(id);
+                setComments(commentsResult);
             } catch (error) {
                 console.error("Error deleting comment:", error);
-                toast.error('Bạn không thể xóa bình luận này.'); // Replace alert with toast
+                toast.error('Bạn không thể xóa bình luận này.');
             }
         }
     };
 
     return (
         <div className="container my-5">
-            <ToastContainer/> {/* Add ToastContainer to your component */}
+            <ToastContainer/>
             {loadingProduct ? (
                 <div className="d-flex flex-column align-items-center"
                      style={{marginTop: '10rem', marginBottom: '10rem'}}>
@@ -179,11 +175,9 @@ const ProductDetail = () => {
                             </div>
                             <div className="col-md-7 d-flex flex-column align-content-start">
                                 <p className="mb-3" style={{fontSize: "26px", color: "#8c5e58"}}>{product.name}</p>
-                                <p className="mb-3"
-                                   style={{color: "#8c5e58"}}>{product.unit_price.toLocaleString("vi-VN", {
-                                    style: "currency",
-                                    currency: "VND",
-                                })}</p>
+                                <p className="mb-3" style={{color: "#8c5e58"}}>
+                                    {product.unit_price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                                </p>
                                 <p className="mb-3" style={{color: "#8c5e58"}}>{brandName}</p>
                                 <p className="mb-3" style={{color: "#8c5e58"}}>{product.weight}</p>
 
@@ -211,61 +205,70 @@ const ProductDetail = () => {
                                             style={{fontSize: '13px'}}
                                             onClick={() => handleAddToCart(product.id, cart[product.id] || 1)}>
                                         <p><i className="fa fa-shopping-basket" aria-hidden="true"
-                                              style={{marginRight: "6px"}}></i>Thêm
-                                            vào giỏ</p>
+                                              style={{marginRight: "6px"}}></i>Thêm vào giỏ</p>
                                     </button>
-
                                 </div>
                             </div>
 
                             <div className="product-details" style={{marginTop: "2rem"}}>
                                 <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}}
                                    className="font-bold">Thông tin chi tiết sản phẩm:</p>
-                                <div className="product-details">
-                                    <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}}
-                                       className="font-bold">Thông tin chi tiết sản phẩm:</p>
-                                    <ul>
-                                        <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
-                                            className="font-semibold">Tên sản phẩm:</strong> {product.name}</li>
-                                        <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
-                                            className="font-semibold">Giá:</strong> {product.unit_price.toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                        })}</li>
-                                        <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
-                                            className="font-semibold">Danh mục:</strong> {categoryName}</li>
-                                    </ul>
-                                </div>
+                                <ul>
+                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                        className="font-semibold">Tên sản phẩm:</strong> {product.name}</li>
+                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                        className="font-semibold">Tên thương hiệu:</strong> {brandName}</li>
+                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                        className="font-semibold">Tên danh mục:</strong> {categoryName}</li>
+                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                        className="font-semibold">Khối lượng:</strong> {product.weight}</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
                     <div className="col-md-3">
-                        <h5 style={{color: "#8c5e58"}}>Bình luận:</h5>
                         <form onSubmit={handleSubmitComment}>
                             <div className="form-group">
-                                <textarea className="form-control"
-                                          value={newComment}
-                                          onChange={handleNewCommentChange}
-                                          rows="3"
-                                          placeholder="Nhập bình luận của bạn..."></textarea>
+                                <label htmlFor="newComment" style={{color: "#8c5e58"}}>Viết bình luận:</label>
+                                <textarea
+                                    className="form-control"
+                                    id="newComment"
+                                    value={newComment}
+                                    onChange={handleNewCommentChange}
+                                />
                             </div>
-                            <button type="submit" className="btn btn-primary">Gửi bình luận</button>
+                            <button type="submit" className="btn btn-primary mt-2 font-semibold">Gửi bình luận</button>
                         </form>
+
                         {loadingComments ? (
-                            <p>Đang tải bình luận...</p>
+                            <div className="d-flex flex-column align-items-center"
+                                 style={{marginTop: '10rem', marginBottom: '10rem'}}>
+                                <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
+                                <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
+                            </div>
                         ) : (
-                            <ul className="list-unstyled mt-3">
-                                {comments.map(comment => (
-                                    <li key={comment.id} className="border-bottom mb-2">
-                                        <p className="font-weight-bold">{comment.user_id}:</p>
-                                        <p>{comment.content}</p>
-                                        <button className="btn btn-danger btn-sm" onClick={() => handleDeleteComment(comment.id)}>
-                                            Xóa
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                            <div className="mt-5">
+                                <h4 style={{color: "#8c5e58"}}>Bình luận</h4>
+                                {comments.length > 0 ? (
+                                    comments.map((comment) => (
+                                        <div key={comment.id} className="mb-3">
+                                            <p><strong>{comment.user_name}</strong>:</p>
+                                            <p>{comment.content}</p>
+
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => handleDeleteComment(comment.id)}>
+                                                    Xóa
+                                                </button>
+
+                                            <hr/>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>Không có bình luận nào.</p>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>
