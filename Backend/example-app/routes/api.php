@@ -42,6 +42,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('role', RoleController::class);
     Route::apiResource('comments', CommentController::class);
     Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('role', RoleController::class);
     Route::apiResource('products', ProductController::class);
     Route::get('/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);
