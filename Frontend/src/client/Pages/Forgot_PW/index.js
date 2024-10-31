@@ -20,7 +20,7 @@ export default function ForgotPassword() {
             // Call sendOtp and await its response
             const response = await sendOtp(email);
             // Assuming the response has a success message, you can adjust as needed
-            setMessage("Đường dẫn đặt lại mật khẩu đã được gửi đến email của bạn.");
+            setMessage("Mã OTP đã được gửi đến email của bạn.");
 
             // Redirect to the VerifyOtp page after a successful OTP send
             setTimeout(() => {
