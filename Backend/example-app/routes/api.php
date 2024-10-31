@@ -34,6 +34,8 @@ use App\Http\Controllers\Client\CartController as CartClient;
 Route::prefix('admin')->group(function () {
 
     Route::apiResource('brands', BrandController::class);
+    Route::put('brands/update/{id}', [BrandController::class, 'update']);
+
     Route::apiResource('blog', BlogController::class);
     Route::apiResource('blogcategory', BlogCategoryController::class);
     Route::apiResource('productCategory', CategoryController::class);
@@ -47,6 +49,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);
     Route::middleware('auth:api')->group(function () {
+        Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
     });
 
@@ -71,7 +74,11 @@ Route::prefix('client')->group(function () {
         Route::get('/getAllCart', [CartClient::class, 'getCart']);
         Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
         Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
-        Route::get('/user', [UserController::class, 'getUser'])->middleware('auth:api');
+        Route::get('/user', [UserController::class, 'getUser']);
+
+        // VNPay payment routes
+        Route::post('/vnpay/create-payment', [VNPAYController::class, 'createPayment']);
+        Route::get('/vnpay-return', [VNPAYController::class, 'paymentReturn']);
     });
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
@@ -81,7 +88,7 @@ Route::prefix('client')->group(function () {
 
 });
 
-// General user route (outside of client prefix)
+Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('client.reset-password');
 Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 
