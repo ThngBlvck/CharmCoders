@@ -11,22 +11,19 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     // Hiển thị danh sách sản phẩm
-    public function index()
-    {
-        // Join bảng categories, chọn thông tin cần thiết và phân trang
-        $products = Product::leftJoin('categories', 'products.category_id', '=', 'categories.id')
-            ->select('products.*', 'categories.name as category_name')
-            ->orderBy('products.created_at', 'desc') // Sắp xếp theo sản phẩm mới nhất
-            ->paginate(10); // Phân trang, lấy 10 sản phẩm mỗi trang
+   public function index()
+       {
+           $products = Product::leftJoin('categories', 'products.category_id', '=', 'categories.id')
+               ->select('products.*', 'categories.name as category_name')
+               ->get();
 
-        // Biến đổi kết quả để gán 'Chưa phân loại' nếu không có category_name
-        $products->getCollection()->transform(function ($product) {
-            $product->category_name = $product->category_name ?? 'Chưa phân loại';
-            return $product;
-        });
+           $products->transform(function ($product) {
+               $product->category_name = $product->category_name ?? 'Chưa phân loại';
+               return $product;
+           });
 
-        return response()->json($products);
-    }
+           return response()->json($products);
+       }
 
 
 

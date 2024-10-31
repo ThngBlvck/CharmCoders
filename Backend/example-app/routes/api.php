@@ -56,7 +56,7 @@ Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderClient::class);
         Route::post('/checkout', [CheckoutController::class, 'checkout']);
-        Route::get('/getCart', [CartClient::class, 'getCart']);
+        Route::get('/getAllCart', [CartClient::class, 'getCart']);
         Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
         Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
         Route::get('/user', [UserController::class, 'getUser'])->middleware('auth:api');
