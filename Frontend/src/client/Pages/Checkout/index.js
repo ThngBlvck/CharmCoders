@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {useLocation, useParams} from "react-router-dom";
 import {makeMomoPayment} from '../../../services/Product'; // Import service
-import { getCartsByIds } from '../../../services/Cart';
-import { getProductsByIds } from "../../../services/Product";
+import {getCartsByIds} from '../../../services/Cart';
+import {getProductsByIds} from "../../../services/Product";
 import "../../../assets/styles/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {getUserInfo} from "../../../services/User";
+import {checkout} from '../../../services/Checkout';
 import axios from "axios";
 
 export default function Checkout() {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        address: "",
         phone: "",
-        paymentMethod: "cashOnDelivery",
+        paymentMethod: "cashOnDelivery", // Mặc định là thanh toán khi nhận hàng
     });
-    const { cartIds } = useParams();
+    const {cartIds} = useParams();
     const [products, setProducts] = useState([]);
     const location = useLocation();
     const [loading, setLoading] = useState(false); // Thêm state loading
@@ -31,6 +31,12 @@ export default function Checkout() {
     const [selectedProvince, setSelectedProvince] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
+    const [provinceName, setProvinceName] = useState("");
+    const [districtName, setDistrictName] = useState("");
+    const [wardName, setWardName] = useState("");
+
+    const [address, setAddress] = useState('');
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -75,7 +81,6 @@ export default function Checkout() {
             });
     }, []);
 
-    // Lấy danh sách huyện khi chọn tỉnh
     useEffect(() => {
         if (selectedProvince) {
             axios.get(`https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`)
@@ -84,6 +89,11 @@ export default function Checkout() {
                     setWards([]); // Xóa danh sách xã khi thay đổi tỉnh
                     setSelectedDistrict("");
                     setSelectedWard("");
+
+                    // Cập nhật tên tỉnh
+                    setProvinceName(response.data.name); // Lưu tên tỉnh
+
+                    console.log("Districts:", response.data.district); // Kiểm tra danh sách districts
                 })
                 .catch(error => {
                     console.error("Error fetching districts:", error);
@@ -98,6 +108,13 @@ export default function Checkout() {
                 .then(response => {
                     setWards(response.data.wards);
                     setSelectedWard("");
+
+                    setDistrictName(response.data.name);
+
+                    // Cập nhật tên xã/phường đầu tiên trong danh sách (nếu có)
+                    if (response.data.wards.length > 0) {
+                        setWardName(response.data.wards[0].name); // Lưu tên xã/phường đầu tiên
+                    }
                 })
                 .catch(error => {
                     console.error("Error fetching wards:", error);
@@ -105,17 +122,42 @@ export default function Checkout() {
         }
     }, [selectedDistrict]);
 
+
     // Hàm xử lý thay đổi các giá trị trong form
     const handleProvinceChange = (e) => {
-        setSelectedProvince(e.target.value);
+        const selectedProvince = e.target.value;
+        setSelectedProvince(selectedProvince);
+
+        // Tìm tên huyện dựa trên id hoặc value
+        const selectedProvinceObj = provinces.find(province => province.code === selectedProvince);
+        if (selectedProvinceObj) {
+            setProvinceName(selectedProvinceObj.name); // Cập nhật tên tỉnh
+        }
     };
 
     const handleDistrictChange = (e) => {
-        setSelectedDistrict(e.target.value);
+        const selectedDistrict = e.target.value;
+        setSelectedDistrict(selectedDistrict);
+
+        console.log("Selected District:", selectedDistrict); // Kiểm tra giá trị này
+        console.log("Districts:", districts); // Kiểm tra danh sách districts
+        const selectedDistrictObj = districts.find(district => district.code === selectedDistrict);
+        if (selectedDistrictObj) {
+            setDistrictName(selectedDistrictObj.name); // Cập nhật tên huyện
+        } else {
+            setDistrictName(""); // Đặt lại tên huyện nếu không tìm thấy
+        }
     };
 
-    const handleWardChange = (e) => {
-        setSelectedWard(e.target.value);
+    const handleWardChange = (event) => {
+        const selectedWard = event.target.value;
+        setSelectedWard(selectedWard);
+
+        // Tìm tên xã/phường dựa trên id hoặc value
+        const selectedWardObj = wards.find(ward => ward.code === selectedWard);
+        if (selectedWardObj) {
+            setWardName(selectedWardObj.name); // Cập nhật tên xã/phường
+        }
     };
 
     const fetchCartsByIds = async (cartIds) => {
@@ -143,7 +185,7 @@ export default function Checkout() {
                                 quantity: cart.quantity
                             };
                         }
-                        return null;
+                        return null; // Trả về null nếu không tìm thấy sản phẩm
                     }).filter(item => item !== null); // Loại bỏ các sản phẩm null
 
                     setProducts(combinedProducts);
@@ -161,6 +203,17 @@ export default function Checkout() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const calculateTotal = () => {
+        if (!Array.isArray(products) || products.length === 0) {
+            return 0; // Trả về 0 nếu không phải là mảng hoặc mảng rỗng
+        }
+        return products.reduce((total, item) => total + (item.unit_price * item.quantity), 0);
+    };
+
+    const total = (item) => {
+        return item.unit_price * item.quantity;
     };
 
     const fetchUserInfo = async () => {
@@ -181,19 +234,44 @@ export default function Checkout() {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const {name, value} = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Thông tin thanh toán:", formData);
+    const handleSubmit = async (event) => {
+        event.preventDefault(); // Ngăn chặn hành động mặc định của form
 
-        if (formData.paymentMethod === "momo") {
-            handleMomoPayment(); // Gọi hàm để xử lý thanh toán qua Momo
-        } else {
-            // Xử lý các phương thức thanh toán khác
-            console.log("Thông tin thanh toán:", formData);
+        // Nối các phần của địa chỉ
+        const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${provinceName}`.trim();
+
+        const totalAmount = calculateTotal();
+
+        // Tạo một object mới chứa dữ liệu để gửi lên server
+        const orderData = {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            address: fullAddress, // Sử dụng địa chỉ đã nối
+            paymentMethod: formData.paymentMethod,
+            total_amount: totalAmount,
+        };
+        console.log(orderData)
+
+        // Kiểm tra xem địa chỉ có phải là chuỗi không
+        if (typeof orderData.address !== "string" || orderData.address.length === 0) {
+            setMessage("Địa chỉ phải là chuỗi ký tự.");
+            return; // Dừng lại nếu địa chỉ không hợp lệ
+        }
+
+        // Gọi hàm checkout với dữ liệu đã chuẩn bị
+        try {
+            const result = await checkout(orderData);
+            setMessage(result.message); // Hiển thị thông báo thành công từ server
+        } catch (error) {
+            setMessage(error.message); // Hiển thị thông báo lỗi
         }
     };
 
@@ -229,46 +307,34 @@ export default function Checkout() {
         }
     };
 
-
-    const calculateTotal = () => {
-        if (!Array.isArray(products) || products.length === 0) {
-            return 0; // Trả về 0 nếu không phải là mảng hoặc mảng rỗng
-        }
-        return products.reduce((total, item) => total + item.unit_price * item.quantity, 0);
-    };
-
-    const total = (item) => {
-        return item.unit_price * item.quantity;
-    };
-
     return (
         <div className="container py-5">
             <div className="row">
                 {/* Kiểm tra trạng thái đăng nhập */}
-                    <>
-                        {/* Hiển thị sản phẩm */}
-                        <div className="col-md-6">
-                            <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Sản phẩm của
-                                bạn</p>
-                            <div className="list-group">
-                                {loading ? (
-                                    <div className="d-flex flex-column align-items-center"
-                                         style={{marginTop: '10rem', marginBottom: '10rem'}}>
-                                        <FontAwesomeIcon icon={faSpinner} spin
-                                                         style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                                        <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
-                                    </div>
-                                ) : (
-                                    Array.isArray(products) && products.length > 0 ? (
-                                        products.map(item => (
-                                            <div key={item.id}
-                                                 className="list-group-item d-flex justify-content-between align-items-center">
+                <>
+                    {/* Hiển thị sản phẩm */}
+                    <div className="col-md-6">
+                        <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Sản phẩm của
+                            bạn</p>
+                        <div className="list-group">
+                            {loading ? (
+                                <div className="d-flex flex-column align-items-center"
+                                     style={{marginTop: '10rem', marginBottom: '10rem'}}>
+                                    <FontAwesomeIcon icon={faSpinner} spin
+                                                     style={{fontSize: '4rem', color: '#8c5e58'}}/>
+                                    <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
+                                </div>
+                            ) : (
+                                Array.isArray(products) && products.length > 0 ? (
+                                    products.map(item => (
+                                        <div key={item.id}
+                                             className="list-group-item d-flex justify-content-between align-items-center">
                                             <div className="d-flex align-items-center">
                                                 <img src={item.image} alt={item.name} className="img-thumbnail me-3"
                                                      style={{width: "100px", height: "100px"}}/>
                                                 <div>
                                                     <p style={{
-                                                        color: "#8c5e58",overflow: "hidden", // Ẩn phần không hiển thị
+                                                        color: "#8c5e58", overflow: "hidden", // Ẩn phần không hiển thị
                                                         textOverflow: "ellipsis", // Thêm dấu ... nếu dài hơn
                                                         whiteSpace: "normal", // Cho phép xuống dòng
                                                         maxHeight: "3em",
@@ -286,181 +352,185 @@ export default function Checkout() {
                                             </div>
                                         </div>
                                     ))
-                                    ) : (
-                                        <p>Không có sản phẩm nào.</p>
-                                    )
-                                )}
+                                ) : (
+                                    <p>Không có sản phẩm nào.</p>
+                                )
+                            )}
+                        </div>
+
+                        <p className="mt-4 font-semibold"
+                           style={{color: "#8c5e58"}}>Thành tiền: {calculateTotal().toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                        })}</p>
+                    </div>
+
+                    {/* Form thông tin người dùng */}
+                    <div className="col-md-6">
+                        <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin
+                            thanh toán</p>
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-3">
+                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Họ và
+                                    Tên</label>
+                                <input
+                                    type="text"
+                                    className="form-control rounded"
+                                    name="name"
+                                    value={formData.name || ""}
+                                    onChange={handleChange}
+                                    required
+                                    style={{color: "#8c5e58"}}
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Email</label>
+                                <input
+                                    type="email"
+                                    className="form-control rounded"
+                                    name="email"
+                                    value={formData.email || ""}
+                                    onChange={handleChange}
+                                    required
+                                    style={{color: "#8c5e58"}}
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Số điện
+                                    thoại</label>
+                                <input
+                                    type="tel"
+                                    className="form-control rounded"
+                                    name="phone"
+                                    value={formData.phone || ""}
+                                    onChange={handleChange}
+                                    required
+                                    style={{color: "#8c5e58"}}
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Địa
+                                    chỉ</label>
+                                <div className="d-flex justify-content-between">
+                                    <div className="form-group mb-2" style={{flex: 1, marginRight: "10px"}}>
+                                        <select
+                                            className="form-control rounded"
+                                            value={selectedProvince}
+                                            onChange={handleProvinceChange}
+                                            required
+                                            style={{backgroundColor: "white", color: "#8c5e58"}}
+                                        >
+                                            <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
+                                            {provinces.map((province) => (
+                                                <option key={province.code} value={province.code}>
+                                                    {province.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group mb-2" style={{flex: 1, marginRight: "10px"}}>
+                                        <select
+                                            className="form-control rounded"
+                                            value={selectedDistrict}
+                                            onChange={handleDistrictChange}
+                                            required
+                                            style={{backgroundColor: "white", color: "#8c5e58"}}
+                                            disabled={!selectedProvince}
+                                        >
+                                            <option value="" className="font-bold">Chọn Quận/Huyện</option>
+                                            {districts.map((district) => (
+                                                <option key={district.code} value={district.code}>
+                                                    {district.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group mb-2" style={{flex: 1}}>
+                                        <select
+                                            className="form-control rounded"
+                                            value={selectedWard}
+                                            onChange={handleWardChange}
+                                            required
+                                            style={{backgroundColor: "white", color: "#8c5e58"}}
+                                            disabled={!selectedDistrict}
+                                        >
+                                            <option value="" className="font-bold">Chọn Xã/Phường</option>
+                                            {wards.map((ward) => (
+                                                <option key={ward.code} value={ward.code}>
+                                                    {ward.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <input
+                                    type="text"
+                                    className="form-control rounded"
+                                    name="address"
+                                    placeholder={"Vui lòng nhập địa chỉ nhà..."}
+                                    onChange={handleChange}
+                                    required
+                                    style={{color: "#8c5e58"}}
+                                />
                             </div>
 
-                            <p className="mt-4 font-semibold"
-                               style={{color: "#8c5e58"}}>Thành tiền: {calculateTotal().toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                            })}</p>
-                        </div>
-
-                        {/* Form thông tin người dùng */}
-                        <div className="col-md-6">
-                            <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin
-                                thanh toán</p>
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Họ và
-                                        Tên</label>
-                                    <input
-                                        type="text"
-                                        className="form-control rounded"
-                                        name="name"
-                                        value={formData.name || ""}
-                                        onChange={handleChange}
-                                        required
-                                        style={{color: "#8c5e58"}}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Email</label>
-                                    <input
-                                        type="email"
-                                        className="form-control rounded"
-                                        name="email"
-                                        value={formData.email || ""}
-                                        onChange={handleChange}
-                                        required
-                                        style={{color: "#8c5e58"}}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Số điện
-                                        thoại</label>
-                                    <input
-                                        type="tel"
-                                        className="form-control rounded"
-                                        name="phone"
-                                        value={formData.phone || ""}
-                                        onChange={handleChange}
-                                        required
-                                        style={{color: "#8c5e58"}}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Địa
-                                        chỉ</label>
-                                    <div className="d-flex justify-content-between">
-                                        <div className="form-group mb-2" style={{flex: 1, marginRight: "10px"}}>
-                                            <select
-                                                className="form-control rounded"
-                                                value={selectedProvince}
-                                                onChange={handleProvinceChange}
-                                                required
-                                                style={{backgroundColor: "white", color: "#8c5e58"}}
-                                            >
-                                                <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
-                                                {provinces.map((province) => (
-                                                    <option key={province.code} value={province.code}>
-                                                        {province.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        <div className="form-group mb-2" style={{flex: 1, marginRight: "10px"}}>
-                                            <select
-                                                className="form-control rounded"
-                                                value={selectedDistrict}
-                                                onChange={handleDistrictChange}
-                                                required
-                                                style={{backgroundColor: "white", color: "#8c5e58"}}
-                                                disabled={!selectedProvince}
-                                            >
-                                                <option value="" className="font-bold">Chọn Quận/Huyện</option>
-                                                {districts.map((district) => (
-                                                    <option key={district.code} value={district.code}>
-                                                        {district.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        <div className="form-group mb-2" style={{flex: 1}}>
-                                            <select
-                                                className="form-control rounded"
-                                                value={selectedWard}
-                                                onChange={handleWardChange}
-                                                required
-                                                style={{backgroundColor: "white", color: "#8c5e58"}}
-                                                disabled={!selectedDistrict}
-                                            >
-                                                <option value="" className="font-bold">Chọn Xã/Phường</option>
-                                                {wards.map((ward) => (
-                                                    <option key={ward.code} value={ward.code}>
-                                                        {ward.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
+                            {/* Phương thức thanh toán với icon */}
+                            <div className="mb-4">
+                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Phương thức
+                                    thanh toán</label>
+                                <div className="d-flex">
+                                    <div className="form-check me-3">
+                                        <input
+                                            type="radio"
+                                            className="form-check-input"
+                                            name="paymentMethod"
+                                            value="cashOnDelivery"
+                                            checked={formData.paymentMethod === "cashOnDelivery"}
+                                            onChange={handleChange}
+                                        />
+                                        <label className="form-check-label" style={{color: "#8c5e58"}}>
+                                            <i className="fas fa-money-bill fa-2x"></i> Thanh toán khi nhận hàng
+                                        </label>
                                     </div>
-                                    <input
-                                        type="text"
-                                        className="form-control rounded"
-                                        name="address"
-                                        placeholder={"Vui lòng nhập địa chỉ nhà..."}
-                                        onChange={handleChange}
-                                        required
-                                        style={{color: "#8c5e58"}}
-                                    />
-                                </div>
-
-                                {/* Phương thức thanh toán với icon */}
-                                <div className="mb-4">
-                                    <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Phương thức
-                                        thanh toán</label>
-                                    <div className="d-flex">
-                                        <div className="form-check me-3">
-                                            <input
-                                                type="radio"
-                                                className="form-check-input"
-                                                name="paymentMethod"
-                                                value="cashOnDelivery"
-                                                checked={formData.paymentMethod === "cashOnDelivery"}
-                                                onChange={handleChange}
-                                            />
-                                            <label className="form-check-label" style={{color: "#8c5e58"}}>
-                                                <i className="fas fa-money-bill fa-2x"></i> Thanh toán khi nhận hàng
-                                            </label>
-                                        </div>
-                                        <div className="form-check me-3">
-                                            <input
-                                                type="radio"
-                                                className="form-check-input"
-                                                name="paymentMethod"
-                                                value="momo"
-                                                checked={formData.paymentMethod === "momo"}
-                                                onChange={handleChange}
-                                            />
-                                            <label className="form-check-label" style={{color: "#8c5e58"}}>
-                                                <i className="fab fa-gg-circle fa-2x"></i> Momo
-                                            </label>
-                                        </div>
-                                        <div className="form-check">
-                                            <input
-                                                type="radio"
-                                                className="form-check-input"
-                                                name="paymentMethod"
-                                                value="creditCard"
-                                                checked={formData.paymentMethod === "creditCard"}
-                                                onChange={handleChange}
-                                            />
-                                            <label className="form-check-label" style={{color: "#8c5e58"}}>
-                                                <i className="fas fa-credit-card fa-2x"></i> Credit card
-                                            </label>
-                                        </div>
+                                    <div className="form-check me-3">
+                                        <input
+                                            type="radio"
+                                            className="form-check-input"
+                                            name="paymentMethod"
+                                            value="momo"
+                                            checked={formData.paymentMethod === "momo"}
+                                            onChange={handleChange}
+                                        />
+                                        <label className="form-check-label" style={{color: "#8c5e58"}}>
+                                            <i className="fab fa-gg-circle fa-2x"></i> Momo
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input
+                                            type="radio"
+                                            className="form-check-input"
+                                            name="paymentMethod"
+                                            value="creditCard"
+                                            checked={formData.paymentMethod === "creditCard"}
+                                            onChange={handleChange}
+                                        />
+                                        <label className="form-check-label" style={{color: "#8c5e58"}}>
+                                            <i className="fas fa-credit-card fa-2x"></i> Credit card
+                                        </label>
                                     </div>
                                 </div>
+                            </div>
 
-                                <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Xác nhận thanh toán</button>
-                            </form>
-                        </div>
-                    </>
+                            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Xác nhận thanh
+                                toán
+                            </button>
+                            {message &&
+                                <div className="alert alert-info mt-3">{message}</div>} {/* Hiển thị thông báo */}
+                        </form>
+                    </div>
+                </>
             </div>
         </div>
     );
