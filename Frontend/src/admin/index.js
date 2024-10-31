@@ -30,10 +30,6 @@ import EditEmployee from "./Pages/User/Edit";
 // Blog and BlogCategory
 import Blog from "./Pages/Blog/List";
 import BlogCaterogy from "./Pages/BlogCategory/List";
-
-
-
-
 import AddBlogCategory from "./Pages/BlogCategory/Add";
 import EditBlogCategory from "./Pages/BlogCategory/Edit";
 import AddBlog from "./Pages/Blog/Add";
