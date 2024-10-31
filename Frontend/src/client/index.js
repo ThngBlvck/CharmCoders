@@ -21,7 +21,7 @@ import OrderManagement from "./Pages/OrderManagement";
 import OrderHistory from "./Pages/OrderHistory";
 import Page404 from "./Pages/404";
 import VerifyOtp from "./Pages/Otp_PW";
-import ResetPassword from "./Pages/Confirm_PW";
+
 
 export default function Client() {
 
@@ -49,7 +49,6 @@ export default function Client() {
                     
                     <Route path="/forgot-password" element={<ForgotPassword/>}/>
                     <Route path="/otp-password" element={<VerifyOtp/>}/>
-                    <Route path="/confirm-password" element={<ResetPassword/>}/>
                     <Route path="/ordered" element={<Ordered/>} />
                     <Route path="/order-detail" element={<OrderManagement/>} />
                     <Route path="/order-history" element={<OrderHistory/>} />
