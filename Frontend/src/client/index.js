@@ -49,7 +49,7 @@ export default function Client() {
                     <Route path="/forgot-password" element={<ForgotPassword/>}/>
                     <Route path="/otp-password" element={<VerifyOtp/>}/>
                     <Route path="/ordered" element={<Ordered/>} />
-                    <Route path="/order-detail" element={<OrderManagement/>} />
+                    <Route path="/order-list" element={<OrderManagement/>} />
                     <Route path="/order-history" element={<OrderHistory/>} />
                     <Route path="/post" element={<Post/>} />
                     <Route path="/postdetail/:id" element={<PostDetail/>} />

@@ -87,7 +87,7 @@ const ProductDetail = () => {
         try {
             const response = await addToCart(productId, quantity);
             Swal.fire('Thành công', 'Thêm vào giỏ hàng thành công.', 'success');
-            navigate(`/checkout?productId=${productId}`);
+            navigate(`/cart?productId=${productId}`);
         } catch (error) {
             console.error('Lỗi khi thêm vào giỏ hàng:', error);
         }
@@ -171,7 +171,7 @@ const ProductDetail = () => {
                     <div className="col-md-9 d-flex justify-start">
                         <div className="row">
                             <div className="col-md-5">
-                                <img src={product.image} alt="Product" className="img-fluid rounded"/>
+                                <img src={product.image} alt="Product" className="img-fluid rounded" style={{maxHeight: "400px", objectFit: "cover"}}/>
                             </div>
                             <div className="col-md-7 d-flex flex-column align-content-start">
                                 <p className="mb-3" style={{fontSize: "26px", color: "#8c5e58"}}>{product.name}</p>
@@ -221,7 +221,7 @@ const ProductDetail = () => {
                                     <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
                                         className="font-semibold">Tên danh mục:</strong> {categoryName}</li>
                                     <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
-                                        className="font-semibold">Khối lượng:</strong> {product.weight}</li>
+                                        className="font-semibold">Mô tả sản phẩm:</strong> {product.content}</li>
                                 </ul>
                             </div>
                         </div>

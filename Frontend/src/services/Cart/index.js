@@ -1,7 +1,7 @@
 import request from '../../api';
 
 const URL_Cart = 'admin/cart';
-const URL_CartId = 'client/getCart';
+const URL_CartId = 'client/getAllCart';
 
 export const addToCart = (productId, quantity) => {
     return request({
