@@ -66,24 +66,24 @@ export default function Home() {
 
     const sliderSettings = {
         dots: false,
-        infinite: true,
+        infinite: brands.length >= 5, // Chỉ cho phép infinite nếu có 5 item trở lên
         speed: 500,
-        slidesToShow: 4,
+        slidesToShow: Math.min(brands.length, 5), // Luôn luôn hiển thị 5 item
         slidesToScroll: 1,
         arrows: false,
-        autoplay: true,
+        autoplay: brands.length >= 5, // Chỉ tự động chạy khi có 5 item trở lên
         autoplaySpeed: 2000,
         responsive: [
             {
                 breakpoint: 768,
                 settings: {
-                    slidesToShow: 2,
+                    slidesToShow: 2, // Tối đa hiển thị 2 item cho kích thước màn hình nhỏ hơn 768px
                 },
             },
             {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: 1,
+                    slidesToShow: 1, // Luôn hiển thị 1 item cho kích thước màn hình nhỏ hơn 480px
                 },
             },
         ],
@@ -129,7 +129,7 @@ export default function Home() {
                                                             src={product.image || "https://via.placeholder.com/500"}
                                                             className="card-img-top img-fluid rounded"
                                                             alt="Product"
-                                                            style={{maxHeight: '500px', objectFit: 'cover'}}
+                                                            style={{maxHeight: '200px', objectFit: 'cover'}}
                                                         />
                                                     </NavLink>
                                                     <div className="card-body">
@@ -169,42 +169,47 @@ export default function Home() {
                         <div className="container text-center">
                             <p className="font-bold mb-5" style={{color: "#8c5e58", fontSize: "30px"}}>Các thương
                                 hiệu</p>
-                                <Slider className="mb-5 position-relative" {...sliderSettings}>
-                                    {brands.length > 0 ? (
-                                        brands.map((brand) => (
-                                            <div key={brand.id}
-                                                 className="text-center d-flex flex-column align-items-center card-style">
-                                                <div className="brand-card w-100" style={{
-                                                    padding: "15px",
-                                                    backgroundColor: "#fff",
-                                                    borderRadius: "15px",
-                                                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                                                    maxWidth: "200px",
-                                                    height: '200px',
-                                                    display: 'flex',            // Sử dụng Flexbox
-                                                    flexDirection: 'column',    // Sắp xếp theo chiều dọc
-                                                    alignItems: 'center',       // Căn giữa theo chiều ngang
-                                                    justifyContent: 'center',   // Căn giữa theo chiều dọc
-                                                    transition: "transform 0.3s ease",
-                                                }}>
-                                                    <img src={brand.image || "https://via.placeholder.com/200"}
-                                                         alt={brand.name} className="img-fluid rounded"
-                                                         style={{width: "100%", height: "auto", marginBottom: "10px"}}/>
-                                                </div>
-                                                <p className="mt-2" style={{
-                                                    color: "#8c5e58",
-                                                    fontWeight: "bold",
-                                                    fontSize: "16px",
-                                                    textTransform: "uppercase"
-                                                }}>
-                                                    {brand.name}
-                                                </p>
+                            <Slider className="mb-5 position-relative" {...sliderSettings}>
+                                {brands.length > 0 ? (
+                                    brands.map((brand) => (
+                                        <div key={brand.id}
+                                             className="text-center d-flex flex-column align-items-center card-style">
+                                            <div className="brand-card w-100" style={{
+                                                padding: "15px",
+                                                backgroundColor: "#fff",
+                                                borderRadius: "15px",
+                                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                                maxWidth: "170px",
+                                                height: '170px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                transition: "transform 0.3s ease",
+                                                minWidth: "100px", // Đảm bảo độ rộng tối thiểu
+                                            }}>
+                                                <img src={brand.image || "https://via.placeholder.com/200"}
+                                                     alt={brand.name} className="img-fluid rounded"
+                                                     style={{
+                                                         maxWidth: "100%", // Đảm bảo không vượt quá chiều rộng của ô
+                                                         maxHeight: "100%", // Đảm bảo không vượt quá chiều cao của ô
+                                                         objectFit: "contain" // Giữ nguyên tỷ lệ của hình ảnh
+                                                     }}/>
                                             </div>
-                                        ))
-                                    ) : (
-                                        <p className="text-center">Không có thương hiệu nào.</p>
-                                    )}
-                                </Slider>
+                                            <p className="mt-2" style={{
+                                                color: "#8c5e58",
+                                                fontWeight: "bold",
+                                                fontSize: "16px",
+                                                textTransform: "uppercase"
+                                            }}>
+                                                {brand.name}
+                                            </p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-center">Không có thương hiệu nào.</p>
+                                )}
+                            </Slider>
                             <NavLink to="/brands" className="btn btn-secondary rounded-pill py-3 px-5 mt-1">
                                 Xem Tất Cả
                             </NavLink>
