@@ -82,7 +82,6 @@ export default function Cart() {
 
         } catch (error) {
             console.error("Lỗi khi lấy danh sách sản phẩm:", error);
-            alert("Có lỗi xảy ra khi lấy dữ liệu giỏ hàng.");
             setProducts([]);
         } finally {
             setLoading(false);
