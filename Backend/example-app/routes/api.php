@@ -60,7 +60,12 @@ Route::prefix('client')->group(function () {
         Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
         Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
         Route::get('/user', [UserController::class, 'getUser'])->middleware('auth:api');
+        Route::apiResource('comments', CommentController::class);
     });
+    Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
+        Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
+        Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
+        Route::post('/contact/send', [MailController::class, 'send']);
 });
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
