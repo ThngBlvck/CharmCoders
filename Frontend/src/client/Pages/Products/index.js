@@ -243,7 +243,7 @@ export default function Products() {
                                                     src={product.image}
                                                     className="card-img-top img-fluid rounded"
                                                     alt="Product"
-                                                    style={{maxHeight: "500px", objectFit: "cover"}}
+                                                    style={{maxHeight: "200px", objectFit: "cover"}}
                                                 />
                                             </NavLink>
                                             <div className="card-body">

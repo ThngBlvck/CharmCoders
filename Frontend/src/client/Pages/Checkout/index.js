@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {useLocation, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {makeMomoPayment} from '../../../services/Product'; // Import service
 import {getCartsByIds} from '../../../services/Cart';
 import {getProductsByIds} from "../../../services/Product";
@@ -10,12 +10,14 @@ import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {getUserInfo} from "../../../services/User";
 import {checkout} from '../../../services/Checkout';
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function Checkout() {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         phone: "",
+        address: "",
         paymentMethod: "cashOnDelivery", // Mặc định là thanh toán khi nhận hàng
     });
     const {cartIds} = useParams();
@@ -37,6 +39,8 @@ export default function Checkout() {
 
     const [address, setAddress] = useState('');
     const [message, setMessage] = useState('');
+    const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -63,7 +67,6 @@ export default function Checkout() {
         } else {
             console.error("Không tìm thấy token trong localStorage.");
         }
-
         const cartIds = queryParams.get('cartIds')?.split(',') || [];
         if (cartIds.length > 0) {
             fetchCartsByIds(cartIds);
@@ -244,10 +247,44 @@ export default function Checkout() {
     const handleSubmit = async (event) => {
         event.preventDefault(); // Ngăn chặn hành động mặc định của form
 
-        // Nối các phần của địa chỉ
-        const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${provinceName}`.trim();
-
         const totalAmount = calculateTotal();
+
+        // Reset errors
+        const newErrors = {};
+
+        // Kiểm tra Họ và Tên
+        if (!formData.name.trim()) {
+            newErrors.name = "Họ và Tên không được để trống.";
+        }
+
+        // Kiểm tra Email
+        if (!formData.email.trim()) {
+            newErrors.email = "Email không được để trống.";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = "Email không đúng định dạng.";
+        }
+
+        // Kiểm tra Số điện thoại
+        if (!formData.phone.trim()) {
+            newErrors.phone = "Số điện thoại không được để trống.";
+        } else if (!/^\d{10}$/.test(formData.phone)) {
+            newErrors.phone = "Số điện thoại phải có 10 chữ số.";
+        }
+
+        // Kiểm tra Địa chỉ
+        const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
+        if (!formData.address?.trim()) {
+            newErrors.address = "Vui lòng nhập địa chỉ nhà.";
+        } else if (!wardName || !districtName || !provinceName) {
+            newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+        }
+
+        setErrors(newErrors);
+
+        // Nếu có lỗi, dừng xử lý
+        if (Object.keys(newErrors).length > 0) {
+            return;
+        }
 
         // Tạo một object mới chứa dữ liệu để gửi lên server
         const orderData = {
@@ -269,9 +306,10 @@ export default function Checkout() {
         // Gọi hàm checkout với dữ liệu đã chuẩn bị
         try {
             const result = await checkout(orderData);
-            setMessage(result.message); // Hiển thị thông báo thành công từ server
+            Swal.fire('Thành công', 'Thanh toán thành công.', 'success');
+            navigate(`/order-list`);
         } catch (error) {
-            setMessage(error.message); // Hiển thị thông báo lỗi
+            Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
         }
     };
 
@@ -382,6 +420,7 @@ export default function Checkout() {
                                     required
                                     style={{color: "#8c5e58"}}
                                 />
+                                {errors.name && <div className="text-danger mt-2">{errors.name}</div>}
                             </div>
                             <div className="mb-3">
                                 <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Email</label>
@@ -394,6 +433,7 @@ export default function Checkout() {
                                     required
                                     style={{color: "#8c5e58"}}
                                 />
+                                {errors.email && <div className="text-danger mt-2">{errors.email}</div>}
                             </div>
                             <div className="mb-3">
                                 <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Số điện
@@ -407,6 +447,7 @@ export default function Checkout() {
                                     required
                                     style={{color: "#8c5e58"}}
                                 />
+                                {errors.phone && <div className="text-danger mt-2">{errors.phone}</div>}
                             </div>
                             <div className="mb-3">
                                 <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Địa
@@ -474,6 +515,7 @@ export default function Checkout() {
                                     required
                                     style={{color: "#8c5e58"}}
                                 />
+                                {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                             </div>
 
                             {/* Phương thức thanh toán với icon */}
@@ -526,8 +568,6 @@ export default function Checkout() {
                             <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Xác nhận thanh
                                 toán
                             </button>
-                            {message &&
-                                <div className="alert alert-info mt-3">{message}</div>} {/* Hiển thị thông báo */}
                         </form>
                     </div>
                 </>
