@@ -5,6 +5,7 @@ import {Link, NavLink, useNavigate} from "react-router-dom";
 import { logout } from "../../../services/User";
 import { getCart } from "../../../services/Cart";
 import {getProduct, searchProduct} from "../../../services/Product";
+import { googleLogout } from '@react-oauth/google';
 
 export default function Header() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -121,18 +122,23 @@ export default function Header() {
         }
     };
 
-    const handleLogout = () => {
-        logout()
-            .then(() => {
-                localStorage.removeItem("token");
-                setIsLoggedIn(false); // Cập nhật trạng thái đăng nhập
-                setIsDropdownOpen(false); // Đóng dropdown
-                navigate("/login");
-            })
-            .catch(err => {
-                console.error("Đăng xuất thất bại:", err);
-            });
-    };
+    
+const handleLogout = () => {
+    // Đăng xuất Google
+    googleLogout();
+    
+    // Tiếp tục đăng xuất khỏi hệ thống
+    logout()
+        .then(() => {
+            localStorage.removeItem("token"); // Xóa token
+            setIsLoggedIn(false); // Cập nhật trạng thái đăng nhập
+            setIsDropdownOpen(false); // Đóng dropdown
+            navigate("/login"); // Điều hướng đến trang đăng nhập
+        })
+        .catch(err => {
+            console.error("Đăng xuất thất bại:", err);
+        });
+};
 
     // Hàm để mở hoặc đóng dropdown
     const toggleDropdown = () => {
