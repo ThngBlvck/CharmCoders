@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Http\JsonResponse;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -90,4 +94,49 @@ class AuthController extends Controller
             'message' => 'Không tìm thấy người dùng hoặc người dùng chưa đăng nhập',
         ], 401);
     }
+
+    public function redirectToGoogle()
+    {
+        $loginUrl = Socialite::driver('google')
+            ->stateless()
+            ->with(['prompt' => 'select_account']) // Thêm prompt để buộc chọn tài khoản
+            ->redirect()
+            ->getTargetUrl();
+    
+        return response()->json([
+            'url' => $loginUrl,
+        ]);
+    }
+    
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+            
+            // Đặt giá trị mặc định cho role là 1
+            $role = 1; // Mặc định là người dùng
+    
+            $user = User::firstOrCreate(
+                ['email' => $googleUser->getEmail()],
+                [
+                    'name' => $googleUser->getName(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'role_id' => $role, // Thiết lập giá trị role mặc định
+                ]
+            );
+    
+            // Tạo token Passport cho người dùng
+            $token = $user->createToken('Google Login')->accessToken;
+    
+            return response()->json(['token' => $token, 'user' => $user]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Lỗi xảy ra: ' . $e->getMessage()], 500);
+        }
+    }
+    
+    
+
+
 }

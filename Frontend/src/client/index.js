@@ -21,6 +21,7 @@ import OrderManagement from "./Pages/OrderManagement";
 import OrderHistory from "./Pages/OrderHistory";
 import Page404 from "./Pages/404";
 import VerifyOtp from "./Pages/Otp_PW";
+import GoogleCallback from "./Pages/GoogleCallback";
 
 
 export default function Client() {
@@ -54,6 +55,7 @@ export default function Client() {
                     <Route path="/post" element={<Post/>} />
                     <Route path="/postdetail/:id" element={<PostDetail/>} />
                     <Route path="/404" element={<Page404/>} />
+                    <Route path="/auth/google" element={isAuthenticated() ? <Navigate to="/home" />:<GoogleCallback />}></Route>
 
                     {/* Trang chủ khi vào đường dẫn gốc */}
                     <Route path="/" element={<Navigate to="/home" />} />
