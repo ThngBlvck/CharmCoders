@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddStatusToBrandsTable extends Migration
+class AddGoogleIdToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddStatusToBrandsTable extends Migration
      */
     public function up()
     {
-        Schema::table('brands', function (Blueprint $table) {
-            $table->tinyInteger('status')->default(1)->after('image'); // Thêm cột status
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('google_id')->nullable()->after('id'); // Thêm cột google_id
         });
     }
 
@@ -25,8 +25,8 @@ class AddStatusToBrandsTable extends Migration
      */
     public function down()
     {
-        Schema::table('brands', function (Blueprint $table) {
-            $table->dropColumn('status'); // Xóa cột status khi rollback
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('google_id'); // Xóa cột google_id nếu rollback
         });
     }
 }

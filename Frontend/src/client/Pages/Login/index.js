@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState, useEffect} from 'react';
 import "../../../assets/styles/css/bootstrap.min.css";
 import "../../../assets/styles/css/style.css";
 import '@fortawesome/fontawesome-free/css/all.min.css'; 
@@ -12,6 +12,7 @@ export default function Login() {
     const [errorMessage, setErrorMessage] = useState(""); // Trạng thái lỗi
     const [loading, setLoading] = useState(false); // Trạng thái loading
     const [errors, setErrors] = useState({});
+    const [loginUrl, setLoginUrl] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -61,6 +62,24 @@ export default function Login() {
             setLoading(false);
         }
     };
+    useEffect(() => {
+        fetch('http://localhost:8000/api/auth/google', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Something went wrong!');
+            })
+            .then((data) => setLoginUrl(data.url))
+            .catch((error) => console.error(error));
+    }, []);
+    
+ 
 
     return (
         <div className="container py-5">
@@ -120,7 +139,7 @@ export default function Login() {
                         {/* Google Login Button */}
                         <div className="text-center mt-3">
                             <p className="font-semibold" style={{color: '#8c5e58'}}>Hoặc đăng nhập bằng</p>
-                            <a href="/login-with-google" className="btn btn-outline-danger w-100 mt-3">
+                            <a href={loginUrl} className="btn btn-outline-danger w-100 mt-3">
                                 <i className="fab fa-google me-2"></i> Đăng Nhập với Google
                             </a>
                         </div>
