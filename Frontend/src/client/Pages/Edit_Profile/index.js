@@ -4,9 +4,8 @@ import "../../../assets/styles/css/bootstrap.min.css";
 import {NavLink, useLocation} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {getUserInfo} from "../../../services/User";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 
-export default function Profile() {
+export default function Edit_Profile() {
     const location = useLocation();
     const [loading, setLoading] = useState(false); // Thêm state loading
     const queryParams = new URLSearchParams(location.search);
@@ -63,48 +62,82 @@ export default function Profile() {
         }
     };
 
+    // Hàm để cập nhật thông tin người dùng
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        setUser((prevUser) => ({
+            ...prevUser,
+            [name]: value,
+        }));
+    };
+
+
     return (
         <>
             <div className="container py-5">
                 <div className="row g-4 align-items-center">
                     <div className="col-lg-4 text-center">
-                        <div className="d-flex justify-center">
+                        <div className="d-flex flex-column align-items-center">
                             <img
                                 src="https://via.placeholder.com/300"
                                 alt="User Avatar"
                                 className="img-fluid rounded-circle mb-3"
                                 style={{maxHeight: '300px', objectFit: 'cover'}}
                             />
+                            <input type="file" className="mt-2"/>
                         </div>
                         <div className="text-center">
-                            <p style={{color: "#8c5e58"}} className="font-semibold">{user.name}</p>
-                            <NavLink to={`/edit_profile`}>
-                                <button className="btn btn-primary mt-3 font-semibold" style={{color: '#442e2b'}}>
-                                    Chỉnh sửa hồ sơ
+                            <NavLink to={`/profile`}>
+                                <button className="btn btn-primary mt-3 font-semibold"
+                                        style={{color: '#442e2b'}}>
+                                    Hủy bỏ
                                 </button>
                             </NavLink>
                         </div>
                     </div>
                     <div className="col-lg-8">
                         <div className="p-4 bg-light border rounded">
-                            <p className="font-semibold mb-4 text-center" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin cá
+                            <p className="font-semibold mb-4 text-center"
+                               style={{color: "#8c5e58", fontSize: "30px"}}>Chỉnh sửa thông tin cá
                                 nhân</p>
                             <form>
                                 <div className="form-group mb-4">
                                     <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                           className="font-semibold mb-2">Tên: <span style={{color: "#bd8782", fontSize: "20px"}}>{user.name}</span></label>
-
+                                           className="font-semibold mb-2">Tên:</label>
+                                    <input
+                                        type="text"
+                                        className="form-control rounded"
+                                        name="name"
+                                        value={user.name}
+                                        onChange={handleChange}
+                                    />
                                 </div>
                                 <div className="form-group mb-4">
                                     <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                           className="font-semibold mb-2">Email: <span
-                                        style={{color: "#bd8782", fontSize: "20px"}}>{user.email}</span></label>
+                                           className="font-semibold mb-2">Email:</label>
+                                    <input
+                                        type="email"
+                                        className="form-control rounded"
+                                        name="email"
+                                        value={user.email}
+                                        onChange={handleChange}
+                                    />
                                 </div>
                                 <div className="form-group mb-4">
                                     <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                           className="font-semibold mb-2">Số điện thoại: <span
-                                        style={{color: "#bd8782", fontSize: "20px"}}>{user.phone}</span></label>
+                                           className="font-semibold mb-2">Số điện thoại:</label>
+                                    <input
+                                        type="tel"
+                                        className="form-control"
+                                        name="phone"
+                                        value={user.phone}
+                                        onChange={handleChange}
+                                    />
                                 </div>
+                                <button className="btn btn-primary w-100 mt-3 font-semibold" type="submit"
+                                        style={{color: '#442e2b', fontSize: "20px"}}>
+                                    Lưu thay đổi
+                                </button>
                             </form>
                         </div>
                     </div>

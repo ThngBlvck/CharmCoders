@@ -322,7 +322,7 @@ export default function Header() {
                                                 </NavLink>
                                             </li>
                                             <li>
-                                                <NavLink to="/order-detail" onClick={() => setIsDropdownOpen(false)}>
+                                                <NavLink to="/order-list" onClick={() => setIsDropdownOpen(false)}>
                                                     <button className="dropdown-item modal-item"
                                                             style={{color: "#8c5e58"}}>
                                                         <i className="fas fa-file-alt me-2"></i>Quản lý đơn hàng
@@ -338,27 +338,35 @@ export default function Header() {
                                                     </button>
                                                 </NavLink>
                                             </li>
-                                                <li>
+                                            <li>
+                                                <NavLink to="/address" onClick={() => setIsDropdownOpen(false)}>
+                                                    <button className="dropdown-item modal-item"
+                                                            style={{color: "#8c5e58"}}>
+                                                        <i className="fas fa-location-dot me-2"></i>Địa chỉ
+                                                    </button>
+                                                </NavLink>
+                                            </li>
+                                            <li>
 
-                                                        <NavLink to="" onClick={() => {
-                                                            // Logic cho nút thoát
-                                                            toggleDropdown();
-                                                        }}>
-                                                            <button className="dropdown-item modal-item"
-                                                                    onClick={handleLogout}
-                                                                    style={{color: "#8c5e58"}}>
-                                                                <i className="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                                            </button>
-                                                        </NavLink>
-                                                </li>
-                                            </ul>
-                                        )}
-                                    </div>
+                                                <NavLink to="" onClick={() => {
+                                                    // Logic cho nút thoát
+                                                    toggleDropdown();
+                                                }}>
+                                                    <button className="dropdown-item modal-item"
+                                                            onClick={handleLogout}
+                                                            style={{color: "#8c5e58"}}>
+                                                        <i className="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                                    </button>
+                                                </NavLink>
+                                            </li>
+                                        </ul>
+                                    )}
+                                </div>
                                 )}
                                 {!isLoggedIn && (
                                     <button className="btn btn-primary w-50 font-semibold" style={{marginLeft: '20px'}}>
                                         <Link to="/login">
-                                            <p style={{ fontSize: "14px", color: '#442e2b' }}>Đăng nhập</p>
+                                            <p style={{fontSize: "14px", color: '#442e2b'}}>Đăng nhập</p>
                                         </Link>
                                     </button>
                                 )}

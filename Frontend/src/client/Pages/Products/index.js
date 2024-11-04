@@ -24,6 +24,7 @@ export default function Products() {
     const [productId, setProductId] = useState(null);
     const [loading, setLoading] = useState(false); // State để theo dõi trạng thái tải
     const [cart, setCart] = useState({});
+    const [minPrice, setMinPrice] = useState(0); // Giá tối đa (tùy chỉnh theo giá cao nhất của sản phẩm)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -95,10 +96,8 @@ export default function Products() {
     const filteredProducts = products
         .filter(product => selectedCategory === "all" || product.category_id === parseInt(selectedCategory)) // Lọc theo category_id
         .filter(product => {
-            const productPrice = parseFloat(product.unit_price); // Chuyển giá sản phẩm sang dạng số
-            if (priceFilter === "low") return productPrice < 100000;
-            if (priceFilter === "high") return productPrice >= 100000;
-            return true;
+            const productPrice = parseFloat(product.unit_price);
+            return productPrice >= minPrice; // Lọc sản phẩm có giá <= maxPrice
         })
         .filter(product => brandFilter === "all" || product.brand_id === parseInt(brandFilter))
 
@@ -175,23 +174,24 @@ export default function Products() {
                     {/* Lọc theo giá */}
                     <div className="col-md-4 mb-3">
                         <p style={{fontSize: "20px", color: "#8c5e58"}} className="font-bold">
-                            Lọc theo giá
+                            Chọn mức giá
                         </p>
-                        <select
-                            className="form-select"
-                            value={priceFilter}
-                            onChange={handleFilterChange(setPriceFilter)}
-                        >
-                            <option value="all" style={{color: "#8c5e58"}}>
-                                Tất cả
-                            </option>
-                            <option value="low" style={{color: "#8c5e58"}}>
-                                Dưới 100.000đ
-                            </option>
-                            <option value="high" style={{color: "#8c5e58"}}>
-                                Từ 100.000đ trở lên
-                            </option>
-                        </select>
+                        <div className="d-flex align-items-center">
+                            {/* Giá thấp nhất */}
+                            <span style={{color: "#8c5e58", marginRight: "10px"}}>0</span>
+                            <input
+                                type="range"
+                                min="0"
+                                max="1000000"
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(Number(e.target.value))}
+                                className="form-range"
+                                style={{flex: 1}}
+                            />
+                            {/* Giá cao nhất */}
+                            <span style={{color: "#8c5e58", marginLeft: "10px"}}>1,000,000</span>
+                        </div>
+                        <p>Giá: {minPrice.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}</p>
                     </div>
 
                     {/* Lọc theo thương hiệu */}
@@ -226,7 +226,8 @@ export default function Products() {
             {/* Hiển thị sản phẩm */}
             <div className="container">
                 {loading ? (
-                    <div className="d-flex flex-column align-items-center" style={{marginTop: '10rem', marginBottom: '10rem'}}>
+                    <div className="d-flex flex-column align-items-center"
+                         style={{marginTop: '10rem', marginBottom: '10rem'}}>
                         <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
                         <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
                     </div>
@@ -239,7 +240,7 @@ export default function Products() {
                                         <div className="card text-center bg-hover"
                                              style={{borderRadius: "15px", padding: "20px"}}>
                                             <NavLink to={`/products/${product.id}`}>
-                                                <img
+                                            <img
                                                     src={product.image}
                                                     className="card-img-top img-fluid rounded"
                                                     alt="Product"
@@ -272,7 +273,7 @@ export default function Products() {
                                     </div>
                                 ))
                             ) : (
-                                <p>Đang tải dữ liệu...</p>
+                                <p className="text-center" style={{fontSize: '30px', color: '#8c5e58'}}>Không có sản phẩm!</p>
                             )}
                         </div>
 

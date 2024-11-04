@@ -21,6 +21,10 @@ import OrderManagement from "./Pages/OrderManagement";
 import OrderHistory from "./Pages/OrderHistory";
 import Page404 from "./Pages/404";
 import VerifyOtp from "./Pages/Otp_PW";
+import Edit_Profile from "./Pages/Edit_Profile";
+import List_Address from "./Pages/Address/List_Address";
+import Add_Address from "./Pages/Address/Add_Address";
+import Edit_Address from "./Pages/Edit_Profile";
 
 
 export default function Client() {
@@ -39,6 +43,7 @@ export default function Client() {
                     <Route path="/products" element={<Products/>}/>
                     <Route path="/products/:id" element={<ProductDetail/>}/>
                     <Route path="/profile" element={<Profile/>}/>
+                    <Route path="/edit_profile" element={<Edit_Profile/>}/>
                     <Route path="/cart" element={<Cart/>}/>
                     <Route path="/checkout" element={<Checkout/>} />
 
@@ -54,6 +59,9 @@ export default function Client() {
                     <Route path="/post" element={<Post/>} />
                     <Route path="/postdetail/:id" element={<PostDetail/>} />
                     <Route path="/404" element={<Page404/>} />
+                    <Route path="/address" element={<List_Address/>} />
+                    <Route path="/add-address" element={<Add_Address/>} />
+                    <Route path="/edit-address/:id" element={<Edit_Address/>} />
 
                     {/* Trang chủ khi vào đường dẫn gốc */}
                     <Route path="/" element={<Navigate to="/home" />} />
