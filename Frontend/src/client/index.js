@@ -1,5 +1,5 @@
 import React from "react";
-import {Routes, Route, Navigate} from "react-router-dom";
+import {Routes, Route, Navigate,useLocation} from "react-router-dom";
 import {CartProvider} from './components/Cart';
 import Footer from "./components/Footer";
 import Home from "./Pages/Home";
