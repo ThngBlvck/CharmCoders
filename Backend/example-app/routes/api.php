@@ -68,7 +68,6 @@ Route::middleware(['web'])->group(function () {
 Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderClient::class);
-        Route::post('/checkout', [CheckoutController::class, 'checkout']);
         Route::get('/getAllCart', [CartClient::class, 'getCart']);
         Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
         Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
@@ -87,9 +86,9 @@ Route::prefix('client')->group(function () {
     // Route để yêu cầu đặt lại mật khẩu qua API
 
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
-        Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
-        Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
-        Route::post('/contact/send', [MailController::class, 'send']);
+    Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
+    Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
+    Route::post('/contact/send', [MailController::class, 'send']);
 });
 
 // General user route (outside of client prefix)
