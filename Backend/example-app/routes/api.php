@@ -61,12 +61,10 @@ Route::prefix('admin')->group(function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
-
-// Socialite authentication routes
-Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'authProviderRedirect']);
-Route::get('/auth/callback/{provider}', [SocialiteController::class, 'socialAuthentication']);
-
-// Client routes
+Route::middleware(['web'])->group(function () {
+    Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'authProviderRedirect']);
+    Route::get('/auth/{provider}/callback', [SocialiteController::class, 'socialAuthentication']);
+});
 Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderClient::class);
@@ -76,14 +74,14 @@ Route::prefix('client')->group(function () {
         Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
         Route::get('/user', [UserController::class, 'getUser']);
 
-        // VNPay payment routes
-        Route::post('/vnpay/create-payment', [VNPAYController::class, 'createPayment']);
-        Route::get('/vnpay-return', [VNPAYController::class, 'paymentReturn']);
+        #payment
+        Route::post('/checkout', [PaymentController::class, 'checkout']);
+        Route::get('/payment-return', [PaymentController::class, 'paymentReturn']);
     });
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::post('/contact/send', [MailController::class, 'send']);
+    Route::post('/contact/send', [MailController::class, 'sendMail']);
     // Route để yêu cầu đặt lại mật khẩu qua API
 
 });
@@ -96,7 +94,6 @@ Route::middleware('auth:api')->apiResource('comments', CommentController::class)
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'Register']);
 
-Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('client.reset-password');
 Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);

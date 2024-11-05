@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Services\VNPayPaymentGateway;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\User;
@@ -23,13 +24,11 @@ class CheckoutController extends Controller
             return response()->json(['error' => 'Người dùng không tồn tại!'], 404);
         }
 
-        // Nhận danh sách cart item IDs từ request
         $cartItemIds = $request->input('cart_item_ids');
         if (!$cartItemIds || !is_array($cartItemIds)) {
             return response()->json(['error' => 'Bạn cần cung cấp danh sách cart_item_ids!'], 400);
         }
 
-        // Lấy thông tin giỏ hàng dựa trên ID và user_id
         $cartItems = Cart::whereIn('id', $cartItemIds)->where('user_id', $userId)->get();
         if ($cartItems->isEmpty()) {
             return response()->json(['error' => 'Không tìm thấy giỏ hàng nào!'], 404);
@@ -64,7 +63,6 @@ class CheckoutController extends Controller
         ]);
     }
 
-    //  Nhập địa chỉ và tiến hành thanh toán
     public function checkout(Request $request)
     {
         $userId = Auth::id();
@@ -116,19 +114,53 @@ class CheckoutController extends Controller
         $user->address = $address;
         $user->save();
 
-        return response()->json([
-            'success' => 'Đang tiến hành thanh toán!',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'address' => $user->address,
-            ],
-            'products' => $products,
-            'total_amount' => $totalAmount,
-        ]);
-    }
+        // Xác định phương thức thanh toán
+        $paymentMethod = $request->input('payment_method');
+        switch ($paymentMethod) {
+            case 'vnpay':
+                // Gọi hàm xử lý thanh toán VNPay
+                $paymentGateway = new VNPayPaymentGateway();
+                $paymentResponse = $paymentGateway->createPayment($totalAmount, $user);
+                break;
+            case 'momo':
+                // Gọi hàm xử lý thanh toán MoMo
+                // $paymentGateway = new MoMoPaymentGateway();
+                // $paymentResponse = $paymentGateway->createPayment($totalAmount, $user);
+                break;
+            case 'cod': // Thanh toán khi nhận hàng
+                return response()->json([
+                    'success' => 'Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng.',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'address' => $user->address,
+                    ],
+                    'products' => $products,
+                    'total_amount' => $totalAmount,
+                ]);
+            default:
+                return response()->json(['error' => 'Phương thức thanh toán không hợp lệ!'], 400);
+        }
 
+        // Xử lý phản hồi thanh toán
+        if ($paymentResponse['status'] === 'success') {
+            return response()->json([
+                'success' => 'Đang tiến hành thanh toán!',
+                'payment_url' => $paymentResponse['payment_url'],
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'address' => $user->address,
+                ],
+                'products' => $products,
+                'total_amount' => $totalAmount,
+            ]);
+        } else {
+            return response()->json(['error' => 'Thanh toán không thành công!'], 500);
+        }
+    }
 
     public function buyNow(Request $request)
     {
@@ -161,56 +193,35 @@ class CheckoutController extends Controller
         }
 
         // Tính tổng tiền từ giá sản phẩm lấy từ bảng `products`
-        $totalAmount = $product->unit_price * $quantity;
+        $totalAmount = $product->getPrice() * $quantity;
 
-        // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng hay chưa
-        $existingCart = Cart::where('user_id', $user->id)
-            ->where('product_id', $productId)
-            ->first();
-
-        if ($existingCart) {
-            // Nếu sản phẩm đã có trong giỏ hàng, cập nhật số lượng và tổng tiền
-            $existingCart->quantity += $quantity;
-            $existingCart->total_amount += $totalAmount;
-            $existingCart->save();
-        } else {
-            // Nếu sản phẩm chưa có, tạo mới
-            Cart::create([
-                'user_id' => $user->id, // Lưu ID người dùng
-                'product_id' => $productId, // Lưu ID sản phẩm
-                'quantity' => $quantity, // Lưu số lượng
-                'total_amount' => $totalAmount, // Lưu tổng tiền vào cột total_amount
-            ]);
+        // Lưu địa chỉ vào người dùng
+        $address = $request->input('address');
+        if (!$address) {
+            return response()->json(['error' => 'Bạn cần cung cấp địa chỉ!'], 400);
         }
 
-        // Trả về thông tin thanh toán
+        // Cập nhật địa chỉ cho người dùng
+        $user->address = $address;
+        $user->save();
+
+        // Trả về thông tin giao dịch
         return response()->json([
-            'success' => 'Đã thêm sản phẩm vào giỏ hàng!',
+            'success' => true,
+            'message' => 'Đặt hàng thành công!',
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'address' => $user->address,
             ],
             'product' => [
                 'id' => $product->id,
                 'name' => $product->name,
-                'price' => $product->unit_price, // Hiển thị giá từ bảng products
+                'price' => $product->getPrice(),
+                'quantity' => $quantity,
             ],
-            'quantity' => $quantity,
             'total_amount' => $totalAmount,
-        ], 200);
+        ]);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
