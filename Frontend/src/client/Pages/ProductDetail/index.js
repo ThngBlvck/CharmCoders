@@ -9,7 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
 const ProductDetail = () => {
@@ -227,50 +227,61 @@ const ProductDetail = () => {
                         </div>
                     </div>
 
-                    <div className="col-md-3">
-                        <form onSubmit={handleSubmitComment}>
+                    <div className="col-md-8 mt-5" style={{maxWidth: '800px', paddingLeft: '0'}}> {/* Aligned left */}
+                        <form onSubmit={handleSubmitComment} className="p-3 mb-4 border rounded">
                             <div className="form-group">
-                                <label htmlFor="newComment" style={{color: "#8c5e58"}}>Viết bình luận:</label>
+                                <label htmlFor="newComment" style={{fontWeight: 'bold', fontSize: '16px'}}>Viết bình
+                                    luận:</label>
                                 <textarea
                                     className="form-control"
                                     id="newComment"
                                     value={newComment}
                                     onChange={handleNewCommentChange}
+                                    rows="3"
+                                    style={{resize: 'none'}}
                                 />
                             </div>
-                            <button type="submit" className="btn btn-primary mt-2 font-semibold">Gửi bình luận</button>
+                            <button type="submit" className="btn btn-primary mt-2">
+                                Gửi bình luận
+                            </button>
                         </form>
 
                         {loadingComments ? (
-                            <div className="d-flex flex-column align-items-center"
-                                 style={{marginTop: '10rem', marginBottom: '10rem'}}>
-                                <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                                <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
+                            <div className="d-flex justify-content-center mt-5">
+                                <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '2rem'}}/>
                             </div>
                         ) : (
-                            <div className="mt-5">
-                                <h4 style={{color: "#8c5e58"}}>Bình luận</h4>
+                            <div className="mt-4">
+                                <h4 style={{fontWeight: 'bold'}}>Bình luận</h4>
                                 {comments.length > 0 ? (
                                     comments.map((comment) => (
-                                        <div key={comment.id} className="mb-3">
-                                            <p><strong>{comment.user_name}</strong>:</p>
-                                            <p>{comment.content}</p>
-
-                                                <button
-                                                    className="btn btn-danger btn-sm"
-                                                    onClick={() => handleDeleteComment(comment.id)}>
-                                                    Xóa
-                                                </button>
-
-                                            <hr/>
+                                        <div key={comment.id} className="mb-3 p-3 rounded border">
+                                            <div className="d-flex justify-content-between align-items-start">
+                                                <div style={{maxWidth: '90%'}}>
+                                                    <p style={{
+                                                        fontSize: '14px',
+                                                        marginBottom: '4px',
+                                                        fontWeight: 'bold'
+                                                    }}>{comment.user_name}</p>
+                                                    <p style={{fontSize: '13px'}}>{comment.content}</p>
+                                                </div>
+                                                <FontAwesomeIcon
+                                                    icon={faTrash}
+                                                    style={{cursor: 'pointer', fontSize: '14px'}}
+                                                    onClick={() => handleDeleteComment(comment.id)}
+                                                    title="Xóa bình luận"
+                                                />
+                                            </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <p>Không có bình luận nào.</p>
+                                    <p style={{fontSize: '13px'}}>Không có bình luận nào.</p>
                                 )}
                             </div>
                         )}
                     </div>
+
+
                 </div>
             ) : (
                 <p>Sản phẩm không tồn tại.</p>
