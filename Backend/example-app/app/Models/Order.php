@@ -22,7 +22,8 @@ class Order extends Model
         'total_amount',
         'address',
         'status',
-        'user_id', // khóa ngoại cho người dùng
+        'user_id',
+        'payment_method', // khóa ngoại cho người dùng
     ];
 
     /**

@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StoreOrderRequest; // Import request cho việc xác thực
-use App\Models\Order; // Import model Order
-use App\Models\Cart; // Import model Cart
-use App\Models\Order_detail; // Import model Order_detail
-use App\Models\Product; // Import model Product
+use App\Models\Order;
+use App\Models\Cart;
+use App\Models\Order_detail;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -22,7 +24,7 @@ class OrderController extends Controller
             $validated = $request->validated();
 
             // Lấy ID người dùng đã đăng nhập
-            $userId = auth()->id();
+            $userId = Auth::id();
 
             // Lấy sản phẩm từ giỏ hàng của người dùng
             $cartItems = Cart::where('user_id', $userId)->get();
@@ -39,12 +41,16 @@ class OrderController extends Controller
                 return $item->quantity * $item->price;
             });
 
+            // Lấy phương thức thanh toán từ request
+            $paymentMethod = $validated['payment_method'] ?? 'Thanh toán khi nhận hàng'; // Giá trị mặc định nếu không có
+
             // Tạo đơn hàng mới
             $order = Order::create([
                 'total_amount' => $totalAmount,
                 'address' => $validated['address'],
                 'status' => 0, // Trạng thái mặc định là đang xử lý
                 'user_id' => $userId,
+                'payment_method' => $paymentMethod, // Lưu phương thức thanh toán
             ]);
 
             // Lưu sản phẩm vào chi tiết đơn hàng và trừ số lượng kho
@@ -90,15 +96,17 @@ class OrderController extends Controller
         }
     }
 
-
     // Xem danh sách đơn hàng
     public function index(Request $request)
     {
         // Lấy ID người dùng đã đăng nhập
-        $userId = auth()->id();
+        $userId = Auth::id();
 
-        // Lấy danh sách đơn hàng của người dùng
-        $orders = Order::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+        // Lấy danh sách đơn hàng của người dùng cùng với chi tiết
+        $orders = Order::where('user_id', $userId)
+            ->with('details.product') // Tải chi tiết đơn hàng và sản phẩm
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         // Trả về danh sách đơn hàng dưới dạng JSON
         return response()->json([
@@ -111,7 +119,7 @@ class OrderController extends Controller
     public function show($id)
     {
         // Lấy ID người dùng đã đăng nhập
-        $userId = auth()->id();
+        $userId = Auth::id();
 
         // Tìm đơn hàng của người dùng
         $order = Order::where('id', $id)->where('user_id', $userId)->with('details.product')->first();
@@ -133,7 +141,7 @@ class OrderController extends Controller
     public function cancel($id)
     {
         // Lấy ID người dùng đã đăng nhập
-        $userId = auth()->id();
+        $userId = Auth::id();
 
         // Tìm đơn hàng của người dùng
         $order = Order::where('id', $id)->where('user_id', $userId)->first();
@@ -153,5 +161,4 @@ class OrderController extends Controller
             'message' => 'Đơn hàng đã được hủy thành công.',
         ], 200);
     }
-
 }

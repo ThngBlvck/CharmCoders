@@ -16,6 +16,7 @@ class StoreOrderRequest extends FormRequest
         return [
             'address' => 'required|string|max:255', // Địa chỉ là bắt buộc và tối đa 255 ký tự
             'status' => 'integer', // Trạng thái phải là số nguyên và bắt buộc
+            'payment_method' => 'nullable|string|max:50',
         ];
     }
 
@@ -25,7 +26,8 @@ class StoreOrderRequest extends FormRequest
             'address.required' => 'Địa chỉ là bắt buộc.',
             'address.string' => 'Địa chỉ phải là chuỗi ký tự.',
             'address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
-            'status.integer' => 'Trạng thái phải là một số nguyên hợp lệ.', // Thay đổi thành số nguyên
+            'status.integer' => 'Trạng thái phải là một số nguyên hợp lệ.',
+            'payment_method.required' => 'Vui lòng chọn phương thức thanh toán.',
         ];
     }
 }
