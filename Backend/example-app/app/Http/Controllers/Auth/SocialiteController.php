@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
+use App\Http\Controllers\Controller;
 
 use App\Models\User;
 use Exception;
@@ -14,43 +15,52 @@ class SocialiteController extends Controller
 {
     public function authProviderRedirect($provider)
     {
-        if ($provider) {
+        if (in_array($provider, ['facebook', 'google'])) { // Kiểm tra provider hợp lệ
             return Socialite::driver($provider)->redirect();
         }
-        abort(404);
+        return response()->json(['error' => 'Provider not supported'], 400);
     }
+
 
     public function socialAuthentication($provider)
     {
         try {
             if ($provider) {
-                $socialUser = Socialite::driver($provider)->user();
-                $user = User::where('auth_provider_id', $socialUser->id)->first();
+                // Sử dụng stateless() để đảm bảo không sử dụng session
+                $socialUser = Socialite::driver($provider)->stateless()->user();
+                \Log::info('Social User Data: ', (array) $socialUser);
 
-                if ($user) {
-                    Auth::login($user);
-                } else {
-                    $user = User::create([
+                // Đặt giá trị mặc định cho role (nếu cần)
+                $role = 1; // Mặc định là người dùng
+
+                // Sử dụng firstOrCreate để tìm hoặc tạo người dùng
+                $user = User::firstOrCreate(
+                    ['auth_provider_id' => $socialUser->id],
+                    [
                         'name' => $socialUser->name,
                         'email' => $socialUser->email,
-                        'password' => Hash::make('Password@1234'),
+                        'password' => Hash::make('Password@1234'), // Đặt mật khẩu mặc định
                         'auth_provider' => $provider,
-                        'auth_provider_id' => $socialUser->id,
-                    ]);
+                        'role_id' => $role, // Thiết lập giá trị role mặc định
+                    ]
+                );
 
-                    Auth::login($user);
-                }
+                // Đăng nhập người dùng
+                Auth::login($user);
 
-                // Tạo token Passport sau khi đăng nhập
+                // Tạo token Passport cho người dùng
                 $token = $user->createToken('Personal Access Token')->accessToken;
 
-                // Trả về token để sử dụng cho API, hoặc chuyển hướng đến dashboard nếu là ứng dụng web
-                return response()->json(['token' => $token], 200);
+                return response()->json(['token' => $token, 'user' => $user], 200);
             }
-            abort(404);
-
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Provider not found.'], 404);
+        } catch (\Exception $e) {
+            // Ghi log lỗi ra file với thông tin chi tiết
+            \Log::error('Social Authentication Error: ' . $e->getMessage() . ' | Stack Trace: ' . $e->getTraceAsString());
+            return response()->json(['error' => 'Lỗi xảy ra: ' . $e->getMessage()], 500);
         }
     }
+
+
+
 }
