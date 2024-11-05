@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
@@ -7,13 +6,17 @@ use App\Http\Requests\Client\StoreOrderRequest; // Import request cho việc xá
 use App\Models\Order; // Import model Order
 use App\Models\Cart; // Import model Cart
 use App\Models\Order_detail; // Import model Order_detail
+use App\Models\Product; // Import model Product
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
     // Tạo đơn hàng
     public function store(StoreOrderRequest $request)
     {
+        DB::beginTransaction();
+
         try {
             // Dữ liệu đã xác thực từ StoreOrderRequest
             $validated = $request->validated();
@@ -44,8 +47,18 @@ class OrderController extends Controller
                 'user_id' => $userId,
             ]);
 
-            // Lưu sản phẩm vào chi tiết đơn hàng
+            // Lưu sản phẩm vào chi tiết đơn hàng và trừ số lượng kho
             $orderDetails = $cartItems->map(function ($item) use ($order) {
+                // Lấy sản phẩm từ bảng products
+                $product = Product::find($item->product_id);
+
+                if (!$product || $product->quantity < $item->quantity) {
+                    throw new \Exception("Sản phẩm {$product->name} không đủ số lượng trong kho.");
+                }
+
+                // Trừ số lượng sản phẩm trong kho
+                $product->decrement('quantity', $item->quantity);
+
                 return [
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
@@ -55,22 +68,28 @@ class OrderController extends Controller
                     'updated_at' => now(),
                 ];
             })->toArray();
+
             Order_detail::insert($orderDetails);
 
             // Xóa giỏ hàng của người dùng sau khi tạo đơn hàng
             Cart::where('user_id', $userId)->delete();
 
+            DB::commit();
+
             return response()->json([
                 'message' => 'Đơn hàng đã được tạo thành công.',
                 'order' => $order,
             ], 201);
+
         } catch (\Exception $e) {
+            DB::rollback();
             return response()->json([
                 'message' => 'Có lỗi xảy ra trong quá trình tạo đơn hàng.',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
+
 
     // Xem danh sách đơn hàng
     public function index(Request $request)
@@ -134,4 +153,5 @@ class OrderController extends Controller
             'message' => 'Đơn hàng đã được hủy thành công.',
         ], 200);
     }
+
 }
