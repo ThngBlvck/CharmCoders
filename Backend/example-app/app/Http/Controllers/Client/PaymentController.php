@@ -8,6 +8,7 @@ use App\Services\VNPayPaymentGateway;
 use App\Models\Cart; // Giả định rằng bạn có model Cart để lấy thông tin giỏ hàng
 use App\Models\Product; // Giả định rằng bạn có model Cart để lấy thông tin giỏ hàng
 use App\Models\User; // Giả định rằng bạn có model Cart để lấy thông tin giỏ hàng
+use App\Models\Order; // Thêm model Order để lưu thông tin đơn hàng
 use Auth;
 
 class PaymentController extends Controller
@@ -54,11 +55,14 @@ class PaymentController extends Controller
             $totalAmount += $product->getPrice() * $cartItem->quantity;
         }
 
-        // Lấy địa chỉ từ request và kiểm tra
+        // Lấy địa chỉ và phương thức thanh toán từ request và kiểm tra
         $address = $request->input('address');
         if (!$address) {
             return response()->json(['error' => 'Bạn cần cung cấp địa chỉ!'], 400);
         }
+
+        $paymentMethod = $request->input('payment_method');
+
 
         // Kiểm tra nếu tổng tiền bị thiếu
         if ($totalAmount <= 0) {
@@ -70,10 +74,17 @@ class PaymentController extends Controller
         // Tạo URL thanh toán thông qua cổng thanh toán
         $paymentUrl = $this->paymentGateway->createPayment($totalAmount, $orderInfo);
 
-        return response()->json(['url' => $paymentUrl]);
+        // Lưu thông tin đơn hàng vào database
+        $order = Order::create([
+            'user_id' => $userId,
+            'total_amount' => $totalAmount,
+            'address' => $address,
+            'payment_method' => $paymentMethod, // Lưu phương thức thanh toán
+            'status' => 0, // Giả định trạng thái đơn hàng, 0 là chưa thanh toán
+        ]);
+
+        return response()->json(['url' => $paymentUrl, 'order_id' => $order->id]);
     }
-
-
 
     public function paymentReturn(Request $request)
     {
@@ -89,5 +100,4 @@ class PaymentController extends Controller
 
         return response()->json(['status' => 'fail', 'message' => 'Giao dịch thất bại']);
     }
-
 }
