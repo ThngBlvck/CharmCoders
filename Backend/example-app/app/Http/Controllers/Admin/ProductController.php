@@ -93,34 +93,32 @@ class ProductController extends Controller
     // Chức năng tìm kiếm sản phẩm
     public function search(Request $request)
     {
-        // Lấy từ khóa tìm kiếm từ request
-        $query = $request->input('query');
+    // Lấy từ khóa tìm kiếm từ request
+    $query = $request->input('query');
+    $perPage = 10; // số lượng sản phẩm mỗi trang
+    $currentPage = $request->input('page', 1); // số trang hiện tại, mặc định là 1
 
-        // Nếu không có từ khóa tìm kiếm, hiển thị tất cả sản phẩm
-        if (!$query) {
-            $products = Product::all();
-        } else {
-            // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
-            $products = Product::where('name', 'LIKE', "%{$query}%")
-                ->orWhere('content', 'LIKE', "%{$query}%")
-                ->orWhere('unit_price', 'LIKE', "%{$query}%")
-                ->get();
-        }
+    // Nếu không có từ khóa tìm kiếm, hiển thị tất cả sản phẩm
+    if (!$query) {
+        $products = Product::paginate($perPage);
+    } else {
+        // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
+        $products = Product::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('content', 'LIKE', "%{$query}%")
+            ->orWhere('unit_price', 'LIKE', "%{$query}%")
+            ->paginate($perPage); // Phân trang cho kết quả tìm kiếm
+    }
 
-        // Nếu không tìm thấy sản phẩm
-        if ($products->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy sản phẩm nào phù hợp.',
-            ], 404);
-        }
-
+    // Biến đổi kết quả để gán 'Chưa phân loại' nếu không có category_name
+    $products->getCollection()->transform(function ($product) {
+        $product->category_name = $product->category_name ?? 'Chưa phân loại';
+        return $product;
+    });
         // Trả về danh sách sản phẩm phù hợp hoặc tất cả sản phẩm
         return response()->json([
             'success' => true,
             'products' => $products,
         ], 200);
     }
-
 
 }

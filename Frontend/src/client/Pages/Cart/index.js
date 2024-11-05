@@ -5,6 +5,7 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import {deleteCart, getCart} from "../../../services/Cart";
 import {getOneProduct} from "../../../services/Comment";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import Swal from 'sweetalert2';
 
 export default function Cart() {
     const [products, setProducts] = useState([]);
@@ -40,10 +41,6 @@ export default function Cart() {
         try {
             const result = await getCart();
             console.log("Cart Result: ", result);
-
-            if (!result || result.length === 0) {
-                throw new Error("No items in cart.");
-            }
 
             const productDetails = await Promise.all(result.map(item => getOneProduct(item.product_id)));
             console.log("Product Details: ", productDetails);
@@ -149,17 +146,23 @@ export default function Cart() {
 
     const handleBuy = () => {
         if (selectedItems.length === 0) {
-            alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Không có sản phẩm',
+                text: 'Cần có sản phẩm để thanh toán.',
+                confirmButtonColor: '#8c5e58',
+                confirmButtonText: 'OK',
+                customClass: {
+                    title: 'swal2-title-custom',
+                    content: 'swal2-content-custom'
+                }
+            });
             return;
         }
 
-        // Tạo chuỗi các id sản phẩm được chọn, phân tách bằng dấu phẩy
         const selectedProductIds = selectedItems.join(',');
-
-        // Chuyển đến trang thanh toán với danh sách các id sản phẩm
         navigate(`/checkout?cartIds=${selectedProductIds}`);
     };
-
 
     return (
         <div className="container py-4">
@@ -195,7 +198,7 @@ export default function Cart() {
                             !!!</p>
                     ) : (
                         <>
-                        {products.map(item => (
+                            {products.map(item => (
                                 <div key={item.id}
                                      className="cart-item d-flex align-items-center justify-content-between py-3"
                                      style={{
@@ -302,10 +305,13 @@ export default function Cart() {
                      marginBottom: "20px"
                  }}>
                 <div>
-                    <button className="btn btn-primary font-semibold" style={{marginRight: "20px"}}
-                            onClick={removeSelectedItems}>
-                        Xóa các sản phẩm đã chọn ({selectedItems.length})
-                    </button>
+                    {selectedItems.length > 0 && ( // Chỉ hiển thị nút xóa khi có sản phẩm được chọn
+                        <button className="btn btn-primary font-semibold"
+                                style={{marginRight: "20px", width: "220px"}} // Đặt chiều rộng của nút
+                                onClick={removeSelectedItems}>
+                            Xóa sản phẩm đã chọn ({selectedItems.length})
+                        </button>
+                    )}
                 </div>
 
                 <div className="d-flex justify-content-end align-items-center" style={{width: "100%"}}>
@@ -328,6 +334,7 @@ export default function Cart() {
                     </button>
                 </div>
             </div>
+
 
         </div>
     );

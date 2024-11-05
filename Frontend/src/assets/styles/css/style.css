@@ -999,3 +999,13 @@
 .custom-prev-arrow {
     left: 10px; /* Vị trí bên trái cho mũi tên prev */
 }
+/* Điều chỉnh màu chữ tiêu đề cho SweetAlert2 */
+.swal2-title-custom {
+    color: #8c5e58; /* Đặt màu tiêu đề phù hợp với màu trang của bạn */
+    font-weight: bold;
+}
+
+/* Điều chỉnh màu chữ nội dung cho SweetAlert2 */
+.swal2-content-custom {
+    color: #6b4c4a; /* Đặt màu nội dung phù hợp với màu trang của bạn */
+}
