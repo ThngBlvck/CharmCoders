@@ -1,5 +1,5 @@
 import React from "react";
-import {Routes, Route, Navigate, useLocation} from "react-router-dom";
+import {Routes, Route, Navigate} from "react-router-dom";
 import {CartProvider} from './components/Cart';
 import Footer from "./components/Footer";
 import Home from "./Pages/Home";
@@ -21,6 +21,11 @@ import OrderManagement from "./Pages/OrderManagement";
 import OrderHistory from "./Pages/OrderHistory";
 import Page404 from "./Pages/404";
 import VerifyOtp from "./Pages/Otp_PW";
+import Edit_Profile from "./Pages/Edit_Profile";
+import List_Address from "./Pages/Address/List_Address";
+import Add_Address from "./Pages/Address/Add_Address";
+import Edit_Address from "./Pages/Edit_Profile";
+
 import GoogleCallback from "./Pages/GoogleCallback";
 
 
@@ -56,6 +61,10 @@ export default function Client() {
                     <Route path="/postdetail/:id" element={<PostDetail/>} />
                     <Route path="/404" element={<Page404/>} />
                     <Route path="/auth/google" element={isAuthenticated() ? <Navigate to="/home" />:<GoogleCallback />}></Route>
+
+                    <Route path="/address" element={<List_Address/>} />
+                    <Route path="/add-address" element={<Add_Address/>} />
+                    <Route path="/edit-address/:id" element={<Edit_Address/>} />
 
                     {/* Trang chủ khi vào đường dẫn gốc */}
                     <Route path="/" element={<Navigate to="/home" />} />
