@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('payment_method')->nullable(); // Thêm cột payment_method
+            $table->integer('payment_method')->nullable(); // Thêm cột payment_method với kiểu int
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('payment_method'); // Xóa cột payment_method nếu cần
+            $table->dropColumn('payment_method'); // Xóa cột payment_method
         });
     }
 };

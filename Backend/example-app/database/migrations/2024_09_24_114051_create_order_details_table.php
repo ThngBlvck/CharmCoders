@@ -23,6 +23,7 @@ class CreateOrderDetailsTable extends Migration
 
             // Foreign key constraint nếu có bảng orders
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('set null');
+            $table->foreignId('product_id')->constrained('products')->after('order_id');
         });
     }
 
