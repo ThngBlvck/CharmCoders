@@ -23,8 +23,11 @@ class Order extends Model
         'address',
         'status',
         'user_id',
-        'payment_method', // khóa ngoại cho người dùng
+        'payment_method',
+        'phone',
     ];
+
+
 
     /**
      * Quan hệ với model `User`.

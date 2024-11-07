@@ -41,8 +41,9 @@ class OrderController extends Controller
                 return $item->quantity * $item->price;
             });
 
-            // Lấy phương thức thanh toán từ request
-            $paymentMethod = $validated['payment_method'] ?? 'Thanh toán khi nhận hàng'; // Giá trị mặc định nếu không có
+            // Lấy phương thức thanh toán và số điện thoại từ request
+            $paymentMethod = $validated['payment_method'] ?? '1'; // Giá trị mặc định nếu không có
+            $phone = $validated['phone'];  // Lấy số điện thoại từ request
 
             // Tạo đơn hàng mới
             $order = Order::create([
@@ -51,6 +52,7 @@ class OrderController extends Controller
                 'status' => 0, // Trạng thái mặc định là đang xử lý
                 'user_id' => $userId,
                 'payment_method' => $paymentMethod, // Lưu phương thức thanh toán
+                'phone' => $phone, // Lưu số điện thoại
             ]);
 
             // Lưu sản phẩm vào chi tiết đơn hàng và trừ số lượng kho
@@ -95,6 +97,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
 
     // Xem danh sách đơn hàng
     public function index(Request $request)
