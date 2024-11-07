@@ -2,48 +2,26 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Order;
-use App\Mail\Admin\ReportReadyMail;
+use App\Exports\Admin\ReportExport;
+use App\Jobs\Admin\ExportReportJob;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\OrdersExport;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Controller;
 
 class ReportExportController extends Controller
 {
     /**
-     * Xuất báo cáo đơn hàng.
-     *
-     * @return \Illuminate\Http\Response
+     * Xuất báo cáo thống kê đơn hàng có trạng thái 3 và gửi qua email.
      */
-    public function export()
+    public function export(Request $request)
     {
-        // Xuất báo cáo đơn hàng thành file Excel
-        $fileName = 'orders_report_' . now()->format('Y_m_d_H_i_s') . '.xlsx';
-        $filePath = storage_path('app/reports/' . $fileName);
+        // Lấy email của người dùng đã đăng nhập
+        $userEmail = $request->user()->email;
 
-        // Lưu file Excel vào thư mục báo cáo
-        Excel::store(new OrdersExport, 'reports/' . $fileName);
+        // Dispatch công việc export báo cáo vào queue
+        ExportReportJob::dispatch($userEmail);
 
-        // Gửi email thông báo với file đính kèm
-        $this->sendReportReadyEmail($filePath);
-
-        // Trả về thông báo thành công
-        return response()->json([
-            'message' => 'Báo cáo đã được xuất và gửi qua email.',
-        ]);
-    }
-
-    /**
-     * Gửi email thông báo báo cáo đã sẵn sàng.
-     *
-     * @param string $filePath
-     * @return void
-     */
-    protected function sendReportReadyEmail($filePath)
-    {
-        // Gửi email cho người dùng với file báo cáo đính kèm
-        Mail::to('user@example.com')->send(new ReportReadyMail($filePath));
+        // Trả về phản hồi cho người dùng
+        return response()->json(['message' => 'Báo cáo đang được tạo và sẽ gửi qua email.']);
     }
 }

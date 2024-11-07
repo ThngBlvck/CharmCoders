@@ -26,9 +26,12 @@ class ExportReportJob implements ShouldQueue
 
     public function handle()
     {
-        $filePath = 'reports/admin_report_' . now()->timestamp . '.xlsx';
-        Excel::store(new ReportExport, $filePath, 'public');
+        // Tạo file Excel dưới dạng dữ liệu thô trong bộ nhớ
+        $excelData = Excel::raw(new ReportExport, \Maatwebsite\Excel\Excel::XLSX);
 
-        Mail::to($this->userEmail)->send(new ReportReadyMail($filePath));
+        // Gửi email với file Excel đính kèm
+        $adminEmail = 'admin@example.com';
+        Mail::to($adminEmail)->send(new ReportReadyMail($excelData));
     }
+
 }
