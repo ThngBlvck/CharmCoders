@@ -97,9 +97,6 @@ Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 
 // Password reset routes
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'Register']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 
 
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
