@@ -13,7 +13,8 @@ use App\Http\Controllers\Admin\{
     ImageController,
     CartController,
     ProductController,
-    UserController
+    UserController,
+    ReportExportController
 };
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
@@ -53,8 +54,7 @@ Route::prefix('admin')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
     });
-
-    Route::apiResource('orders', OrderController::class);
+    Route::middleware('auth:api')->post('request-export-report', [ReportExportController::class, 'export']);
     Route::apiResource('employee', UserController::class);
 });
 
