@@ -19,7 +19,6 @@ use App\Http\Controllers\Admin\{
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
     MailController,
-    VNPAYController,
     ProductController as ClientProductController,
     CheckoutController,
     CartController as CartClient,
@@ -77,8 +76,8 @@ Route::prefix('client')->group(function () {
     });
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::post('/contact/send', [MailController::class, 'sendMail']);
+    Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
     // Route để yêu cầu đặt lại mật khẩu qua API
 
 
