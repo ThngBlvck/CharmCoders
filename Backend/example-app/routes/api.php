@@ -90,6 +90,9 @@ Route::prefix('client')->group(function () {
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::post('/contact/send', [MailController::class, 'send']);
+
+    //profile user
+    Route::put('/profile/{id}', [UserController::class, 'profile'])->middleware('auth:api');
 });
 
 // General user route (outside of client prefix)
@@ -106,9 +109,6 @@ Route::middleware('auth:api')->apiResource('comments', CommentController::class)
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
-//login goog
-Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
 
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\Client\UpdateUserProfileRequest;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -91,6 +92,26 @@ class UserController extends Controller
         $user->update($validatedData);
 
         return response()->json($user);
+    }
+
+    public function profile(UpdateUserProfileRequest $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $validatedData = $request->validated();
+       
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time(). '_'. $image->getClientOriginalName();
+            $image->storeAs('public/images/users', $imageName);
+            $validatedData['image'] = asset('storage/images/users/'. $imageName);
+        } else {
+            $validatedData['image'] = $user->image;
+        }
+
+        $user->update($validatedData);
+
+        return response()->json($user);
+
     }
 
     public function getUser(Request $request)
