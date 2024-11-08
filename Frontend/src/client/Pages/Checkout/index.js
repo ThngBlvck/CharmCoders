@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {getUserInfo} from "../../../services/User";
-import {checkout} from '../../../services/Checkout';
+import {checkout, vnPayCheckout} from '../../../services/Checkout';
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -244,74 +244,101 @@ export default function Checkout() {
         });
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault(); // Ngăn chặn hành động mặc định của form
+        const handleSubmit = async (event) => {
+            event.preventDefault();
 
-        const totalAmount = calculateTotal();
+            const totalAmount = calculateTotal();
 
-        // Reset errors
-        const newErrors = {};
+            // Reset errors
+            const newErrors = {};
 
-        // Kiểm tra Họ và Tên
-        if (!formData.name.trim()) {
-            newErrors.name = "Họ và Tên không được để trống.";
-        }
+            // Validation for Name
+            if (!formData.name.trim()) {
+                newErrors.name = "Họ và Tên không được để trống.";
+            }
 
-        // Kiểm tra Email
-        if (!formData.email.trim()) {
-            newErrors.email = "Email không được để trống.";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "Email không đúng định dạng.";
-        }
+            // Validation for Email
+            if (!formData.email.trim()) {
+                newErrors.email = "Email không được để trống.";
+            } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+                newErrors.email = "Email không đúng định dạng.";
+            }
 
-        // Kiểm tra Số điện thoại
-        if (!formData.phone.trim()) {
-            newErrors.phone = "Số điện thoại không được để trống.";
-        } else if (!/^\d{10}$/.test(formData.phone)) {
-            newErrors.phone = "Số điện thoại phải có 10 chữ số.";
-        }
+            // Validation for Phone
+            if (!formData.phone.trim()) {
+                newErrors.phone = "Số điện thoại không được để trống.";
+            } else if (!/^\d{10}$/.test(formData.phone)) {
+                newErrors.phone = "Số điện thoại phải có 10 chữ số.";
+            }
 
-        // Kiểm tra Địa chỉ
-        const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
-        if (!formData.address?.trim()) {
-            newErrors.address = "Vui lòng nhập địa chỉ nhà.";
-        } else if (!wardName || !districtName || !provinceName) {
-            newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
-        }
+            // Validation for Address
+            const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
+            if (!formData.address?.trim()) {
+                newErrors.address = "Vui lòng nhập địa chỉ nhà.";
+            } else if (!wardName || !districtName || !provinceName) {
+                newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+            }
 
-        setErrors(newErrors);
+            setErrors(newErrors);
 
-        // Nếu có lỗi, dừng xử lý
-        if (Object.keys(newErrors).length > 0) {
-            return;
-        }
+            // Stop if there are validation errors
+            if (Object.keys(newErrors).length > 0) return;
 
-        // Tạo một object mới chứa dữ liệu để gửi lên server
-        const orderData = {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            address: fullAddress, // Sử dụng địa chỉ đã nối
-            paymentMethod: formData.paymentMethod,
-            total_amount: totalAmount,
+            // Ensure cart_item_ids are provided correctly
+            const cartItemIds = []; // Populate this with the actual cart item IDs
+
+            const orderData = {
+                cart_item_ids: cartItemIds,
+                address: fullAddress,
+                payment_method: formData.paymentMethod, // Ensure this matches the backend expected input
+            };
+
+            console.log(orderData); // Log the orderData to debug
+
+            try {
+                const result = await checkout(orderData);
+
+                // Only handle success
+                if (result.url) {
+                    console.log("Redirecting to payment URL:", result.url); // Check the URL
+                    // Show a success message
+                    Swal.fire({
+                        title: "Thành công",
+                        text: "Bạn sẽ được chuyển đến trang thanh toán VNPay.",
+                        icon: "success",
+                        timer: 2000, // Duration in milliseconds
+                        showConfirmButton: false,
+                    });
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        window.location.href = result.url; // Redirect to the VNPay payment page
+                    }, 2000);
+                } else {
+                    console.error("No payment URL returned:", result); // Log if no URL is returned
+                }
+            } catch (error) {
+                console.error("Checkout error:", error); // Log the error for debugging
+                Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình thanh toán.", "error");
+            }
         };
-        console.log(orderData)
 
-        // Kiểm tra xem địa chỉ có phải là chuỗi không
-        if (typeof orderData.address !== "string" || orderData.address.length === 0) {
-            setMessage("Địa chỉ phải là chuỗi ký tự.");
-            return; // Dừng lại nếu địa chỉ không hợp lệ
-        }
 
-        // Gọi hàm checkout với dữ liệu đã chuẩn bị
-        try {
-            const result = await checkout(orderData);
-            Swal.fire('Thành công', 'Thanh toán thành công.', 'success');
-            navigate(`/order-list`);
-        } catch (error) {
-            Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
-        }
-    };
+
+    // const handleVnpayPayment = async () => {
+    //     try {
+    //         const response = await fetch('/api/vnpay/create', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({ amount: calculateTotal() }),
+    //         });
+    //         const data = await response.json();
+    //         if (data.paymentUrl) {
+    //             window.location.href = data.paymentUrl;
+    //         }
+    //     } catch (error) {
+    //         console.error("Payment error:", error);
+    //     }
+    // };
 
     const handleMomoPayment = async () => {
         try {
@@ -554,12 +581,12 @@ export default function Checkout() {
                                             type="radio"
                                             className="form-check-input"
                                             name="paymentMethod"
-                                            value="creditCard"
-                                            checked={formData.paymentMethod === "creditCard"}
+                                            value="vnpay"
+                                            checked={formData.paymentMethod === "vnpay"}
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label" style={{color: "#8c5e58"}}>
-                                            <i className="fas fa-credit-card fa-2x"></i> Credit card
+                                            <i className="fas fa-globe fa-2x"></i> VNPay
                                         </label>
                                     </div>
                                 </div>
