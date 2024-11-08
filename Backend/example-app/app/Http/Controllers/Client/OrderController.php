@@ -66,6 +66,8 @@ class OrderController extends Controller
 
                 // Trừ số lượng sản phẩm trong kho
                 $product->decrement('quantity', $item->quantity);
+                // $product->increment('purchase_count', $item->quantity);
+
 
                 return [
                     'order_id' => $order->id,
