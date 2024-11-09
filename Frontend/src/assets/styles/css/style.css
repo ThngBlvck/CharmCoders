@@ -972,33 +972,6 @@
     transform: scale(1.05); /* Hiệu ứng phóng to nhẹ khi hover */
 }
 
-.carousel-control-prev,
-.carousel-control-next {
-    background-color: rgba(0, 0, 0, 0.3); /* Nền nút điều hướng */
-}
-
-.slick-arrow.slick-prev,
-.slick-arrow.slick-next {
-    display: none !important; /* Ẩn mũi tên mặc định */
-}
-
-.custom-next-arrow,
-.custom-prev-arrow {
-    display: block !important; /* Bảo đảm mũi tên tùy chỉnh được hiển thị */
-    position: absolute;
-    z-index: 2; /* Đảm bảo mũi tên nằm trên slider */
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 24px;
-    cursor: pointer;
-}
-.custom-next-arrow {
-    right: 10px; /* Vị trí bên phải cho mũi tên next */
-}
-
-.custom-prev-arrow {
-    left: 10px; /* Vị trí bên trái cho mũi tên prev */
-}
 /* Điều chỉnh màu chữ tiêu đề cho SweetAlert2 */
 .swal2-title-custom {
     color: #8c5e58; /* Đặt màu tiêu đề phù hợp với màu trang của bạn */

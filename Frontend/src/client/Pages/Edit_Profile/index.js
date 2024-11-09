@@ -123,17 +123,6 @@ export default function Edit_Profile() {
                                         onChange={handleChange}
                                     />
                                 </div>
-                                <div className="form-group mb-4">
-                                    <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                           className="font-semibold mb-2">Số điện thoại:</label>
-                                    <input
-                                        type="tel"
-                                        className="form-control"
-                                        name="phone"
-                                        value={user.phone}
-                                        onChange={handleChange}
-                                    />
-                                </div>
                                 <button className="btn btn-primary w-100 mt-3 font-semibold" type="submit"
                                         style={{color: '#442e2b', fontSize: "20px"}}>
                                     Lưu thay đổi

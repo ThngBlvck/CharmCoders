@@ -28,6 +28,14 @@ export const deleteCart = (id) => {
     });
 };
 
+export const updateCart = (id, quantity) => {
+    return request({
+        method: 'PUT',
+        path: `${URL_Cart}/${id}`,
+        data: { quantity }
+    });
+};
+
 export const getCartsByIds = (ids) => {
     const idsParam = ids.join(','); // nối các id thành một chuỗi, ngăn cách bằng dấu phẩy
     return request({
