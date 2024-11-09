@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\Client\UpdateUserProfileRequest;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\Client\ChangePasswordRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -127,4 +129,32 @@ class UserController extends Controller
             'role' => $request->user()->role_id, // Nếu có
         ]);
     }
+
+    public function changePassword(ChangePasswordRequest $request)
+{
+    $user = Auth::user();
+
+    // Nếu người dùng có tài khoản xã hội, không cho phép đổi mật khẩu
+    if ($user->auth_provider !== null) {
+        return response()->json([
+            'error' => 'Không thể thay đổi mật khẩu cho tài khoản đăng nhập qua mạng xã hội.',
+        ], 400);
+    }
+
+    // Kiểm tra mật khẩu hiện tại
+    if (!Hash::check($request->current_password, $user->password)) {
+        return response()->json([
+            'error' => 'Mật khẩu hiện tại không chính xác.',
+        ], 400);
+    }
+
+    // Cập nhật mật khẩu mới
+    $user->password = bcrypt($request->password);
+    $user->save();
+
+    return response()->json([
+        'message' => 'Mật khẩu đã được thay đổi thành công.',
+    ], 200);
+}
+
 }

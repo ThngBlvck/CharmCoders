@@ -18,43 +18,43 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $user = Auth::user();
-            $user->tokens->each(function ($token, $key) {
+        // Kiểm tra tài khoản bình thường (không có auth_provider)
+        $user = User::where('email', $request->email)
+                    ->whereNull('auth_provider') // Chỉ tìm tài khoản bình thường
+                    ->first();
+    
+        if (!$user) {
+            // Nếu không tìm thấy tài khoản, trả về lỗi
+            return response([
+                'message' => 'Tài khoản không tồn tại'
+            ], 404);
+        }
+    
+        // Kiểm tra mật khẩu so với mật khẩu đã băm trong cơ sở dữ liệu
+        if (Hash::check($request->password, $user->password)) {
+            // Nếu mật khẩu đúng, tạo token mới
+            $user->tokens->each(function ($token) {
                 $token->delete();
             });
-            if ($user->role_id == 2) {
-                // Admin
-                $token = $user->createToken('AdminToken', ['admin'])->accessToken;
-                return response([
-                    'message' => 'Đăng nhập thành công',
-                    'token' => $token,
-                    'role' => 'admin',
-                ], 200);
-            } elseif ($user->role_id == 1) {
-                // User
-                $token = $user->createToken('UserToken', ['user'])->accessToken;
-                return response([
-                    'message' => 'Đăng nhập thành công',
-                    'token' => $token,
-                    'role' => 'user',
-                ], 200);
-            } elseif ($user->role_id == 3) {
-                // Employee
-                $token = $user->createToken('EmployeeToken', ['employee'])->accessToken;
-                return response([
-                    'message' => 'Đăng nhập thành công',
-                    'token' => $token,
-                    'role' => 'employee',
-                ], 200);
-            }
+    
+            $token = $user->createToken('UserToken', ['user'])->accessToken;
+    
+            return response([
+                'message' => 'Đăng nhập thành công',
+                'token' => $token,
+                'role' => 'user',
+            ], 200);
         }
-
+    
+        // Nếu mật khẩu sai
         return response([
-            'message' => 'Đăng nhập không thành công'
+            'message' => 'Mật khẩu không đúng'
         ], 401);
     }
-
+    
+    
+    
+    
     public function Register(RegisterRequest $request)
     {
         try {
@@ -78,21 +78,25 @@ class AuthController extends Controller
     }
 
     public function logout(Request $request)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user(); // Lấy người dùng hiện tại
 
-        if ($user) {
-            $user->token()->revoke();
-
-            return response()->json([
-                'message' => 'Đăng xuất thành công',
-            ], 200);
-        }
+    if ($user) {
+        // Xóa tất cả các token của người dùng
+        $user->tokens->each(function ($token) {
+            $token->delete();
+        });
 
         return response()->json([
-            'message' => 'Không tìm thấy người dùng hoặc người dùng chưa đăng nhập',
-        ], 401);
+            'message' => 'Đăng xuất thành công',
+        ], 200);
     }
+
+    return response()->json([
+        'message' => 'Không tìm thấy người dùng hoặc người dùng chưa đăng nhập',
+    ], 401);
+}
+
 
 
 

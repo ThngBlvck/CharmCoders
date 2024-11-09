@@ -94,6 +94,8 @@ Route::prefix('client')->group(function () {
     Route::put('/profile', [UserController::class, 'profile'])->middleware('auth:api');
     //adress
     Route::apiResource('/address', AddressController::class)->middleware('auth:api');
+    //change password
+    Route::put('/changepassword', [UserController::class, 'changePassword'])->middleware('auth:api');
 });
 
 // General user route (outside of client prefix)
