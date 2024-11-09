@@ -331,7 +331,7 @@ const handleLogout = () => {
                                                 <NavLink to="/order-list" onClick={() => setIsDropdownOpen(false)}>
                                                     <button className="dropdown-item modal-item"
                                                             style={{color: "#8c5e58"}}>
-                                                        <i className="fas fa-file-alt me-2"></i>Quản lý đơn hàng
+                                                        <i className="fas fa-box me-2"></i>Đơn hàng đã đặt
                                                     </button>
                                                 </NavLink>
                                             </li>

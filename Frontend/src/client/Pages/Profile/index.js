@@ -78,7 +78,7 @@ export default function Profile() {
                         </div>
                         <div className="text-center">
                             <p style={{color: "#8c5e58"}} className="font-semibold">{user.name}</p>
-                            <NavLink to={`/edit_profile`}>
+                            <NavLink to={`/edit-profile`}>
                                 <button className="btn btn-primary mt-3 font-semibold" style={{color: '#442e2b'}}>
                                     Chỉnh sửa hồ sơ
                                 </button>
