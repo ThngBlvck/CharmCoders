@@ -30,10 +30,10 @@ class ReportReadyMail extends Mailable
     public function build()
     {
         return $this->subject('Báo cáo đã sẵn sàng')
-            ->view('emails.admin.report_ready')  // Thư mục 'admin'
-            ->attach($this->filePath, [
-                'as' => 'report.xlsx',
+            ->view('emails.admin.report_ready')
+            ->attachData($this->filePath, 'report.xlsx', [
                 'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ]);
     }
+
 }

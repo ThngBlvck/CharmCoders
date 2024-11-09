@@ -8,20 +8,18 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('payment_method')->nullable(); // Thêm cột payment_method
+            $table->string('phone')->nullable();  // Thêm cột phone, có thể để trống.
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('payment_method'); // Xóa cột payment_method nếu cần
+            $table->dropColumn('phone');  // Xóa cột phone nếu rollback migration.
         });
     }
+
 };

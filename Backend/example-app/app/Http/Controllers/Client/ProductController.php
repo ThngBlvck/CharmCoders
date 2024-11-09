@@ -42,4 +42,23 @@ class ProductController extends Controller
             'products' => $products,
         ], 200);
     }
+
+    public function getRelatedProducts($id)
+    {
+        // Lấy sản phẩm theo id
+        $product = Product::findOrFail($id);
+
+        // Lấy các sản phẩm cùng danh mục và cùng thương hiệu, loại trừ sản phẩm hiện tại
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('brand_id', $product->brand_id)  // Thêm điều kiện brand_id
+            ->where('id', '!=', $product->id)  // Loại trừ sản phẩm hiện tại
+            ->get(['id', 'name', 'image', 'unit_price', 'sale_price']);
+
+        // Trả về JSON
+        return response()->json([
+            'product' => $product,  // Trả về sản phẩm chi tiết
+            'related_products' => $relatedProducts,  // Trả về các sản phẩm liên quan
+        ]);
+    }
+
 }

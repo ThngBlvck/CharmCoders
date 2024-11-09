@@ -11,19 +11,19 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     // Hiển thị danh sách sản phẩm
-   public function index()
-       {
-           $products = Product::leftJoin('categories', 'products.category_id', '=', 'categories.id')
-               ->select('products.*', 'categories.name as category_name')
-               ->get();
+    public function index()
+    {
+        $products = Product::leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->select('products.*', 'categories.name as category_name')
+            ->get();
 
-           $products->transform(function ($product) {
-               $product->category_name = $product->category_name ?? 'Chưa phân loại';
-               return $product;
-           });
+        $products->transform(function ($product) {
+            $product->category_name = $product->category_name ?? 'Chưa phân loại';
+            return $product;
+        });
 
-           return response()->json($products);
-       }
+        return response()->json($products);
+    }
 
 
 
@@ -48,8 +48,10 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::findOrFail($id);
-        $product->views = $product->views + 1;
-        $product->save();
+
+        // Tăng lượt xem sử dụng phương thức increment()
+        $product->increment('views');
+
         return response()->json($product);
     }
 
@@ -93,27 +95,27 @@ class ProductController extends Controller
     // Chức năng tìm kiếm sản phẩm
     public function search(Request $request)
     {
-    // Lấy từ khóa tìm kiếm từ request
-    $query = $request->input('query');
-    $perPage = 10; // số lượng sản phẩm mỗi trang
-    $currentPage = $request->input('page', 1); // số trang hiện tại, mặc định là 1
+        // Lấy từ khóa tìm kiếm từ request
+        $query = $request->input('query');
+        $perPage = 10; // số lượng sản phẩm mỗi trang
+        $currentPage = $request->input('page', 1); // số trang hiện tại, mặc định là 1
 
-    // Nếu không có từ khóa tìm kiếm, hiển thị tất cả sản phẩm
-    if (!$query) {
-        $products = Product::paginate($perPage);
-    } else {
-        // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
-        $products = Product::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('content', 'LIKE', "%{$query}%")
-            ->orWhere('unit_price', 'LIKE', "%{$query}%")
-            ->paginate($perPage); // Phân trang cho kết quả tìm kiếm
-    }
+        // Nếu không có từ khóa tìm kiếm, hiển thị tất cả sản phẩm
+        if (!$query) {
+            $products = Product::paginate($perPage);
+        } else {
+            // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
+            $products = Product::where('name', 'LIKE', "%{$query}%")
+                ->orWhere('content', 'LIKE', "%{$query}%")
+                ->orWhere('unit_price', 'LIKE', "%{$query}%")
+                ->paginate($perPage); // Phân trang cho kết quả tìm kiếm
+        }
 
-    // Biến đổi kết quả để gán 'Chưa phân loại' nếu không có category_name
-    $products->getCollection()->transform(function ($product) {
-        $product->category_name = $product->category_name ?? 'Chưa phân loại';
-        return $product;
-    });
+        // Biến đổi kết quả để gán 'Chưa phân loại' nếu không có category_name
+        $products->getCollection()->transform(function ($product) {
+            $product->category_name = $product->category_name ?? 'Chưa phân loại';
+            return $product;
+        });
         // Trả về danh sách sản phẩm phù hợp hoặc tất cả sản phẩm
         return response()->json([
             'success' => true,
