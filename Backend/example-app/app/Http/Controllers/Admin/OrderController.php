@@ -7,19 +7,22 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 class OrderController extends Controller
 {
-    public function index(Request $request)
-    {
-        // Lấy tất cả danh sách đơn hàng kèm theo tên người dùng
-        $orders = Order::with('user:id,name')
-            ->orderBy('created_at', 'desc')
-            ->get();
-        // Trả về danh sách đơn hàng dưới dạng JSON
-        return response()->json([
-            'data' => $orders,
-            'message' => 'Danh sách đơn hàng được lấy thành công.',
-        ], 200);
-    }
+    public function index()
+           {
+               // Lấy danh sách đơn hàng kết hợp với thông tin người dùng (dùng leftJoin)
+               $orders = Order::leftJoin('users', 'orders.user_id', '=', 'users.id')
+                   ->select('orders.*', 'users.name as user_name') // Chọn tất cả thông tin đơn hàng và tên người dùng
+                   ->get();
 
+               // Xử lý dữ liệu nếu cần, ví dụ, nếu tên người dùng không có thì gán giá trị mặc định
+               $orders->transform(function ($order) {
+                   $order->user_name = $order->user_name ?? 'Người dùng không xác định'; // Gán tên mặc định nếu không có tên người dùng
+                   return $order;
+               });
+
+               // Trả về danh sách đơn hàng dưới dạng JSON
+               return response()->json($orders);
+           }
     public function show($id)
     {
         // Tìm đơn hàng theo ID, bao gồm các sản phẩm trong đơn hàng
