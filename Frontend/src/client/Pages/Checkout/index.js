@@ -243,88 +243,122 @@ export default function Checkout() {
             [name]: value,
         });
     };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-        const handleSubmit = async (event) => {
-            event.preventDefault();
+        // Calculate the total amount
+        const totalAmount = calculateTotal();
+        const validationErrors = {};
 
-            const totalAmount = calculateTotal();
+        // Validate Name
+        if (!formData.name.trim()) {
+            validationErrors.name = "Họ và Tên không được để trống.";
+        }
 
-            // Reset errors
-            const newErrors = {};
+        // Validate Email
+        if (!formData.email.trim()) {
+            validationErrors.email = "Email không được để trống.";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            validationErrors.email = "Email không đúng định dạng.";
+        }
 
-            // Validation for Name
-            if (!formData.name.trim()) {
-                newErrors.name = "Họ và Tên không được để trống.";
-            }
+        // Validate Phone
+        if (!formData.phone.trim()) {
+            validationErrors.phone = "Số điện thoại không được để trống.";
+        } else if (!/^\d{10}$/.test(formData.phone)) {
+            validationErrors.phone = "Số điện thoại phải có 10 chữ số.";
+        }
 
-            // Validation for Email
-            if (!formData.email.trim()) {
-                newErrors.email = "Email không được để trống.";
-            } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-                newErrors.email = "Email không đúng định dạng.";
-            }
+        // Validate Address
+        if (!formData.address?.trim()) {
+            validationErrors.address = "Vui lòng nhập địa chỉ nhà.";
+        }
 
-            // Validation for Phone
-            if (!formData.phone.trim()) {
-                newErrors.phone = "Số điện thoại không được để trống.";
-            } else if (!/^\d{10}$/.test(formData.phone)) {
-                newErrors.phone = "Số điện thoại phải có 10 chữ số.";
-            }
+        if (!wardName || !districtName || !provinceName) {
+            validationErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+        }
 
-            // Validation for Address
-            const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
-            if (!formData.address?.trim()) {
-                newErrors.address = "Vui lòng nhập địa chỉ nhà.";
-            } else if (!wardName || !districtName || !provinceName) {
-                newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
-            }
+        setErrors(validationErrors);
+        if (Object.keys(validationErrors).length > 0) return;
 
-            setErrors(newErrors);
+        // Get cartItemIds from the query params
+        const cartIds = queryParams.get('cartIds')?.split(',') || [];
 
-            // Stop if there are validation errors
-            if (Object.keys(newErrors).length > 0) return;
+        if (cartIds.length === 0) {
+            Swal.fire("Lỗi", "Không có sản phẩm trong giỏ hàng.", "error");
+            return;
+        }
 
-            // Ensure cart_item_ids are provided correctly
-            const cartItemIds = []; // Populate this with the actual cart item IDs
+        // Fetch cart items if needed
+        await fetchCartsByIds(cartIds);
 
-            const orderData = {
-                cart_item_ids: cartItemIds,
-                address: fullAddress,
-                payment_method: formData.paymentMethod, // Ensure this matches the backend expected input
-            };
-
-            console.log(orderData); // Log the orderData to debug
-
-            try {
-                const result = await checkout(orderData);
-
-                // Only handle success
-                if (result.url) {
-                    console.log("Redirecting to payment URL:", result.url); // Check the URL
-                    // Show a success message
-                    Swal.fire({
-                        title: "Thành công",
-                        text: "Bạn sẽ được chuyển đến trang thanh toán VNPay.",
-                        icon: "success",
-                        timer: 2000, // Duration in milliseconds
-                        showConfirmButton: false,
-                    });
-                    // Redirect after a short delay
-                    setTimeout(() => {
-                        window.location.href = result.url; // Redirect to the VNPay payment page
-                    }, 2000);
-                } else {
-                    console.error("No payment URL returned:", result); // Log if no URL is returned
-                }
-            } catch (error) {
-                console.error("Checkout error:", error); // Log the error for debugging
-                Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình thanh toán.", "error");
-            }
+        // Prepare the order data
+        const orderData = {
+            cartItemIds: cartIds,  // Ensure cartIds are passed as an array
+            address: `${formData.address?.trim()}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim(),
+            paymentMethod: formData.paymentMethod,  // Using selected payment method from radio buttons
         };
 
+        try {
+            // Handle payment based on the selected method
+            if (orderData.paymentMethod === "cashOnDelivery") {
+                // Handle Cash on Delivery logic (you can add specific actions here)
+                Swal.fire({
+                    title: "Thanh toán khi nhận hàng",
+                    text: "Đơn hàng của bạn sẽ được giao tận nơi và thanh toán khi nhận hàng.",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+                // Redirect to order summary or success page
+                setTimeout(() => {
+                    window.location.href = "/order-summary";  // Redirect to order summary page or similar
+                }, 2000);
+            } else if (orderData.paymentMethod === "momo") {
+                // Handle MoMo payment method
+                const result = await makeMomoPayment(orderData.cartItemIds, orderData.address);
+                if (result && result.url) {
+                    Swal.fire({
+                        title: "Thành công",
+                        text: "Bạn sẽ được chuyển đến trang thanh toán MoMo.",
+                        icon: "success",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+                    setTimeout(() => {
+                        window.location.href = result.url; // Redirect to MoMo payment page
+                    }, 2000);
+                } else {
+                    Swal.fire("Lỗi", "Không có URL thanh toán MoMo trả về.", "error");
+                }
+            } else if (orderData.paymentMethod === "vnpay") {
+                // Handle VNPay payment method
+                const result = await vnPayCheckout(orderData.cartItemIds, orderData.address, orderData.paymentMethod);
+                if (result && result.url) {
+                    Swal.fire({
+                        title: "Thành công",
+                        text: "",
+                        icon: "success",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+                    setTimeout(() => {
+                        window.location.href = result.url; // Redirect to VNPay payment page
+                    }, 2000);
+                } else {
+                    Swal.fire("Lỗi", "Không có URL thanh toán VNPay trả về.", "error");
+                }
+            } else {
+                Swal.fire("Lỗi", "Phương thức thanh toán không hợp lệ.", "error");
+            }
+        } catch (error) {
+            Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình thanh toán.", "error");
+        }
+    };
 
 
-    // const handleVnpayPayment = async () => {
+
+    // const handleVnpayPayment = async () => {php
     //     try {
     //         const response = await fetch('/api/vnpay/create', {
     //             method: 'POST',
