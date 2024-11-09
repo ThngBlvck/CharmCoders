@@ -2,10 +2,11 @@ import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/bootstrap.min.css";
 import {NavLink, useNavigate, useLocation} from "react-router-dom";
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import {deleteCart, getCart} from "../../../services/Cart";
+import {deleteCart, getCart, updateCart} from "../../../services/Cart";
 import {getOneProduct} from "../../../services/Comment";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Swal from 'sweetalert2';
+import debounce from 'lodash.debounce';
 
 export default function Cart() {
     const [products, setProducts] = useState([]);
@@ -92,10 +93,6 @@ export default function Cart() {
             .reduce((total, item) => total + (item.price ? item.price * item.quantity : 0), 0); // Thành tiền = Giá tiền * Số lượng
     };
 
-    const updateQuantity = (id, newQuantity) => {
-        setProducts(products.map(item => item.id === id ? {...item, quantity: newQuantity} : item));
-    };
-
     const removeItem = async (id) => {
         try {
             await deleteCart(id); // Gọi API để xóa sản phẩm khỏi cơ sở dữ liệu
@@ -142,6 +139,35 @@ export default function Cart() {
         }
     };
 
+    const updateQuantity = async (id, quantity) => {
+        // Cập nhật số lượng trong state ngay lập tức mà không cần load lại trang
+        setProducts(prevProducts =>
+            prevProducts.map(product =>
+                product.id === id ? { ...product, quantity } : product
+            )
+        );
+
+        // Cập nhật số lượng trên server sau một khoảng thời gian (debounce)
+        debouncedUpdateQuantity(id, quantity);
+    };
+
+    // Hàm debounce để chỉ gọi API khi người dùng ngừng thay đổi trong một khoảng thời gian
+    const debouncedUpdateQuantity = debounce(async (id, quantity) => {
+        try {
+            // Gọi API để cập nhật số lượng sản phẩm trong giỏ hàng
+            await updateCart(id, quantity);
+            console.log("Đã cập nhật số lượng thành công");
+        } catch (error) {
+            console.error("Lỗi khi cập nhật số lượng:", error);
+        }
+    }, 500); // 500ms debounce delay (bạn có thể điều chỉnh thời gian này)
+
+    const handleQuantityChange = (e, id) => {
+        const newQuantity = parseInt(e.target.value);
+        if (newQuantity > 0) {
+            updateQuantity(id, newQuantity);
+        }
+    };
 
     const handleBuy = () => {
         if (selectedItems.length === 0) {
@@ -260,7 +286,7 @@ export default function Cart() {
                                             type="number"
                                             min="1"
                                             value={item.quantity}
-                                            onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                                            onChange={(e) => handleQuantityChange(e, item.id)} // Thay đổi sự kiện onChange
                                             style={{
                                                 width: "60px",
                                                 padding: "5px",

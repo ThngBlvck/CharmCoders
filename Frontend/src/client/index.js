@@ -27,6 +27,7 @@ import Add_Address from "./Pages/Address/Add_Address";
 import Edit_Address from "./Pages/Edit_Profile";
 
 import GoogleCallback from "./Pages/GoogleCallback";
+import OrderDetail from "./Pages/Order_Detail";
 
 
 export default function Client() {
@@ -45,6 +46,7 @@ export default function Client() {
                     <Route path="/products" element={<Products/>}/>
                     <Route path="/products/:id" element={<ProductDetail/>}/>
                     <Route path="/profile" element={<Profile/>}/>
+                    <Route path="/edit-profile" element={<Edit_Profile/>}/>
                     <Route path="/cart" element={<Cart/>}/>
                     <Route path="/checkout" element={<Checkout/>} />
 
@@ -55,6 +57,7 @@ export default function Client() {
                     <Route path="/forgot-password" element={<ForgotPassword/>}/>
                     <Route path="/otp-password" element={<VerifyOtp/>}/>
                     <Route path="/ordered" element={<Ordered/>} />
+                    <Route path="/order/:id" element={<OrderDetail/>} />
                     <Route path="/order-list" element={<OrderManagement/>} />
                     <Route path="/order-history" element={<OrderHistory/>} />
                     <Route path="/post" element={<Post/>} />

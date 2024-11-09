@@ -73,7 +73,7 @@ export default function Contact() {
                 </div>
             </div>
 
-            <div className="container-fluid contact py-5" style={{ backgroundColor: "#f8c7c2", marginTop: "2rem" }}>
+            <div className="container-fluid contact py-5" style={{ backgroundColor: "white", marginTop: "2rem" }}>
                 <div className="container pt-1">
                     <div className="row g-4 align-items-center">
                         <div className="col-lg-6">
