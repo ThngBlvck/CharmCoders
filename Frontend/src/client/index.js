@@ -27,6 +27,7 @@ import Add_Address from "./Pages/Address/Add_Address";
 import Edit_Address from "./Pages/Edit_Profile";
 
 import GoogleCallback from "./Pages/GoogleCallback";
+import OrderDetail from "./Pages/Order_Detail";
 import FacebookCallback from "./Pages/FacebookCallback";
 import OrderDetail from "./Pages/Order_Detail";
 
