@@ -23,7 +23,8 @@ use App\Http\Controllers\Client\{
     ProductController as ClientProductController,
     CheckoutController,
     CartController as CartClient,
-    PaymentController
+    PaymentController,
+    AddressController 
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -91,6 +92,8 @@ Route::prefix('client')->group(function () {
 
     //profile user
     Route::put('/profile/{id}', [UserController::class, 'profile'])->middleware('auth:api');
+    //adress
+    Route::apiResource('/address', AddressController::class)->middleware('auth:api');
 });
 
 // General user route (outside of client prefix)
