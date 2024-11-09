@@ -63,7 +63,6 @@ class AuthController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'address' => $request->address,
                 'role_id' => 1, // Đặt mặc định là user
             ]);
             $token = $user->createToken('app')->accessToken;
