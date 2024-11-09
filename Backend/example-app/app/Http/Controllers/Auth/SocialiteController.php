@@ -15,10 +15,15 @@ class SocialiteController extends Controller
 {
     public function authProviderRedirect($provider)
     {
-        if (in_array($provider, ['facebook', 'google'])) { // Kiểm tra provider hợp lệ
-            return Socialite::driver($provider)->redirect();
-        }
-        return response()->json(['error' => 'Provider not supported'], 400);
+        $loginUrl = Socialite::driver($provider)
+            ->stateless()
+            ->with(['prompt' => 'select_account']) // Thêm prompt để buộc chọn tài khoản
+            ->redirect()
+            ->getTargetUrl();
+
+        return response()->json([
+            'url' => $loginUrl,
+        ]);
     }
 
 
@@ -27,7 +32,7 @@ class SocialiteController extends Controller
         try {
             if ($provider) {
                 // Sử dụng stateless() để đảm bảo không sử dụng session
-                $socialUser = Socialite::driver($provider)->stateless()->user();
+                $socialUser = Socialite::driver($provider)->stateless()->with(['prompt' => 'select_account']) ->user();
                 \Log::info('Social User Data: ', (array) $socialUser);
 
                 // Đặt giá trị mặc định cho role (nếu cần)
@@ -39,7 +44,6 @@ class SocialiteController extends Controller
                     [
                         'name' => $socialUser->name,
                         'email' => $socialUser->email,
-                        'password' => Hash::make('Password@1234'), // Đặt mật khẩu mặc định
                         'auth_provider' => $provider,
                         'role_id' => $role, // Thiết lập giá trị role mặc định
                     ]

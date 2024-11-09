@@ -4,7 +4,7 @@ const Ad = 'admin/'
 export const getBrand = () => {
     return request({
         method: 'GET',
-        path: `${Ad}brands`
+        path: `${Ad}brands`,
     });
 };
 

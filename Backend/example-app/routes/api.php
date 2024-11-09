@@ -13,7 +13,8 @@ use App\Http\Controllers\Admin\{
     ImageController,
     CartController,
     ProductController,
-    UserController
+    UserController,
+    ReportExportController
 };
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
@@ -22,7 +23,8 @@ use App\Http\Controllers\Client\{
     ProductController as ClientProductController,
     CheckoutController,
     CartController as CartClient,
-    PaymentController
+    PaymentController,
+    AddressController 
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -45,16 +47,13 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('role', RoleController::class);
     Route::apiResource('products', ProductController::class);
     Route::get('/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
-    Route::apiResource('image', ImageController::class);
-
-    Route::get('/search', [ProductController::class, 'search']); // http://localhost:8000/api/client/search?query=teneanpham
+    Route::apiResource('image', ImageController::class);// http://localhost:8000/api/client/search?query=teneanpham
 
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
     });
-
-    Route::apiResource('orders', OrderController::class);
+    Route::middleware('auth:api')->post('request-export-report', [ReportExportController::class, 'export']);
     Route::apiResource('employee', UserController::class);
 });
 
@@ -82,14 +81,19 @@ Route::prefix('client')->group(function () {
     });
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::post('/contact/send', [MailController::class, 'sendMail']);
+    Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
     // Route để yêu cầu đặt lại mật khẩu qua API
 
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::post('/contact/send', [MailController::class, 'send']);
+
+    //profile user
+    Route::put('/profile/{id}', [UserController::class, 'profile'])->middleware('auth:api');
+    //adress
+    Route::apiResource('/address', AddressController::class)->middleware('auth:api');
 });
 
 // General user route (outside of client prefix)
@@ -97,9 +101,6 @@ Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 
 // Password reset routes
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'Register']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 
 
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);

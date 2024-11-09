@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\Models\User;
+
 class ResetPasswordController extends Controller
 {
     // Gửi OTP
@@ -37,11 +38,7 @@ class ResetPasswordController extends Controller
         return response()->json(['message' => 'OTP has been sent to your email'], 200);
     }
 
-    // Xác minh OTP và đặt lại mật khẩu
-    // Xác minh OTP và đặt lại mật khẩu
-
-
-
+    // Xác minh OTP
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -57,8 +54,8 @@ class ResetPasswordController extends Controller
             return response()->json(['message' => 'Invalid OTP'], 400);
         }
 
-        // Kiểm tra nếu OTP đã hết hạn (ví dụ: 10 phút)
-        if (Carbon::parse($otpRecord->created_at)->addMinutes(10)->isPast()) {
+        // Kiểm tra nếu OTP đã hết hạn (1 phút)
+        if (Carbon::parse($otpRecord->created_at)->addMinute()->isPast()) {
             return response()->json(['message' => 'OTP has expired'], 400);
         }
 
@@ -69,15 +66,11 @@ class ResetPasswordController extends Controller
 
         return response()->json([
             'message' => 'OTP verified successfully. Now you can reset the password.',
-            'email' => $otpRecord->email, // Gửi lại email để client biết email đã xác thực
+            'email' => $otpRecord->email,
         ], 200);
     }
 
-
-
-
-
-
+    // Đặt lại mật khẩu
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -94,8 +87,17 @@ class ResetPasswordController extends Controller
             return response()->json(['message' => 'OTP not verified. Please verify your OTP first.'], 400);
         }
 
-        // Đặt lại mật khẩu cho người dùng
+        // Lấy người dùng từ email trong bản ghi OTP
         $user = User::where('email', $otpRecord->email)->first();
+
+        // Kiểm tra nếu người dùng có `auth_provider_id`
+        if (!is_null($user->auth_provider_id)) {
+            return response()->json([
+                'message' => 'Bạn không thể đặt lại mật khẩu cho tài khoản này vì nó được liên kết với nhà cung cấp xác thực bên ngoài.'
+            ], 403);
+        }
+
+        // Đặt lại mật khẩu cho người dùng
         $user->password = Hash::make($request->password);
         $user->save();
 
@@ -104,8 +106,4 @@ class ResetPasswordController extends Controller
 
         return response()->json(['message' => 'Password has been reset successfully'], 200);
     }
-
-
-
-
 }

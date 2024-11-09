@@ -27,6 +27,7 @@ import Add_Address from "./Pages/Address/Add_Address";
 import Edit_Address from "./Pages/Edit_Profile";
 
 import GoogleCallback from "./Pages/GoogleCallback";
+import FacebookCallback from "./Pages/FacebookCallback";
 
 
 export default function Client() {
@@ -61,6 +62,7 @@ export default function Client() {
                     <Route path="/postdetail/:id" element={<PostDetail/>} />
                     <Route path="/404" element={<Page404/>} />
                     <Route path="/auth/google" element={isAuthenticated() ? <Navigate to="/home" />:<GoogleCallback />}></Route>
+                    <Route path="/auth/facebook" element={isAuthenticated() ? <Navigate to="/home" />:<FacebookCallback />}></Route>
 
                     <Route path="/address" element={<List_Address/>} />
                     <Route path="/add-address" element={<Add_Address/>} />
