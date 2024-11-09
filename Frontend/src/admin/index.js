@@ -43,7 +43,8 @@ import EditBrand from "./Pages/Brand/Edit";
 // Other sections
 import Comment from "./Pages/Comment/List";
 import Role from "./Pages/Role/List";
-import Order from "./Pages/Order";
+import Order from "./Pages/Order/List";
+import OrderDetail from "./Pages/Order/OrderDetail";
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
 

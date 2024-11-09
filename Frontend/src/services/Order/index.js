@@ -1,6 +1,7 @@
 import request from '../../api';
 
 const URL_Order = 'client/orders';
+const URL_Order_Admin = 'admin/orders';
 
 export const getOrder = (query = '') => {
     return request({
@@ -17,5 +18,11 @@ export const getOrderById = (id) => {
         method: 'GET',
         path: `${URL_Order}${id}`,
 
+    });
+};
+export const getOrderAdmin = (query = '') => {
+    return request({
+        method: 'GET',
+        path: `${URL_Order_Admin}`,
     });
 };
