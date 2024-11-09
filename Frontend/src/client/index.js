@@ -34,6 +34,7 @@ import FacebookCallback from "./Pages/FacebookCallback";
 
 
 
+
 export default function Client() {
     const isAuthenticated = () => localStorage.getItem('token') !== null;
     const location = useLocation();
