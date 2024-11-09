@@ -3,37 +3,44 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function GoogleCallback() {
+function FacebookCallback() {
     const [loading, setLoading] = useState(true);
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
     const location = useLocation();
-    const navigate = useNavigate(); // dùng để điều hướng
+    const navigate = useNavigate();  // Sử dụng navigate để chuyển hướng
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/auth/google/callback${location.search}`, {
+                const response = await fetch(`http://localhost:8000/api/auth/facebook/callback${location.search}`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     }
                 });
 
+                if (response.status === 404) {
+                    // Chuyển hướng đến trang 404 nếu có lỗi 404
+                    navigate('/404');
+                    return;
+                }
+
                 if (!response.ok) {
-                    throw new Error('Failed to fetch data');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch data');
                 }
 
                 const data = await response.json();
+                setData(data);
 
                 // Lưu token vào localStorage nếu tồn tại và tải lại trang
                 if (data.token) {
                     localStorage.setItem('token', data.token);
-                    window.location.reload();  // Tải lại trang web
-                } else {
-                    throw new Error('Token not found');
+                    window.location.reload();
                 }
             } catch (err) {
-                // Điều hướng đến trang 404 nếu có lỗi
-                navigate('/404');
+                setError(err.message);
             } finally {
                 setLoading(false);
             }
@@ -51,7 +58,20 @@ function GoogleCallback() {
         );
     }
 
+    // Hiển thị khi có lỗi khác (không phải 404)
+    if (error) {
+        return <DisplayError message={error} />;
+    }
+
     return null;
 }
 
-export default GoogleCallback;
+function DisplayError({ message }) {
+    return (
+        <div style={{ color: 'red' }}>
+            <p>Error: {message}</p>
+        </div>
+    );
+}
+
+export default FacebookCallback;
