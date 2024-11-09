@@ -103,6 +103,7 @@ Route::middleware('auth:api')->apiResource('comments', CommentController::class)
 // Password reset routes
 
 
+
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
