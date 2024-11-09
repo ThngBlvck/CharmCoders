@@ -36,6 +36,17 @@ class OrderController extends Controller
                 ], 422);
             }
 
+            // Kiểm tra số lượng của các sản phẩm trong giỏ hàng
+            foreach ($cartItems as $item) {
+                $product = Product::find($item->product_id);
+                if (!$product || $product->quantity < $item->quantity) {
+                    return response()->json([
+                        'message' => "Sản phẩm {$product->name} không đủ số lượng trong kho.",
+                    ], 422);
+                }
+            }
+
+
             // Tính tổng tiền của giỏ hàng
             $totalAmount = $cartItems->sum(function ($item) {
                 return $item->quantity * $item->price;
