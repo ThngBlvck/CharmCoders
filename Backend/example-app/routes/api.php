@@ -79,8 +79,6 @@ Route::prefix('client')->group(function () {
     Route::post('/contact/send', [MailController::class, 'sendMail']);
     Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
     // Route để yêu cầu đặt lại mật khẩu qua API
-
-
 });
 
 // General user route (outside of client prefix)
