@@ -2,7 +2,6 @@ import request from '../../api';
 
 const URL_Order = 'client/orders';
 const URL_Order_Admin = 'admin/orders';
-const URL_Update_Order = 'admin/orders';
 
 export const getOrder = (query = '') => {
     return request({
