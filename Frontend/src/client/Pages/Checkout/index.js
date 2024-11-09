@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {getUserInfo} from "../../../services/User";
-import {checkout, vnPayCheckout} from '../../../services/Checkout';
+import {checkout, vnPayCheckout, paymentReturn } from '../../../services/Checkout';
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -41,6 +41,41 @@ export default function Checkout() {
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+
+    // useEffect(() => {
+    //     // This will run when the user is redirected from VNPay to your payment-return route
+    //     const token = queryParams.get('vnp_TxnRef');
+    //     if (token) {
+    //         handlePaymentReturn(token); // Call your backend API to verify the payment
+    //     }
+    // }, [location.search]);
+    //
+    // const handlePaymentReturn = async (txnRef) => {
+    //     try {
+    //         const response = await paymentReturn(txnRef);
+    //
+    //         if (response.status === 'success') {
+    //             Swal.fire({
+    //                 title: "Thanh toán thành công",
+    //                 text: `Đơn hàng ${response.order_id} đã được xác nhận.`,
+    //                 icon: "success",
+    //                 timer: 2000,
+    //                 showConfirmButton: false,
+    //             });
+    //
+    //             // Redirect to homepage after success
+    //             setTimeout(() => {
+    //                 navigate('/');  // Redirect to homepage or order list page
+    //             }, 2000);
+    //         } else {
+    //             Swal.fire("Lỗi", "Thanh toán thất bại. Vui lòng thử lại.", "error");
+    //         }
+    //     } catch (error) {
+    //         console.error("Lỗi khi xử lý callback thanh toán:", error);
+    //         Swal.fire("Lỗi", "Có lỗi xảy ra khi xử lý thanh toán. Vui lòng thử lại.", "error");
+    //     }
+    // };
+
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -310,9 +345,9 @@ export default function Checkout() {
                     timer: 2000,
                     showConfirmButton: false,
                 });
-                // Redirect to order summary or success page
+                // Redirect to homepage after successful payment (if needed)
                 setTimeout(() => {
-                    window.location.href = "/order-summary";  // Redirect to order summary page or similar
+                    window.location.href = "/";  // Redirect to homepage
                 }, 2000);
             } else if (orderData.paymentMethod === "momo") {
                 // Handle MoMo payment method
@@ -337,7 +372,7 @@ export default function Checkout() {
                 if (result && result.url) {
                     Swal.fire({
                         title: "Thành công",
-                        text: "",
+                        text: "Bạn sẽ được chuyển đến trang thanh toán VNPay.",
                         icon: "success",
                         timer: 2000,
                         showConfirmButton: false,
@@ -358,21 +393,6 @@ export default function Checkout() {
 
 
 
-    // const handleVnpayPayment = async () => {php
-    //     try {
-    //         const response = await fetch('/api/vnpay/create', {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({ amount: calculateTotal() }),
-    //         });
-    //         const data = await response.json();
-    //         if (data.paymentUrl) {
-    //             window.location.href = data.paymentUrl;
-    //         }
-    //     } catch (error) {
-    //         console.error("Payment error:", error);
-    //     }
-    // };
 
     const handleMomoPayment = async () => {
         try {
