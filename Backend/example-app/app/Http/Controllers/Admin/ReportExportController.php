@@ -9,6 +9,7 @@ use App\Exports\OrdersExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Controller;
 
 class ReportExportController extends Controller
 {
