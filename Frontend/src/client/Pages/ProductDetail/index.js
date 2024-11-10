@@ -171,61 +171,129 @@ const ProductDetail = () => {
                     <div className="col-md-9 d-flex justify-start">
                         <div className="row">
                             <div className="col-md-5">
-                                <img src={product.image} alt="Product" className="img-fluid rounded" style={{maxHeight: "400px", objectFit: "cover"}}/>
+                                <img src={product.image} alt="Product" className="img-fluid rounded"
+                                     style={{maxHeight: "400px", objectFit: "cover"}}/>
                             </div>
                             <div className="col-md-7 d-flex flex-column align-content-start">
-                                <p className="mb-3" style={{fontSize: "26px", color: "#8c5e58"}}>{product.name}</p>
+                                <p className="mb-3"
+                                   style={{fontSize: "26px", color: "#8c5e58", fontWeight: 'bold'}}>{product.name}</p>
+
+                                {/* Price Display with Discount */}
+                                <div className="mb-3" style={{color: "#8c5e58"}}>
+                                    <strong>Giá:</strong>
+                                    {product.sale_price ? (
+                                        <div className="d-flex flex-column">
+                        <span style={{fontSize: "20px", textDecoration: "line-through", color: "#6c4d36"}}>
+                            {product.unit_price.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
+                        </span>
+                                            <span style={{fontSize: "22px", color: "#f76c5e", fontWeight: "bold"}}>
+                            {(product.unit_price - product.sale_price).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND"
+                            })}
+                        </span>
+                                        </div>
+                                    ) : (
+                                        <span style={{fontSize: "22px", color: "#f76c5e", fontWeight: "bold"}}>
+                        {product.unit_price.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
+                    </span>
+                                    )}
+                                </div>
+
                                 <p className="mb-3" style={{color: "#8c5e58"}}>
-                                    {product.unit_price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                                    <strong>Thương hiệu:</strong> {brandName}
                                 </p>
-                                <p className="mb-3" style={{color: "#8c5e58"}}>{brandName}</p>
+
                                 <p className="mb-3" style={{color: "#8c5e58"}}>{product.weight}</p>
 
+                                {/* Available Quantity Display */}
+                                <div className="mt-2 mb-3" style={{color: "#8c5e58", fontSize: "16px"}}>
+                                    <strong>Số lượng còn
+                                        lại:</strong> {product.quantity} {product.quantity === 1 ? "sản phẩm" : "sản phẩm"}
+                                </div>
+
+                                {/* Quantity Input */}
                                 <div className="mt-2 d-flex justify-content-start align-items-center mb-3">
-                                    <span style={{color: "#8c5e58"}}>Số lượng:</span>
+                                    <span style={{color: "#8c5e58", fontSize: "16px"}}><strong>Số lượng:</strong></span>
                                     <input
                                         type="number"
                                         value={cart[product.id] || 1}
                                         onChange={handleQuantityChange}
                                         min="1"
-                                        max="99"
+                                        max={product.quantity}  // Limit max input value to available stock
                                         className="form-control mx-2 rounded"
-                                        style={{width: "80px"}}
+                                        style={{width: "80px", fontSize: "16px"}}
                                     />
                                 </div>
 
                                 <div className="d-flex justify-content-start">
-                                    <button className="btn btn-primary mr-2 font-semibold"
-                                            style={{padding: '16px', fontSize: '13px', color: '#442e2b'}}
-                                            onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}>
-                                        <p><i className="fa fa-shopping-cart" aria-hidden="true"
-                                              style={{marginRight: "6px"}}></i>Mua ngay</p>
-                                    </button>
-                                    <button className="btn btn-primary font-semibold"
-                                            style={{fontSize: '13px'}}
-                                            onClick={() => handleAddToCart(product.id, cart[product.id] || 1)}>
-                                        <p><i className="fa fa-shopping-basket" aria-hidden="true"
-                                              style={{marginRight: "6px"}}></i>Thêm vào giỏ</p>
-                                    </button>
+                                    {/* Display "Out of Stock" Message */}
+                                    {product.quantity === 0 ? (
+                                        <p className="text-danger font-bold"
+                                           style={{fontSize: '16px', marginTop: '10px'}}>Hết hàng</p>
+                                    ) : (
+                                        <>
+                                            {/* "Buy Now" Button */}
+                                            <button
+                                                className="btn btn-primary mr-2 font-semibold"
+                                                style={{
+                                                    padding: '16px',
+                                                    fontSize: '14px',
+                                                    color: '#442e2b',
+                                                    borderRadius: '5px',
+                                                    width: '150px',
+                                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                                    backgroundColor: "#ffa69e",
+                                                    cursor: product.quantity === 0 ? "not-allowed" : "pointer"
+                                                }}
+                                                onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}
+                                                disabled={product.quantity === 0}  // Disable button if out of stock
+                                            >
+                                                <p><i className="fa fa-shopping-cart" aria-hidden="true"
+                                                      style={{marginRight: "6px"}}></i>Mua ngay</p>
+                                            </button>
+
+                                            {/* "Add to Cart" Button */}
+                                            <button
+                                                className="btn btn-secondary font-semibold"
+                                                style={{
+                                                    fontSize: '14px',
+                                                    padding: '16px',
+                                                    borderRadius: '5px',
+                                                    width: '150px',
+                                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                                                }}
+                                                onClick={() => handleAddToCart(product.id, cart[product.id] || 1)}
+                                            >
+                                                <p><i className="fa fa-shopping-basket" aria-hidden="true"
+                                                      style={{marginRight: "6px"}}></i>Thêm vào giỏ</p>
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
                             <div className="product-details" style={{marginTop: "2rem"}}>
-                                <p style={{color: "#8c5e58", fontSize: "20px", marginBottom: "1rem"}}
-                                   className="font-bold">Thông tin chi tiết sản phẩm:</p>
-                                <ul>
-                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                <p style={{
+                                    color: "#8c5e58",
+                                    fontSize: "20px",
+                                    marginBottom: "1rem",
+                                    fontWeight: "bold"
+                                }}>Thông tin chi tiết sản phẩm:</p>
+                                <ul style={{paddingLeft: "20px", color: "#8c5e58"}}>
+                                    <li style={{marginBottom: "8px", fontSize: "16px"}}><strong
                                         className="font-semibold">Tên sản phẩm:</strong> {product.name}</li>
-                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                    <li style={{marginBottom: "8px", fontSize: "16px"}}><strong
                                         className="font-semibold">Tên thương hiệu:</strong> {brandName}</li>
-                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                    <li style={{marginBottom: "8px", fontSize: "16px"}}><strong
                                         className="font-semibold">Tên danh mục:</strong> {categoryName}</li>
-                                    <li style={{color: "#8c5e58", marginBottom: "2px"}}><strong
+                                    <li style={{marginBottom: "8px", fontSize: "16px"}}><strong
                                         className="font-semibold">Mô tả sản phẩm:</strong> {product.content}</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
+
 
                     <div className="col-md-8 mt-5" style={{maxWidth: '800px', paddingLeft: '0'}}> {/* Aligned left */}
                         <form onSubmit={handleSubmitComment} className="p-3 mb-4 border rounded">

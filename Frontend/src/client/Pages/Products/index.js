@@ -240,7 +240,7 @@ export default function Products() {
                                         <div className="card text-center bg-hover"
                                              style={{borderRadius: "15px", padding: "20px"}}>
                                             <NavLink to={`/products/${product.id}`}>
-                                            <img
+                                                <img
                                                     src={product.image}
                                                     className="card-img-top img-fluid rounded"
                                                     alt="Product"
@@ -254,26 +254,85 @@ export default function Products() {
                                                         {product.name.length > 30 ? product.name.substring(0, 20) + "..." : product.name}
                                                     </p>
                                                 </NavLink>
-                                                <p className="card-text mb-4 font-semibold" style={{color: '#8c5e58'}}>
-                                                    {product.unit_price ? product.unit_price.toLocaleString("vi-VN", {
-                                                        style: "currency",
-                                                        currency: "VND",
-                                                    }) : "Không có giá"}
-                                                </p>
 
-                                                <button
-                                                    className="btn btn-primary mr-2 font-bold w-100"
-                                                    style={{padding: '14px', fontSize: '13px', color: '#442e2b'}}
-                                                    onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}
-                                                >
-                                                    <p>Mua ngay</p>
-                                                </button>
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    {/* Giá sản phẩm */}
+                                                    {product.sale_price && product.sale_price < product.unit_price ? (
+                                                        <>
+                                                            <p className="card-text mb-2 font-semibold" style={{
+                                                                color: '#8c5e58',
+                                                                textDecoration: 'line-through'
+                                                            }}>
+                                                                {product.unit_price.toLocaleString("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND"
+                                                                })}
+                                                            </p>
+                                                        </>
+                                                    ) : (
+                                                        <p className="card-text mb-2 font-semibold"
+                                                           style={{color: '#8c5e58'}}>
+                                                            {product.unit_price.toLocaleString("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND"
+                                                            })}
+                                                        </p>
+                                                    )}
+
+                                                    {/* Giá Sale */}
+                                                    {product.sale_price && product.sale_price < product.unit_price ? (
+                                                        <p className="card-text mb-4 font-semibold"
+                                                           style={{color: '#e74c3c'}}>
+                                                            {product.sale_price.toLocaleString("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND"
+                                                            })}
+                                                        </p>
+                                                    ) : null}
+                                                </div>
+
+                                                {/* Hiển thị tiết kiệm nếu có giảm giá */}
+                                                {product.sale_price && product.sale_price < product.unit_price && (
+                                                    <p className="text-muted" style={{fontSize: '14px'}}>
+                                                        Tiết
+                                                        kiệm: {(product.unit_price - product.sale_price).toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND"
+                                                    })}
+                                                    </p>
+                                                )}
+
+                                                {/* Nút Mua ngay */}
+                                                {product.quantity === 0 ? (
+                                                    <p className="text-danger font-bold"
+                                                       style={{fontSize: '16px', marginTop: '10px'}}>Hết hàng</p>
+                                                ) : (
+                                                    <button
+                                                        className="btn btn-primary mr-2 font-bold w-100"
+                                                        style={{
+                                                            padding: '16px',
+                                                            fontSize: '14px',
+                                                            color: '#442e2b',
+                                                            borderRadius: '5px',
+                                                            width: '150px',
+                                                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                                            backgroundColor: product.quantity === 0 ? "#dcdcdc" : "#ffa69e", // Disabled button color when out of stock
+                                                            cursor: product.quantity === 0 ? "not-allowed" : "pointer"
+                                                        }}
+                                                        onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}
+                                                        disabled={product.quantity === 0}  // Disable the button if out of stock
+                                                    >
+                                                        <p><i className="fa fa-shopping-cart" aria-hidden="true"
+                                                              style={{marginRight: "6px"}}></i>Mua ngay</p>
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-center" style={{fontSize: '30px', color: '#8c5e58'}}>Không có sản phẩm!</p>
+                                <p className="text-center" style={{fontSize: '30px', color: '#8c5e58'}}>Không có sản
+                                    phẩm!</p>
                             )}
                         </div>
 
@@ -292,6 +351,7 @@ export default function Products() {
                     </>
                 )}
             </div>
+
         </>
     );
 }
