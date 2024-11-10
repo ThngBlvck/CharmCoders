@@ -38,7 +38,7 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Bạn cần cung cấp địa chỉ!'], 400);
         }
 
-        $paymentMethod = $request->input('payment_method');
+//         $paymentMethod = $request->input('payment_method');
 
         $totalAmount = $this->calculateTotalAmount($cartItemIds, $userId);
 
@@ -73,15 +73,15 @@ class PaymentController extends Controller
 
             // Kiểm tra và lấy dữ liệu cần thiết từ request
             $address = $request->input('address');
-            $paymentMethod = $request->input('payment_method');
-            if (!$address || !$paymentMethod) {
-                return response()->json(['status' => 'fail', 'message' => 'Thông tin địa chỉ và phương thức thanh toán không đầy đủ!'], 400);
-            }
+//             $paymentMethod = $request->input('payment_method');
+//             if (!$address || !$paymentMethod) {
+//                 return response()->json(['status' => 'fail', 'message' => 'Thông tin địa chỉ và phương thức thanh toán không đầy đủ!'], 400);
+//             }
 
             // Lấy các sản phẩm trong giỏ hàng của người dùng
             $cartItems = Cart::where('user_id', $userId)->get();
             if ($cartItems->isEmpty()) {
-                return response()->json(['status' => 'fail', 'message' => 'Không tìm thấy sản phẩm trong giỏ hàng!'], 404);
+            return response()->json(['status' => 'fail', 'message' => 'Không tìm thấy sản phẩm trong giỏ hàng!'], 404);
             }
 
             // Kiểm tra số lượng sản phẩm và cập nhật kho nếu đủ
@@ -103,7 +103,7 @@ class PaymentController extends Controller
                 'user_id' => $userId,
                 'total_amount' => $totalAmount,
                 'address' => $address,
-                'payment_method' => $paymentMethod,
+//                 'payment_method' => $paymentMethod,
                 'status' => 1, // Đơn hàng đã được thanh toán
             ]);
 

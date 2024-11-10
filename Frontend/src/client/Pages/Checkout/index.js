@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {getUserInfo} from "../../../services/User";
-import {checkout} from '../../../services/Checkout';
+import {checkout, vnPayCheckout, paymentReturn } from '../../../services/Checkout';
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -41,6 +41,41 @@ export default function Checkout() {
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+
+    // useEffect(() => {
+    //     // This will run when the user is redirected from VNPay to your payment-return route
+    //     const token = queryParams.get('vnp_TxnRef');
+    //     if (token) {
+    //         handlePaymentReturn(token); // Call your backend API to verify the payment
+    //     }
+    // }, [location.search]);
+    //
+    // const handlePaymentReturn = async (txnRef) => {
+    //     try {
+    //         const response = await paymentReturn(txnRef);
+    //
+    //         if (response.status === 'success') {
+    //             Swal.fire({
+    //                 title: "Thanh toán thành công",
+    //                 text: `Đơn hàng ${response.order_id} đã được xác nhận.`,
+    //                 icon: "success",
+    //                 timer: 2000,
+    //                 showConfirmButton: false,
+    //             });
+    //
+    //             // Redirect to homepage after success
+    //             setTimeout(() => {
+    //                 navigate('/');  // Redirect to homepage or order list page
+    //             }, 2000);
+    //         } else {
+    //             Swal.fire("Lỗi", "Thanh toán thất bại. Vui lòng thử lại.", "error");
+    //         }
+    //     } catch (error) {
+    //         console.error("Lỗi khi xử lý callback thanh toán:", error);
+    //         Swal.fire("Lỗi", "Có lỗi xảy ra khi xử lý thanh toán. Vui lòng thử lại.", "error");
+    //     }
+    // };
+
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -243,75 +278,121 @@ export default function Checkout() {
             [name]: value,
         });
     };
-
     const handleSubmit = async (event) => {
-        event.preventDefault(); // Ngăn chặn hành động mặc định của form
+        event.preventDefault();
 
+        // Calculate the total amount
         const totalAmount = calculateTotal();
+        const validationErrors = {};
 
-        // Reset errors
-        const newErrors = {};
-
-        // Kiểm tra Họ và Tên
+        // Validate Name
         if (!formData.name.trim()) {
-            newErrors.name = "Họ và Tên không được để trống.";
+            validationErrors.name = "Họ và Tên không được để trống.";
         }
 
-        // Kiểm tra Email
+        // Validate Email
         if (!formData.email.trim()) {
-            newErrors.email = "Email không được để trống.";
+            validationErrors.email = "Email không được để trống.";
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "Email không đúng định dạng.";
+            validationErrors.email = "Email không đúng định dạng.";
         }
 
-        // Kiểm tra Số điện thoại
+        // Validate Phone
         if (!formData.phone.trim()) {
-            newErrors.phone = "Số điện thoại không được để trống.";
+            validationErrors.phone = "Số điện thoại không được để trống.";
         } else if (!/^\d{10}$/.test(formData.phone)) {
-            newErrors.phone = "Số điện thoại phải có 10 chữ số.";
+            validationErrors.phone = "Số điện thoại phải có 10 chữ số.";
         }
 
-        // Kiểm tra Địa chỉ
-        const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
+        // Validate Address
         if (!formData.address?.trim()) {
-            newErrors.address = "Vui lòng nhập địa chỉ nhà.";
-        } else if (!wardName || !districtName || !provinceName) {
-            newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+            validationErrors.address = "Vui lòng nhập địa chỉ nhà.";
         }
 
-        setErrors(newErrors);
+        if (!wardName || !districtName || !provinceName) {
+            validationErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+        }
 
-        // Nếu có lỗi, dừng xử lý
-        if (Object.keys(newErrors).length > 0) {
+        setErrors(validationErrors);
+        if (Object.keys(validationErrors).length > 0) return;
+
+        // Get cartItemIds from the query params
+        const cartIds = queryParams.get('cartIds')?.split(',') || [];
+
+        if (cartIds.length === 0) {
+            Swal.fire("Lỗi", "Không có sản phẩm trong giỏ hàng.", "error");
             return;
         }
 
-        // Tạo một object mới chứa dữ liệu để gửi lên server
+        // Fetch cart items if needed
+        await fetchCartsByIds(cartIds);
+
+        // Prepare the order data
         const orderData = {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            address: fullAddress, // Sử dụng địa chỉ đã nối
-            paymentMethod: formData.paymentMethod,
-            total_amount: totalAmount,
+            cartItemIds: cartIds,  // Ensure cartIds are passed as an array
+            address: `${formData.address?.trim()}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim(),
+            paymentMethod: formData.paymentMethod,  // Using selected payment method from radio buttons
         };
-        console.log(orderData)
 
-        // Kiểm tra xem địa chỉ có phải là chuỗi không
-        if (typeof orderData.address !== "string" || orderData.address.length === 0) {
-            setMessage("Địa chỉ phải là chuỗi ký tự.");
-            return; // Dừng lại nếu địa chỉ không hợp lệ
-        }
-
-        // Gọi hàm checkout với dữ liệu đã chuẩn bị
         try {
-            const result = await checkout(orderData);
-            Swal.fire('Thành công', 'Thanh toán thành công.', 'success');
-            navigate(`/order-list`);
+            // Handle payment based on the selected method
+            if (orderData.paymentMethod === "cashOnDelivery") {
+                // Handle Cash on Delivery logic (you can add specific actions here)
+                Swal.fire({
+                    title: "Thanh toán khi nhận hàng",
+                    text: "Đơn hàng của bạn sẽ được giao tận nơi và thanh toán khi nhận hàng.",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+                // Redirect to homepage after successful payment (if needed)
+                setTimeout(() => {
+                    window.location.href = "/";  // Redirect to homepage
+                }, 2000);
+            } else if (orderData.paymentMethod === "momo") {
+                // Handle MoMo payment method
+                const result = await makeMomoPayment(orderData.cartItemIds, orderData.address);
+                if (result && result.url) {
+                    Swal.fire({
+                        title: "Thành công",
+                        text: "Bạn sẽ được chuyển đến trang thanh toán MoMo.",
+                        icon: "success",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+                    setTimeout(() => {
+                        window.location.href = result.url; // Redirect to MoMo payment page
+                    }, 2000);
+                } else {
+                    Swal.fire("Lỗi", "Không có URL thanh toán MoMo trả về.", "error");
+                }
+            } else if (orderData.paymentMethod === "vnpay") {
+                // Handle VNPay payment method
+                const result = await vnPayCheckout(orderData.cartItemIds, orderData.address, orderData.paymentMethod);
+                if (result && result.url) {
+                    Swal.fire({
+                        title: "Thành công",
+                        text: "Bạn sẽ được chuyển đến trang thanh toán VNPay.",
+                        icon: "success",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+                    setTimeout(() => {
+                        window.location.href = result.url; // Redirect to VNPay payment page
+                    }, 2000);
+                } else {
+                    Swal.fire("Lỗi", "Không có URL thanh toán VNPay trả về.", "error");
+                }
+            } else {
+                Swal.fire("Lỗi", "Phương thức thanh toán không hợp lệ.", "error");
+            }
         } catch (error) {
-            Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
+            Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình thanh toán.", "error");
         }
     };
+
+
+
 
     const handleMomoPayment = async () => {
         try {
@@ -554,12 +635,12 @@ export default function Checkout() {
                                             type="radio"
                                             className="form-check-input"
                                             name="paymentMethod"
-                                            value="creditCard"
-                                            checked={formData.paymentMethod === "creditCard"}
+                                            value="vnpay"
+                                            checked={formData.paymentMethod === "vnpay"}
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label" style={{color: "#8c5e58"}}>
-                                            <i className="fas fa-credit-card fa-2x"></i> Credit card
+                                            <i className="fas fa-globe fa-2x"></i> VNPay
                                         </label>
                                     </div>
                                 </div>
