@@ -24,7 +24,8 @@ import VerifyOtp from "./Pages/Otp_PW";
 import Edit_Profile from "./Pages/Edit_Profile";
 import List_Address from "./Pages/Address/List_Address";
 import Add_Address from "./Pages/Address/Add_Address";
-import Edit_Address from "./Pages/Address/Edit_Address";
+import Edit_Address from "./Pages/Edit_Profile";
+import ChangePassword from "./Pages/Change_Password";
 
 import GoogleCallback from "./Pages/GoogleCallback";
 import OrderDetail from "./Pages/Order_Detail";
@@ -48,6 +49,7 @@ export default function Client() {
                     <Route path="/products" element={<Products/>}/>
                     <Route path="/products/:id" element={<ProductDetail/>}/>
                     <Route path="/profile" element={<Profile/>}/>
+                    <Route path="/change_password" element={<ChangePassword/>}/>
                     <Route path="/edit-profile" element={<Edit_Profile/>}/>
                     <Route path="/cart" element={<Cart/>}/>
                     <Route path="/checkout" element={<Checkout/>} />
