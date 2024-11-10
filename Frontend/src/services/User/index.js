@@ -5,6 +5,7 @@ const URL_VERIFY_OTP = 'password/verify-otp';
 const URL_RESET_PASSWORD = 'password/reset'; // Đường dẫn API cho việc reset mật khẩu với OTP
 
 const URL_User_INFO = "client/user";
+const URL_Change_password = "client/changepassword";
 const URL_Profile_Change = "client/profile";
 
 const URL_Change_password = "client/changepassword";
