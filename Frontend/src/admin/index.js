@@ -45,6 +45,7 @@ import Comment from "./Pages/Comment/List";
 import Role from "./Pages/Role/List";
 import Order from "./Pages/Order/List";
 import OrderDetail from "./Pages/Order/OrderDetail";
+import EditOrder from "./Pages/Order/Edit";
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
 
@@ -94,6 +95,8 @@ export default function Admin() {
                         {/* Other Routes */}
                         <Route path="comment" element={<Comment />} />
                         <Route path="order" element={<Order />} />
+                        <Route path="order/edit/:id" element={<EditOrder />} />
+
                         <Route path="role" element={<Role />} />
                         <Route path="role/add" element={<AddRole />} />
                         <Route path="role/edit/:id" element={<EditRole />} />
