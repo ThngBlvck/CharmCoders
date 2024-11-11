@@ -46,7 +46,6 @@ class OrderController extends Controller
                 }
             }
 
-
             // Tính tổng tiền của giỏ hàng
             $totalAmount = $cartItems->sum(function ($item) {
                 return $item->quantity * $item->price;
@@ -56,8 +55,12 @@ class OrderController extends Controller
             $paymentMethod = $validated['payment_method'] ?? '1'; // Giá trị mặc định nếu không có
             $phone = $validated['phone'];  // Lấy số điện thoại từ request
 
+            // Nhận order_id từ request
+            $order_id = $validated['order_id'];  // Lấy order_id từ request
+
             // Tạo đơn hàng mới
             $order = Order::create([
+                'order_id' => $order_id,  // Lưu order_id nhập vào
                 'total_amount' => $totalAmount,
                 'address' => $validated['address'],
                 'status' => 0, // Trạng thái mặc định là đang xử lý
@@ -77,8 +80,6 @@ class OrderController extends Controller
 
                 // Trừ số lượng sản phẩm trong kho
                 $product->decrement('quantity', $item->quantity);
-                // $product->increment('purchase_count', $item->quantity);
-
 
                 return [
                     'order_id' => $order->id,
