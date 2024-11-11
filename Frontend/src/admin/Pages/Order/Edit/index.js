@@ -36,11 +36,10 @@ export default function EditOrderStatus() {
 
     const onSubmit = async (data) => {
         try {
-            const updatedData = { status: parseInt(data.status) }; // Send status as JSON
-
+            const updatedData = data.status; // Send status as JSON
             await updateOrder(id, updatedData);
             Swal.fire('Thành công', 'Cập nhật trạng thái đơn hàng thành công.', 'success').then(() => {
-                navigate('/admin/orders');
+                navigate('/admin/order');
             });
         } catch (err) {
             console.error('Error updating order status:', err);

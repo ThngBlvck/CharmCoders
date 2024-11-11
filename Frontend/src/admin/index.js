@@ -96,6 +96,7 @@ export default function Admin() {
                         <Route path="comment" element={<Comment />} />
                         <Route path="order" element={<Order />} />
                         <Route path="order/edit/:id" element={<EditOrder />} />
+                        <Route path="order/detail/:id" element={<OrderDetail />} />
 
                         <Route path="role" element={<Role />} />
                         <Route path="role/add" element={<AddRole />} />
