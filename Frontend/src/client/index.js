@@ -26,6 +26,7 @@ import List_Address from "./Pages/Address/List_Address";
 import Add_Address from "./Pages/Address/Add_Address";
 import Edit_Address from "./Pages/Edit_Profile";
 import ChangePassword from "./Pages/Change_Password";
+import Edit_Address from "./Pages/Address/Edit_Address";
 
 import GoogleCallback from "./Pages/GoogleCallback";
 import OrderDetail from "./Pages/Order_Detail";
