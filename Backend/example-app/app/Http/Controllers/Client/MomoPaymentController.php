@@ -38,7 +38,7 @@ class MomoPaymentController extends Controller
             'requestType' => 'captureWallet',
             'signature' => $signature
         ];
-     
+
 
         $response = Http::post($endpoint, $data);
         return $response->json();
@@ -48,7 +48,7 @@ class MomoPaymentController extends Controller
     {
         $signature = $data['signature'];
 
-        return true; 
+        return true;
     }
 
     public function handleIPN(Request $request)
@@ -65,7 +65,7 @@ class MomoPaymentController extends Controller
             // Thanh toán thành công
             $orderId = $data['orderId'];
             $order = Order::where('order_id', $orderId)->first();
-           
+
 
             if ($order) {
                 $order->status = 5 ; // Cập nhật trạng thái đơn hàng
