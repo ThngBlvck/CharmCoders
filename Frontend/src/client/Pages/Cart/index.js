@@ -5,6 +5,7 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { deleteCart, getCart, updateCart } from "../../../services/Cart";
 import { getOneProduct } from "../../../services/Comment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import debounce from 'lodash.debounce';
 
@@ -196,33 +197,28 @@ export default function Cart() {
             ) : (
                 <>
                     {products.length === 0 ? (
-                        <p className="font-semibold text-center" style={{ color: "#8c5e58", fontSize: "30px", marginTop: "30px" }}>Giỏ hàng của bạn trống !!!</p>
+                        <p className="font-semibold text-center" style={{ color: "#8c5e58", fontSize: "30px", marginTop: "30px" }}>
+                            Giỏ hàng của bạn trống !!!
+                        </p>
                     ) : (
                         <>
                             {products.map(item => (
-                                <div key={item.id}
-                                     className="cart-item d-flex align-items-center justify-content-between py-3"
-                                     style={{borderBottom: "1px solid #ddd", marginBottom: "20px"}}>
-                                    <div className="cart-item-checkbox" style={{width: "10%", textAlign: "center"}}>
+                                <div key={item.id} className="cart-item d-flex align-items-center justify-content-between py-3" style={{ borderBottom: "1px solid #ddd", marginBottom: "20px" }}>
+                                    <div className="cart-item-checkbox" style={{ width: "10%", textAlign: "center" }}>
                                         <input
                                             type="checkbox"
                                             checked={selectedItems.includes(item.id)}
                                             onChange={() => handleSelectItem(item.id)}
+                                            disabled={item.quantity === 0} // Disable selection if out of stock
                                         />
                                     </div>
 
-                                    <div className="d-flex align-items-center" style={{width: "30%"}}>
-                                        <NavLink to={`/products/${item.product_id}`}
-                                                 className="d-flex align-items-center">
+                                    <div className="d-flex align-items-center" style={{ width: "30%" }}>
+                                        <NavLink to={`/products/${item.product_id}`} className="d-flex align-items-center">
                                             <img
                                                 src={item.image}
                                                 alt={item.name}
-                                                style={{
-                                                    width: "80px",
-                                                    height: "80px",
-                                                    objectFit: "cover",
-                                                    marginRight: "15px"
-                                                }}
+                                                style={{ width: "80px", height: "80px", objectFit: "cover", marginRight: "15px" }}
                                             />
                                             <div style={{
                                                 display: "-webkit-box",
@@ -238,121 +234,111 @@ export default function Cart() {
                                         </NavLink>
                                     </div>
 
-                                    <div className="cart-item-price" style={{
-                                        width: "15%",
-                                        textAlign: "right",
-                                        color: "#8c5e58",
-                                        fontWeight: "bold"
-                                    }}>
+                                    <div className="cart-item-price" style={{ width: "15%", textAlign: "right", color: "#8c5e58", fontWeight: "bold" }}>
                                         {item.salePrice
-                                            ? item.salePrice.toLocaleString("vi-VN", {
-                                                style: "currency",
-                                                currency: "VND"
-                                            })
-                                            : item.price.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
+                                            ? item.salePrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })
+                                            : item.price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
                                     </div>
 
-                                    <div className="cart-item-quantity" style={{width: "15%", textAlign: "center"}}>
-                                        <div className="input-group" style={{width: "160px", margin: "0 auto"}}>
-                                            <button
-                                                className="btn btn-sm"
-                                                onClick={() => handleQuantityChange({target: {value: item.quantity - 1}}, item.id)}
-                                                disabled={item.quantity <= 1}  // Disable decrement if quantity is 1 or lower
-                                                style={{
-                                                    backgroundColor: "#ffa69e",
-                                                    borderColor: "#8c5e58",
-                                                    color: "#8c5e58",
-                                                    borderRadius: "50%",
-                                                    padding: "0.5rem",
-                                                    fontSize: "1.25rem",
-                                                    minWidth: "40px",
-                                                    height: "40px",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center"
-                                                }}
-                                            >
-                                                <span style={{fontWeight: "bold"}}>-</span>
-                                            </button>
+                                    <div className="cart-item-quantity" style={{ width: "15%", textAlign: "center" }}>
+                                        {item.quantity === 0 ? (
+                                            <p className="text-danger font-bold" style={{ fontSize: '16px' }}>Hết hàng</p>
+                                        ) : (
+                                            <div className="input-group" style={{ width: "160px", margin: "0 auto" }}>
+                                                <button
+                                                    className="btn btn-sm"
+                                                    onClick={() => handleQuantityChange({ target: { value: item.quantity - 1 } }, item.id)}
+                                                    disabled={item.quantity <= 1}
+                                                    style={{
+                                                        backgroundColor: "#ffa69e",
+                                                        borderColor: "#8c5e58",
+                                                        color: "#8c5e58",
+                                                        borderRadius: "50%",
+                                                        padding: "0.5rem",
+                                                        fontSize: "1.25rem",
+                                                        minWidth: "40px",
+                                                        height: "40px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center"
+                                                    }}
+                                                >
+                                                    <span style={{ fontWeight: "bold" }}>-</span>
+                                                </button>
 
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value={item.quantity}
-                                                onChange={(e) => handleQuantityChange(e, item.id)}
-                                                style={{
-                                                    width: "60px",
-                                                    textAlign: "center",
-                                                    border: "2px solid #8c5e58",
-                                                    borderRadius: "10px",
-                                                    fontWeight: "bold",
-                                                    fontSize: "1.1rem",
-                                                    backgroundColor: "#f7f7f7",
-                                                    margin: "0 0.5rem",
-                                                    transition: "border-color 0.3s",
-                                                }}
-                                                onFocus={(e) => e.target.style.borderColor = "#8c5e58"}
-                                                onBlur={(e) => e.target.style.borderColor = "#8c5e58"}
-                                            />
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={item.quantity}
+                                                    onChange={(e) => handleQuantityChange(e, item.id)}
+                                                    style={{
+                                                        width: "60px",
+                                                        textAlign: "center",
+                                                        border: "2px solid #8c5e58",
+                                                        borderRadius: "10px",
+                                                        fontWeight: "bold",
+                                                        fontSize: "1.1rem",
+                                                        backgroundColor: "#f7f7f7",
+                                                        margin: "0 0.5rem",
+                                                        transition: "border-color 0.3s",
+                                                    }}
+                                                    disabled={item.quantity === 0} // Disable input if out of stock
+                                                    onFocus={(e) => e.target.style.borderColor = "#8c5e58"}
+                                                    onBlur={(e) => e.target.style.borderColor = "#8c5e58"}
+                                                />
 
-                                            <button
-                                                className="btn btn-sm"
-                                                onClick={() => handleQuantityChange({target: {value: item.quantity + 1}}, item.id)}
-                                                style={{
-                                                    backgroundColor: "#ffa69e",
-                                                    borderColor: "#8c5e58",
-                                                    color: "#8c5e58",
-                                                    borderRadius: "50%",
-                                                    padding: "0.5rem",
-                                                    fontSize: "1.25rem",
-                                                    minWidth: "40px",
-                                                    height: "40px",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center"
-                                                }}
-                                            >
-                                                <span style={{fontWeight: "bold"}}>+</span>
-                                            </button>
-                                        </div>
+                                                <button
+                                                    className="btn btn-sm"
+                                                    onClick={() => handleQuantityChange({ target: { value: item.quantity + 1 } }, item.id)}
+                                                    disabled={item.quantity === 0} // Disable button if out of stock
+                                                    style={{
+                                                        backgroundColor: "#ffa69e",
+                                                        borderColor: "#8c5e58",
+                                                        color: "#8c5e58",
+                                                        borderRadius: "50%",
+                                                        padding: "0.5rem",
+                                                        fontSize: "1.25rem",
+                                                        minWidth: "40px",
+                                                        height: "40px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center"
+                                                    }}
+                                                >
+                                                    <span style={{ fontWeight: "bold" }}>+</span>
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
 
-
-                                    <div className="cart-item-total" style={{
-                                        width: "15%",
-                                        textAlign: "right",
-                                        color: "#8c5e58",
-                                        fontWeight: "bold"
-                                    }}>
-                                        {(item.price * item.quantity).toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND"
-                                        })}
+                                    <div className="cart-item-total" style={{ width: "15%", textAlign: "right", color: "#8c5e58", fontWeight: "bold" }}>
+                                        {(item.price * item.quantity).toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
                                     </div>
 
                                     <div className="cart-item-actions" style={{width: "15%", textAlign: "center"}}>
-                                        <button
-                                            className="btn btn-sm btn-primary"
-                                            onClick={() => removeItem(item.id)}
-                                            style={{backgroundColor: "#ffa69e", borderColor: "#8c5e58"}}
-                                        >
-                                            Xóa
+                                        <button className="btn btn-primary" onClick={removeSelectedItems}
+                                                style={{backgroundColor: "#ffffff", borderColor: "#ffffff"}}>
+                                            <FontAwesomeIcon icon={faTrash}
+                                                             style={{color: "red"}}/> {/* This sets the trash icon color to red */}
                                         </button>
+
                                     </div>
                                 </div>
                             ))}
 
                             <div className="cart-footer d-flex justify-content-between">
-                                <button className="btn btn-primary" onClick={removeSelectedItems}
-                                        style={{backgroundColor: "#ffa69e", borderColor: "#8c5e58"}}>
-                                    Xóa đã chọn
-                                </button>
+                                {selectedItems.length > 0 && (
+                                    <button className="btn btn-primary" onClick={removeSelectedItems}
+                                            style={{backgroundColor: "#ffa69e", borderColor: "#8c5e58"}}>
+                                        Xóa đã chọn
+                                    </button>
+                                )}
 
                                 <div className="cart-footer-total" style={{fontSize: "20px", color: "#8c5e58"}}>
                                     Tổng cộng:{" "}
                                     <span style={{fontWeight: "bold"}}>
-                                        {calculateTotal().toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
-                                    </span>
+                                    {calculateTotal().toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
+                                </span>
                                 </div>
 
                                 <button className="btn btn-primary" onClick={handleBuy}
@@ -366,4 +352,5 @@ export default function Cart() {
             )}
         </div>
     );
+
 }
