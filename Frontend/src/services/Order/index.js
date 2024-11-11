@@ -27,6 +27,12 @@ export const getOrderByIdAd = (id) => {
         path: `${URL_Order_Admin}/${id}`,
     });
 };
+export const getOrderByIdAd = (id) => {
+    return request({
+        method: 'GET',
+        path: `${URL_Order_Admin}/${id}`,
+    });
+};
 
 export const updateOrder = (id, status) => {
     return request({
