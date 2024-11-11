@@ -139,7 +139,10 @@ export default function OrderManagement() {
                                     <div className="footerStyle font-semibold row">
                                         {/* Cột 1 */}
                                         <div className="col-4">
-                                            <span className="statusStyle">{order.payment_method}</span>
+                                            <span className="statusStyle">
+                                                {order.payment_method === 1 ? 'Thanh toán khi nhận hàng'
+                                                    : order.payment_method === 2 ? 'Thanh toán chuyển khoản'
+                                                        : 'Không xác định'}</span>
                                         </div>
 
                                         {/* Cột 2 */}
@@ -157,7 +160,8 @@ export default function OrderManagement() {
                                             <span style={{marginRight: "10px"}}>Tổng tiền:</span>
                                             <span className="totalAmountStyle">
                                                 {order.total_amount.toLocaleString("vi-VN", {
-                                                    style: "currency", currency: "VND",})}
+                                                    style: "currency", currency: "VND",
+                                                })}
                                             </span>
                                         </div>
                                     </div>

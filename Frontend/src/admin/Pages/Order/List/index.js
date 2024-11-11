@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { getOrderAdmin } from '../../../../services//Order';  // Assuming you have a similar service for fetching orders
+import { useNavigate } from "react-router-dom";
+import { getOrderAdmin } from '../../../../services/Order';  // Assuming you have a similar service for fetching orders
 
 export default function Order({ color }) {
     const [orders, setOrders] = useState([]);
+    const navigate = useNavigate(); // Initialize navigate
 
     useEffect(() => {
         fetchOrders();
@@ -24,6 +26,11 @@ export default function Order({ color }) {
             style: 'currency',
             currency: 'VND',
         }).format(amount);
+    };
+
+    // Navigate to the order edit page
+    const handleEditOrder = (orderId) => {
+        navigate(`/admin/order/edit/${orderId}`);
     };
 
     return (
@@ -60,7 +67,7 @@ export default function Order({ color }) {
                                         ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
                                         : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
                                 }
-                                style={{width: "10%"}}
+                                style={{ width: "10%" }}
                             >
                                 STT
                             </th>
@@ -71,7 +78,7 @@ export default function Order({ color }) {
                                         ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
                                         : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
                                 }
-                                style={{width: "20%"}}
+                                style={{ width: "20%" }}
                             >
                                 Tên người dùng
                             </th>
@@ -82,7 +89,7 @@ export default function Order({ color }) {
                                         ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
                                         : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
                                 }
-                                style={{width: "20%"}}
+                                style={{ width: "20%" }}
                             >
                                 Thành Tiền
                             </th>
@@ -93,7 +100,7 @@ export default function Order({ color }) {
                                         ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
                                         : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
                                 }
-                                style={{width: "10%"}}
+                                style={{ width: "10%" }}
                             >
                                 Trạng Thái
                             </th>
@@ -104,7 +111,7 @@ export default function Order({ color }) {
                                         ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
                                         : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
                                 }
-                                style={{width: "10%"}}
+                                style={{ width: "10%" }}
                             >
                                 Hành động
                             </th>
@@ -115,14 +122,14 @@ export default function Order({ color }) {
                             orders.map((order, index) => (
                                 <tr key={order.id}>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                        <span
-                                            className={
-                                                "ml-3 font-bold " +
-                                                (color === "light" ? "text-blueGray-600" : "text-white")
-                                            }
-                                        >
-                                            {index + 1}
-                                        </span>
+                                            <span
+                                                className={
+                                                    "ml-3 font-bold " +
+                                                    (color === "light" ? "text-blueGray-600" : "text-white")
+                                                }
+                                            >
+                                                {index + 1}
+                                            </span>
                                     </th>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
                                         {order.user_name}
@@ -149,7 +156,10 @@ export default function Order({ color }) {
                                         })()}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                        <button className="text-blue-500 hover:text-blue-700 px-2">
+                                        <button
+                                            className="text-blue-500 hover:text-blue-700 px-2"
+                                            onClick={() => handleEditOrder(order.id)} // Trigger navigation to edit page
+                                        >
                                             <i className="fas fa-pen text-xl"></i>
                                         </button>
                                         <button className="text-blue-500 hover:text-blue-700 ml-2 px-2">
