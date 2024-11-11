@@ -9,7 +9,6 @@ const URL_Profile_Change = "client/profile";
 
 const URL_Change_password = "client/changepassword";
 
-const URL_Change_password = "client/changepassword";
 // Phương thức gửi OTP
 export const sendOtp = async (email) => {
     try {
