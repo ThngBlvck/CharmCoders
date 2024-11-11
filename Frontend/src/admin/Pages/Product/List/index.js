@@ -8,10 +8,21 @@ export default function ProductCategoryList() {
     const [selectedProducts, setSelectedProducts] = useState([]); // State lưu sản phẩm được chọn
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
+    const [displayedProducts, setDisplayedProducts] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 3; // Số sản phẩm trên mỗi trang
 
     useEffect(() => {
         fetchProducts();
     }, [searchTerm]);
+
+    // Hàm để tính số trang
+    useEffect(() => {
+        // Cập nhật danh sách sản phẩm hiển thị khi trang thay đổi
+        const startIndex = (currentPage - 1) * productsPerPage;
+        const endIndex = startIndex + productsPerPage;
+        setDisplayedProducts(products.slice(startIndex, endIndex));
+    }, [currentPage, products]);
 
     const removeVietnameseTones = (str) => {
         const accents = {
@@ -130,6 +141,13 @@ export default function ProductCategoryList() {
         }
     };
 
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= Math.ceil(products.length / productsPerPage)) {
+            setCurrentPage(page);
+        }
+    };
+
+
     return (
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
             <div className="rounded-t mb-0 px-4 py-3 border-0">
@@ -169,15 +187,23 @@ export default function ProductCategoryList() {
                         </th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
                         <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình ảnh</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá gốc</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá sale</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao tác</th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình
+                            ảnh
+                        </th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
+                            gốc
+                        </th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
+                            sale
+                        </th>
+                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
+                            tác
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
-                    {products && products.length > 0 ? (
-                        products.map((product, index) => (
+                    {displayedProducts.length > 0 ? (
+                        displayedProducts.map((product, index) => (
                             <tr key={product.id}>
                                 <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
                                     <input
@@ -224,13 +250,35 @@ export default function ProductCategoryList() {
                     ) : (
                         <tr>
                             <td colSpan="7" className="text-center p-4">
-                            Không có sản phẩm nào
+                                Không có sản phẩm nào
                             </td>
                         </tr>
                     )}
                     </tbody>
                 </table>
             </div>
+
+            {/* Phân trang */}
+            <div className="flex justify-center items-center mt-4">
+                <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                    &#9664; {/* Mũi tên trái */}
+                </button>
+                <span className="px-4 py-2 mx-1 bg-gray-100 border rounded">
+        Trang {currentPage} / {Math.ceil(products.length / productsPerPage)}
+    </span>
+                <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === Math.ceil(products.length / productsPerPage)}
+                    className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                    &#9654; {/* Mũi tên phải */}
+                </button>
+            </div>
+
 
             {/* Nút xóa hàng loạt */}
             {selectedProducts.length > 0 && (
