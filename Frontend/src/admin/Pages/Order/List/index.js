@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { getOrderAdmin } from '../../../../services/Order';  // Assuming you have a similar service for fetching orders
+import { getOrderAdmin } from '../../../../services/Order'; // Assuming you have a similar service for fetching orders
 
 export default function Order({ color }) {
     const [orders, setOrders] = useState([]);
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchOrders();
@@ -31,6 +31,11 @@ export default function Order({ color }) {
     // Navigate to the order edit page
     const handleEditOrder = (orderId) => {
         navigate(`/admin/order/edit/${orderId}`);
+    };
+
+    // Navigate to the order detail page
+    const handleViewOrder = (orderId) => {
+        navigate(`/admin/order/detail/${orderId}`);
     };
 
     return (
@@ -60,59 +65,19 @@ export default function Order({ color }) {
                     <table className="items-center w-full bg-transparent border-collapse table-fixed">
                         <thead>
                         <tr>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "10%" }}
-                            >
+                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{ width: "10%" }}>
                                 STT
                             </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "20%" }}
-                            >
+                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{ width: "20%" }}>
                                 Tên người dùng
                             </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "20%" }}
-                            >
+                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{ width: "20%" }}>
                                 Thành Tiền
                             </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "10%" }}
-                            >
+                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{ width: "10%" }}>
                                 Trạng Thái
                             </th>
-                            <th
-                                className={
-                                    "px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light"
-                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                        : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")
-                                }
-                                style={{ width: "10%" }}
-                            >
+                            <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")} style={{ width: "10%" }}>
                                 Hành động
                             </th>
                         </tr>
@@ -122,12 +87,7 @@ export default function Order({ color }) {
                             orders.map((order, index) => (
                                 <tr key={order.id}>
                                     <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                            <span
-                                                className={
-                                                    "ml-3 font-bold " +
-                                                    (color === "light" ? "text-blueGray-600" : "text-white")
-                                                }
-                                            >
+                                            <span className={"ml-3 font-bold " + (color === "light" ? "text-blueGray-600" : "text-white")}>
                                                 {index + 1}
                                             </span>
                                     </th>
@@ -135,7 +95,7 @@ export default function Order({ color }) {
                                         {order.user_name}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {formatVND(order.total_amount)} {/* Formatted in VND */}
+                                        {formatVND(order.total_amount)}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
                                         {(() => {
@@ -158,11 +118,14 @@ export default function Order({ color }) {
                                     <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
                                         <button
                                             className="text-blue-500 hover:text-blue-700 px-2"
-                                            onClick={() => handleEditOrder(order.id)} // Trigger navigation to edit page
+                                            onClick={() => handleEditOrder(order.id)}
                                         >
                                             <i className="fas fa-pen text-xl"></i>
                                         </button>
-                                        <button className="text-blue-500 hover:text-blue-700 ml-2 px-2">
+                                        <button
+                                            className="text-blue-500 hover:text-blue-700 ml-2 px-2"
+                                            onClick={() => handleViewOrder(order.id)}
+                                        >
                                             <i className="fas fa-eye text-xl"></i>
                                         </button>
                                     </td>
