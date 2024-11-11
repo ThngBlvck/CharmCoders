@@ -24,7 +24,8 @@ use App\Http\Controllers\Client\{
     CheckoutController,
     CartController as CartClient,
     PaymentController,
-    AddressController 
+    AddressController,
+    MomoPaymentController
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -96,6 +97,9 @@ Route::prefix('client')->group(function () {
     Route::apiResource('/address', AddressController::class)->middleware('auth:api');
     //change password
     Route::put('/changepassword', [UserController::class, 'changePassword'])->middleware('auth:api');
+    Route::post('/payment/momo', [MomoPaymentController::class, 'createPayment']);
+    Route::get('/payment/redirect', [MomoPaymentController::class, 'handleRedirect']);
+
 });
 
 // General user route (outside of client prefix)
