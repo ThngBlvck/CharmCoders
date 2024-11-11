@@ -45,7 +45,8 @@ class SocialiteController extends Controller
                         'name' => $socialUser->name,
                         'email' => $socialUser->email,
                         'auth_provider' => $provider,
-                        'role_id' => $role, // Thiết lập giá trị role mặc định
+                        'role_id' => $role,
+                        'phone' => $socialUser->phone ?? null, // Thiết lập giá trị role mặc định
                     ]
                 );
 
