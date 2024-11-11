@@ -25,6 +25,7 @@ class Order extends Model
         'user_id',
         'payment_method',
         'phone',
+        'order_id',
     ];
 
 
