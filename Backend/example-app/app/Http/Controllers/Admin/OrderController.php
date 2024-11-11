@@ -39,43 +39,26 @@ class OrderController extends Controller
     }
     public function update(Request $request, $id)
     {
-        // Xác thực dữ liệu trạng thái
         $validated = $request->validate([
             'status' => 'required|integer',
         ]);
 
-        // Bắt đầu transaction để đảm bảo tính toàn vẹn dữ liệu
         DB::beginTransaction();
 
         try {
-            // Tìm đơn hàng theo ID
             $order = Order::findOrFail($id);
-
-            // Kiểm tra trạng thái cũ của đơn hàng
             $oldStatus = $order->status;
-
-            // Cập nhật trạng thái đơn hàng
             $newStatus = $validated['status'];
-            $order->update([
-                'status' => $newStatus,
-            ]);
+            $order->update(['status' => $newStatus]);
 
-            $updatedProducts = []; // Mảng lưu thông tin sản phẩm cập nhật
+            $updatedProducts = [];
 
-            // Nếu trạng thái mới là 4 (hủy đơn) và trạng thái cũ khác 4
             if ($newStatus == 4 && $oldStatus != 4) {
-                // Lấy các chi tiết đơn hàng để hoàn lại số lượng sản phẩm
                 $orderDetails = Order_detail::where('order_id', $id)->get();
-
                 foreach ($orderDetails as $detail) {
-                    // Lấy sản phẩm từ bảng products
                     $product = Product::find($detail->product_id);
-
-                    // Hoàn lại số lượng sản phẩm trong kho
                     if ($product) {
                         $product->increment('quantity', $detail->quantity);
-
-                        // Thêm thông tin sản phẩm vào mảng cập nhật
                         $updatedProducts[] = [
                             'product_id' => $product->id,
                             'product_name' => $product->name,
@@ -85,18 +68,30 @@ class OrderController extends Controller
                 }
             }
 
-            // Xác nhận thay đổi
+            if ($newStatus == 3 && $oldStatus != 3) {
+                $orderDetails = Order_detail::where('order_id', $id)->get();
+                foreach ($orderDetails as $detail) {
+                    $product = Product::find($detail->product_id);
+                    if ($product) {
+                        $product->increment('purchase_count', $detail->quantity);
+                        $updatedProducts[] = [
+                            'product_id' => $product->id,
+                            'product_name' => $product->name,
+                            'updated_purchase_count' => $product->purchase_count,
+                        ];
+                    }
+                }
+            }
+
             DB::commit();
 
-            // Trả về phản hồi JSON sau khi cập nhật
             return response()->json([
                 'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
                 'order' => $order,
-                'updated_products' => $updatedProducts, // Thông tin sản phẩm cập nhật
+                'updated_products' => $updatedProducts,
             ], 200);
 
         } catch (\Exception $e) {
-            // Khôi phục dữ liệu nếu có lỗi xảy ra
             DB::rollback();
             return response()->json([
                 'message' => 'Có lỗi xảy ra trong quá trình cập nhật trạng thái đơn hàng.',
