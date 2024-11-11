@@ -71,7 +71,7 @@ export default function OrderHistory() {
                                             <strong>ID đơn hàng: {order.id}</strong>
                                             <strong>Trạng thái đơn hàng: <span className="statusStyle"
                                                                                style={getStatusStyle(order.status)}>
-                                        {order.status === 3 ? 'Đã nhận hàng'
+                                        {order.status === 3 ? 'Đã nhận'
                                             : order.status === 4 ? 'Đã hủy'
                                                 : 'Không xác định'}
                                         </span>
@@ -137,7 +137,10 @@ export default function OrderHistory() {
                                     <div className="footerStyle font-semibold row">
                                         {/* Cột 1 */}
                                         <div className="col-4">
-                                            <span className="statusStyle">{order.payment_method}</span>
+                                            <span className="statusStyle">
+                                                {order.payment_method === 1 ? 'Thanh toán khi nhận hàng'
+                                                    : order.payment_method === 2 ? 'Thanh toán chuyển khoản'
+                                                        : 'Không xác định'}</span>
                                         </div>
 
                                         {/* Cột 2 */}
