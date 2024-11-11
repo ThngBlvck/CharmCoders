@@ -735,11 +735,6 @@
     color: #ffa69e !important;
 }
 
-.fa-trash:hover,
-.fa-eye:hover {
-    color: #ffa69e !important;
-}
-
 .modal-overlay {
     position: fixed;
     top: 0;

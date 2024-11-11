@@ -111,6 +111,35 @@ export default function OrderDetail() {
         }
     };
 
+    // Hàm xử lý đã nhận hàng
+    const handleReceived = async () => {
+        const result = await Swal.fire({
+            title: 'Thông báo',
+            text: "Bạn có chắc chắn đã nhận được hàng?",
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonColor: '#27b701',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Có!',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Chuyển status thành chuỗi trực tiếp
+                const updatedOrder = await updateOrder(order.id, '3'); // Truyền trực tiếp giá trị chuỗi "4"
+                setOrder(updatedOrder);
+                console.log("Đơn hàng đã được nhận");
+                Swal.fire('Thành công', 'Nhận hàng thành công.', 'success').then(() => {
+                    navigate('/order-history'); // Chuyển hướng sang trang order-history sau khi thông báo thành công
+                });
+            } catch (error) {
+                console.error("Lỗi khi xác nhận đơn hàng:", error);
+                toast.error("Không thể xác nhận đơn hàng.");
+            }
+        }
+    };
+
     return (
         <div className="order-detail-container">
             {/* Thông tin người dùng */}
@@ -197,10 +226,13 @@ export default function OrderDetail() {
                     <div>
                         <div className="mb-3">
                             <span style={{color: "#8c5e58"}}>Phương thức thanh toán:</span> <span
-                            className="statusStyle">{order.payment_method}</span>
+                            className="statusStyle">
+                                {order.payment_method === 1 ? 'Thanh toán khi nhận hàng'
+                                    : order.payment_method === 2 ? 'Thanh toán chuyển khoản'
+                                        : 'Không xác định'}</span>
                         </div>
                         <div>
-                            {order.status !== 2 && order.status !== 3 && order.status !== 4 && (
+                            {order.status !== 1 && order.status !== 2 && order.status !== 3 && order.status !== 4 && (
                                 <button
                                     className="btn btn-primary font-semibold"
                                     style={{fontSize: '16px', backgroundColor: "red"}}
@@ -226,6 +258,7 @@ export default function OrderDetail() {
                                 <button className="btn btn-primary font-semibold"
                                         style={{fontSize: '16px'}}
                                         disabled={order.status === 0 || order.status === 1}
+                                        onClick={handleReceived}
                                 >
                                     <p>Đã nhận hàng</p>
                                 </button>
