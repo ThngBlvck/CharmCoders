@@ -24,7 +24,8 @@ use App\Http\Controllers\Client\{
     CheckoutController,
     CartController as CartClient,
     PaymentController,
-    AddressController
+    AddressController,
+    MomoPaymentController
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -91,11 +92,14 @@ Route::prefix('client')->group(function () {
     Route::post('/contact/send', [MailController::class, 'send']);
 
     //profile user
-    Route::put('/profile', [UserController::class, 'profile'])->middleware('auth:api');
+    Route::put('/profile/{id}', [UserController::class, 'profile'])->middleware('auth:api');
     //adress
     Route::apiResource('/address', AddressController::class)->middleware('auth:api');
     //change password
     Route::put('/changepassword', [UserController::class, 'changePassword'])->middleware('auth:api');
+    Route::post('/payment/momo', [MomoPaymentController::class, 'createPayment']);
+    Route::get('/payment/redirect', [MomoPaymentController::class, 'handleRedirect']);
+
 });
 
 // General user route (outside of client prefix)
@@ -103,7 +107,6 @@ Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
 
 // Password reset routes
-
 
 
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
