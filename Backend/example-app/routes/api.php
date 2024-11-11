@@ -126,9 +126,7 @@ Route::middleware('auth:api')->apiResource('comments', CommentController::class)
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
-//login goog
-Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
 
 
 
