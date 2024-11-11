@@ -94,11 +94,12 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    public function profile(UpdateUserProfileRequest $request, $id)
+    public function profile(UpdateUserProfileRequest $request)
     {
+        $id = auth()->id();
         $user = User::findOrFail($id);
         $validatedData = $request->validated();
-       
+
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time(). '_'. $image->getClientOriginalName();
@@ -122,6 +123,7 @@ class UserController extends Controller
             'email' => $request->user()->email,
             'address' => $request->user()->address, // Nếu có
             'phone' => $request->user()->phone,
+            'image' => $request->user()->image,
             'role' => $request->user()->role_id, // Nếu có
         ]);
     }

@@ -5,6 +5,7 @@ const URL_VERIFY_OTP = 'password/verify-otp';
 const URL_RESET_PASSWORD = 'password/reset'; // Đường dẫn API cho việc reset mật khẩu với OTP
 
 const URL_User_INFO = "client/user";
+const URL_Profile_Change = "client/profile";
 
 // Phương thức gửi OTP
 export const sendOtp = async (email) => {
@@ -152,7 +153,10 @@ export const deleteUser = (id) => {
     });
 };
 
-
-
-
-
+export const changeProfile = (data) => {
+    return request({
+        method: 'POST',
+        path: `${URL_Profile_Change}?_method=PUT`, // Đảm bảo URL đúng
+        data
+    });
+};

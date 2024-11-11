@@ -24,7 +24,7 @@ import VerifyOtp from "./Pages/Otp_PW";
 import Edit_Profile from "./Pages/Edit_Profile";
 import List_Address from "./Pages/Address/List_Address";
 import Add_Address from "./Pages/Address/Add_Address";
-import Edit_Address from "./Pages/Edit_Profile";
+import Edit_Address from "./Pages/Address/Edit_Address";
 
 import GoogleCallback from "./Pages/GoogleCallback";
 import FacebookCallback from "./Pages/FacebookCallback";

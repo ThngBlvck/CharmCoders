@@ -1,13 +1,17 @@
 import React, {useEffect, useState} from "react";
 import "../../../../assets/styles/css/style.css";
 import "../../../../assets/styles/css/bootstrap.min.css";
-import {NavLink, useLocation} from "react-router-dom";
+import {NavLink, useLocation, useNavigate, useParams} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import {postAddress, updateAddress} from "../../../../services/Address";
+import Swal from "sweetalert2";
 
 export default function Edit_Address() {
     const location = useLocation();
     const [loading, setLoading] = useState(false); // Thêm state loading
+
+    const {id} = useParams(); // Lấy id từ URL
 
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -19,6 +23,43 @@ export default function Edit_Address() {
     const [provinceName, setProvinceName] = useState("");
     const [districtName, setDistrictName] = useState("");
     const [wardName, setWardName] = useState("");
+
+    const [address, setAddress] = useState('');
+    const [message, setMessage] = useState('');
+    const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (id) {
+            // Gọi API để lấy địa chỉ hiện tại
+            axios.get(`https://your-api-url.com/addresses/${id}`)
+                .then(response => {
+                    const addressData = response.data;
+                    setAddress(addressData.address); // Điền vào ô địa chỉ
+                    const fullAddress = addressData.address.split(','); // Tách địa chỉ thành các phần (Tỉnh/Quận/Xã)
+
+                    // Giả sử định dạng địa chỉ là: "Địa chỉ, Xã/Phường, Quận/Huyện, Tỉnh/Thành"
+                    if (fullAddress.length >= 3) {
+                        setWardName(fullAddress[0].trim());
+                        setDistrictName(fullAddress[1].trim());
+                        setProvinceName(fullAddress[2].trim());
+                    }
+
+                    // Lấy mã Tỉnh/Quận/Xã từ tên đã phân tích
+                    const province = provinces.find(p => p.name === provinceName);
+                    if (province) setSelectedProvince(province.code);
+
+                    const district = districts.find(d => d.name === districtName);
+                    if (district) setSelectedDistrict(district.code);
+
+                    const ward = wards.find(w => w.name === wardName);
+                    if (ward) setSelectedWard(ward.code);
+                })
+                .catch(error => {
+                    console.error("Error fetching address:", error);
+                });
+        }
+    }, [id, provinces, districts, wards, provinceName, districtName, wardName]);
 
     // Lấy danh sách tỉnh khi component được mount
     useEffect(() => {
@@ -77,7 +118,7 @@ export default function Edit_Address() {
         const selectedProvince = e.target.value;
         setSelectedProvince(selectedProvince);
 
-        // Tìm tên huyện dựa trên id hoặc value
+        // Tìm tên tỉnh dựa trên code
         const selectedProvinceObj = provinces.find(province => province.code === selectedProvince);
         if (selectedProvinceObj) {
             setProvinceName(selectedProvinceObj.name); // Cập nhật tên tỉnh
@@ -88,13 +129,10 @@ export default function Edit_Address() {
         const selectedDistrict = e.target.value;
         setSelectedDistrict(selectedDistrict);
 
-        console.log("Selected District:", selectedDistrict); // Kiểm tra giá trị này
-        console.log("Districts:", districts); // Kiểm tra danh sách districts
+        // Tìm tên huyện dựa trên code
         const selectedDistrictObj = districts.find(district => district.code === selectedDistrict);
         if (selectedDistrictObj) {
             setDistrictName(selectedDistrictObj.name); // Cập nhật tên huyện
-        } else {
-            setDistrictName(""); // Đặt lại tên huyện nếu không tìm thấy
         }
     };
 
@@ -102,11 +140,49 @@ export default function Edit_Address() {
         const selectedWard = event.target.value;
         setSelectedWard(selectedWard);
 
-        // Tìm tên xã/phường dựa trên id hoặc value
+        // Tìm tên xã/phường dựa trên code
         const selectedWardObj = wards.find(ward => ward.code === selectedWard);
         if (selectedWardObj) {
             setWardName(selectedWardObj.name); // Cập nhật tên xã/phường
         }
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        // Reset errors
+        const newErrors = {};
+
+        // Kiểm tra Địa chỉ
+        const fullAddress = `${address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
+        if (!address?.trim()) {
+            newErrors.address = "Vui lòng nhập địa chỉ nhà.";
+        } else if (!wardName || !districtName || !provinceName) {
+            newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+        }
+
+        setErrors(newErrors);
+
+        // Nếu có lỗi thì không gửi
+        if (Object.keys(newErrors).length > 0) {
+            return;
+        }
+
+        const addressData = {
+            address: fullAddress, // Cập nhật địa chỉ đầy đủ
+        };
+
+        try {
+            const result = await updateAddress(id, addressData); // Gọi API update
+            Swal.fire('Thành công', 'Cập nhật địa chỉ thành công.', 'success');
+            navigate(`/address`);
+        } catch (error) {
+            Swal.fire('Thất bại', 'Cập nhật địa chỉ thất bại.', 'error');
+        }
+    };
+
+    const handleCancel = () => {
+        navigate("/address"); // Chuyển hướng về trang /address
     };
 
     return (
@@ -179,13 +255,24 @@ export default function Edit_Address() {
                                         type="text"
                                         className="form-control rounded"
                                         name="address"
+                                        value={address} // Lấy giá trị từ state
+                                        onChange={(e) => setAddress(e.target.value)} // Cập nhật khi người dùng nhập
                                         placeholder={"Vui lòng nhập địa chỉ nhà..."}
                                     />
+                                    {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                                 </div>
-                                <button className="btn btn-primary w-100 mt-3 font-semibold" type="submit"
-                                        style={{color: '#442e2b', fontSize: "20px"}}>
-                                    Sửa
-                                </button>
+                                <div className="d-flex justify-content-center">
+                                    <button className="btn btn-primary mx-2 mt-3 font-semibold" type="submit"
+                                            style={{color: '#442e2b', fontSize: "20px", width: "50%"}}
+                                            onClick={handleSubmit}>
+                                        Sửa
+                                    </button>
+                                    <button className="btn btn-primary mx-2 mt-3 font-semibold" type="button"
+                                            style={{color: '#442e2b', fontSize: "20px", width: "50%"}}
+                                            onClick={handleCancel}>
+                                        Hủy
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>

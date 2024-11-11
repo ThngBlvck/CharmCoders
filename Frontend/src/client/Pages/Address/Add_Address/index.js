@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from "react";
 import "../../../../assets/styles/css/style.css";
 import "../../../../assets/styles/css/bootstrap.min.css";
-import {NavLink, useLocation} from "react-router-dom";
+import {NavLink, useLocation, useNavigate} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import {postAddress} from "../../../../services/Address";
+import Swal from "sweetalert2";
 
 export default function Add_Address() {
     const location = useLocation();
@@ -19,6 +21,11 @@ export default function Add_Address() {
     const [provinceName, setProvinceName] = useState("");
     const [districtName, setDistrictName] = useState("");
     const [wardName, setWardName] = useState("");
+
+    const [address, setAddress] = useState('');
+    const [message, setMessage] = useState('');
+    const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     // Lấy danh sách tỉnh khi component được mount
     useEffect(() => {
@@ -109,6 +116,49 @@ export default function Add_Address() {
         }
     };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault(); // Ngăn chặn hành động mặc định của form
+
+        // Reset errors
+        const newErrors = {};
+
+        // Kiểm tra Địa chỉ
+        const fullAddress = `${address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
+        if (!address?.trim()) {
+            newErrors.address = "Vui lòng nhập địa chỉ nhà.";
+        } else if (!wardName || !districtName || !provinceName) {
+            newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+        }
+
+        setErrors(newErrors);
+
+        // Nếu có lỗi, dừng xử lý
+        if (Object.keys(newErrors).length > 0) {
+            return;
+        }
+
+        // Tạo một object mới chứa dữ liệu để gửi lên server
+        const addressData = {
+            address: fullAddress, // Sử dụng địa chỉ đã nối
+        };
+        console.log(addressData)
+
+        // Kiểm tra xem địa chỉ có phải là chuỗi không
+        if (typeof addressData.address !== "string" || addressData.address.length === 0) {
+            setMessage("Địa chỉ phải là chuỗi ký tự.");
+            return; // Dừng lại nếu địa chỉ không hợp lệ
+        }
+
+        // Gọi hàm checkout với dữ liệu đã chuẩn bị
+        try {
+            const result = await postAddress(addressData);
+            Swal.fire('Thành công', 'Thêm địa chỉ thành công.', 'success');
+            navigate(`/address`);
+        } catch (error) {
+            Swal.fire('Thất bại', 'Thêm địa chỉ thất bại.', 'error');
+        }
+    };
+
     return (
         <>
             <div className="container py-5">
@@ -180,10 +230,14 @@ export default function Add_Address() {
                                         className="form-control rounded"
                                         name="address"
                                         placeholder={"Vui lòng nhập địa chỉ nhà..."}
+                                        value={address} // Bind state to input
+                                        onChange={(e) => setAddress(e.target.value)} // Update state
                                     />
+                                    {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                                 </div>
                                 <button className="btn btn-primary w-100 mt-3 font-semibold" type="submit"
-                                        style={{color: '#442e2b', fontSize: "20px"}}>
+                                        style={{color: '#442e2b', fontSize: "20px"}}
+                                        onClick={handleSubmit}>
                                     Thêm
                                 </button>
                             </form>

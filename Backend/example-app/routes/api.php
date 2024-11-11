@@ -24,7 +24,7 @@ use App\Http\Controllers\Client\{
     CheckoutController,
     CartController as CartClient,
     PaymentController,
-    AddressController 
+    AddressController
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -91,7 +91,7 @@ Route::prefix('client')->group(function () {
     Route::post('/contact/send', [MailController::class, 'send']);
 
     //profile user
-    Route::put('/profile/{id}', [UserController::class, 'profile'])->middleware('auth:api');
+    Route::put('/profile', [UserController::class, 'profile'])->middleware('auth:api');
     //adress
     Route::apiResource('/address', AddressController::class)->middleware('auth:api');
 });
