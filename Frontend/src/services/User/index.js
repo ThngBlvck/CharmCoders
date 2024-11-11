@@ -7,6 +7,7 @@ const URL_RESET_PASSWORD = 'password/reset'; // Đường dẫn API cho việc r
 const URL_User_INFO = "client/user";
 const URL_Profile_Change = "client/profile";
 
+const URL_Change_password = "client/changepassword";
 // Phương thức gửi OTP
 export const sendOtp = async (email) => {
     try {
@@ -35,9 +36,6 @@ export const verifyOtp = async (email, otp) => {
 };
 
 
-
-
-
 export const resetPassword = async ({ email, otp, password, password_confirmation }) => {
     try {
         const response = await request({
@@ -49,6 +47,19 @@ export const resetPassword = async ({ email, otp, password, password_confirmatio
     } catch (error) {
         throw error;
     }
+};
+
+
+export const changePassword = async ({ current_password, new_password, new_password_confirmation }) => {
+    return await request({
+        method: 'PUT',
+        path: URL_Change_password,
+        data: {
+            current_password,               // The current password field stays the same
+            password: new_password,         // Use 'password' instead of 'new_password' to match backend
+            password_confirmation: new_password_confirmation, // Use 'password_confirmation' for confirmation
+        },
+    });
 };
 
 
