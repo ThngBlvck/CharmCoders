@@ -977,3 +977,14 @@
 .swal2-content-custom {
     color: #6b4c4a; /* Đặt màu nội dung phù hợp với màu trang của bạn */
 }
+.btn-danger:hover, .btn-info:hover {
+    background-color: transparent !important;
+    color: #dc3545 !important; /* For Google button, matching danger color */
+}
+
+.btn-info:hover {
+    color: #0dcaf0 !important; /* For Facebook button, matching info color */
+}
+.btn-info i {
+    color: white !important; /* Ensure the Facebook icon remains white */
+}

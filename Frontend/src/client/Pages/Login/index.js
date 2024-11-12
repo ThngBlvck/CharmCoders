@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import "../../../assets/styles/css/bootstrap.min.css";
 import "../../../assets/styles/css/style.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { login } from "../../../services/User"; // Đảm bảo đã import FontAwesome cho icon
+import { login } from "../../../services/User";
 
 export default function Login() {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
-    const [errorMessage, setErrorMessage] = useState(""); // Trạng thái lỗi
-    const [loading, setLoading] = useState(false); // Trạng thái loading
+    const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [GoogleloginUrl, setGoogleLoginUrl] = useState(null);
     const [FacebookloginUrl, setFacebookLoginUrl] = useState(null);
@@ -25,7 +25,6 @@ export default function Login() {
         setLoading(true);
         setErrorMessage("");
 
-        // Kiểm tra các trường nhập trước khi gửi yêu cầu
         if (!formData.email || !formData.password) {
             setErrorMessage("Vui lòng nhập đầy đủ email và mật khẩu.");
             setLoading(false);
@@ -34,25 +33,18 @@ export default function Login() {
 
         try {
             const response = await login(formData);
-            console.log(response);
             if (response && response.token) {
-                // Nếu có token trả về, lưu vào localStorage
-                console.log("Token:", response.token);
                 localStorage.setItem('token', response.token);
                 window.location.href = "/home";
             } else {
                 setErrorMessage("Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
             }
         } catch (error) {
-            console.error("Đăng nhập thất bại:", error);
-            // Xử lý thông báo lỗi từ backend
             if (error.response && error.response.data) {
                 const errorData = error.response.data;
                 if (errorData.errors) {
-                    // Nếu có lỗi xác thực từ backend
-                    setErrors(errorData.errors); // Gán lỗi cho errors object
+                    setErrors(errorData.errors);
                 } else {
-                    // Nếu không có lỗi xác thực cụ thể
                     setErrorMessage(errorData.message || 'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.');
                 }
             } else {
@@ -62,6 +54,7 @@ export default function Login() {
             setLoading(false);
         }
     };
+
     useEffect(() => {
         fetch('http://localhost:8000/api/auth/redirect/google', {
             headers: {
@@ -69,12 +62,7 @@ export default function Login() {
                 'Accept': 'application/json'
             }
         })
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Something went wrong!');
-            })
+            .then((response) => response.ok ? response.json() : Promise.reject())
             .then((data) => setGoogleLoginUrl(data.url))
             .catch((error) => console.error(error));
     }, []);
@@ -86,18 +74,10 @@ export default function Login() {
                 'Accept': 'application/json'
             }
         })
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error('Something went wrong!');
-            })
+            .then((response) => response.ok ? response.json() : Promise.reject())
             .then((data) => setFacebookLoginUrl(data.url))
             .catch((error) => console.error(error));
     }, []);
-    
-
-
 
     return (
         <div className="container py-5">
@@ -154,19 +134,20 @@ export default function Login() {
                             </div>
                         )}
 
-                        {/* Google Login Button */}
-                        <div className="text-center mt-3">
+                        {/* Social Login Buttons */}
+                        {/* Social Login Buttons */}
+                        <div className="text-center mt-4">
                             <p className="font-semibold" style={{ color: '#8c5e58' }}>Hoặc đăng nhập bằng</p>
-                            <a href={GoogleloginUrl} className="btn btn-outline-danger w-100 mt-3">
-                                <i className="fab fa-google me-2"></i> Đăng Nhập với Google
-                            </a>
+                            <div className="d-flex justify-content-center gap-3">
+                                <a href={GoogleloginUrl} className="btn btn-danger d-flex align-items-center px-3 py-2 rounded-pill" style={{ gap: '8px' }}>
+                                    <i className="fab fa-google"></i> Google
+                                </a>
+                                <a href={FacebookloginUrl} className="btn btn-info d-flex align-items-center px-3 py-2 rounded-pill" style={{ gap: '8px' }}>
+                                    <i className="fab fa-facebook-f"></i> Facebook
+                                </a>
+                            </div>
                         </div>
-                        <div className="text-center mt-3">
-                            <p className="font-semibold" style={{ color: '#8c5e58' }}>Hoặc đăng nhập bằng</p>
-                            <a href={FacebookloginUrl} className="btn btn-outline-danger w-100 mt-3">
-                                <i className="fab fa-google me-2"></i> Đăng Nhập với facebook
-                            </a>
-                        </div>
+
 
                         <div className="mt-3 text-center">
                             <p className="font-semibold" style={{ color: '#8c5e58' }}>Bạn chưa có tài khoản? <a href="/register" className="text-decoration-none font-bold" style={{ color: '#8c5e58' }}>Đăng ký ngay</a></p>
