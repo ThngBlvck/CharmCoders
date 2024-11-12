@@ -22,39 +22,39 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)
                     ->whereNull('auth_provider') // Chỉ tìm tài khoản bình thường
                     ->first();
-    
+
         if (!$user) {
             // Nếu không tìm thấy tài khoản, trả về lỗi
             return response([
                 'message' => 'Tài khoản không tồn tại'
             ], 404);
         }
-    
+
         // Kiểm tra mật khẩu so với mật khẩu đã băm trong cơ sở dữ liệu
         if (Hash::check($request->password, $user->password)) {
             // Nếu mật khẩu đúng, tạo token mới
             $user->tokens->each(function ($token) {
                 $token->delete();
             });
-    
+
             $token = $user->createToken('UserToken', ['user'])->accessToken;
-    
+
             return response([
                 'message' => 'Đăng nhập thành công',
                 'token' => $token,
                 'role' => 'user',
             ], 200);
         }
-    
+
         // Nếu mật khẩu sai
         return response([
             'message' => 'Mật khẩu không đúng'
         ], 401);
     }
-    
-    
-    
-    
+
+
+
+
     public function Register(RegisterRequest $request)
     {
         try {

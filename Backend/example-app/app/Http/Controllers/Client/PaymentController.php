@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Services\VNPayPaymentGateway;
 use App\Models\Cart;
 use App\Models\Product;
@@ -14,138 +15,158 @@ use Exception;
 
 class PaymentController extends Controller
 {
-    protected $paymentGateway;
+    protected $vnpayService;
 
-    public function __construct(VNPayPaymentGateway $paymentGateway)
+    public function __construct(VNPayPaymentGateway $vnpayService)
     {
-        $this->paymentGateway = $paymentGateway;
+        $this->vnpayService = $vnpayService; // Inject VNPayPaymentGateway Service
     }
 
-    public function checkout(Request $request)
+    public function createPayment(Request $request)
     {
-        $userId = Auth::id();
-        if (!$userId) {
-            return response()->json(['error' => 'Bạn cần đăng nhập!'], 400);
-        }
-
-        $cartItemIds = $request->input('cart_item_ids');
-        if (!$cartItemIds || !is_array($cartItemIds)) {
-            return response()->json(['error' => 'Bạn cần cung cấp danh sách cart_item_ids!'], 400);
-        }
-
+        // Lấy thông tin từ request
         $address = $request->input('address');
-        if (!$address) {
-            return response()->json(['error' => 'Bạn cần cung cấp địa chỉ!'], 400);
+        $phone = $request->input('phone');
+        $paymentMethod = $request->input('payment_method', '1'); // Phương thức thanh toán, mặc định là '1'
+        $userId = Auth::id(); // Lấy ID người dùng đã đăng nhập
+
+        // Lấy các sản phẩm trong giỏ hàng của người dùng
+        $cartItems = Cart::where('user_id', $userId)->get();
+
+        // Kiểm tra nếu giỏ hàng rỗng
+        if ($cartItems->isEmpty()) {
+            return response()->json([
+                'message' => 'Giỏ hàng rỗng.',
+            ], 422);
         }
 
-//         $paymentMethod = $request->input('payment_method');
-
-        $totalAmount = $this->calculateTotalAmount($cartItemIds, $userId);
-
-        if ($totalAmount <= 0) {
-            return response()->json(['error' => 'Thiếu thông tin thanh toán!'], 400);
+        // Kiểm tra các item có đầy đủ thông tin
+        foreach ($cartItems as $item) {
+            if (!$item->price || !$item->quantity) {
+                return response()->json([
+                    'message' => 'Sản phẩm trong giỏ hàng không hợp lệ.',
+                ], 422);
+            }
         }
 
-        $paymentUrl = $this->paymentGateway->createPayment($totalAmount, "Thanh toán đơn hàng");
+        // Tính tổng số tiền cần thanh toán từ các sản phẩm trong giỏ hàng
+        $totalAmount = $cartItems->sum(function ($item) {
+            return $item->quantity * $item->price;
+        });
 
-        return response()->json(['url' => $paymentUrl]);
+        // Tạo thông tin đơn hàng
+        $orderInfo = "Thanh toán giỏ hàng";
+
+        // Gọi VNPayPaymentGateway để tạo URL thanh toán
+        $paymentUrl = $this->vnpayService->createPayment($totalAmount, $orderInfo);
+
+        // Trả về URL thanh toán và các thông tin khác
+        // Trước khi trả về, bạn có thể xử lý thông tin đơn hàng ngay tại đây
+
+        // Giả sử người dùng nhập OTP thành công, bạn sẽ tự động gọi returnPayment như sau:
+        $response = $this->returnPayment($request);
+
+        return response()->json([
+            'payment_url' => $paymentUrl,  // URL thanh toán VNPay
+            'address' => $address,      // Địa chỉ
+            'phone' => $phone,          // Số điện thoại
+            'payment_method' => $paymentMethod,  // Phương thức thanh toán
+            'total_amount' => $totalAmount, // Tổng số tiền
+            'order_response' => $response // Thêm phản hồi từ hàm returnPayment
+        ]);
     }
 
-    public function paymentReturn(Request $request)
+
+
+
+    public function returnPayment(Request $request)
     {
-        // Log dữ liệu từ VNPay callback để kiểm tra
-        \Log::info('Payment Return Data:', $request->all());
+        $vnp_HashSecret = config('vnpay.hash_secret'); // Lấy cấu hình chính xác từ vnpay.php
+        $inputData = $request->all();
 
-        try {
-            // Kiểm tra trạng thái thanh toán từ VNPay
-            $isSuccess = $this->paymentGateway->paymentReturn($request);
+        // Kiểm tra xem 'vnp_SecureHash' có trong mảng không
+        if (!isset($inputData['vnp_SecureHash'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Thiếu vnp_SecureHash trong phản hồi'
+            ]);
+        }
 
-            // Nếu thanh toán thất bại, trả về thông báo lỗi
-            if (!$isSuccess) {
-                return response()->json(['status' => 'fail', 'message' => 'Giao dịch thất bại'], 400);
-            }
+        $vnp_SecureHash = $inputData['vnp_SecureHash'];
+        unset($inputData['vnp_SecureHash']);
+        ksort($inputData);
 
-            // Lấy ID người dùng đã xác thực
-            $userId = Auth::id();
-            if (!$userId) {
-                return response()->json(['status' => 'fail', 'message' => 'Bạn cần đăng nhập!'], 400);
-            }
+        // Tạo dữ liệu để tính toán chữ ký
+        $hashData = '';
+        foreach ($inputData as $key => $value) {
+            $hashData .= urlencode($key) . '=' . urlencode($value) . '&';
+        }
+        $hashData = rtrim($hashData, '&');
 
-            // Kiểm tra và lấy dữ liệu cần thiết từ request
-            $address = $request->input('address');
-//             $paymentMethod = $request->input('payment_method');
-//             if (!$address || !$paymentMethod) {
-//                 return response()->json(['status' => 'fail', 'message' => 'Thông tin địa chỉ và phương thức thanh toán không đầy đủ!'], 400);
-//             }
+        // Tính toán lại mã bảo mật
+        $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
 
-            // Lấy các sản phẩm trong giỏ hàng của người dùng
-            $cartItems = Cart::where('user_id', $userId)->get();
-            if ($cartItems->isEmpty()) {
-            return response()->json(['status' => 'fail', 'message' => 'Không tìm thấy sản phẩm trong giỏ hàng!'], 404);
-            }
+        // Kiểm tra chữ ký và mã phản hồi
+        if ($secureHash == $vnp_SecureHash) {
+            // Kiểm tra nếu thanh toán thành công
+            if ($inputData['vnp_ResponseCode'] == '00') {
+                // Cập nhật đơn hàng trong cơ sở dữ liệu
+                $order = Order::where('id', $inputData['vnp_TxnRef'])->first();
 
-            // Kiểm tra số lượng sản phẩm và cập nhật kho nếu đủ
-            foreach ($cartItems as $item) {
-                $product = Product::find($item->product_id);
-                if (!$product || $product->quantity < $item->quantity) {
-                    return response()->json(['status' => 'fail', 'message' => "Sản phẩm {$product->name} không đủ số lượng trong kho!"], 400);
+                if (!$order) {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Đơn hàng không tồn tại'
+                    ]);
                 }
 
-                // Trừ số lượng sản phẩm trong kho và tăng lượt mua
-                $product->decrement('quantity', $item->quantity);
+                // Tạo đơn hàng chi tiết
+                $orderDetails = [];
+                $cartItems = Cart::where('user_id', Auth::id())->get();
+                foreach ($cartItems as $item) {
+                    $orderDetails[] = [
+                        'order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+
+                Order_detail::insert($orderDetails);
+
+                // Xóa giỏ hàng của người dùng sau khi tạo đơn hàng
+                Cart::where('user_id', Auth::id())->delete();
+
+                // Cập nhật trạng thái đơn hàng
+                $order->update([
+                    'status' => 1, // 1: Đã thanh toán
+                    'payment_time' => now(),
+                    'transaction_id' => $inputData['vnp_TransactionNo'], // Lưu mã giao dịch từ VNPay
+                    'bank_code' => $inputData['vnp_BankCode'] // Lưu mã ngân hàng
+                ]);
+
+                \Log::info('Thanh toán thành công: ', ['order_id' => $order->id, 'transaction_id' => $inputData['vnp_TransactionNo']]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Thanh toán thành công',
+                    'order' => $order
+                ]);
             }
 
-            // Tính tổng tiền của giỏ hàng
-            $totalAmount = $this->calculateTotalAmount($cartItems->pluck('id')->toArray(), $userId);
-
-            // Tạo đơn hàng mới
-            $order = Order::create([
-                'user_id' => $userId,
-                'total_amount' => $totalAmount,
-                'address' => $address,
-//                 'payment_method' => $paymentMethod,
-                'status' => 1, // Đơn hàng đã được thanh toán
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Thanh toán thất bại. Mã lỗi: ' . $inputData['vnp_ResponseCode']
             ]);
-
-            // Lưu chi tiết đơn hàng
-            $orderDetails = $cartItems->map(function ($item) use ($order) {
-                return [
-                    'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            })->toArray();
-
-            Order_detail::insert($orderDetails);
-
-            // Xóa giỏ hàng của người dùng sau khi tạo đơn hàng
-            Cart::where('user_id', $userId)->delete();
-
-            // Trả về phản hồi thành công với ID đơn hàng
-            return response()->json(['status' => 'success', 'message' => 'Thanh toán thành công', 'order_id' => $order->id]);
-        } catch (Exception $e) {
-            // Log lỗi nếu có ngoại lệ xảy ra
-            \Log::error('Payment Return Error:', ['error' => $e->getMessage()]);
-            return response()->json(['status' => 'error', 'message' => 'Lỗi hệ thống, vui lòng thử lại sau'], 500);
         }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Sai chữ ký'
+        ]);
     }
 
 
-    private function calculateTotalAmount($cartItemIds, $userId)
-    {
-        $totalAmount = 0;
-        $cartItems = Cart::whereIn('id', $cartItemIds)->where('user_id', $userId)->get();
-
-        foreach ($cartItems as $cartItem) {
-            $product = Product::find($cartItem->product_id);
-            if ($product) {
-                $totalAmount += $product->getPrice() * $cartItem->quantity;
-            }
-        }
-
-        return $totalAmount;
-    }
 }

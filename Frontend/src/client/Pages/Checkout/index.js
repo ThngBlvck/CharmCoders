@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {getUserInfo} from "../../../services/User";
-import {checkout} from '../../../services/Checkout';
+import {checkout,momoCheckout} from '../../../services/Checkout';
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -246,31 +246,31 @@ export default function Checkout() {
 
     const handleSubmit = async (event) => {
         event.preventDefault(); // Ngăn chặn hành động mặc định của form
-
+    
         const totalAmount = calculateTotal();
-
+    
         // Reset errors
         const newErrors = {};
-
+    
         // Kiểm tra Họ và Tên
         if (!formData.name.trim()) {
             newErrors.name = "Họ và Tên không được để trống.";
         }
-
+    
         // Kiểm tra Email
         if (!formData.email.trim()) {
             newErrors.email = "Email không được để trống.";
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = "Email không đúng định dạng.";
         }
-
+    
         // Kiểm tra Số điện thoại
         if (!formData.phone.trim()) {
             newErrors.phone = "Số điện thoại không được để trống.";
         } else if (!/^\d{10}$/.test(formData.phone)) {
             newErrors.phone = "Số điện thoại phải có 10 chữ số.";
         }
-
+    
         // Kiểm tra Địa chỉ
         const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
         if (!formData.address?.trim()) {
@@ -278,73 +278,73 @@ export default function Checkout() {
         } else if (!wardName || !districtName || !provinceName) {
             newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
         }
-
+    
         setErrors(newErrors);
-
+    
         // Nếu có lỗi, dừng xử lý
         if (Object.keys(newErrors).length > 0) {
             return;
         }
-
+    
         // Tạo một object mới chứa dữ liệu để gửi lên server
         const orderData = {
+            order_id: `MDH_${Date.now()}`,
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
             address: fullAddress, // Sử dụng địa chỉ đã nối
-            paymentMethod: formData.paymentMethod,
+            payment_method: formData.paymentMethod, // Thêm thông tin phương thức thanh toán
             total_amount: totalAmount,
         };
-        console.log(orderData)
-
-        // Kiểm tra xem địa chỉ có phải là chuỗi không
-        if (typeof orderData.address !== "string" || orderData.address.length === 0) {
-            setMessage("Địa chỉ phải là chuỗi ký tự.");
-            return; // Dừng lại nếu địa chỉ không hợp lệ
-        }
-
-        // Gọi hàm checkout với dữ liệu đã chuẩn bị
-        try {
-            const result = await checkout(orderData);
-            Swal.fire('Thành công', 'Thanh toán thành công.', 'success');
-            navigate(`/order-list`);
-        } catch (error) {
-            Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
+    
+        // Kiểm tra nếu phương thức thanh toán là MoMo
+        if (orderData.payment_method === "2") {
+            
+            handleMomoPayment(orderData); // Gọi hàm xử lý thanh toán MoMo
+        } else {
+            // Tiến hành xử lý thanh toán với các phương thức khác (nếu có)
+            try {
+                const result = await checkout(orderData);
+                Swal.fire('Thành công', 'Thanh toán thành công.', 'success');
+                navigate(`/order-list`);
+            } catch (error) {
+                Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
+            }
         }
     };
+    
 
-    const handleMomoPayment = async () => {
+    const handleMomoPayment = async (orderData) => {
         try {
-            const amount = calculateTotal(); // Tính tổng tiền thanh toán
-            if (amount <= 0) {
-                console.error("Số tiền thanh toán không hợp lệ.");
-                return;
-            }
-
-            // Thông tin đơn hàng
+            // Bước 1: Tạo đơn hàng trong cơ sở dữ liệu
+            const createdOrder = await checkout(orderData);
+    
+           
+    
+            // Bước 2 và 3: Xử lý thanh toán MoMo
             const orderInfo = {
-                amount,
-                orderId: `order_${Date.now()}`,
+                amount: orderData.total_amount,
+                orderId: orderData.order_id,
                 description: "Thanh toán đơn hàng qua MoMo",
                 customerInfo: {
-                    name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone
-                }
+                    name: orderData.name,
+                    email: orderData.email,
+                    phone: orderData.phone,
+                },
             };
-
-            // Gọi API để tạo URL thanh toán
-            const response = await makeMomoPayment(orderInfo);
-            if (response && response.payUrl) {
-                window.location.href = response.payUrl; // Chuyển hướng tới URL thanh toán MoMo
+    
+            const payUrl = await momoCheckout(orderInfo);
+            if (payUrl) {
+                window.location.href = payUrl;
             } else {
-                console.error("Lỗi thanh toán MoMo: không có URL thanh toán.");
+                Swal.fire("Lỗi", "Không nhận được URL thanh toán MoMo.", "error");
             }
         } catch (error) {
-            console.error('Lỗi thanh toán MoMo:', error);
+            console.error("Lỗi thanh toán MoMo:", error);
+            Swal.fire("Lỗi", "Không thể tạo đơn hàng. Vui lòng thử lại.", "error");
         }
     };
-
+    
     return (
         <div className="container py-5">
             <div className="row">
@@ -528,8 +528,8 @@ export default function Checkout() {
                                             type="radio"
                                             className="form-check-input"
                                             name="paymentMethod"
-                                            value="cashOnDelivery"
-                                            checked={formData.paymentMethod === "cashOnDelivery"}
+                                            value="1"
+                                            checked={formData.paymentMethod === "1"}
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label" style={{color: "#8c5e58"}}>
@@ -541,8 +541,8 @@ export default function Checkout() {
                                             type="radio"
                                             className="form-check-input"
                                             name="paymentMethod"
-                                            value="momo"
-                                            checked={formData.paymentMethod === "momo"}
+                                            value="2"
+                                            checked={formData.paymentMethod === "2"}
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label" style={{color: "#8c5e58"}}>
@@ -554,8 +554,8 @@ export default function Checkout() {
                                             type="radio"
                                             className="form-check-input"
                                             name="paymentMethod"
-                                            value="creditCard"
-                                            checked={formData.paymentMethod === "creditCard"}
+                                            value="3"
+                                            checked={formData.paymentMethod === "3"}
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label" style={{color: "#8c5e58"}}>

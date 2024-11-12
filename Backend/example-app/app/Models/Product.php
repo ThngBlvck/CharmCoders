@@ -14,6 +14,7 @@ class Product extends Model
         'unit_price',
         'sale_price',
         'quantity',
+        'purchase_count',
         'image',
         'content',
         'views',

@@ -16,8 +16,9 @@ class StoreOrderRequest extends FormRequest
         return [
             'address' => 'required|string|max:255', // Địa chỉ là bắt buộc và tối đa 255 ký tự
             'status' => 'integer', // Trạng thái phải là số nguyên và bắt buộc
-            'payment_method' => 'nullable|string|max:50',
+            'payment_method' => 'nullable|max:50',
             'phone' => 'required|string|max:15',
+            'order_id' => 'required|string|unique:orders,order_id',
         ];
     }
 
@@ -30,6 +31,9 @@ class StoreOrderRequest extends FormRequest
             'status.integer' => 'Trạng thái phải là một số nguyên hợp lệ.',
             'payment_method.required' => 'Vui lòng chọn phương thức thanh toán.',
             'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'order_id.required' => 'Vui lòng nhập mã đơn hàng.',
+            'order_id.unique' => 'Mã đơn hàng là duy nhất.',
+
         ];
     }
 }
