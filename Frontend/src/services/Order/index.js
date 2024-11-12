@@ -36,13 +36,3 @@ export const getOrderAdmin = (query = '') => {
         path: `${URL_Order_Admin}`,
     });
 };
-
-export const updateOrder = (id, status) => {
-    return request({
-        method: 'POST',
-        path: `${URL_Update_Order}/${id}?_method=PUT`,
-        data: {
-            status: status, // Truyền status là chuỗi thay vì đối tượng
-        },
-    });
-};
