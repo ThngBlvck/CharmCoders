@@ -34,7 +34,7 @@ export default function OrderDetail() {
                             <div className="mb-4">
                                 <h2 className="text-2xl font-semibold mb-4">Thông Tin Khách Hàng:</h2>
                                 <p className="text-lg font-semibold mb-2">Tên Người Dùng: {orderData.user.name}</p>
-                                <p className="text-lg font-semibold mb-2">Số Điện Thoại: {orderData.user.phone}</p>
+                                <p className="text-lg font-semibold mb-2">Số Điện Thoại: {orderData.phone}</p>
                             </div>
                         )}
                         <p className="text-lg font-semibold mb-2">Địa chỉ: {orderData.address}</p>
