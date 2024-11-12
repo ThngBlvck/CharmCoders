@@ -30,8 +30,6 @@ import ChangePassword from "./Pages/Change_Password";
 import GoogleCallback from "./Pages/GoogleCallback";
 import OrderDetail from "./Pages/Order_Detail";
 import FacebookCallback from "./Pages/FacebookCallback";
-import OrderDetail from "./Pages/Order_Detail";
-
 
 
 

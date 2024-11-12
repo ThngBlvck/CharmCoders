@@ -288,6 +288,7 @@ export default function Checkout() {
     
         // Tạo một object mới chứa dữ liệu để gửi lên server
         const orderData = {
+            order_id: `MDH_${Date.now()}`,
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
@@ -297,7 +298,7 @@ export default function Checkout() {
         };
     
         // Kiểm tra nếu phương thức thanh toán là MoMo
-        if (orderData.payment_method === "momo") {
+        if (orderData.payment_method === "2") {
             
             handleMomoPayment(orderData); // Gọi hàm xử lý thanh toán MoMo
         } else {
@@ -323,7 +324,7 @@ export default function Checkout() {
             // Bước 2 và 3: Xử lý thanh toán MoMo
             const orderInfo = {
                 amount: orderData.total_amount,
-                orderId: `order_${Date.now()}`,
+                orderId: orderData.order_id,
                 description: "Thanh toán đơn hàng qua MoMo",
                 customerInfo: {
                     name: orderData.name,
@@ -527,8 +528,8 @@ export default function Checkout() {
                                             type="radio"
                                             className="form-check-input"
                                             name="paymentMethod"
-                                            value="cashOnDelivery"
-                                            checked={formData.paymentMethod === "cashOnDelivery"}
+                                            value="1"
+                                            checked={formData.paymentMethod === "1"}
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label" style={{color: "#8c5e58"}}>
@@ -540,8 +541,8 @@ export default function Checkout() {
                                             type="radio"
                                             className="form-check-input"
                                             name="paymentMethod"
-                                            value="momo"
-                                            checked={formData.paymentMethod === "momo"}
+                                            value="2"
+                                            checked={formData.paymentMethod === "2"}
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label" style={{color: "#8c5e58"}}>
@@ -553,8 +554,8 @@ export default function Checkout() {
                                             type="radio"
                                             className="form-check-input"
                                             name="paymentMethod"
-                                            value="creditCard"
-                                            checked={formData.paymentMethod === "creditCard"}
+                                            value="3"
+                                            checked={formData.paymentMethod === "3"}
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label" style={{color: "#8c5e58"}}>
