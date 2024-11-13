@@ -1,12 +1,13 @@
 import request from '../../api';
 
 const URL_Product = 'admin/products';
-
 const URL_Search = 'admin/search';  // Thay đổi URL nếu cần
-
 const URL_Checkout = 'client/buy-now';
 const URL_MomoPayment = 'momo-payment';
+const URL_related = 'client/related-products';
+const URL_HotProducts = 'client/products/hot';
 
+// Hàm tìm kiếm sản phẩm
 export const searchProduct = (query) => {
     return request({
         method: 'GET',
@@ -14,6 +15,7 @@ export const searchProduct = (query) => {
     });
 };
 
+// Hàm lấy danh sách sản phẩm
 export const getProduct = (query = '') => {
     return request({
         method: 'GET',
@@ -24,7 +26,7 @@ export const getProduct = (query = '') => {
     });
 };
 
-// Các hàm CRUD khác không thay đổi
+// Hàm lấy thông tin 1 sản phẩm
 export const getOneProduct = (id) => {
     return request({
         method: 'GET',
@@ -32,6 +34,7 @@ export const getOneProduct = (id) => {
     });
 };
 
+// Hàm lấy danh sách sản phẩm theo ID
 export const getProductsByIds = (ids) => {
     return request({
         method: 'GET',
@@ -39,7 +42,7 @@ export const getProductsByIds = (ids) => {
     });
 };
 
-
+// Hàm thêm mới sản phẩm
 export const postProduct = (data) => {
     return request({
         method: 'POST',
@@ -48,6 +51,7 @@ export const postProduct = (data) => {
     });
 };
 
+// Hàm cập nhật sản phẩm
 export const updateProduct = (id, data) => {
     return request({
         method: 'POST',
@@ -56,6 +60,7 @@ export const updateProduct = (id, data) => {
     });
 };
 
+// Hàm xóa sản phẩm
 export const deleteProduct = (id) => {
     return request({
         method: 'DELETE',
@@ -85,4 +90,27 @@ export const makeMomoPayment = (amount, orderId, orderInfo) => {
             orderInfo     // Thông tin đơn hàng để hiển thị khi thanh toán
         }
     });
+};
+
+// Hàm lấy sản phẩm liên quan
+export const getRelatedProducts = (id) => {
+    return request({
+        method: 'GET',
+        path: `client/products/related/${id}`, // Đường dẫn tương ứng với API route
+    });
+};
+
+
+// Hàm lấy danh sách sản phẩm hot nhất
+export const getHotProducts = async () => {
+    try {
+        const response = await request({
+            method: 'GET',
+            path: 'client/products/hot', // Đường dẫn API từ route
+        });
+        return response.data; // Trả về dữ liệu từ API
+    } catch (error) {
+        console.error('Error fetching hot products:', error);
+        throw error; // Ném lỗi để xử lý tại nơi gọi
+    }
 };
