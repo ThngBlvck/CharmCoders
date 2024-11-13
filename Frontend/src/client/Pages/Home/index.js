@@ -5,15 +5,15 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
 import Slider from "react-slick";
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import {faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {getProduct, searchProduct, getCheckoutData} from "../../../services/Product";
-import { getBrand } from '../../../services/Brand';
+import {getBrand} from '../../../services/Brand';
 import Swal from "sweetalert2";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {addToCart} from "../../../services/Cart";
 
 export default function Home() {
-    const { id } = useParams();
+    const {id} = useParams();
     const [products, setProducts] = useState([]);
     const [brands, setBrands] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -215,6 +215,50 @@ export default function Home() {
                                     ) : (
                                         <p className="text-center">Không có sản phẩm để hiển thị</p>
                                     )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="container-fluid about py-2">
+                        <div className="container py-5">
+                            <div className="row g-5 align-items-center">
+                                {/* Hình ảnh bên trái */}
+                                <div className="col-lg-5">
+                                    <div className="video">
+                                        <img src="https://via.placeholder.com/400x300" className="img-fluid rounded"
+                                             alt="About Us"/>
+                                        <div
+                                            className="position-absolute rounded border-5 border-top border-start border-white"
+                                            style={{bottom: '0', right: '0'}}>
+                                            <img src="https://via.placeholder.com/200x150" className="img-fluid rounded"
+                                                 alt="Extra Image"/>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                {/* Nội dung giới thiệu */}
+                                <div className="col-lg-7">
+                                    <div>
+                                        <p className="fs-4 text-primary font-semibold custom-font">Về Chúng Tôi</p>
+                                        <p className="mb-4 font-bold"
+                                           style={{color: '#8c5e58', fontSize: "30px"}}>GlowMakers –
+                                            Cửa hàng mỹ phẩm dưỡng da, dưỡng môi chính hãng.</p>
+                                        <p className="mb-4" style={{color: '#8c5e58'}}>
+                                            GlowMakers là cửa hàng mỹ phẩm chuyên cung cấp các sản phẩm dưỡng da và
+                                            dưỡng môi
+                                            cao cấp, mang lại vẻ đẹp tự nhiên và rạng rỡ cho phái đẹp. Với sứ mệnh giúp
+                                            bạn tự
+                                            tin tỏa sáng, GlowMakers luôn lựa chọn những dòng sản phẩm an toàn, lành
+                                            tính, chiết
+                                            xuất từ thiên nhiên, phù hợp cho mọi loại da...
+                                        </p>
+                                        <NavLink to="/about"
+                                                 className="btn btn-primary btn-primary-outline-0 rounded-pill py-3 px-5">
+                                            Xem thêm
+                                        </NavLink>
+                                    </div>
                                 </div>
                             </div>
                         </div>
