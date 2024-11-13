@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 // components
 import Navbar from "./components/Navbars";
@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 // views
 import Dashboard from "./Pages/Dashboard";
 import Page404 from "../client/Pages/404";
+import Login from "./Pages/Login";
 
 // Product
 import Product from "./Pages/Product/List";
@@ -50,17 +51,19 @@ import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
 
 export default function Admin() {
+    const location = useLocation();
+    const isLoginPage = location.pathname === "/admin/login";
+
     return (
         <>
-            <Sidebar />
-            <div className="relative md:ml-64 bg-blueGray-100">
-                <Navbar />
-                {/* Header */}
-                <HeaderStats />
+            {!isLoginPage && <Sidebar />}
+            <div className={`relative ${!isLoginPage ? "md:ml-64 bg-blueGray-100" : "bg-white"}`}>
+                {!isLoginPage && <Navbar />}
+                {!isLoginPage && <HeaderStats />}
                 <div className="px-4 md:px-10 mx-auto w-full -m-24">
                     <Routes>
                         <Route path="dashboard" element={<Dashboard />} />
-
+                        <Route path="login" element={<Login />} />
                         {/* Product Category Routes */}
                         <Route path="category_product" element={<ProductCategory />} />
                         <Route path="category_product/add" element={<AddProductCategory />} />
@@ -107,7 +110,7 @@ export default function Admin() {
                         <Route path="/404" element={<Page404 />} />
                         <Route path="*" element={<Navigate to="/404" />} />
                     </Routes>
-                    <Footer />
+                    {!isLoginPage && <Footer />}
                 </div>
             </div>
         </>
