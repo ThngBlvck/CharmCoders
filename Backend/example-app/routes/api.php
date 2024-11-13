@@ -84,6 +84,7 @@ Route::prefix('client')->group(function () {
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
     Route::post('/contact/send', [MailController::class, 'sendMail']);
     Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
+    Route::get('products/hot', [ClientProductController::class, 'getHotProducts']);
     // Route để yêu cầu đặt lại mật khẩu qua API
 
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);

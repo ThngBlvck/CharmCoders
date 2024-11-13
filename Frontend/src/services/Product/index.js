@@ -5,6 +5,8 @@ const URL_Search = 'admin/search';  // Thay đổi URL nếu cần
 const URL_Checkout = 'client/buy-now';
 const URL_MomoPayment = 'momo-payment';
 const URL_related = 'client/related-products';
+const URL_HotProducts = 'client/products/hot';
+
 // Hàm tìm kiếm sản phẩm
 export const searchProduct = (query) => {
     return request({
@@ -96,4 +98,19 @@ export const getRelatedProducts = (id) => {
         method: 'GET',
         path: `client/products/related/${id}`, // Đường dẫn tương ứng với API route
     });
+};
+
+
+// Hàm lấy danh sách sản phẩm hot nhất
+export const getHotProducts = async () => {
+    try {
+        const response = await request({
+            method: 'GET',
+            path: 'client/products/hot', // Đường dẫn API từ route
+        });
+        return response.data; // Trả về dữ liệu từ API
+    } catch (error) {
+        console.error('Error fetching hot products:', error);
+        throw error; // Ném lỗi để xử lý tại nơi gọi
+    }
 };
