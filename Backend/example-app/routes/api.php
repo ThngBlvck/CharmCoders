@@ -98,7 +98,7 @@ Route::prefix('client')->group(function () {
     //change password
     Route::put('/changepassword', [UserController::class, 'changePassword'])->middleware('auth:api');
     Route::post('/payment/momo', [MomoPaymentController::class, 'createPayment']);
-    Route::post('/payment-ipn', [MomoPaymentController::class, 'handleIPN']);
+    Route::get('/payment/redirect', [MomoPaymentController::class, 'handleRedirect']);
 
 });
 
@@ -113,7 +113,9 @@ Route::middleware('auth:api')->apiResource('comments', CommentController::class)
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
-
+//login goog
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
 
 
