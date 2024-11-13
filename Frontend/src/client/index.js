@@ -30,6 +30,7 @@ import ChangePassword from "./Pages/Change_Password";
 import GoogleCallback from "./Pages/GoogleCallback";
 import OrderDetail from "./Pages/Order_Detail";
 import FacebookCallback from "./Pages/FacebookCallback";
+import Success from "./Pages/payment-result";
 
 
 
@@ -73,6 +74,8 @@ export default function Client() {
                     <Route path="/address" element={<List_Address/>} />
                     <Route path="/add-address" element={<Add_Address/>} />
                     <Route path="/edit-address/:id" element={<Edit_Address/>} />
+
+                    <Route path="payment-result" element={<Success/>} />
 
                     {/* Trang chủ khi vào đường dẫn gốc */}
                     <Route path="/" element={<Navigate to="/home" />} />
