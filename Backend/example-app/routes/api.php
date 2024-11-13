@@ -93,7 +93,7 @@ Route::prefix('client')->group(function () {
     Route::post('/contact/send', [MailController::class, 'send']);
 
     //profile user
-    Route::put('/profile/{id}', [UserController::class, 'profile'])->middleware('auth:api');
+    Route::put('/profile', [UserController::class, 'profile'])->middleware('auth:api');
     //adress
     Route::apiResource('/address', AddressController::class)->middleware('auth:api');
     //change password
