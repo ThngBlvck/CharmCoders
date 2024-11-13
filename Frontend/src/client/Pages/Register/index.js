@@ -143,13 +143,6 @@ export default function Register() {
                         <button type="submit" className="btn btn-primary w-100 font-semibold mt-1"
                                 style={{color: '#442e2b'}}>Đăng Ký
                         </button>
-                        {/* Google Login Button */}
-                        <div className="text-center mt-3">
-                            <p className="font-semibold" style={{color: '#8c5e58'}}>Hoặc đăng nhập bằng</p>
-                            <a href="/login-with-google" className="btn btn-outline-danger w-100 mt-3">
-                                <i className="fab fa-google me-2"></i> Đăng Nhập với Google
-                            </a>
-                        </div>
                         <div className="mt-3 text-center">
                             <p className="font-semibold" style={{color: '#8c5e58'}}>Bạn đã có tài khoản? <a
                                 href="/login" className="text-decoration-none font-bold" style={{color: '#8c5e58'}}>Đăng
