@@ -241,8 +241,8 @@ const handleLogout = () => {
                                                     onClick={() => setSearchTerm("")} // Reset lại thanh tìm kiếm khi click
                                                 >
 
-                                                    <div className="d-flex justify-start">
-                                                        <div>
+                                                    <div className="row">
+                                                        <div className="col-3">
                                                             <img
                                                                 src={product.image}
                                                                 alt={product.name}
@@ -254,7 +254,7 @@ const handleLogout = () => {
                                                                 }}
                                                             />
                                                         </div>
-                                                        <div>
+                                                        <div className="col-9">
                                                             <p className="product-n" style={{
                                                                 fontWeight: "bold",
                                                                 overflow: "hidden", // Ẩn phần không hiển thị
