@@ -37,14 +37,22 @@ class AuthController extends Controller
                 $token->delete();
             });
 
-            $token = $user->createToken('UserToken', ['user'])->accessToken;
+            // Kiểm tra role_id và tạo token với quyền tương ứng
+            if ($user->role_id == 2) {
+                $token = $user->createToken('AdminToken', ['admin'])->accessToken;  // Quyền admin
+            } elseif ($user->role_id == 3) {
+                $token = $user->createToken('EmployeeToken', ['employee'])->accessToken;  // Quyền employee
+            } else {
+                $token = $user->createToken('UserToken', ['user'])->accessToken;  // Quyền mặc định cho user
+            }
 
             return response([
                 'message' => 'Đăng nhập thành công',
                 'token' => $token,
-                'role' => 'user',
+                'role' => $user->role_id == 2 ? 'admin' : ($user->role_id == 3 ? 'employee' : 'user'),
             ], 200);
         }
+
 
         // Nếu mật khẩu sai
         return response([

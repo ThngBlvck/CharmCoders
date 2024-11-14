@@ -3,18 +3,23 @@ import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getBlogCategory, deleteBlogCategory } from '../../../../services/BlogCategory';
 import Swal from 'sweetalert2';
+import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
 
 export default function BlogCategory({ color }) {
     const [Blogcategories, setBlogcategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true); // Thêm state loading
+    const [currentPage, setCurrentPage] = useState(1);
+    const blogCateriesPerPage = 3; // Số sản phẩm trên mỗi trang
 
     useEffect(() => {
         fetchBlogcategories();
     }, []);
 
     const fetchBlogcategories = async () => {
+        setLoading(true)
         try {
             const result = await getBlogCategory();
             setBlogcategories(result || []);
@@ -22,6 +27,8 @@ export default function BlogCategory({ color }) {
             console.error('Error fetching categories:', err);
             setBlogcategories([]);
             Swal.fire('Error', 'Lỗi khi tải danh mục. Vui lòng thử lại.', 'error');
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -99,6 +106,12 @@ export default function BlogCategory({ color }) {
         }
     };
 
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= Math.ceil(Blogcategories.length / blogCateriesPerPage)) {
+            setCurrentPage(page);
+        }
+    };
+
     return (
         <>
             <div
@@ -129,67 +142,106 @@ export default function BlogCategory({ color }) {
                         {/* Remove Xóa đã chọn button from here */}
                     </div>
                 </div>
-                <div className="block w-full overflow-x-auto">
-                    <table className="items-center w-full bg-transparent border-collapse table-fixed">
-                        <thead>
-                        <tr>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
-                                <input
-                                    type="checkbox"
-                                    checked={selectAll}
-                                    onChange={handleSelectAll}
-                                />
-                                <span className="ml-2">Chọn tất cả</span>
-                            </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên danh mục</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng Thái</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành động</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {Blogcategories.length > 0 ? (
-                            Blogcategories.map((category, index) => (
-                                <tr key={category.id}>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedCategories.includes(category.id)}
-                                            onChange={() => handleSelectCategory(category.id)}
-                                        />
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{category.name}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {category.status === 1 ? "Hiển thị" : "Ẩn"}
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                        <button
-                                            className="text-blue-500 hover:text-blue-700 px-2 transition duration-150 ease-in-out"
-                                            onClick={() => handleEditClick(category.id)}
-                                        >
-                                            <i className="fas fa-pen text-xl"></i>
-                                        </button>
-                                        <button
-                                            className="text-red-500 hover:text-red-700 ml-2 px-2 transition duration-150 ease-in-out"
-                                            onClick={() => handleDeleteClick(category)}
-                                        >
-                                            <i className="fas fa-trash text-xl"></i>
-                                        </button>
+                { loading ? (
+                    <div className="flex justify-center items-center py-4">
+                        <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                    </div>
+                ) : (
+                    <div className="block w-full overflow-x-auto">
+                        <table className="items-center w-full bg-transparent border-collapse table-fixed">
+                            <thead>
+                            <tr>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectAll}
+                                        onChange={handleSelectAll}
+                                    />
+                                    <span className="ml-2">Chọn tất cả</span>
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên
+                                    danh mục
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng
+                                    Thái
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành
+                                    động
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {Blogcategories.length > 0 ? (
+                                Blogcategories.map((category, index) => (
+                                    <tr key={category.id}>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedCategories.includes(category.id)}
+                                                onChange={() => handleSelectCategory(category.id)}
+                                            />
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{category.name}</td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                            {category.status === 1 ? "Hiển thị" : "Ẩn"}
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700 px-2 transition duration-150 ease-in-out"
+                                                onClick={() => handleEditClick(category.id)}
+                                            >
+                                                <i className="fas fa-pen text-xl"></i>
+                                            </button>
+                                            <button
+                                                className="text-red-500 hover:text-red-700 ml-2 px-2 transition duration-150 ease-in-out"
+                                                onClick={() => handleDeleteClick(category)}
+                                            >
+                                                <i className="fas fa-trash text-xl"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center">
+                                        Không có danh mục nào
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5" className="text-center">
-                                    Không có danh mục nào
-                                </td>
-                            </tr>
-                        )}
-                        </tbody>
+                            )}
+                            </tbody>
 
-                    </table>
+                        </table>
+                    </div>
+                )}
+
+                {/* Phân trang */}
+                <div className="flex justify-center items-center mt-4">
+                    {/* Nút Previous */}
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                        &#9664; {/* Mũi tên trái */}
+                    </button>
+
+                    {/* Trang hiện tại */}
+                    <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
+                        Trang {currentPage} / {Math.ceil(Blogcategories.length / blogCateriesPerPage) || 1}
+                    </span>
+
+                    {/* Nút Next */}
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === Math.ceil(Blogcategories.length / blogCateriesPerPage)}
+                        className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                        &#9654; {/* Mũi tên phải */}
+                    </button>
                 </div>
+
                 {/* Move Xóa đã chọn button here */}
                 {selectedCategories.length > 0 && (
                     <div className="flex justify-end mb-2">

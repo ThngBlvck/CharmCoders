@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { getUser, deleteUser } from "../../../../services/User";
 import { getRole } from "../../../../services/Role";
 import Swal from 'sweetalert2';
+import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
@@ -10,6 +11,8 @@ export default function UserList() {
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
+    const usersPerPage = 3; // Số sản phẩm trên mỗi trang
 
     const userToken = localStorage.getItem("token");
     let userRole = null;
@@ -18,6 +21,7 @@ export default function UserList() {
         const parts = userToken.split('.');
         if (parts.length === 3) {
             const payload = JSON.parse(atob(parts[1]));
+            console.log("Token payload:", payload); // In ra payload để kiểm tra
             userRole = payload.scopes.includes("admin") ? "admin" : (payload.scopes.includes("employee") ? "employee" : "user");
             console.log("User Role:", userRole);
         }
@@ -26,28 +30,33 @@ export default function UserList() {
     useEffect(() => {
         const fetchData = async () => {
             await Promise.all([fetchUsers(), fetchRoles()]);
-            setLoading(false);
         };
 
         fetchData();
     }, []);
 
     const fetchUsers = async () => {
+        setLoading(true)
         try {
             const userList = await getUser();
             setUsers(userList);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách người dùng:", error);
             setUsers([]);
+        } finally {
+            setLoading(false)
         }
     };
 
     const fetchRoles = async () => {
+        setLoading(true)
         try {
             const roleList = await getRole();
             setRoles(roleList);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách quyền:", error);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -121,9 +130,12 @@ export default function UserList() {
         return role ? role.name : 'Unknown';
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= Math.ceil(users.length / usersPerPage)) {
+            setCurrentPage(page);
+        }
+    };
+
 
     return (
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
@@ -140,98 +152,137 @@ export default function UserList() {
                     )}
                 </div>
             </div>
-
-            <div className="block w-full overflow-x-auto">
-                <table className="items-center w-full bg-transparent border-collapse table-fixed">
-                    <thead>
-                    <tr>
-                        {userRole !== "admin" ? (
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"></th>
-                        ) : (
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
-                                <input
-                                    type="checkbox"
-                                    onChange={handleSelectAll}
-                                    checked={selectedUsers.length === users.length}
-                                />
-                            </th>
-                        )}
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình ảnh</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Email</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Số điện thoại</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Địa chỉ</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Quyền Người Dùng</th>
-                        {userRole !== "admin" ? (
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"></th>
-                        ):(
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
-                                tác</th>
-                        )
-                        }
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {users.length > 0 ? (
-                        users.map((user, index) => (
-                            <tr key={user.id}>
-                                <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
-                                    {/* Hiển thị checkbox cho nhân viên (role_id == 2) và người dùng khác không phải là admin (role_id khác 1) */}
-                                    {user.role_id === 3 && userRole === "admin" ? (
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedUsers.includes(user.id)}
-                                            onChange={() => handleSelectUser(user.id)}
-                                        />
-                                    ) : (
-                                        <span className="w-4 h-4" />
-                                    )}
-                                </td>
-                                <td>
-                                    <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                        <span className="ml-3 text-blueGray-600">{index + 1}</span>
-                                    </th>
-                                </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.name}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
-                                    {user.avatar ? (
-                                        <img src={user.avatar} alt={user.name} className="w-12 h-12 rounded-full"/>
-                                    ) : (
-                                        <i className="fas fa-user-circle text-3xl text-gray-400"/>
-                                    )}
-                                </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.email}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.phone}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.address}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{getRoleName(user.role_id)}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
-                                    {userRole === "admin" && user.role_id == 3 && (
-                                        <>
-                                            <button
-                                                onClick={() => handleEdit(user.id)}
-                                                className="text-blue-500 hover:text-blue-700 ml-2 px-2"
-                                            >
-                                                <i className="fas fa-pen text-xl"></i>
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(user.id)}
-                                                className="text-red-500 hover:text-red-700 ml-2 px-2"
-                                            >
-                                                <i className="fas fa-trash text-xl"></i>
-                                            </button>
-                                        </>
-                                    )}
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
+            { loading ? (
+                <div className="flex justify-center items-center py-4">
+                    <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                </div>
+            ) : (
+                <div className="block w-full overflow-x-auto">
+                    <table className="items-center w-full bg-transparent border-collapse table-fixed">
+                        <thead>
                         <tr>
-                            <td colSpan={9} className="text-center p-4">Không có người dùng nào.</td>
+                            {userRole !== "admin" ? (
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"></th>
+                            ) : (
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                    <input
+                                        type="checkbox"
+                                        onChange={handleSelectAll}
+                                        checked={selectedUsers.length === users.length}
+                                    />
+                                </th>
+                            )}
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình
+                                ảnh
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Email</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Số
+                                điện thoại
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Địa
+                                chỉ
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Quyền
+                                Người Dùng
+                            </th>
+                            {userRole !== "admin" ? (
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"></th>
+                            ) : (
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
+                                    tác</th>
+                            )
+                            }
                         </tr>
-                    )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {users.length > 0 ? (
+                            users.map((user, index) => (
+                                <tr key={user.id}>
+                                    <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
+                                        {/* Hiển thị checkbox cho nhân viên (role_id == 2) và người dùng khác không phải là admin (role_id khác 1) */}
+                                        {user.role_id === 3 && userRole === "admin" ? (
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedUsers.includes(user.id)}
+                                                onChange={() => handleSelectUser(user.id)}
+                                            />
+                                        ) : (
+                                            <span className="w-4 h-4"/>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+                                            <span className="ml-3 text-blueGray-600">{index + 1}</span>
+                                        </th>
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.name}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
+                                        {user.avatar ? (
+                                            <img src={user.avatar} alt={user.name} className="w-12 h-12 rounded-full"/>
+                                        ) : (
+                                            <i className="fas fa-user-circle text-3xl text-gray-400"/>
+                                        )}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.email}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.phone}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.address}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{getRoleName(user.role_id)}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
+                                        {userRole === "admin" && user.role_id == 3 && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleEdit(user.id)}
+                                                    className="text-blue-500 hover:text-blue-700 ml-2 px-2"
+                                                >
+                                                    <i className="fas fa-pen text-xl"></i>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(user.id)}
+                                                    className="text-red-500 hover:text-red-700 ml-2 px-2"
+                                                >
+                                                    <i className="fas fa-trash text-xl"></i>
+                                                </button>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={9} className="text-center p-4">Không có người dùng nào.</td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {/* Phân trang */}
+            <div className="flex justify-center items-center mt-4">
+                {/* Nút Previous */}
+                <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                    &#9664; {/* Mũi tên trái */}
+                </button>
+
+                {/* Trang hiện tại */}
+                <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
+                    Trang {currentPage} / {Math.ceil(users.length / usersPerPage) || 1}
+                </span>
+
+                {/* Nút Next */}
+                <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === Math.ceil(users.length / usersPerPage)}
+                    className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                    &#9654; {/* Mũi tên phải */}
+                </button>
             </div>
 
             {userRole === "admin" && selectedUsers.length > 0 && (

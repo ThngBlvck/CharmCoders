@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { getComments, deleteComment, getProductWithUserNames } from "../../../../services/Comment"; // Adjust imports as necessary
 import Swal from 'sweetalert2'; // Import SweetAlert2
+import { PulseLoader } from 'react-spinners'; // Import PulseLoader từ react-spinners
 
 export default function Comment({ color, userId }) {
     const [comments, setComments] = useState([]);
@@ -9,6 +10,7 @@ export default function Comment({ color, userId }) {
     const [products, setProducts] = useState([]);
     const [users, setUsers] = useState({}); // State to hold user data
     const [loadingId, setLoadingId] = useState(null);
+    const [loading, setLoading] = useState(true); // Thêm state loading
 
     useEffect(() => {
         fetchComments();
@@ -17,6 +19,7 @@ export default function Comment({ color, userId }) {
 
     // Fetch comments and filter by userId
     const fetchComments = async () => {
+        setLoading(true)
         try {
             const userComments = await getComments();
 
@@ -26,6 +29,9 @@ export default function Comment({ color, userId }) {
             setComments(filteredComments);
         } catch (error) {
             console.error("Failed to fetch comments", error);
+        }
+        finally {
+            setLoading(false)
         }
         console.log(setComments);
     };
@@ -138,63 +144,79 @@ export default function Comment({ color, userId }) {
                     </button>
                 )}
             </div>
-            <div className="block w-full overflow-x-auto">
-                <table className="items-center w-full bg-transparent border-collapse table-fixed">
-                    <thead>
-                    <tr>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
-                            <input
-                                type="checkbox"
-                                onChange={(e) => setSelectedComments(e.target.checked ? comments.map(c => c.id) : [])}
-                                checked={selectedComments.length === comments.length}
-                            />
-                        </th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Nội dung</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Người dùng</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Sản phẩm</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng Thái</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {comments.map((comment, index) => {
-                        console.log(comments);
-                        // Find product name using productId
-                        const product = products.find(p => p.id === comment.productId);
-                        const productName = product ? product.productName : 'Sản phẩm không xác định';
-                        const userName = users[comment.userId] || 'Người dùng không xác định'; // Get user name from user map
+            { loading ? (
+                <div className="flex justify-center items-center py-4">
+                    <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                </div>
+            ) : (
+                <div className="block w-full overflow-x-auto">
+                    <table className="items-center w-full bg-transparent border-collapse table-fixed">
+                        <thead>
+                        <tr>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                <input
+                                    type="checkbox"
+                                    onChange={(e) => setSelectedComments(e.target.checked ? comments.map(c => c.id) : [])}
+                                    checked={selectedComments.length === comments.length}
+                                />
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Nội
+                                dung
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Người
+                                dùng
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Sản
+                                phẩm
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng
+                                Thái
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành
+                                động
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {comments.map((comment, index) => {
+                            console.log(comments);
+                            // Find product name using productId
+                            const product = products.find(p => p.id === comment.productId);
+                            const productName = product ? product.productName : 'Sản phẩm không xác định';
+                            const userName = users[comment.userId] || 'Người dùng không xác định'; // Get user name from user map
 
-                        return (
-                            <tr key={comment.id}>
-                                <td className="border-t-0 px-6 align-middle text-left flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedComments.includes(comment.id)}
-                                        onChange={() => handleSelectComment(comment.id)}
-                                    />
-                                </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.content}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.user_name}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.product_name}</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.status}</td>
-                                <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                    <button
-                                        aria-label="Delete comment"
-                                        className={`text-red-500 hover:text-red-700 ml-2 px-2 ${loadingId === comment.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        onClick={() => handleDelete(comment.id)}
-                                        disabled={loadingId === comment.id}
-                                    >
-                                        <i className="fas fa-trash text-xl"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                    </tbody>
-                </table>
-            </div>
+                            return (
+                                <tr key={comment.id}>
+                                    <td className="border-t-0 px-6 align-middle text-left flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedComments.includes(comment.id)}
+                                            onChange={() => handleSelectComment(comment.id)}
+                                        />
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.content}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.user_name}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.product_name}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{comment.status}</td>
+                                    <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                        <button
+                                            aria-label="Delete comment"
+                                            className={`text-red-500 hover:text-red-700 ml-2 px-2 ${loadingId === comment.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            onClick={() => handleDelete(comment.id)}
+                                            disabled={loadingId === comment.id}
+                                        >
+                                            <i className="fas fa-trash text-xl"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 }
