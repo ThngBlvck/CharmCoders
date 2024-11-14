@@ -53,13 +53,14 @@ export default function Cart() {
 
                 if (productMap[productId]) {
                     productMap[productId].quantity += item.quantity;
-                    productMap[productId].totalPrice += productDetail.unit_price * item.quantity;
+                    productMap[productId].totalPrice += item.unit_price * item.quantity;
                 } else {
                     productMap[productId] = {
                         id: item.id,
                         product_id: productId,
                         quantity: item.quantity,
-                        price: productDetail.unit_price,
+                        unit_price: productDetail.unit_price,
+                        sale_price: productDetail.sale_price,
                         name: productDetail.name,
                         image: productDetail.image,
                         totalPrice: productDetail.unit_price * item.quantity
@@ -90,7 +91,10 @@ export default function Cart() {
     const calculateTotal = () => {
         return products
             .filter(item => selectedItems.includes(item.id)) // Chỉ tính cho các sản phẩm được chọn
-            .reduce((total, item) => total + (item.price ? item.price * item.quantity : 0), 0); // Thành tiền = Giá tiền * Số lượng
+            .reduce((total, item) => {
+                const price = item.sale_price || item.unit_price; // Nếu có sale_price thì lấy sale_price, nếu không có thì lấy unit_price
+                return total + (price ? price * item.quantity : 0); // Thành tiền = Giá tiền * Số lượng
+            }, 0);
     };
 
     const removeItem = async (id) => {
@@ -268,19 +272,37 @@ export default function Cart() {
                                         </NavLink>
                                     </div>
 
-                                    <div className="cart-item-price"
-                                         style={{
-                                             width: "15%",
-                                             textAlign: "right",
-                                             color: "#8c5e58",
-                                             fontWeight: "bold"
-                                         }}>
-                                        {item.price ? item.price.toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                        }) : "Chưa có giá"}
+                                    <div className="cart-item-price" style={{
+                                        width: "15%",
+                                        textAlign: "right",
+                                        color: "#8c5e58",
+                                        fontWeight: "bold"
+                                    }}>
+                                        {item.sale_price ? (
+                                            <div>
+                                                <span style={{textDecoration: "line-through", color: "#6c4d36"}}>
+                                                    {item.unit_price.toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND"
+                                                    })}
+                                                </span>
+                                                <br/>
+                                                <span style={{color: "#f76c5e", fontWeight: "bold"}}>
+                                                    {item.sale_price.toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND"
+                                                    })}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span style={{color: "#8c5e58", fontWeight: "bold"}}>
+                                                {item.unit_price.toLocaleString("vi-VN", {
+                                                    style: "currency",
+                                                    currency: "VND"
+                                                })}
+                                            </span>
+                                        )}
                                     </div>
-
                                     <div className="cart-item-quantity" style={{width: "15%", textAlign: "center"}}>
                                         <input
                                             type="number"
@@ -303,7 +325,10 @@ export default function Cart() {
                                              color: "#8c5e58",
                                              fontWeight: "bold"
                                          }}>
-                                        {(item.price * item.quantity).toLocaleString("vi-VN", {
+                                        {(
+                                            (item.sale_price && !isNaN(item.sale_price) ? item.sale_price : item.unit_price)
+                                            * item.quantity
+                                        ).toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                         })}
