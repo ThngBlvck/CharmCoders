@@ -93,11 +93,17 @@ export default function Products() {
 
     const productsPerPage = 12;
 
+    const maxPrice = Math.max(...products.map(product => {
+        const productPrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.unit_price);
+        return productPrice;
+    }));
+
+
     const filteredProducts = products
         .filter(product => selectedCategory === "all" || product.category_id === parseInt(selectedCategory)) // Lọc theo category_id
         .filter(product => {
-            const productPrice = parseFloat(product.unit_price);
-            return productPrice >= minPrice; // Lọc sản phẩm có giá <= maxPrice
+            const productPrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.unit_price);
+            return productPrice >= minPrice && productPrice <= maxPrice;
         })
         .filter(product => brandFilter === "all" || product.brand_id === parseInt(brandFilter))
 
@@ -178,18 +184,20 @@ export default function Products() {
                         </p>
                         <div className="d-flex align-items-center">
                             {/* Giá thấp nhất */}
-                            <span style={{color: "#8c5e58", marginRight: "10px"}}>0</span>
+                            <span style={{color: "#8c5e58", marginRight: "10px"}}>0 ₫</span>
                             <input
                                 type="range"
                                 min="0"
-                                max="1000000"
+                                max={maxPrice}
                                 value={minPrice}
                                 onChange={(e) => setMinPrice(Number(e.target.value))}
                                 className="form-range"
                                 style={{flex: 1}}
                             />
                             {/* Giá cao nhất */}
-                            <span style={{color: "#8c5e58", marginLeft: "10px"}}>1,000,000</span>
+                            <span style={{color: "#8c5e58", marginLeft: "10px"}}>
+                                {maxPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                            </span>
                         </div>
                         <p>Giá: {minPrice.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}</p>
                     </div>
@@ -256,51 +264,47 @@ export default function Products() {
                                                 </NavLink>
 
                                                 <div className="d-flex justify-content-between align-items-center">
-                                                    {/* Giá sản phẩm */}
+                                                    {/* Kiểm tra có giá sale hay không */}
                                                     {product.sale_price && product.sale_price < product.unit_price ? (
                                                         <>
+                                                            {/* Giá sản phẩm gốc bị gạch ngang */}
                                                             <p className="card-text mb-2 font-semibold" style={{
                                                                 color: '#8c5e58',
-                                                                textDecoration: 'line-through'
+                                                                textDecoration: 'line-through',
+                                                                flex: 1
                                                             }}>
                                                                 {product.unit_price.toLocaleString("vi-VN", {
                                                                     style: "currency",
                                                                     currency: "VND"
                                                                 })}
                                                             </p>
+
+                                                            {/* Giá sale nằm bên phải */}
+                                                            <p className="card-text mb-2 font-semibold" style={{
+                                                                color: '#e74c3c',
+                                                                flex: 1,
+                                                                textAlign: 'right'
+                                                            }}>
+                                                                {product.sale_price.toLocaleString("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND"
+                                                                })}
+                                                            </p>
                                                         </>
                                                     ) : (
-                                                        <p className="card-text mb-2 font-semibold"
-                                                           style={{color: '#8c5e58'}}>
+                                                        // Nếu không có giá sale, đơn giản là hiển thị giá gốc ở giữa
+                                                        <p className="card-text mb-2 font-semibold" style={{
+                                                            color: '#8c5e58',
+                                                            textAlign: 'center',
+                                                            flex: 1
+                                                        }}>
                                                             {product.unit_price.toLocaleString("vi-VN", {
                                                                 style: "currency",
                                                                 currency: "VND"
                                                             })}
                                                         </p>
                                                     )}
-
-                                                    {/* Giá Sale */}
-                                                    {product.sale_price && product.sale_price < product.unit_price ? (
-                                                        <p className="card-text mb-4 font-semibold"
-                                                           style={{color: '#e74c3c'}}>
-                                                            {product.sale_price.toLocaleString("vi-VN", {
-                                                                style: "currency",
-                                                                currency: "VND"
-                                                            })}
-                                                        </p>
-                                                    ) : null}
                                                 </div>
-
-                                                {/* Hiển thị tiết kiệm nếu có giảm giá */}
-                                                {product.sale_price && product.sale_price < product.unit_price && (
-                                                    <p className="text-muted" style={{fontSize: '14px'}}>
-                                                        Tiết
-                                                        kiệm: {(product.unit_price - product.sale_price).toLocaleString("vi-VN", {
-                                                        style: "currency",
-                                                        currency: "VND"
-                                                    })}
-                                                    </p>
-                                                )}
 
                                                 {/* Nút Mua ngay */}
                                                 {product.quantity === 0 ? (
