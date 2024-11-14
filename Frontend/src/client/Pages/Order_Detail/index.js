@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
-import {getOrderById, updateOrder} from "../../../services/Order"; // API để lấy đơn hàng
+import {getOrder,getOrderById, updateOrder} from "../../../services/Order"; // API để lấy đơn hàng
 import {getUserInfo} from "../../../services/User"; // API để lấy thông tin người dùng
 import {useNavigate, useParams} from "react-router-dom"; // Để lấy ID từ URL
 import {NavLink} from "react-router-dom";
@@ -26,6 +26,7 @@ export default function OrderDetail() {
 
                 const order = {
                     id: orderData.data.id,
+                    order_id: orderData.data.order_id,
                     address: orderData.data.address,
                     paymentMethod: orderData.data.payment_method,
                     status: orderData.data.status,
@@ -148,7 +149,7 @@ export default function OrderDetail() {
                     {/* Thông tin đơn hàng */}
                     <div className="row">
                         <div className="col-6" style={{color: "#8c5e58"}}>
-                            <div className="mb-3"><span className="font-semibold">ID đơn hàng: </span>{order.id}</div>
+                            <div className="mb-3"><span className="font-semibold">Mã đơn hàng: </span>{order.order_id}</div>
                             <div className="mb-3"><span className="font-semibold">Trạng thái đơn hàng: </span>
                                 <span className="statusStyle" style={getStatusStyle(order.status)}>
                                   {order.status === 0 ? 'Đang chờ xác nhận' :

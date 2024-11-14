@@ -69,7 +69,7 @@ export default function OrderManagement() {
                                 <div key={order.id} className="order-history-card mb-4 cardStyle">
                                     <div className="headerStyle">
                                         <div className="headerRowStyle">
-                                            <strong>ID đơn hàng: {order.id}</strong>
+                                            <strong>Mã đơn hàng: {order.order_id}</strong>
                                             <strong>Trạng thái đơn hàng: <span className="statusStyle"
                                                                                style={getStatusStyle(order.status)}>
                                         {order.status === 0 ? 'Đang chờ xác nhận'
