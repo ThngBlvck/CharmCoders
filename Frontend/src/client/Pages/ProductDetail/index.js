@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from "react-router-dom";
-import { getOneProduct } from "../../../services/Product";
-import { getOneBrand } from "../../../services/Brand";
-import { getOneCategory } from "../../../services/Category";
-import { addToCart } from "../../../services/Cart";
-import { getCommentsByProductId, addComment, deleteComment } from "../../../services/Comment";
-import { ToastContainer, toast } from 'react-toastify';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from "react-router-dom";
+import {getOneProduct} from "../../../services/Product";
+import {getOneBrand} from "../../../services/Brand";
+import {getOneCategory} from "../../../services/Category";
+import {addToCart} from "../../../services/Cart";
+import {getCommentsByProductId, addComment, deleteComment} from "../../../services/Comment";
+import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '@fortawesome/fontawesome-free/css/all.css';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
 const ProductDetail = () => {
-    const { id } = useParams();
+    const {id} = useParams();
     const [product, setProduct] = useState(null);
     const [brandName, setBrandName] = useState("");
     const [categoryName, setCategoryName] = useState("");
@@ -176,42 +176,29 @@ const ProductDetail = () => {
                             </div>
                             <div className="col-md-7 d-flex flex-column align-content-start">
                                 <p className="mb-3"
-                                   style={{fontSize: "26px", color: "#8c5e58", fontWeight: 'bold'}}>{product.name}</p>
-
+                                   style={{fontSize: "26px", color: "#8c5e58", fontWeight: 'bold'}}>{product.name}
+                                </p>
                                 {/* Price Display with Discount */}
                                 <div className="mb-3" style={{color: "#8c5e58"}}>
                                     <strong>Giá:</strong>
                                     {product.sale_price ? (
-                                        <div className="d-flex flex-column">
-                        <span style={{fontSize: "20px", textDecoration: "line-through", color: "#6c4d36"}}>
-                            {product.unit_price.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
-                        </span>
+                                        <div className="d-flex align-items-center">
+                                            <span style={{fontSize: "20px", textDecoration: "line-through", color: "#6c4d36", marginRight: "10px"}}>
+                                                {product.unit_price.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
+                                            </span>
                                             <span style={{fontSize: "22px", color: "#f76c5e", fontWeight: "bold"}}>
-                            {(product.unit_price - product.sale_price).toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND"
-                            })}
-                        </span>
+                                                {product.sale_price.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
+                                            </span>
                                         </div>
                                     ) : (
                                         <span style={{fontSize: "22px", color: "#f76c5e", fontWeight: "bold"}}>
-                        {product.unit_price.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
-                    </span>
+                                            {product.unit_price.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}
+                                        </span>
                                     )}
                                 </div>
-
-                                <p className="mb-3" style={{color: "#8c5e58"}}>
+                                <p className="mb-2" style={{color: "#8c5e58"}}>
                                     <strong>Thương hiệu:</strong> {brandName}
                                 </p>
-
-                                <p className="mb-3" style={{color: "#8c5e58"}}>{product.weight}</p>
-
-                                {/* Available Quantity Display */}
-                                <div className="mt-2 mb-3" style={{color: "#8c5e58", fontSize: "16px"}}>
-                                    <strong>Số lượng còn
-                                        lại:</strong> {product.quantity} {product.quantity === 1 ? "sản phẩm" : "sản phẩm"}
-                                </div>
-
                                 {/* Quantity Input */}
                                 <div className="mt-2 d-flex justify-content-start align-items-center mb-3">
                                     <span style={{color: "#8c5e58", fontSize: "16px"}}><strong>Số lượng:</strong></span>
