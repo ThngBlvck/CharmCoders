@@ -65,4 +65,35 @@ class BlogController extends Controller
         $blog->update($validatedData);
         return response()->json($blog, 201);
     }
+
+    public function search(Request $request)
+    {
+        // Lấy từ khóa tìm kiếm từ request
+        $query = $request->input('query');
+
+        // Nếu không có từ khóa tìm kiếm, trả về lỗi
+        if (!$query) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng cung cấp từ khóa tìm kiếm.',
+            ], 400);
+        }
+
+        // Tìm kiếm bài viết theo tiêu đề
+        $blogs = Blog::where('title', 'LIKE', "%{$query}%")->get();
+
+        // Nếu không tìm thấy bài viết nào
+        if ($blogs->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy bài viết nào phù hợp.',
+            ], 404);
+        }
+
+        // Trả về danh sách bài viết phù hợp
+        return response()->json([
+            'success' => true,
+            'blogs' => $blogs,
+        ], 200);
+    }
 }

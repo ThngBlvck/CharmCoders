@@ -40,4 +40,36 @@ class BlogCategoryController extends Controller
             'message' => 'Danh mục đã được xóa thành công.',
         ], 200);
     }
+
+    public function search(Request $request)
+    {
+        // Lấy từ khóa tìm kiếm từ request
+        $query = $request->input('query');
+
+        // Nếu không có từ khóa tìm kiếm, trả về lỗi
+        if (!$query) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng cung cấp từ khóa tìm kiếm.',
+            ], 400);
+        }
+
+        // Tìm kiếm danh mục blog theo tên
+        $categories = Blog_category::where('name', 'LIKE', "%{$query}%")->get();
+
+        // Nếu không tìm thấy danh mục nào
+        if ($categories->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy danh mục nào phù hợp.',
+            ], 404);
+        }
+
+        // Trả về danh sách danh mục phù hợp
+        return response()->json([
+            'success' => true,
+            'categories' => $categories,
+        ], 200);
+    }
+
 }
