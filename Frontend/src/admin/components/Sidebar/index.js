@@ -195,16 +195,13 @@ export default function Sidebar() {
 
                         {/* Auth Layout Pages */}
                         <hr className="my-4 md:min-w-full"/>
-                        <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-                            Auth Layout Pages
-                        </h6>
                         <ul className="md:flex-col md:min-w-full flex flex-col list-none pl-4">
                             <li className="items-center">
                                 <Link
                                     className="text-xs uppercase py-3 font-bold block text-blueGray-700 hover:text-blueGray-500"
-                                    to="/auth/login"
+                                    to="/admin/login"
                                 >
-                                    <i className="fas fa-fingerprint mr-2 text-sm text-blueGray-300"></i>
+                                    <i className="fas fa-sign-in mr-2 text-sm text-blueGray-300"></i>
                                     Đăng Nhập
                                 </Link>
                             </li>
@@ -213,8 +210,8 @@ export default function Sidebar() {
                                     className="text-xs uppercase py-3 font-bold block text-blueGray-700 hover:text-blueGray-500"
                                     to="/auth/register"
                                 >
-                                    <i className="fas fa-clipboard mr-2 text-sm text-blueGray-300"></i>
-                                    Đăng Ký
+                                    <i className="fas fa-sign-out mr-2 text-sm text-blueGray-300"></i>
+                                    Đăng xuất
                                 </Link>
                             </li>
                         </ul>

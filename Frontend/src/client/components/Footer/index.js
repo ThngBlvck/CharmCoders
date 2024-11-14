@@ -1,19 +1,31 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
-import {getCategory} from "../../../services/Category";
-import {jwtDecode} from "jwt-decode";
+import { getUserInfo } from "../../../services/User";
+import { getCategory } from "../../../services/Category";
 
 export default function Footer() {
     const [categories, setCategories] = useState([]);
     const [showChatModal, setShowChatModal] = useState(false);
+    const [userMessage, setUserMessage] = useState("");
+    const [chatMessages, setChatMessages] = useState([]);
+    const [userInfo, setUserInfo] = useState({});
+    const [greetingSent, setGreetingSent] = useState(false); // Track if greeting was sent
 
     const toggleChatModal = () => {
         setShowChatModal(!showChatModal);
+
+        // Send greeting only the first time the chat is opened
+        if (!greetingSent) {
+            const greetingMessage = { user: "admin", content: "Chào bạn! GlowMakers có thể giúp gì cho bạn?" };
+            setChatMessages([...chatMessages, greetingMessage]);
+            setGreetingSent(true); // Mark greeting as sent
+        }
     };
 
     useEffect(() => {
         fetchCategories();
+        fetchUserData();
     }, []);
 
     const fetchCategories = async () => {
@@ -23,6 +35,36 @@ export default function Footer() {
         } catch (error) {
             console.error("Lỗi khi lấy danh mục sản phẩm:", error);
         }
+    };
+
+    const fetchUserData = async () => {
+        try {
+            const data = await getUserInfo();
+            setUserInfo(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin người dùng:", error);
+        }
+    };
+
+    const getKeywordResponse = (message) => {
+        if (message.includes("số điện thoại")) {
+            return `Số điện thoại của bạn là ${userInfo.phone || "(không có thông tin)"}`;
+        }
+        if (message.includes("email")) {
+            return `Email của bạn là ${userInfo.email || "(không có thông tin)"}`;
+        }
+        return "Xin lỗi, tôi không hiểu yêu cầu của bạn.";
+    };
+
+    const handleSendMessage = () => {
+        if (!userMessage.trim()) return;
+
+        const updatedChatMessages = [...chatMessages, { user: "user", content: userMessage }];
+        setChatMessages(updatedChatMessages);
+        setUserMessage("");
+
+        const response = getKeywordResponse(userMessage.toLowerCase());
+        setChatMessages([...updatedChatMessages, { user: "admin", content: response }]);
     };
 
     return (
@@ -35,14 +77,15 @@ export default function Footer() {
                                 <p className="text-primary font-bold mb-4" style={{fontSize: "40px"}}>GlowMakers</p>
                                 <p className="font-bold title" style={{fontSize: '16px', color: '#8c5e58'}}>Liên hệ
                                     chúng tôi</p>
-                                <p style={{color: '#8c5e58', fontSize: '14px'}}><i
-                                    className="fas fa-envelope me-2"
-                                    style={{color: '#ff7e6b', fontSize: '14px'}}></i> glowmakers@gmail.com</p>
-                                <p style={{color: '#8c5e58', fontSize: '14px', marginBottom: "1rem"}}><i
-                                    className="fas fa-phone me-2"
-                                    style={{color: '#ff7e6b', fontSize: '14px'}}></i> (+012)
-                                    3456
-                                    7890 123</p>
+                                <p style={{color: '#8c5e58', fontSize: '14px'}}>
+                                    <i className="fas fa-envelope me-2"
+                                       style={{color: '#ff7e6b', fontSize: '14px'}}></i>
+                                    glowmakers@gmail.com
+                                </p>
+                                <p style={{color: '#8c5e58', fontSize: '14px', marginBottom: "1rem"}}>
+                                    <i className="fas fa-phone me-2" style={{color: '#ff7e6b', fontSize: '14px'}}></i>
+                                    (+012) 3456 7890 123
+                                </p>
                                 <p className="font-bold title" style={{fontSize: '16px', color: '#8c5e58'}}>Chấp nhận
                                     phương thức thanh toán</p>
                                 <label className="form-check-label mb-2" style={{color: "#8c5e58"}}>
@@ -95,27 +138,6 @@ export default function Footer() {
                     </div>
                 </div>
             </footer>
-
-            <div className="container-fluid copyright py-4" style={{backgroundColor: '#8c5e58'}}>
-                <div className="container">
-                    <div className="row g-4 align-items-center d-flex">
-                        <div className="col-md-6 text-center text-md-start d-0">
-                            <span style={{color: '#fff7f8'}}>
-                                <i className="fas fa-copyright me-2" style={{color: '#ff7e6b'}}></i>
-                                <a href="#" style={{color: '#fff7f8'}} className="border-bottom">
-                                    Glow Makers
-                                </a>
-                                , All right reserved.
-                            </span>
-                        </div>
-
-                        <div className="col-md-6 text-center text-md-end" style={{color: '#fff7f8'}}>
-                            Designed By <a className="border-bottom" href="#">Glow Makers</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* Back to top button */}
             <button style={{position: 'fixed', bottom: '20px', right: '80px', zIndex: 1000}}>
                 <a href="#" className="btn btn-primary btn-md-square rounded-circle back-to-top" style={{
@@ -128,7 +150,6 @@ export default function Footer() {
                     <i className="fa fa-arrow-up"></i>
                 </a>
             </button>
-
             {/* Chat Icon */}
             <button
                 className="btn btn-primary btn-md-square rounded-circle chat-icon"
@@ -140,8 +161,8 @@ export default function Footer() {
 
             {/* Chat Modal */}
             {showChatModal && (
-                <div className="modal fade show" style={{display: 'block'}} tabIndex="-1" role="dialog">
-                    <div className="modal-dialog" role="document" style={{bottom: "-160px", right: "-380px"}}>
+                <div className="modal fade show" style={{display: "block"}} tabIndex="-1" role="dialog">
+                    <div className="modal-dialog" role="document" style={{bottom: "-380px", right: "-565px"}}>
                         <div className="modal-content">
                             <div className="modal-header">
                                 <p className="modal-title text-primary font-semibold"
@@ -152,44 +173,29 @@ export default function Footer() {
                                    style={{fontSize: "20px", color: "#8c5e58", cursor: "pointer"}}></i>
                             </div>
                             <div className="modal-body" style={{maxHeight: '400px', overflowY: 'auto'}}>
-                                <div className="chat-window" style={{
-                                    maxHeight: '250px',  // Điều chỉnh chiều cao để phù hợp với 4 tin nhắn
-                                    overflowY: 'auto',   // Thêm thuộc tính overflow-y để tạo scroll khi có nhiều tin nhắn
-                                    height: "250px"
-                                }}>
-                                    {/* User Message */}
-                                    <div className="chat-message user">
-                                        <div className="user-avatar">
-                                            <img src="https://via.placeholder.com/50" alt="User Avatar"/>
+                                <div className="chat-window"
+                                     style={{maxHeight: '250px', overflowY: 'auto', height: "250px"}}>
+                                    {chatMessages.map((msg, index) => (
+                                        <div key={index} className={`chat-message ${msg.user}`}>
+                                            <span>{msg.content}</span>
                                         </div>
-                                        <div className="message-content">
-                                            <span className="message">Sốp ơi, sốp à cho em hỏi sản phẩm này còn hong sốp ơi, mua nhiều có được giảm giá hay có chương rình mua 1 tặng 100 gì hong sốp ơi, có thì em mua liền nè sốp...</span>
-                                        </div>
-                                    </div>
-                                    {/* Admin Message */}
-                                    <div className="chat-message admin">
-                                        <div className="admin-avatar">
-                                            <img src="https://via.placeholder.com/50" alt="Admin Avatar"/>
-                                        </div>
-                                        <div className="message-content">
-                                            <span className="message">Hong bé ơi...</span>
-                                        </div>
-                                    </div>
-                                    {/* Các tin nhắn khác */}
+                                    ))}
                                 </div>
 
                                 <textarea
                                     className="form-control mt-3"
-                                    rows="4" // Giới hạn số hàng hiển thị là 4
+                                    rows="4"
                                     style={{
-                                        resize: "none", // Không cho phép thay đổi kích thước của textarea
-                                        maxHeight: "100px", // Chiều cao tối đa
-                                        overflow: "auto", // Hiển thị thanh cuộn nếu vượt quá chiều cao
-                                        width: "100%", // Giới hạn chiều rộng
+                                        resize: "none",
+                                        maxHeight: "100px",
+                                        overflow: "auto",
+                                        width: "100%",
                                         padding: "10px",
-                                        fontSize: "14px" // Điều chỉnh kích thước chữ
+                                        fontSize: "14px"
                                     }}
                                     placeholder="Nhập nội dung tin nhắn..."
+                                    value={userMessage}
+                                    onChange={(e) => setUserMessage(e.target.value)}
                                 ></textarea>
                             </div>
                             <div className="modal-footer d-flex justify-content-between align-items-center"
@@ -201,7 +207,8 @@ export default function Footer() {
                                        style={{fontSize: "20px", color: "#8c5e58", cursor: "pointer"}}></i>
                                 </div>
                                 <i className="fa fa-paper-plane" aria-hidden="true"
-                                   style={{fontSize: "20px", color: "#8c5e58", cursor: "pointer"}}></i>
+                                   style={{fontSize: "20px", color: "#8c5e58", cursor: "pointer"}}
+                                   onClick={handleSendMessage}></i>
                             </div>
                         </div>
                     </div>

@@ -128,7 +128,7 @@ export default function Profile() {
                                 </form>
                             </div>
                             <div>
-                                <NavLink to={`/change-password`}>
+                                <NavLink to={`/change_password`}>
                                     <button className="btn btn-primary mt-3 mx-2 font-semibold"
                                             style={{color: '#442e2b'}}>
                                         Đổi mật khẩu
