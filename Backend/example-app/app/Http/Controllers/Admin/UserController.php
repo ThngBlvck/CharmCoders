@@ -104,9 +104,9 @@ class UserController extends Controller
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time(). '_'. $image->getClientOriginalName();
+            $imageName = time() . '_' . $image->getClientOriginalName();
             $image->storeAs('public/images/users', $imageName);
-            $validatedData['image'] = asset('storage/images/users/'. $imageName);
+            $validatedData['image'] = asset('storage/images/users/' . $imageName);
         } else {
             $validatedData['image'] = $user->image;
         }
@@ -131,30 +131,61 @@ class UserController extends Controller
     }
 
     public function changePassword(ChangePasswordRequest $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    // Nếu người dùng có tài khoản xã hội, không cho phép đổi mật khẩu
-    if ($user->auth_provider !== null) {
+        // Nếu người dùng có tài khoản xã hội, không cho phép đổi mật khẩu
+        if ($user->auth_provider !== null) {
+            return response()->json([
+                'error' => 'Không thể thay đổi mật khẩu cho tài khoản đăng nhập qua mạng xã hội.',
+            ], 400);
+        }
+
+        // Kiểm tra mật khẩu hiện tại
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'error' => 'Mật khẩu hiện tại không chính xác.',
+            ], 400);
+        }
+
+        // Cập nhật mật khẩu mới
+        $user->password = bcrypt($request->password);
+        $user->save();
+
         return response()->json([
-            'error' => 'Không thể thay đổi mật khẩu cho tài khoản đăng nhập qua mạng xã hội.',
-        ], 400);
+            'message' => 'Mật khẩu đã được thay đổi thành công.',
+        ], 200);
     }
 
-    // Kiểm tra mật khẩu hiện tại
-    if (!Hash::check($request->current_password, $user->password)) {
+
+    public function search(Request $request)
+    {
+        // Lấy từ khóa tìm kiếm từ request
+        $query = $request->input('query');
+
+        // Nếu không có từ khóa tìm kiếm, trả về lỗi
+        if (!$query) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng cung cấp từ khóa tìm kiếm.',
+            ], 400);
+        }
+
+        // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
+        $products = User::where('name', 'LIKE', "%{$query}%")->get();
+
+        // Nếu không tìm thấy sản phẩm
+        if ($products->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy sản phẩm nào phù hợp.',
+            ], 404);
+        }
+
+        // Trả về danh sách sản phẩm phù hợp
         return response()->json([
-            'error' => 'Mật khẩu hiện tại không chính xác.',
-        ], 400);
+            'success' => true,
+            'products' => $products,
+        ], 200);
     }
-
-    // Cập nhật mật khẩu mới
-    $user->password = bcrypt($request->password);
-    $user->save();
-
-    return response()->json([
-        'message' => 'Mật khẩu đã được thay đổi thành công.',
-    ], 200);
-}
-
 }

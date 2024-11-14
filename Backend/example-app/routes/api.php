@@ -25,7 +25,8 @@ use App\Http\Controllers\Client\{
     CartController as CartClient,
     PaymentController,
     AddressController,
-    MomoPaymentController
+    MomoPaymentController,
+    ShippingController,
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -47,7 +48,13 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('role', RoleController::class);
     Route::apiResource('products', ProductController::class);
-    Route::get('/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
+    Route::get('product/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
+    Route::get('category/search', [CategoryController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
+    Route::get('user/search', [UserController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
+    Route::get('order/search', [OrderController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
+    Route::get('brand/search', [BrandController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
+    Route::get('blog/search', [BlogController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
+    Route::get('blogCategory/search', [BlogCategoryController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class);// http://localhost:8000/api/client/search?query=teneanpham
 
     Route::middleware('auth:api')->group(function () {
@@ -100,6 +107,11 @@ Route::prefix('client')->group(function () {
     Route::put('/changepassword', [UserController::class, 'changePassword'])->middleware('auth:api');
     Route::post('/payment/momo', [MomoPaymentController::class, 'createPayment']);
     Route::get('/payment/redirect', [MomoPaymentController::class, 'handleRedirect']);
+
+    //giao hàng nhanh
+    Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);
+    Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
+    Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
 
 });
 
