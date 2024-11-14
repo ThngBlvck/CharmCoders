@@ -81,6 +81,35 @@ class BrandController extends Controller
             'message' => 'Thương hiệu và tất cả các sản phẩm liên quan đã được xóa thành công.',
         ], 200);
     }
+    public function search(Request $request)
+    {
+        // Lấy từ khóa tìm kiếm từ request
+        $query = $request->input('query');
 
+        // Nếu không có từ khóa tìm kiếm, trả về lỗi
+        if (!$query) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng cung cấp từ khóa tìm kiếm.',
+            ], 400);
+        }
+
+        // Tìm kiếm thương hiệu theo tên hoặc mô tả
+        $brands = Brand::where('name', 'LIKE', "%{$query}%")->get();
+
+        // Nếu không tìm thấy thương hiệu nào
+        if ($brands->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy thương hiệu nào phù hợp.',
+            ], 404);
+        }
+
+        // Trả về danh sách thương hiệu phù hợp
+        return response()->json([
+            'success' => true,
+            'brands' => $brands,
+        ], 200);
+    }
 
 }

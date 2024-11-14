@@ -113,4 +113,36 @@ class OrderController extends Controller
         ], 200);
     }
 
+    public function search(Request $request)
+    {
+        // Lấy từ khóa tìm kiếm từ request
+        $query = $request->input('query');
+
+        // Nếu không có từ khóa tìm kiếm, trả về lỗi
+        if (!$query) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vui lòng cung cấp từ khóa tìm kiếm.',
+            ], 400);
+        }
+
+        // Tìm kiếm đơn hàng dựa trên order_id
+        $orders = Order::where('order_id', $query)->get();
+
+        // Nếu không tìm thấy đơn hàng nào
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy đơn hàng nào phù hợp.',
+            ], 404);
+        }
+
+        // Trả về danh sách đơn hàng phù hợp
+        return response()->json([
+            'success' => true,
+            'orders' => $orders,
+        ], 200);
+    }
+
+
 }
