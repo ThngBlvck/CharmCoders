@@ -123,6 +123,16 @@ Route::prefix('client')->group(function () {
     Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
     Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
 
+    //giao hàng nhanh
+    Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);
+    Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
+    Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
+
+    //giao hàng nhanh
+    Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);
+    Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
+    Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
+
 });
 
 // General user route (outside of client prefix)
