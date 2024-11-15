@@ -51,6 +51,7 @@ export default function OrderManagement() {
         }));
     };
 
+
     return (
         <div className="container mt-5">
             <p className="headingStyle font-semibold">Đơn hàng đã đặt</p>
@@ -64,17 +65,18 @@ export default function OrderManagement() {
                 <>
                     {orders.length > 0 ? (
                         // Lọc đơn hàng có status là 3 hoặc 4
-                        orders.filter(order => [0, 1, 2].includes(order.status)).length > 0 ? (
-                            orders.filter(order => [0, 1, 2].includes(order.status)).map((order) => (
+                        orders.filter(order => [0, 1, 2, 5].includes(order.status)).length > 0 ? (
+                            orders.filter(order => [0, 1, 2, 5].includes(order.status)).map((order) => (
                                 <div key={order.id} className="order-history-card mb-4 cardStyle">
                                     <div className="headerStyle">
                                         <div className="headerRowStyle">
-                                            <strong>ID đơn hàng: {order.id}</strong>
+                                            <strong>ID đơn hàng: {order.order_id}</strong>
                                             <strong>Trạng thái đơn hàng: <span className="statusStyle"
                                                                                style={getStatusStyle(order.status)}>
                                         {order.status === 0 ? 'Đang chờ xác nhận'
                                             : order.status === 1 ? 'Đang chuẩn bị hàng'
                                                 : order.status === 2 ? 'Đang giao'
+                                                : order.status === 5 ? 'Đã thanh toán'
                                                     : 'Không xác định'}
                                         </span>
                                             </strong>
@@ -141,7 +143,7 @@ export default function OrderManagement() {
                                         <div className="col-4">
                                             <span className="statusStyle">
                                                 {order.payment_method === 1 ? 'Thanh toán khi nhận hàng'
-                                                    : order.payment_method === 2 ? 'Thanh toán chuyển khoản'
+                                                    : order.payment_method == 2 ? 'Thanh toán momo'
                                                         : 'Không xác định'}</span>
                                         </div>
 

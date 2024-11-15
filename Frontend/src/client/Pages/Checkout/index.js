@@ -40,6 +40,8 @@ export default function Checkout() {
     const [address, setAddress] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
+    const [user_id, setUserId] = useState([]);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -51,7 +53,7 @@ export default function Checkout() {
             // Gọi fetchUserInfo để lấy thông tin người dùng
             fetchUserInfo().then(userInfo => {
                 console.log("Thông tin người dùng:", userInfo); // Xem thông tin người dùng đã nhận
-
+                setUserId(userInfo.user_id);
                 if (userInfo && typeof userInfo === 'object' && userInfo.user_id) {
                     // Kiểm tra userInfo có phải là một đối tượng và có user_id
                     setFormData(prevFormData => ({
@@ -190,7 +192,6 @@ export default function Checkout() {
                         }
                         return null; // Trả về null nếu không tìm thấy sản phẩm
                     }).filter(item => item !== null); // Loại bỏ các sản phẩm null
-
                     setProducts(combinedProducts);
                 } else {
                     console.error("Không tìm thấy sản phẩm nào.");
@@ -214,7 +215,6 @@ export default function Checkout() {
         }
         return products.reduce((total, item) => total + (item.unit_price * item.quantity), 0);
     };
-
     const total = (item) => {
         return item.unit_price * item.quantity;
     };
@@ -311,21 +311,24 @@ export default function Checkout() {
                 Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
             }
         }
-    };
-    
+    };  
+
+ console.log(products);
 
     const handleMomoPayment = async (orderData) => {
+        const extradata = products.map(item => ({
+            product_id: item.id,
+            quantity: item.quantity,
+            user_id: user_id,
+            address: orderData.address, 
+            price: item.unit_price
+        }));
         try {
-            // Bước 1: Tạo đơn hàng trong cơ sở dữ liệu
-            const createdOrder = await checkout(orderData);
-    
-           
-    
-            // Bước 2 và 3: Xử lý thanh toán MoMo
             const orderInfo = {
                 amount: orderData.total_amount,
                 orderId: orderData.order_id,
                 description: "Thanh toán đơn hàng qua MoMo",
+                extraData: JSON.stringify(extradata),
                 customerInfo: {
                     name: orderData.name,
                     email: orderData.email,
@@ -334,6 +337,7 @@ export default function Checkout() {
             };
     
             const payUrl = await momoCheckout(orderInfo);
+            console.log(orderInfo);
             if (payUrl) {
                 window.location.href = payUrl;
             } else {
@@ -344,6 +348,8 @@ export default function Checkout() {
             Swal.fire("Lỗi", "Không thể tạo đơn hàng. Vui lòng thử lại.", "error");
         }
     };
+
+  
     
     return (
         <div className="container py-5">

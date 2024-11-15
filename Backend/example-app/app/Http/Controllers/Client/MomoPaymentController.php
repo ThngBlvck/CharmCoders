@@ -1,7 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\Client;
+
 use App\Models\Order;
+use App\Models\Order_detail;
+use App\Models\Cart;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -20,8 +24,7 @@ class MomoPaymentController extends Controller
         $orderInfo = "Thanh toán đơn hàng MoMo";
         $redirectUrl = env('MOMO_REDIRECT_URL');
         $ipnUrl = env('MOMO_IPN_URL');
-        $extraData = "";
-
+        $extraData = $request->extraData;
         $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData . "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=captureWallet";
         $signature = hash_hmac("sha256", $rawHash, $secretKey);
 
@@ -40,6 +43,7 @@ class MomoPaymentController extends Controller
         ];
 
 
+
         $response = Http::post($endpoint, $data);
         return $response->json();
     }
@@ -54,29 +58,72 @@ class MomoPaymentController extends Controller
     public function handleIPN(Request $request)
     {
         $data = $request->all();
-
+    
         // Xác minh chữ ký MoMo (cần tạo hàm verifySignature để kiểm tra)
         if (!$this->verifySignature($data)) {
             return response()->json(['message' => 'Invalid signature'], 400);
         }
-
+    
         // Kiểm tra trạng thái thanh toán
         if ($data['resultCode'] == 0) {
             // Thanh toán thành công
-            $orderId = $data['orderId'];
-            $order = Order::where('order_id', $orderId)->first();
-
-
-            if ($order) {
-                $order->status = 5 ; // Cập nhật trạng thái đơn hàng
-                $order->save();
-                return response()->json(['message' => 'Thanh toán thành công'], 200);
-            } else {
-                return response()->json(['message' => 'Không tìm thấy đơn hàng'], 404);
+    
+            // Lấy thông tin từ extraData
+            $extradata = json_decode($data['extraData'], true);  // Giả sử extraData chứa mảng các sản phẩm
+            $user_id = $extradata[0]['user_id']; 
+            $address = $extradata[0]['address'];
+            $user = User::find($user_id);
+    
+            // Tạo đơn hàng mới
+            $orderData = [
+                'order_id' => $data['orderId'],
+                'user_id' => $user_id, 
+                'total_amount' => $data['amount'],
+                'status' => 5,  
+                'created_at' => now(),
+                'updated_at' => now(),
+                'address' => $address,
+                'phone' => $user ? $user->phone : null,  
+                'payment_method'=>2
+            ];
+    
+            // Lưu đơn hàng vào bảng Order
+            $order = Order::create($orderData);
+    
+            // Lưu chi tiết đơn hàng
+            $orderDetails = [];
+            foreach ($extradata as $item) {
+                // Truy vấn bảng Cart để lấy thông tin sản phẩm và số lượng
+                $cartItem = Cart::where('user_id', $item['user_id'])
+                                ->where('product_id', $item['product_id'])
+                                ->first();
+    
+                if (!$cartItem) {
+                    return response()->json(['message' => 'Sản phẩm không có trong giỏ hàng'], 404);
+                }
+    
+                // Tạo chi tiết đơn hàng
+                $orderDetails[] = [
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'], // Giả sử có mối quan hệ với bảng product
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+    
+                // Xóa sản phẩm khỏi giỏ hàng sau khi thanh toán
+                $cartItem->delete();
             }
+    
+            // Lưu chi tiết đơn hàng vào bảng OrderDetail
+            Order_detail::insert($orderDetails);
+    
+            return response()->json(['message' => 'Thanh toán thành công và tạo đơn hàng mới'], 200);
         }
-
+    
         // Trường hợp thanh toán không thành công
         return response()->json(['message' => 'Thanh toán thất bại'], 400);
     }
+    
 }
