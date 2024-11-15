@@ -3,22 +3,29 @@ import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getCategory, deleteCategory } from "../../../../services/Category";
 import Swal from 'sweetalert2';
+import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
 
 export default function ProductCategory({ color = "light" }) {
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]); // Lưu trữ các danh mục đã chọn
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 3; // Số sản phẩm trên mỗi trang
+    const [loading, setLoading] = useState(true); // Thêm state loading
 
     useEffect(() => {
         fetchCategories();
     }, []);
 
     const fetchCategories = async () => {
+        setLoading(true)
         try {
             const result = await getCategory();
             setCategories(result);
         } catch (error) {
             console.error("Lỗi khi lấy danh mục sản phẩm:", error);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -103,6 +110,12 @@ export default function ProductCategory({ color = "light" }) {
         return status === 1 ? "Hiện" : "Ẩn"; // Chuyển đổi trạng thái
     };
 
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= Math.ceil(categories.length / productsPerPage)) {
+            setCurrentPage(page);
+        }
+    };
+
     return (
         <>
             <div
@@ -130,64 +143,102 @@ export default function ProductCategory({ color = "light" }) {
                         </NavLink>
                     </div>
                 </div>
-                <div className="block w-full overflow-x-auto">
-                    <table className="items-center w-full bg-transparent border-collapse table-fixed">
-                        <thead>
-                        <tr>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
-                                <input
-                                    type="checkbox"
-                                    onChange={handleSelectAll}
-                                    checked={selectedCategories.length === categories.length}
-                                />
-                            </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên danh mục</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng thái</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành động</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {categories.length > 0 ? (
-                            categories.map((category, index) => (
-                                <tr key={category.id}>
-                                    <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedCategories.includes(category.id)}
-                                            onChange={() => handleSelectCategory(category.id)}
-                                        />
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {category.name.length > 30 ? category.name.substring(0, 30) + "..." : category.name}
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{getStatusText(category.status)}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                        <button
-                                            className="text-blue-500 hover:text-blue-700 px-2"
-                                            onClick={() => handleEdit(category.id)}
-                                        >
-                                            <i className="fas fa-pen text-xl"></i>
-                                        </button>
-                                        <button
-                                            className="text-red-500 hover:text-red-700 ml-2 px-2"
-                                            onClick={() => handleDelete(category.id)}
-                                        >
-                                            <i className="fas fa-trash text-xl"></i>
-                                        </button>
+                { loading ? (
+                    <div className="flex justify-center items-center py-4">
+                        <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                    </div>
+                ) : (
+                    <div className="block w-full overflow-x-auto">
+                        <table className="items-center w-full bg-transparent border-collapse table-fixed">
+                            <thead>
+                            <tr>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                    <input
+                                        type="checkbox"
+                                        onChange={handleSelectAll}
+                                        checked={selectedCategories.length === categories.length}
+                                    />
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên
+                                    danh mục
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng
+                                    thái
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành
+                                    động
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {categories.length > 0 ? (
+                                categories.map((category, index) => (
+                                    <tr key={category.id}>
+                                        <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedCategories.includes(category.id)}
+                                                onChange={() => handleSelectCategory(category.id)}
+                                            />
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                            {category.name.length > 30 ? category.name.substring(0, 30) + "..." : category.name}
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{getStatusText(category.status)}</td>
+                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700 px-2"
+                                                onClick={() => handleEdit(category.id)}
+                                            >
+                                                <i className="fas fa-pen text-xl"></i>
+                                            </button>
+                                            <button
+                                                className="text-red-500 hover:text-red-700 ml-2 px-2"
+                                                onClick={() => handleDelete(category.id)}
+                                            >
+                                                <i className="fas fa-trash text-xl"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center p-4">
+                                        Không có danh mục nào
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5" className="text-center p-4">
-                                    Không có danh mục nào
-                                </td>
-                            </tr>
-                        )}
-                        </tbody>
-                    </table>
+                            )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {/* Phân trang */}
+                <div className="flex justify-center items-center mt-4">
+                    {/* Nút Previous */}
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                        &#9664; {/* Mũi tên trái */}
+                    </button>
+
+                    {/* Trang hiện tại */}
+                    <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
+        Trang {currentPage} / {Math.ceil(categories.length / productsPerPage) || 1}
+    </span>
+
+                    {/* Nút Next */}
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === Math.ceil(categories.length / productsPerPage)}
+                        className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                        &#9654; {/* Mũi tên phải */}
+                    </button>
                 </div>
 
                 {/* Nút xóa hàng loạt */}

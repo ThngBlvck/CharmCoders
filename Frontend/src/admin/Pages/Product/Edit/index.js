@@ -5,7 +5,8 @@ import Swal from 'sweetalert2';
 import PropTypes from "prop-types";
 import { getOneProduct, updateProduct } from "../../../../services/Product"; // Hàm lấy và cập nhật sản phẩm
 import { getBrand } from "../../../../services/Brand"; // Hàm lấy danh sách nhãn hàng
-import { getCategory } from "../../../../services/Category"; // Hàm lấy danh sách danh mục
+import { getCategory } from "../../../../services/Category";
+import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
 
 export default function EditProduct({ color = "light" }) {
     const { id } = useParams(); // Lấy id từ URL
@@ -22,12 +23,12 @@ export default function EditProduct({ color = "light" }) {
     const [brands, setBrands] = useState([]); // State lưu trữ danh sách nhãn hàng
     const [categories, setCategories] = useState([]); // State lưu trữ danh sách danh mục
     const [originalProduct, setOriginalProduct] = useState(null); // State lưu trữ dữ liệu sản phẩm gốc
-    const [isLoading, setIsLoading] = useState(true); // Trạng thái tải dữ liệu
+    const [loading, setLoading] = useState(true); // Thêm state loading
     const [selectedImage, setSelectedImage] = useState(null); // State lưu trữ hình ảnh đã chọn
 
     useEffect(() => {
         const fetchProductData = async () => {
-            setIsLoading(true); // Bắt đầu trạng thái tải
+            setLoading(true); // Bắt đầu loading
             try {
                 const [product, brandList, categoryList] = await Promise.all([
                     getOneProduct(id), // Gọi API lấy sản phẩm theo id
@@ -58,7 +59,7 @@ export default function EditProduct({ color = "light" }) {
                     confirmButtonText: 'OK'
                 });
             } finally {
-                setIsLoading(false); // Kết thúc trạng thái tải
+                setLoading(false); // Kết thúc trạng thái tải
             }
         };
 
@@ -154,10 +155,6 @@ export default function EditProduct({ color = "light" }) {
     };
 
 
-    if (isLoading) {
-        return <div>Đang tải dữ liệu...</div>; // Hiển thị khi đang tải dữ liệu
-    }
-
     return (
         <div
             className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}
@@ -171,6 +168,11 @@ export default function EditProduct({ color = "light" }) {
                     </div>
                 </div>
             </div>
+            {loading ?  (
+                <div className="flex justify-center items-center py-4">
+                    <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                </div>
+            ) : (
             <div className="p-4">
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap">
                     {/* Cột 1 */}
@@ -304,6 +306,7 @@ export default function EditProduct({ color = "light" }) {
                     </div>
                 </form>
             </div>
+                )}
         </div>
     );
 }

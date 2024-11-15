@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getProduct, deleteProduct, searchProduct } from "../../../../services/Product";
 import Swal from 'sweetalert2';
+import { PulseLoader } from 'react-spinners'; // Import PulseLoader từ react-spinners
 
 export default function ProductCategoryList() {
     const [products, setProduct] = useState([]);
@@ -10,6 +11,7 @@ export default function ProductCategoryList() {
     const navigate = useNavigate();
     const [displayedProducts, setDisplayedProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [loading, setLoading] = useState(true); // Thêm state loading
     const productsPerPage = 3; // Số sản phẩm trên mỗi trang
 
     useEffect(() => {
@@ -18,7 +20,6 @@ export default function ProductCategoryList() {
 
     // Hàm để tính số trang
     useEffect(() => {
-        // Cập nhật danh sách sản phẩm hiển thị khi trang thay đổi
         const startIndex = (currentPage - 1) * productsPerPage;
         const endIndex = startIndex + productsPerPage;
         setDisplayedProducts(products.slice(startIndex, endIndex));
@@ -44,6 +45,7 @@ export default function ProductCategoryList() {
 
     const fetchProducts = async () => {
         try {
+            setLoading(true); // Bắt đầu loading
             let result;
             if (searchTerm.trim() === "") {
                 result = await getProduct();
@@ -52,8 +54,6 @@ export default function ProductCategoryList() {
                 result = await searchProduct(sanitizedSearchTerm);
             }
 
-            console.log("Full API result:", result);
-
             if (Array.isArray(result)) {
                 setProduct(result);
             } else if (result && result.products && Array.isArray(result.products)) {
@@ -61,10 +61,11 @@ export default function ProductCategoryList() {
             } else {
                 setProduct([]);
             }
-
         } catch (error) {
             console.error("Lỗi khi lấy danh mục sản phẩm:", error);
             setProduct([]);
+        } finally {
+            setLoading(false); // Kết thúc loading
         }
     };
 
@@ -174,111 +175,122 @@ export default function ProductCategoryList() {
                 />
             </div>
 
-            <div className="block w-full overflow-x-auto">
-                <table className="items-center w-full bg-transparent border-collapse table-fixed">
-                    <thead>
-                    <tr>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
-                            <input
-                                type="checkbox"
-                                onChange={handleSelectAll}
-                                checked={selectedProducts.length === products.length}
-                            />
-                        </th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình
-                            ảnh
-                        </th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
-                            gốc
-                        </th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
-                            sale
-                        </th>
-                        <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
-                            tác
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {displayedProducts.length > 0 ? (
-                        displayedProducts.map((product, index) => (
-                            <tr key={product.id}>
-                                <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedProducts.includes(product.id)}
-                                        onChange={() => handleSelectProduct(product.id)}
-                                    />
-                                </td>
-                                <td>
-                                    <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+            {/* Hiệu ứng loading */}
+            {loading ? (
+                <div className="flex justify-center items-center py-4">
+                    <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                </div>
+            ) : (
+                <div className="block w-full overflow-x-auto">
+                    <table className="items-center w-full bg-transparent border-collapse table-fixed">
+                        <thead>
+                        <tr>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                <input
+                                    type="checkbox"
+                                    onChange={handleSelectAll}
+                                    checked={selectedProducts.length === products.length}
+                                />
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình
+                                ảnh
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
+                                gốc
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
+                                sale
+                            </th>
+                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
+                                tác
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {displayedProducts.length > 0 ? (
+                            displayedProducts.map((product, index) => (
+                                <tr key={product.id}>
+                                    <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedProducts.includes(product.id)}
+                                            onChange={() => handleSelectProduct(product.id)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
                                     <span className="ml-3 text-blueGray-600">
                                         {index + 1}
                                     </span>
-                                    </th>
-                                </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                    {product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}
-                                </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                    <img src={product.image} alt={product.name} className="h-12 w-12 rounded"/>
-                                </td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.unit_price.toLocaleString()} VND</td>
-                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                    {product.sale_price !== null ? product.sale_price.toLocaleString() + " VND" : "Không có"}
-                                </td>
-                                <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                    <button className="text-blue-500 hover:text-blue-700 px-2"
-                                            onClick={() => handleViewDetail(product.id)}>
-                                        <i className="fas fa-eye text-xl"></i>
-                                    </button>
-                                    <button
-                                        className="text-blue-500 hover:text-blue-700 ml-2 px-2"
-                                        onClick={() => handleEdit(product.id)}
-                                    >
-                                        <i className="fas fa-pen text-xl"></i>
-                                    </button>
-                                    <button className="text-red-500 hover:text-red-700 ml-2 px-2"
-                                            onClick={() => handleDelete(product.id)}>
-                                        <i className="fas fa-trash text-xl"></i>
-                                    </button>
+                                        </th>
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        {product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <img src={product.image} alt={product.name} className="h-12 w-12 rounded"/>
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.unit_price.toLocaleString()} VND</td>
+                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        {product.sale_price !== null ? product.sale_price.toLocaleString() + " VND" : "Không có"}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                        <button className="text-blue-500 hover:text-blue-700 px-2"
+                                                onClick={() => handleViewDetail(product.id)}>
+                                            <i className="fas fa-eye text-xl"></i>
+                                        </button>
+                                        <button
+                                            className="text-blue-500 hover:text-blue-700 ml-2 px-2"
+                                            onClick={() => handleEdit(product.id)}
+                                        >
+                                            <i className="fas fa-pen text-xl"></i>
+                                        </button>
+                                        <button className="text-red-500 hover:text-red-700 ml-2 px-2"
+                                                onClick={() => handleDelete(product.id)}>
+                                            <i className="fas fa-trash text-xl"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="7" className="text-center p-4">
+                                    Không có sản phẩm nào
                                 </td>
                             </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="7" className="text-center p-4">
-                                Không có sản phẩm nào
-                            </td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
-            </div>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {/* Phân trang */}
             <div className="flex justify-center items-center mt-4">
+                {/* Nút Previous */}
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                     &#9664; {/* Mũi tên trái */}
                 </button>
-                <span className="px-4 py-2 mx-1 bg-gray-100 border rounded">
-        Trang {currentPage} / {Math.ceil(products.length / productsPerPage)}
+
+                {/* Trang hiện tại */}
+                <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
+        Trang {currentPage} / {Math.ceil(products.length / productsPerPage) || 1}
     </span>
+
+                {/* Nút Next */}
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === Math.ceil(products.length / productsPerPage)}
-                    className="px-4 py-2 mx-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                     &#9654; {/* Mũi tên phải */}
                 </button>
             </div>
-
 
             {/* Nút xóa hàng loạt */}
             {selectedProducts.length > 0 && (
