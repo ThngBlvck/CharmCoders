@@ -26,7 +26,6 @@ export const getOrderByIdAd = (id) => {
         path: `${URL_Order_Admin}/${id}`,
     });
 };
-
 export const updateOrder = (id, status) => {
     return request({
         method: 'PUT',

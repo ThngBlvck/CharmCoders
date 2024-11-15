@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {getUserInfo} from "../../../services/User";
-import {checkout, momoCheckout} from '../../../services/Checkout';
+import {checkout,momoCheckout} from '../../../services/Checkout';
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -40,6 +40,8 @@ export default function Checkout() {
     const [address, setAddress] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
+    const [user_id, setUserId] = useState([]);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -51,7 +53,7 @@ export default function Checkout() {
             // Gọi fetchUserInfo để lấy thông tin người dùng
             fetchUserInfo().then(userInfo => {
                 console.log("Thông tin người dùng:", userInfo); // Xem thông tin người dùng đã nhận
-
+                setUserId(userInfo.user_id);
                 if (userInfo && typeof userInfo === 'object' && userInfo.user_id) {
                     // Kiểm tra userInfo có phải là một đối tượng và có user_id
                     setFormData(prevFormData => ({
@@ -190,7 +192,6 @@ export default function Checkout() {
                         }
                         return null; // Trả về null nếu không tìm thấy sản phẩm
                     }).filter(item => item !== null); // Loại bỏ các sản phẩm null
-
                     setProducts(combinedProducts);
                 } else {
                     console.error("Không tìm thấy sản phẩm nào.");
@@ -208,35 +209,14 @@ export default function Checkout() {
         }
     };
 
-    const total = (item) => {
-        // Sử dụng sale_price nếu tồn tại, nếu không thì lấy unit_price
-        const price = item.sale_price || item.unit_price;
-        return price * item.quantity;
-    };
-
     const calculateTotal = () => {
         if (!Array.isArray(products) || products.length === 0) {
             return 0; // Trả về 0 nếu không phải là mảng hoặc mảng rỗng
         }
-        return products.reduce((total, item) => {
-            // Sử dụng sale_price nếu tồn tại, nếu không thì lấy unit_price
-            const price = item.sale_price || item.unit_price;
-            return total + (price * item.quantity);
-        }, 0);
+        return products.reduce((total, item) => total + (item.unit_price * item.quantity), 0);
     };
-
-    // Hàm tính tổng tiền tiết kiệm
-    const calculateSavings = () => {
-        if (!Array.isArray(products) || products.length === 0) {
-            return 0; // Trả về 0 nếu không phải là mảng hoặc mảng rỗng
-        }
-        return products.reduce((savings, item) => {
-            // Kiểm tra nếu có sale_price thì tính phần tiết kiệm
-            if (item.sale_price) {
-                return savings + ((item.unit_price - item.sale_price) * item.quantity);
-            }
-            return savings;
-        }, 0);
+    const total = (item) => {
+        return item.unit_price * item.quantity;
     };
 
     const fetchUserInfo = async () => {
@@ -266,31 +246,31 @@ export default function Checkout() {
 
     const handleSubmit = async (event) => {
         event.preventDefault(); // Ngăn chặn hành động mặc định của form
-
+    
         const totalAmount = calculateTotal();
-
+    
         // Reset errors
         const newErrors = {};
-
+    
         // Kiểm tra Họ và Tên
         if (!formData.name.trim()) {
             newErrors.name = "Họ và Tên không được để trống.";
         }
-
+    
         // Kiểm tra Email
         if (!formData.email.trim()) {
             newErrors.email = "Email không được để trống.";
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = "Email không đúng định dạng.";
         }
-
+    
         // Kiểm tra Số điện thoại
         if (!formData.phone.trim()) {
             newErrors.phone = "Số điện thoại không được để trống.";
         } else if (!/^\d{10}$/.test(formData.phone)) {
             newErrors.phone = "Số điện thoại phải có 10 chữ số.";
         }
-
+    
         // Kiểm tra Địa chỉ
         const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
         if (!formData.address?.trim()) {
@@ -298,14 +278,14 @@ export default function Checkout() {
         } else if (!wardName || !districtName || !provinceName) {
             newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
         }
-
+    
         setErrors(newErrors);
-
+    
         // Nếu có lỗi, dừng xử lý
         if (Object.keys(newErrors).length > 0) {
             return;
         }
-
+    
         // Tạo một object mới chứa dữ liệu để gửi lên server
         const orderData = {
             order_id: `MDH_${Date.now()}`,
@@ -316,10 +296,10 @@ export default function Checkout() {
             payment_method: formData.paymentMethod, // Thêm thông tin phương thức thanh toán
             total_amount: totalAmount,
         };
-
+    
         // Kiểm tra nếu phương thức thanh toán là MoMo
         if (orderData.payment_method === "2") {
-
+            
             handleMomoPayment(orderData); // Gọi hàm xử lý thanh toán MoMo
         } else {
             // Tiến hành xử lý thanh toán với các phương thức khác (nếu có)
@@ -331,28 +311,33 @@ export default function Checkout() {
                 Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
             }
         }
-    };
+    };  
 
+ console.log(products);
 
     const handleMomoPayment = async (orderData) => {
+        const extradata = products.map(item => ({
+            product_id: item.id,
+            quantity: item.quantity,
+            user_id: user_id,
+            address: orderData.address, 
+            price: item.unit_price
+        }));
         try {
-            // Bước 1: Tạo đơn hàng trong cơ sở dữ liệu
-            const createdOrder = await checkout(orderData);
-
-
-            // Bước 2 và 3: Xử lý thanh toán MoMo
             const orderInfo = {
                 amount: orderData.total_amount,
                 orderId: orderData.order_id,
                 description: "Thanh toán đơn hàng qua MoMo",
+                extraData: JSON.stringify(extradata),
                 customerInfo: {
                     name: orderData.name,
                     email: orderData.email,
                     phone: orderData.phone,
                 },
             };
-
+    
             const payUrl = await momoCheckout(orderInfo);
+            console.log(orderInfo);
             if (payUrl) {
                 window.location.href = payUrl;
             } else {
@@ -364,6 +349,8 @@ export default function Checkout() {
         }
     };
 
+  
+    
     return (
         <div className="container py-5">
             <div className="row">
@@ -396,37 +383,11 @@ export default function Checkout() {
                                                         whiteSpace: "normal", // Cho phép xuống dòng
                                                         maxHeight: "3em",
                                                     }}>{item.name.length > 100 ? item.name.substring(0, 100) + "..." : item.name}</p>
-                                                    <p className="mb-0" style={{color: "#8c5e58"}}>
-                                                        {item.sale_price ? (
-                                                            <>
-                                                            <span style={{
-                                                                textDecoration: "line-through",
-                                                                color: "#6c4d36"
-                                                            }}>
-                                                                {item.unit_price.toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND"
-                                                                })}
-                                                            </span>
-                                                                {" "}
-                                                                <span style={{fontWeight: "bold", color: "#f76c5e"}}>
-                                                                {item.sale_price.toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND"
-                                                                })}
-                                                            </span>
-                                                            </>
-                                                        ) : (
-                                                            <span style={{fontWeight: "bold"}}>
-                                                                {item.unit_price.toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND"
-                                                                })}
-                                                            </span>
-                                                        )}
-                                                        {" x "}{item.quantity}
-                                                    </p>
-
+                                                    <p className="mb-0"
+                                                       style={{color: "#8c5e58"}}>{item.unit_price.toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    })} x {item.quantity}</p>
                                                     <p style={{color: "#8c5e58"}}>Tổng: {total(item).toLocaleString("vi-VN", {
                                                         style: "currency",
                                                         currency: "VND",
@@ -440,20 +401,17 @@ export default function Checkout() {
                                 )
                             )}
                         </div>
+
                         <p className="mt-4 font-semibold"
                            style={{color: "#8c5e58"}}>Thành tiền: {calculateTotal().toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                         })}</p>
-                        <span>(Tiết kiệm: {calculateSavings().toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND"
-                        })})</span>
                     </div>
 
                     {/* Form thông tin người dùng */}
                     <div className="col-md-6">
-                    <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin
+                        <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin
                             thanh toán</p>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
