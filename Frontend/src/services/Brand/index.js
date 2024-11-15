@@ -1,5 +1,6 @@
 import request from '../../api';
 
+const URL_Search = 'admin/brand/search';
 const Ad = 'admin/'
 export const getBrand = () => {
     return request({
@@ -34,5 +35,12 @@ export const deleteBrand = (id) => {
     return request({
         method: 'DELETE',
         path: `${Ad}brands/${id}`
+    });
+};
+// Hàm tìm kiếm nhãn hàng
+export const searchBrand = (query) => {
+    return request({
+        method: 'GET',
+        path: `${URL_Search}?query=${query}`,
     });
 };

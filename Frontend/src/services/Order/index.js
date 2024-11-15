@@ -3,7 +3,7 @@ import request from '../../api';
 const URL_Order = 'client/orders';
 const URL_Update_Order = 'admin/orders';
 const URL_Order_Admin = 'admin/orders';
-
+const URL_Search = 'admin/order/search';
 export const getOrder = (query = '') => {
     return request({
         method: 'GET',
@@ -39,5 +39,12 @@ export const getOrderAdmin = (query = '') => {
     return request({
         method: 'GET',
         path: `${URL_Order_Admin}`,
+    });
+};
+// Hàm tìm kiếm đơn hàng
+export const searchOrder = (query) => {
+    return request({
+        method: 'GET',
+        path: `${URL_Search}?query=${query}`,
     });
 };

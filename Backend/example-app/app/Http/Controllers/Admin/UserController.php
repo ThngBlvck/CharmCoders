@@ -172,10 +172,10 @@ class UserController extends Controller
         }
 
         // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
-        $products = User::where('name', 'LIKE', "%{$query}%")->get();
+        $users = User::where('name', 'LIKE', "%{$query}%")->get();
 
         // Nếu không tìm thấy sản phẩm
-        if ($products->isEmpty()) {
+        if ($users->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Không tìm thấy sản phẩm nào phù hợp.',
@@ -185,7 +185,7 @@ class UserController extends Controller
         // Trả về danh sách sản phẩm phù hợp
         return response()->json([
             'success' => true,
-            'products' => $products,
+            'users' => $users,
         ], 200);
     }
 }

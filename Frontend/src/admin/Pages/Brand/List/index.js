@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getBrand, deleteBrand } from '../../../../services/Brand';
+import { getBrand, deleteBrand,searchBrand } from '../../../../services/Brand';
 import Swal from 'sweetalert2';
 import { PulseLoader } from 'react-spinners'; // Import PulseLoader từ react-spinners
 
@@ -9,29 +9,73 @@ export default function Brand({ color }) {
     const [brands, setBrands] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState(new Set()); // Track selected brands
     const navigate = useNavigate();
-    const renderStatus = (status) => (status === "1" ? "Hiển thị" : "Ẩn");
+    const renderStatus = (status) => (status == "1" ? "Hiển thị" : "Ẩn");
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true); // Thêm state loading
     const brandsPerPage = 3; // Số sản phẩm trên mỗi trang
-
+    const [searchTerm, setSearchTerm] = useState(""); // State lưu trữ từ khóa tìm kiếm
+    const [displayedBrands, setDisplayedBrands] = useState([]);
     useEffect(() => {
         fetchBrands();
-    }, []);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        const startIndex = (currentPage - 1) * brandsPerPage;
+        const endIndex = startIndex + brandsPerPage;
+        setDisplayedBrands(brands.slice(startIndex, endIndex));
+    }, [currentPage, brands]);
 
     const fetchBrands = async () => {
-        setLoading(true)
         try {
-            const result = await getBrand();
-            setBrands(result || []);
-        } catch (err) {
-            console.error('Error fetching brands:', err);
-            setBrands([]);
-            Swal.fire('Lỗi', 'Lỗi khi tải danh sách nhãn hàng. Vui lòng thử lại.', 'error');
+            setLoading(true); // Start loading
+            let result;
+            if (searchTerm.trim() === "") {
+                result = await getBrand(); // Fetch all brands if no search term
+            } else {
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm).toLowerCase(); // Remove accents and convert to lowercase
+                console.log('Searching for: ', sanitizedSearchTerm); // Log search term
+                result = await getBrand(); // Fetch all brands regardless of search term
+
+                // Filter the brands locally after fetching the data
+                result = result.filter(brand =>
+                    removeVietnameseTones(brand.name).toLowerCase().includes(sanitizedSearchTerm)
+                );
+            }
+
+            console.log('Fetched Brands: ', result); // Log result from API
+
+            if (Array.isArray(result)) {
+                setBrands(result); // Set brands if result is an array
+            } else if (result && result.brands && Array.isArray(result.brands)) {
+                setBrands(result.brands); // Set brands if result contains a 'brands' field
+            } else {
+                setBrands([]); // Set empty brands if no valid result
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách nhãn hàng:", error);
+            setBrands([]); // Set empty brands if error occurs
         } finally {
-            setLoading(false);
+            setLoading(false); // End loading
         }
     };
 
+    const removeVietnameseTones = (str) => {
+        const accents = {
+            a: 'áàảãạâấầẩẫậăắằẳẵặ',
+            e: 'éèẻẽẹêếềểễệ',
+            i: 'íìỉĩị',
+            o: 'óòỏõọôốồổỗộơớờởỡợ',
+            u: 'úùủũụưứừửữự',
+            y: 'ýỳỷỹỵ',
+            d: 'đ'
+        };
+
+        for (let nonAccent in accents) {
+            const accent = accents[nonAccent];
+            str = str.replace(new RegExp(`[${accent}]`, 'g'), nonAccent);
+        }
+        return str;
+    };
     const handleEditClick = (id) => {
         navigate(`/admin/brand/edit/${id}`);
     };
@@ -139,7 +183,17 @@ export default function Brand({ color }) {
                         </NavLink>
                     </div>
                 </div>
-                { loading ? (
+                {/* Input tìm kiếm sản phẩm */}
+                <div className="mb-4 px-4">
+                    <input
+                        type="text"
+                        className="border border-gray-300 rounded px-3 py-2 w-full shadow appearance-none focus:outline-none focus:shadow-outline"
+                        placeholder="Tìm kiếm nhãn hàng..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                {loading ? (
                     <div className="flex justify-center items-center py-4">
                         <PulseLoader color="#4A90E2" loading={loading} size={15}/>
                     </div>
@@ -148,16 +202,17 @@ export default function Brand({ color }) {
                         <table className="items-center w-full bg-transparent border-collapse table-fixed">
                             <thead>
                             <tr>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"
-                                    style={{width: "15%"}}
-                                >
+                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                    (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
+                                    style={{width: "10%"}}>
                                     <input
                                         type="checkbox"
                                         onChange={handleSelectAll}
-                                        checked={selectedBrands.size === brands.length}
+                                        checked={selectedBrands.length === setDisplayedBrands.length}
                                     />
                                     <span className="ml-2">Chọn tất cả</span>
                                 </th>
+
                                 <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}
@@ -186,8 +241,8 @@ export default function Brand({ color }) {
                             </tr>
                             </thead>
                             <tbody>
-                            {brands.length > 0 ? (
-                                brands.map((brand, index) => (
+                            {displayedBrands.length > 0 ? (
+                                displayedBrands.map((brand, index) => (
                                     <tr key={brand.id}>
                                         <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
                                             <input
@@ -234,18 +289,18 @@ export default function Brand({ color }) {
                                 </tr>
                             )}
                             </tbody>
+                            {selectedBrands.size > 0 && ( // Render the delete button only if there are selected brands
+                                <div className="flex justify-start mt-4">
+                                    <button
+                                        className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none"
+                                        type="button"
+                                        onClick={handleBulkDelete}
+                                    >
+                                        XÓA đã CHỌN
+                                    </button>
+                                </div>
+                            )}
                         </table>
-                        {selectedBrands.size > 0 && ( // Render the delete button only if there are selected brands
-                            <div className="flex justify-end mt-4">
-                                <button
-                                    className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none"
-                                    type="button"
-                                    onClick={handleBulkDelete}
-                                >
-                                    XÓA đã CHỌN
-                                </button>
-                            </div>
-                        )}
                     </div>
                 )}
 

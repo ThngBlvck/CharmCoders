@@ -1,32 +1,72 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getCategory, deleteCategory } from "../../../../services/Category";
+import { getCategory, deleteCategory, searchCategory } from "../../../../services/Category";
 import Swal from 'sweetalert2';
-import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
+import { PulseLoader } from "react-spinners"; // Hàm lấy danh sách danh mục
 
 export default function ProductCategory({ color = "light" }) {
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]); // Lưu trữ các danh mục đã chọn
+    const [searchTerm, setSearchTerm] = useState(""); // State lưu trữ từ khóa tìm kiếm
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 3; // Số sản phẩm trên mỗi trang
     const [loading, setLoading] = useState(true); // Thêm state loading
-
+    const [displayedProducts, setDisplayedProducts] = useState([]);
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [searchTerm]);
+    // Hàm để tính số trang
+    useEffect(() => {
+        const startIndex = (currentPage - 1) * productsPerPage;
+        const endIndex = startIndex + productsPerPage;
+        setDisplayedProducts(categories.slice(startIndex, endIndex));
+    }, [currentPage, categories]);
 
     const fetchCategories = async () => {
-        setLoading(true)
         try {
-            const result = await getCategory();
-            setCategories(result);
+            setLoading(true); // Start loading
+            let result;
+            if (searchTerm.trim() === "") {
+                result = await getCategory(); // Fetch all categories if no search term
+            } else {
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm); // Remove accents from search term
+                result = await searchCategory(sanitizedSearchTerm); // Fetch filtered categories based on the sanitized search term
+            }
+
+            if (Array.isArray(result)) {
+                setCategories(result); // Set categories if result is an array
+            } else if (result && result.categories && Array.isArray(result.categories)) {
+                setCategories(result.categories); // Set categories if result contains a 'categories' field
+            } else {
+                setCategories([]); // Set empty categories if no valid result
+            }
         } catch (error) {
             console.error("Lỗi khi lấy danh mục sản phẩm:", error);
+            setCategories([]); // Set empty categories if error occurs
         } finally {
-            setLoading(false)
+            setLoading(false); // End loading
         }
+    };
+
+
+    const removeVietnameseTones = (str) => {
+        const accents = {
+            a: 'áàảãạâấầẩẫậăắằẳẵặ',
+            e: 'éèẻẽẹêếềểễệ',
+            i: 'íìỉĩị',
+            o: 'óòỏõọôốồổỗộơớờởỡợ',
+            u: 'úùủũụưứừửữự',
+            y: 'ýỳỷỹỵ',
+            d: 'đ'
+        };
+
+        for (let nonAccent in accents) {
+            const accent = accents[nonAccent];
+            str = str.replace(new RegExp(`[${accent}]`, 'g'), nonAccent);
+        }
+        return str;
     };
 
     const handleDelete = async (id) => {
@@ -143,9 +183,20 @@ export default function ProductCategory({ color = "light" }) {
                         </NavLink>
                     </div>
                 </div>
-                { loading ? (
+
+                {/* Input tìm kiếm sản phẩm */}
+                <div className="mb-4 px-4">
+                    <input
+                        type="text"
+                        className="border border-gray-300 rounded px-3 py-2 w-full shadow appearance-none focus:outline-none focus:shadow-outline"
+                        placeholder="Tìm kiếm danh mục sản phẩm..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                {loading ? (
                     <div className="flex justify-center items-center py-4">
-                        <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                        <PulseLoader color="#4A90E2" loading={loading} size={15} />
                     </div>
                 ) : (
                     <div className="block w-full overflow-x-auto">
@@ -156,7 +207,7 @@ export default function ProductCategory({ color = "light" }) {
                                     <input
                                         type="checkbox"
                                         onChange={handleSelectAll}
-                                        checked={selectedCategories.length === categories.length}
+                                        checked={selectedCategories.length === setDisplayedProducts.length}
                                     />
                                 </th>
                                 <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
@@ -172,8 +223,8 @@ export default function ProductCategory({ color = "light" }) {
                             </tr>
                             </thead>
                             <tbody>
-                            {categories.length > 0 ? (
-                                categories.map((category, index) => (
+                            {displayedProducts.length > 0 ? (
+                                displayedProducts.map((category, index) => (
                                     <tr key={category.id}>
                                         <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
                                             <input
@@ -205,51 +256,47 @@ export default function ProductCategory({ color = "light" }) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="text-center p-4">
-                                        Không có danh mục nào
-                                    </td>
+                                    <td colSpan="5" className="text-center p-4">Không tìm thấy danh mục nào</td>
                                 </tr>
                             )}
                             </tbody>
+
                         </table>
-                    </div>
-                )}
 
-                {/* Phân trang */}
-                <div className="flex justify-center items-center mt-4">
-                    {/* Nút Previous */}
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                    >
-                        &#9664; {/* Mũi tên trái */}
-                    </button>
+                        {/* Phân trang */}
+                        <div className="flex justify-center items-center mt-4">
+                            {/* Nút Previous */}
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            >
+                                &#9664; {/* Mũi tên trái */}
+                            </button>
 
-                    {/* Trang hiện tại */}
-                    <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
-        Trang {currentPage} / {Math.ceil(categories.length / productsPerPage) || 1}
-    </span>
-
-                    {/* Nút Next */}
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === Math.ceil(categories.length / productsPerPage)}
-                        className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                    >
-                        &#9654; {/* Mũi tên phải */}
-                    </button>
-                </div>
-
-                {/* Nút xóa hàng loạt */}
-                {selectedCategories.length > 0 && (
-                    <div className="mb-4 px-4">
-                        <button
-                            className="bg-red-500 text-white text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
-                            onClick={handleDeleteSelected}
-                        >
-                            Xóa các danh mục đã chọn
-                        </button>
+                            {/* Trang hiện tại */}
+                            <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
+                                Trang {currentPage} / {Math.ceil(categories.length / productsPerPage) || 1}</span>
+                            {/* Nút Next */}
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === Math.ceil(categories.length / productsPerPage)}
+                                className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            >
+                                &#9654; {/* Mũi tên phải */}
+                            </button>
+                        </div>
+                        {/* Nút xóa hàng loạt */}
+                        {selectedCategories.length > 0 && (
+                            <div className="mb-4 px-4">
+                                <button
+                                    className="bg-red-500 text-white text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
+                                    onClick={handleDeleteSelected}
+                                >
+                                    Xóa các danh mục đã chọn
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
@@ -258,5 +305,5 @@ export default function ProductCategory({ color = "light" }) {
 }
 
 ProductCategory.propTypes = {
-    color: PropTypes.oneOf(["light", "dark"]),
+    color: PropTypes.string,
 };

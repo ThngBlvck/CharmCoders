@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getUser, deleteUser } from "../../../../services/User";
+import { getUser, deleteUser, searchUser } from "../../../../services/User";
 import { getRole } from "../../../../services/Role";
 import Swal from 'sweetalert2';
 import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
@@ -12,8 +12,9 @@ export default function UserList() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
-    const usersPerPage = 3; // Số sản phẩm trên mỗi trang
-
+    const usersPerPage = 4; // Số sản phẩm trên mỗi trang
+    const [displayedUsers, setDisplayedUsers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState(""); // State lưu trữ từ khóa tìm kiếm
     const userToken = localStorage.getItem("token");
     let userRole = null;
 
@@ -23,31 +24,67 @@ export default function UserList() {
             const payload = JSON.parse(atob(parts[1]));
             console.log("Token payload:", payload); // In ra payload để kiểm tra
             userRole = payload.scopes.includes("admin") ? "admin" : (payload.scopes.includes("employee") ? "employee" : "user");
-            console.log("User Role:", userRole);
         }
     }
-
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             await Promise.all([fetchUsers(), fetchRoles()]);
         };
-
         fetchData();
-    }, []);
+    }, [searchTerm, currentPage]); // Khi `searchTerm` hoặc `currentPage` thay đổi, gọi lại `fetchData`
 
     const fetchUsers = async () => {
-        setLoading(true)
         try {
-            const userList = await getUser();
-            setUsers(userList);
+            setLoading(true);
+            let result;
+            if (searchTerm.trim() === "") {
+                result = await getUser(); // Lấy danh sách người dùng nếu không tìm kiếm
+            } else {
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm);
+                result = await searchUser(sanitizedSearchTerm); // Lấy kết quả tìm kiếm
+            }
+
+            if (Array.isArray(result)) {
+                setUsers(result); // Cập nhật danh sách người dùng
+            } else if (result && result.users && Array.isArray(result.users)) {
+                setUsers(result.users); // Cập nhật danh sách tìm kiếm
+            } else {
+                setUsers([]); // Nếu không có kết quả tìm kiếm
+            }
         } catch (error) {
             console.error("Lỗi khi lấy danh sách người dùng:", error);
-            setUsers([]);
+            setUsers([]); // Nếu có lỗi
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
+// Cập nhật phân trang
+    useEffect(() => {
+        const startIndex = (currentPage - 1) * usersPerPage;
+        const endIndex = startIndex + usersPerPage;
+        setDisplayedUsers(users.slice(startIndex, endIndex)); // Hiển thị người dùng theo trang
+    }, [currentPage, users]); // Khi `currentPage` hoặc `users` thay đổi
+
+
+    const removeVietnameseTones = (str) => {
+        const accents = {
+            a: 'áàảãạâấầẩẫậăắằẳẵặ',
+            e: 'éèẻẽẹêếềểễệ',
+            i: 'íìỉĩị',
+            o: 'óòỏõọôốồổỗộơớờởỡợ',
+            u: 'úùủũụưứừửữự',
+            y: 'ýỳỷỹỵ',
+            d: 'đ'
+        };
+
+        for (let nonAccent in accents) {
+            const accent = accents[nonAccent];
+            str = str.replace(new RegExp(`[${accent}]`, 'g'), nonAccent);
+        }
+        return str;
+    };
     const fetchRoles = async () => {
         setLoading(true)
         try {
@@ -130,6 +167,7 @@ export default function UserList() {
         return role ? role.name : 'Unknown';
     };
 
+    // Phân trang
     const handlePageChange = (page) => {
         if (page > 0 && page <= Math.ceil(users.length / usersPerPage)) {
             setCurrentPage(page);
@@ -152,7 +190,17 @@ export default function UserList() {
                     )}
                 </div>
             </div>
-            { loading ? (
+            {/* Input tìm kiếm sản phẩm */}
+            <div className="mb-4 px-4">
+                <input
+                    type="text"
+                    className="border border-gray-300 rounded px-3 py-2 w-full shadow appearance-none focus:outline-none focus:shadow-outline"
+                    placeholder="Tìm kiếm người dùng..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)} // Ensure this updates the searchTerm state
+                />
+            </div>
+            {loading ? (
                 <div className="flex justify-center items-center py-4">
                     <PulseLoader color="#4A90E2" loading={loading} size={15}/>
                 </div>
@@ -168,7 +216,7 @@ export default function UserList() {
                                     <input
                                         type="checkbox"
                                         onChange={handleSelectAll}
-                                        checked={selectedUsers.length === users.length}
+                                        checked={selectedUsers.length === displayedUsers.length}
                                     />
                                 </th>
                             )}
@@ -188,7 +236,7 @@ export default function UserList() {
                                 Người Dùng
                             </th>
                             {userRole !== "admin" ? (
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"></th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">...</th>
                             ) : (
                                 <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
                                     tác</th>
@@ -197,8 +245,8 @@ export default function UserList() {
                         </tr>
                         </thead>
                         <tbody>
-                        {users.length > 0 ? (
-                            users.map((user, index) => (
+                        {displayedUsers.length > 0 ? (
+                            displayedUsers.map((user, index) => (
                                 <tr key={user.id}>
                                     <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
                                         {/* Hiển thị checkbox cho nhân viên (role_id == 2) và người dùng khác không phải là admin (role_id khác 1) */}
@@ -219,8 +267,8 @@ export default function UserList() {
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.name}</td>
                                     <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
-                                        {user.avatar ? (
-                                            <img src={user.avatar} alt={user.name} className="w-12 h-12 rounded-full"/>
+                                        {user.image ? (
+                                            <img src={user.image} alt={user.name} className="w-12 h-12 rounded-full"/>
                                         ) : (
                                             <i className="fas fa-user-circle text-3xl text-gray-400"/>
                                         )}

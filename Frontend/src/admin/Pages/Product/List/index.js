@@ -191,6 +191,7 @@ export default function ProductCategoryList() {
                                     onChange={handleSelectAll}
                                     checked={selectedProducts.length === products.length}
                                 />
+                                <span className="ml-2">Chọn tất cả</span>
                             </th>
                             <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
                             <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>

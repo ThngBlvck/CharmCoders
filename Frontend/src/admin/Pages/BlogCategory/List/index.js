@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getBlogCategory, deleteBlogCategory } from '../../../../services/BlogCategory';
+import { getBlogCategory, deleteBlogCategory, searchCateBlog } from '../../../../services/BlogCategory';
 import Swal from 'sweetalert2';
 import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
 
@@ -13,23 +13,64 @@ export default function BlogCategory({ color }) {
     const [loading, setLoading] = useState(true); // Thêm state loading
     const [currentPage, setCurrentPage] = useState(1);
     const blogCateriesPerPage = 3; // Số sản phẩm trên mỗi trang
-
+    const [displayedCateBlog, setDisplayedCateBlog] = useState([])
+    const [searchTerm, setSearchTerm] = useState(""); // State lưu trữ từ khóa tìm kiếm
     useEffect(() => {
         fetchBlogcategories();
-    }, []);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        const startIndex = (currentPage - 1) * blogCateriesPerPage;
+        const endIndex = startIndex + blogCateriesPerPage;
+        setDisplayedCateBlog(Blogcategories.slice(startIndex, endIndex));
+    }, [currentPage, Blogcategories]);
 
     const fetchBlogcategories = async () => {
-        setLoading(true)
         try {
-            const result = await getBlogCategory();
-            setBlogcategories(result || []);
+            setLoading(true); // Start loading
+            let result;
+
+            // If search term is empty, fetch all categories
+            if (searchTerm.trim() === "") {
+                result = await getBlogCategory(); // Fetch all blog categories
+            } else {
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm); // Remove accents from the search term
+                result = await searchCateBlog(sanitizedSearchTerm); // Fetch filtered categories based on the sanitized search term
+            }
+
+            // If result is an array, set the blog categories
+            if (Array.isArray(result)) {
+                setBlogcategories(result);
+            } else if (result && result.categories && Array.isArray(result.categories)) {
+                setBlogcategories(result.categories); // Set categories if result contains a 'categories' field
+            } else {
+                setBlogcategories([]); // Set empty blog categories if no valid result
+            }
         } catch (err) {
             console.error('Error fetching categories:', err);
-            setBlogcategories([]);
+            setBlogcategories([]); // Set empty categories if error occurs
             Swal.fire('Error', 'Lỗi khi tải danh mục. Vui lòng thử lại.', 'error');
         } finally {
-            setLoading(false)
+            setLoading(false); // End loading
         }
+    };
+
+    const removeVietnameseTones = (str) => {
+        const accents = {
+            a: 'áàảãạâấầẩẫậăắằẳẵặ',
+            e: 'éèẻẽẹêếềểễệ',
+            i: 'íìỉĩị',
+            o: 'óòỏõọôốồổỗộơớờởỡợ',
+            u: 'úùủũụưứừửữự',
+            y: 'ýỳỷỹỵ',
+            d: 'đ'
+        };
+
+        for (let nonAccent in accents) {
+            const accent = accents[nonAccent];
+            str = str.replace(new RegExp(`[${accent}]`, 'g'), nonAccent);
+        }
+        return str;
     };
 
     const handleEditClick = (id) => {
@@ -142,6 +183,16 @@ export default function BlogCategory({ color }) {
                         {/* Remove Xóa đã chọn button from here */}
                     </div>
                 </div>
+                {/* Input tìm kiếm danh mục bài viết */}
+                <div className="mb-4 px-4">
+                    <input
+                        type="text"
+                        className="border border-gray-300 rounded px-3 py-2 w-full shadow appearance-none focus:outline-none focus:shadow-outline"
+                        placeholder="Tìm kiếm danh mục bài viết..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
                 { loading ? (
                     <div className="flex justify-center items-center py-4">
                         <PulseLoader color="#4A90E2" loading={loading} size={15}/>
@@ -172,8 +223,8 @@ export default function BlogCategory({ color }) {
                             </tr>
                             </thead>
                             <tbody>
-                            {Blogcategories.length > 0 ? (
-                                Blogcategories.map((category, index) => (
+                            {displayedCateBlog.length > 0 ? (
+                                displayedCateBlog.map((category, index) => (
                                     <tr key={category.id}>
                                         <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
                                             <input

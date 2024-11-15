@@ -1,5 +1,6 @@
 import request from '../../api';
 
+const URL_Search = 'admin/blogCategory/search';
 export const getBlogCategory = () => {
     return request({
         method: 'GET',
@@ -34,5 +35,12 @@ export const deleteBlogCategory = (id) => {
     return request({
         method: 'DELETE',
         path: `admin/blogcategory/${id}`
+    });
+};
+// Hàm tìm kiếm danh mục bài viết
+export const searchCateBlog = (query) => {
+    return request({
+        method: 'GET',
+        path: `${URL_Search}?query=${query}`,
     });
 };

@@ -1,34 +1,87 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getBlog, deleteBlog } from '../../../../services/Blog';
+import { getBlog, deleteBlog,searchBlog  } from '../../../../services/Blog';
 import Swal from 'sweetalert2';
+import { PulseLoader } from "react-spinners"; // Hàm lấy danh sách danh mục
 
 export default function BlogList({ color }) {
     const [blogs, setBlogs] = useState([]);
     const [selectedBlogs, setSelectedBlogs] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false); // Track loading state
+    const [searchTerm, setSearchTerm] = useState(""); // State lưu trữ từ khóa tìm kiếm
+    const blogsPerPage = 5; // Số sản phẩm trên mỗi trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const [displayedBlogs, setDisplayedBlogs] = useState([]);
     useEffect(() => {
         fetchBlogs();
-    }, []);
+    }, [searchTerm]);
 
+    useEffect(() => {
+        const startIndex = (currentPage - 1) * blogsPerPage;
+        const endIndex = startIndex + blogsPerPage;
+        setDisplayedBlogs(blogs.slice(startIndex, endIndex));
+    }, [currentPage, blogs]);
     const fetchBlogs = async () => {
         try {
-            const result = await getBlog();
-            setBlogs(result || []);
-        } catch (err) {
-            console.error('Error fetching blog list:', err);
-            setBlogs([]);
+            setLoading(true); // Start loading
+            let result;
+
+            if (searchTerm.trim() === "") {
+                result = await getBlog(); // Fetch all blogs if no search term
+            } else {
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm.trim()).toLowerCase(); // Remove accents and convert to lowercase
+                console.log('Searching for: ', sanitizedSearchTerm); // Log search term
+                result = await getBlog(); // Fetch all blogs regardless of search term
+
+                // Filter the blogs locally after fetching the data
+                result = result.filter(blog =>
+                    removeVietnameseTones(blog.title).toLowerCase().includes(sanitizedSearchTerm) ||
+                    removeVietnameseTones(blog.category_name).toLowerCase().includes(sanitizedSearchTerm)
+                );
+            }
+
+            console.log('Fetched Blogs: ', result); // Log result from API
+
+            if (Array.isArray(result)) {
+                setBlogs(result); // Set blogs if result is an array
+            } else if (result?.blogs && Array.isArray(result.blogs)) {
+                setBlogs(result.blogs); // Set blogs if result contains a 'blogs' field
+            } else {
+                setBlogs([]); // Set empty blogs if no valid result
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách bài viết:", error);
+            setBlogs([]); // Set empty blogs if error occurs
             Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Lỗi khi tải danh sách bài viết. Vui lòng thử lại sau.'
+                icon: "error",
+                title: "Oops...",
+                text: "Lỗi khi tải danh sách bài viết. Vui lòng thử lại sau."
             });
+        } finally {
+            setLoading(false); // End loading
         }
     };
 
+    const removeVietnameseTones = (str) => {
+        const accents = {
+            a: 'áàảãạâấầẩẫậăắằẳẵặ',
+            e: 'éèẻẽẹêếềểễệ',
+            i: 'íìỉĩị',
+            o: 'óòỏõọôốồổỗộơớờởỡợ',
+            u: 'úùủũụưứừửữự',
+            y: 'ýỳỷỹỵ',
+            d: 'đ'
+        };
+
+        for (let nonAccent in accents) {
+            const accent = accents[nonAccent];
+            str = str.replace(new RegExp(`[${accent}]`, 'g'), nonAccent);
+        }
+        return str;
+    };
     const handleEditClick = (id) => {
         navigate(`/admin/blog/edit/${id}`);
     };
@@ -106,6 +159,12 @@ export default function BlogList({ color }) {
         }
     };
 
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= Math.ceil(blogs.length / blogsPerPage)) {
+            setCurrentPage(page);
+        }
+    };
+
     return (
         <>
             <div
@@ -135,91 +194,121 @@ export default function BlogList({ color }) {
                         </NavLink>
                     </div>
                 </div>
-                <div className="block w-full overflow-x-auto">
-                    {/* Blog list table */}
-                    <table className="items-center w-full bg-transparent border-collapse table-fixed">
-                        <thead>
-                        <tr>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
-                                <input
-                                    type="checkbox"
-                                    checked={selectAll}
-                                    onChange={handleSelectAll}
-                                />
-                                <span className="ml-2">Chọn tất cả</span>
-                            </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình ảnh</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tiêu đề</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Danh mục</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng thái</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành động</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {blogs.length > 0 ? (
-                            blogs.map((blog, index) => (
-                                <tr key={blog.id}>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedBlogs.includes(blog.id)}
-                                            onChange={() => handleSelectBlog(blog.id)}
-                                        />
-                                    </td>
-                                    <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                        <span className="ml-3 font-bold">{index + 1}</span>
-                                    </th>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        <img
-                                            src={blog.image || '/placeholder-image.png'}
-                                            alt={blog.title}
-                                            className="h-16 w-16 object-cover rounded"
-                                        />
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {blog.title}
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {blog.category_name}
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {blog.status == 1 ? 'Hiển thị' : 'Ẩn'}
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                        <button
-                                            className="text-blue-500 hover:text-blue-700 px-2"
-                                            onClick={() => handleEditClick(blog.id)}
-                                        >
-                                            <i className="fas fa-pen text-xl"></i>
-                                        </button>
-                                        <button
-                                            className="text-red-500 hover:text-red-700 ml-2 px-2"
-                                            onClick={() => handleDeleteClick(blog)}
-                                        >
-                                            <i className="fas fa-trash text-xl"></i>
-                                        </button>
+                {/* Input tìm kiếm sản phẩm */}
+                <div className="mb-4 px-4">
+                    <input
+                        type="text"
+                        className="border border-gray-300 rounded px-3 py-2 w-full shadow appearance-none focus:outline-none focus:shadow-outline"
+                        placeholder="Tìm kiếm danh mục sản phẩm..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                {/* Loading spinner */}
+                {loading ? (
+                    <div className="flex justify-center items-center py-4">
+                        <PulseLoader color="#4A90E2" loading={loading} size={15} />
+                    </div>
+                ) : (
+                    <div className="block w-full overflow-x-auto">
+                        {/* Blog list table */}
+                        <table className="items-center w-full bg-transparent border-collapse table-fixed">
+                            <thead>
+                            <tr>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectAll}
+                                        onChange={handleSelectAll}
+                                    />
+                                    <span className="ml-2">Chọn tất cả</span>
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình ảnh</th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tiêu đề</th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Danh mục</th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng thái</th>
+                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {displayedBlogs.length > 0 ? (
+                                displayedBlogs.map((blog, index) => (
+                                    <tr key={blog.id}>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedBlogs.includes(blog.id)}
+                                                onChange={() => handleSelectBlog(blog.id)}
+                                            />
+                                        </td>
+                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+                                            <span className="ml-3 font-bold">{index + 1}</span>
+                                        </th>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                            <img
+                                                src={blog.image || '/placeholder-image.png'}
+                                                alt={blog.title}
+                                                className="h-16 w-16 object-cover rounded"
+                                            />
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                            {blog.title}
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                            {blog.category_name}
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                            {blog.status === 1 ? 'Hiển thị' : 'Ẩn'}
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700 px-2"
+                                                onClick={() => handleEditClick(blog.id)}
+                                            >
+                                                <i className="fas fa-pen text-xl"></i>
+                                            </button>
+                                            <button
+                                                className="text-red-500 hover:text-red-700 ml-2 px-2"
+                                                onClick={() => handleDeleteClick(blog)}
+                                            >
+                                                <i className="fas fa-trash text-xl"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="7" className="text-center py-4">
+                                        Không có bài viết nào
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="7" className="text-center">
-                                    Không có bài viết nào
-                                </td>
-                            </tr>
-                        )}
-                        </tbody>
-                    </table>
-                </div>
-                {selectedBlogs.length > 0 && (
-                    <div className="px-4 py-3">
-                        <button
-                            className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none"
-                            onClick={handleBulkDelete}
-                        >
-                            Xóa đã chọn
-                        </button>
+                            )}
+                            </tbody>
+                        </table>
+                        {/* Phân trang */}
+                        <div className="flex justify-center items-center mt-4">
+                            {/* Nút Previous */}
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            >
+                                &#9664; {/* Mũi tên trái */}
+                            </button>
+
+                            {/* Trang hiện tại */}
+                            <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
+                                Trang {currentPage} / {Math.ceil(blogs.length / blogsPerPage) || 1}</span>
+                            {/* Nút Next */}
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === Math.ceil(blogs.length / blogsPerPage)}
+                                className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                            >
+                                &#9654; {/* Mũi tên phải */}
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
@@ -227,10 +316,9 @@ export default function BlogList({ color }) {
     );
 }
 
-BlogList.defaultProps = {
-    color: "light",
-};
-
 BlogList.propTypes = {
     color: PropTypes.oneOf(["light", "dark"]),
+};
+BlogList.defaultProps = {
+    color: "light",
 };
