@@ -40,6 +40,7 @@ export default function Checkout() {
     const [address, setAddress] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
+    const [user_id, setUserId] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -51,7 +52,7 @@ export default function Checkout() {
             // Gọi fetchUserInfo để lấy thông tin người dùng
             fetchUserInfo().then(userInfo => {
                 console.log("Thông tin người dùng:", userInfo); // Xem thông tin người dùng đã nhận
-
+                setUserId(userInfo.user_id);
                 if (userInfo && typeof userInfo === 'object' && userInfo.user_id) {
                     // Kiểm tra userInfo có phải là một đối tượng và có user_id
                     setFormData(prevFormData => ({
@@ -315,19 +316,19 @@ export default function Checkout() {
 
 
     const handleMomoPayment = async (orderData) => {
+        const extradata = products.map(item => ({
+            product_id: item.id,
+            quantity: item.quantity,
+            user_id: user_id,
+            address: orderData.address,
+            price: item.unit_price
+        }));
         try {
-            // Bước 1: Tạo đơn hàng trong cơ sở dữ liệu
-            const createdOrder = await checkout(orderData);
-
-            const cartIds = new URLSearchParams(window.location.search).get("cartIds");
-            const cartIdsArray = cartIds ? cartIds.split(",") : [];
-
-            // Bước 2 và 3: Xử lý thanh toán MoMo
             const orderInfo = {
                 amount: orderData.total_amount,
                 orderId: orderData.order_id,
-                cart_ids: cartIdsArray,
                 description: "Thanh toán đơn hàng qua MoMo",
+                extraData: JSON.stringify(extradata),
                 customerInfo: {
                     name: orderData.name,
                     email: orderData.email,
@@ -336,6 +337,7 @@ export default function Checkout() {
             };
 
             const payUrl = await momoCheckout(orderInfo);
+            console.log(orderInfo);
             if (payUrl) {
                 window.location.href = payUrl;
             } else {

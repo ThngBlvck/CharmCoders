@@ -102,27 +102,7 @@ Route::prefix('client')->group(function () {
     //change password
     Route::put('/changepassword', [UserController::class, 'changePassword'])->middleware('auth:api');
     Route::post('/payment/momo', [MomoPaymentController::class, 'createPayment']);
-    Route::get('/payment/redirect', [MomoPaymentController::class, 'handleRedirect']);
-
-    //giao hàng nhanh
-    Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);
-    Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
-    Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
-
-    //giao hàng nhanh
-    Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);
-    Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
-    Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
-
-    //giao hàng nhanh
-    Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);
-    Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
-    Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
-
-    //giao hàng nhanh
-    Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);
-    Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
-    Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
+    Route::post('/payment-ipn', [MomoPaymentController::class, 'handleIPN']);
 
     //giao hàng nhanh
     Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);

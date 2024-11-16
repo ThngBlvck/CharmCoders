@@ -50,7 +50,6 @@ export default function OrderManagement() {
             [orderId]: !prevState[orderId],
         }));
     };
-
     return (
         <div className="container mt-5">
             <p className="headingStyle font-semibold">Đơn hàng đã đặt</p>
@@ -75,8 +74,8 @@ export default function OrderManagement() {
                                         {order.status === 0 ? 'Đang chờ xác nhận'
                                             : order.status === 1 ? 'Đang chuẩn bị hàng'
                                                 : order.status === 2 ? 'Đang giao'
-                                                : order.status === 5 ? 'Đã thanh toán'
-                                                    : 'Không xác định'}
+                                                    : order.status === 5 ? 'Đã thanh toán'
+                                                        : 'Không xác định'}
                                         </span>
                                             </strong>
                                         </div>
