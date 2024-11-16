@@ -76,7 +76,7 @@ Route::middleware(['web'])->group(function () {
 Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderClient::class);
-        Route::get('/getAllCart', [CartClient::class, 'getCart']);
+        Route::get('/getAllCart/{ids}', [CartClient::class, 'getCart']);
         Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
         Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
         Route::get('/user', [UserController::class, 'getUser']);
@@ -88,16 +88,12 @@ Route::prefix('client')->group(function () {
         Route::apiResource('comments', CommentController::class);
     });
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
-    Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::post('/contact/send', [MailController::class, 'sendMail']);
     Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
     Route::get('products/hot', [ClientProductController::class, 'getHotProducts']);
     // Route để yêu cầu đặt lại mật khẩu qua API
 
-    Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::get('send-mail', [ClientProductController::class, 'sendMail']); //http://localhost:8000/api/client/products/search?query=teneanpham
-    Route::post('/contact/send', [MailController::class, 'send']);
+    Route::post('/contact/send', [MailController::class, 'sendMail']);
 
     //profile user
     Route::put('/profile', [UserController::class, 'profile'])->middleware('auth:api');
