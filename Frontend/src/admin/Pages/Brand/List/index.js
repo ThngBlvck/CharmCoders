@@ -27,35 +27,41 @@ export default function Brand({ color }) {
 
     const fetchBrands = async () => {
         try {
-            setLoading(true); // Start loading
+            setLoading(true); // Bắt đầu loading
             let result;
-            if (searchTerm.trim() === "") {
-                result = await getBrand(); // Fetch all brands if no search term
-            } else {
-                const sanitizedSearchTerm = removeVietnameseTones(searchTerm).toLowerCase(); // Remove accents and convert to lowercase
-                console.log('Searching for: ', sanitizedSearchTerm); // Log search term
-                result = await getBrand(); // Fetch all brands regardless of search term
 
-                // Filter the brands locally after fetching the data
+            if (searchTerm.trim() === "") {
+                result = await getBrand(); // Lấy tất cả nhãn hàng nếu không có từ khóa tìm kiếm
+            } else {
+                const sanitizedSearchTerm = removeVietnameseTones(searchTerm.trim()).toLowerCase(); // Loại bỏ dấu và chuyển về chữ thường
+                console.log('Tìm kiếm: ', sanitizedSearchTerm); // Ghi log từ khóa tìm kiếm
+                result = await getBrand(); // Lấy tất cả nhãn hàng trước
+
+                // Lọc nhãn hàng tại client sau khi lấy dữ liệu
                 result = result.filter(brand =>
                     removeVietnameseTones(brand.name).toLowerCase().includes(sanitizedSearchTerm)
                 );
             }
 
-            console.log('Fetched Brands: ', result); // Log result from API
+            console.log('Danh sách nhãn hàng: ', result); // Log kết quả trả về từ API
 
             if (Array.isArray(result)) {
-                setBrands(result); // Set brands if result is an array
-            } else if (result && result.brands && Array.isArray(result.brands)) {
-                setBrands(result.brands); // Set brands if result contains a 'brands' field
+                setBrands(result); // Nếu kết quả là một mảng
+            } else if (result?.brands && Array.isArray(result.brands)) {
+                setBrands(result.brands); // Nếu kết quả có trường 'brands' là một mảng
             } else {
-                setBrands([]); // Set empty brands if no valid result
+                setBrands([]); // Đặt danh sách rỗng nếu không có dữ liệu hợp lệ
             }
         } catch (error) {
             console.error("Lỗi khi lấy danh sách nhãn hàng:", error);
-            setBrands([]); // Set empty brands if error occurs
+            setBrands([]); // Đặt danh sách rỗng nếu xảy ra lỗi
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Lỗi khi tải danh sách nhãn hàng. Vui lòng thử lại sau."
+            });
         } finally {
-            setLoading(false); // End loading
+            setLoading(false); // Kết thúc loading
         }
     };
 
