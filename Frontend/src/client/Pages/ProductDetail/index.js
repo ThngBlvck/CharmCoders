@@ -11,6 +11,7 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import "../../../assets/styles/css/productdt/index.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import '@fontsource/roboto';
 import Swal from "sweetalert2";
 import Slider from "react-slick";
@@ -49,8 +50,8 @@ const ProductDetail = () => {
         speed: 500,
         slidesToShow: 4,
         slidesToScroll: 1,
-        draggable: false, // Tắt khả năng kéo
-        swipe: false,     // Tắt khả năng vuốt trên thiết bị di động
+        draggable: false,
+        swipe: false,
         responsive: [
             { breakpoint: 1024, settings: { slidesToShow: 3 } },
             { breakpoint: 768, settings: { slidesToShow: 2 } },
@@ -703,7 +704,7 @@ const ProductDetail = () => {
 
                     </div>
                     {/* Sản phẩm liên quan */}
-                    <div className="related-products mt-5">
+                    <div className="related-products mt-5" style={{position: 'relative'}}>
                         <h5
                             style={{
                                 fontFamily: "'Roboto', sans-serif",
@@ -715,22 +716,51 @@ const ProductDetail = () => {
                         >
                             Sản phẩm liên quan
                         </h5>
-                        <Slider {...sliderSettings}>
+
+                        {/* Nút điều hướng Trái */}
+                        <button
+                            onClick={() => sliderRef.current.slickPrev()}
+                            style={{
+                                position: 'absolute',
+                                left: '-50px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                backgroundColor: 'rgb(247,124,140)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '45px',
+                                height: '45px',
+                                cursor: 'pointer',
+                                zIndex: 2,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                                transition: 'all 0.3s ease',
+                            }}
+
+                        >
+                            <FontAwesomeIcon icon={faChevronLeft}/>
+                        </button>
+
+                        {/* Slider */}
+                        <Slider ref={sliderRef} {...sliderSettings}>
                             {relatedProducts.length > 0 ? (
                                 relatedProducts.map((relatedProduct) => (
-                                    <div key={relatedProduct.id} style={{padding: "10px"}}>
+                                    <div key={relatedProduct.id} style={{padding: '10px'}}>
                                         <div
                                             className="p-3 border rounded"
                                             style={{
-                                                backgroundColor: "#fff",
-                                                boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-                                                borderRadius: "12px",
-                                                textAlign: "center",
-                                                transition: "transform 0.3s ease",
-                                                height: "300px",
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                justifyContent: "space-between",
+                                                backgroundColor: '#fff',
+                                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                                                borderRadius: '12px',
+                                                textAlign: 'center',
+                                                transition: 'transform 0.3s ease',
+                                                height: '300px',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'space-between',
                                             }}
                                             onClick={() =>
                                                 navigate(`/products/${relatedProduct.id}`)
@@ -740,38 +770,38 @@ const ProductDetail = () => {
                                                 src={relatedProduct.image}
                                                 alt={relatedProduct.name}
                                                 style={{
-                                                    width: "100%",
-                                                    height: "180px",
-                                                    objectFit: "cover",
-                                                    borderRadius: "10px",
-                                                    marginBottom: "10px",
+                                                    width: '100%',
+                                                    height: '180px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '10px',
+                                                    marginBottom: '10px',
                                                 }}
                                             />
                                             <p
                                                 style={{
-                                                    fontSize: "14px",
-                                                    fontWeight: "500",
-                                                    margin: "0 0 5px 0",
+                                                    fontSize: '14px',
+                                                    fontWeight: '500',
+                                                    margin: '0 0 5px 0',
                                                 }}
                                             >
                                                 {relatedProduct.name}
                                             </p>
                                             <p
                                                 style={{
-                                                    fontSize: "14px",
-                                                    color: "#e74c3c",
-                                                    fontWeight: "600",
-                                                    margin: "0",
+                                                    fontSize: '14px',
+                                                    color: '#e74c3c',
+                                                    fontWeight: '600',
+                                                    margin: '0',
                                                 }}
                                             >
                                                 {relatedProduct.sale_price
-                                                    ? relatedProduct.sale_price.toLocaleString("vi-VN", {
-                                                        style: "currency",
-                                                        currency: "VND",
+                                                    ? relatedProduct.sale_price.toLocaleString('vi-VN', {
+                                                        style: 'currency',
+                                                        currency: 'VND',
                                                     })
-                                                    : relatedProduct.unit_price.toLocaleString("vi-VN", {
-                                                        style: "currency",
-                                                        currency: "VND",
+                                                    : relatedProduct.unit_price.toLocaleString('vi-VN', {
+                                                        style: 'currency',
+                                                        currency: 'VND',
                                                     })}
                                             </p>
                                         </div>
@@ -780,15 +810,42 @@ const ProductDetail = () => {
                             ) : (
                                 <p
                                     style={{
-                                        fontSize: "14px",
-                                        color: "#8c5e58",
-                                        textAlign: "center",
+                                        fontSize: '14px',
+                                        color: '#8c5e58',
+                                        textAlign: 'center',
                                     }}
                                 >
                                     Không có sản phẩm liên quan.
                                 </p>
                             )}
                         </Slider>
+
+                        {/* Nút điều hướng Phải */}
+                        <button
+                            onClick={() => sliderRef.current.slickNext()}
+                            style={{
+                                position: 'absolute',
+                                right: '-50px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                backgroundColor: 'rgb(247,124,140)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '45px',
+                                height: '45px',
+                                cursor: 'pointer',
+                                zIndex: 2,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                                transition: 'all 0.3s ease',
+                            }}
+
+                        >
+                            <FontAwesomeIcon icon={faChevronRight}/>
+                        </button>
                     </div>
                 </div>
             ) : (
