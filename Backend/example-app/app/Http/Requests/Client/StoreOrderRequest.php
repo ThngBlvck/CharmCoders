@@ -14,6 +14,7 @@ class StoreOrderRequest extends FormRequest
     public function rules()
     {
         return [
+            'cart_ids' => 'required|array',
             'address' => 'required|string|max:255', // Địa chỉ là bắt buộc và tối đa 255 ký tự
             'status' => 'integer', // Trạng thái phải là số nguyên và bắt buộc
             'payment_method' => 'nullable|max:50',

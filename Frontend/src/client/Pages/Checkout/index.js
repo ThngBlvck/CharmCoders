@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from "react";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {makeMomoPayment} from '../../../services/Product'; // Import service
-import {getCartsByIds} from '../../../services/Cart';
-import {getProductsByIds} from "../../../services/Product";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { makeMomoPayment } from '../../../services/Product'; // Import service
+import { getCartsByIds } from '../../../services/Cart';
+import { getProductsByIds } from "../../../services/Product";
 import "../../../assets/styles/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons";
-import {getUserInfo} from "../../../services/User";
-import {checkout,momoCheckout} from '../../../services/Checkout';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { getUserInfo } from "../../../services/User";
+import { checkout, momoCheckout } from '../../../services/Checkout';
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -20,7 +20,7 @@ export default function Checkout() {
         address: "",
         paymentMethod: "cashOnDelivery", // Mặc định là thanh toán khi nhận hàng
     });
-    const {cartIds} = useParams();
+    const { cartIds } = useParams();
     const [products, setProducts] = useState([]);
     const location = useLocation();
     const [loading, setLoading] = useState(false); // Thêm state loading
@@ -40,8 +40,6 @@ export default function Checkout() {
     const [address, setAddress] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
-    const [user_id, setUserId] = useState([]);
-
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -53,7 +51,7 @@ export default function Checkout() {
             // Gọi fetchUserInfo để lấy thông tin người dùng
             fetchUserInfo().then(userInfo => {
                 console.log("Thông tin người dùng:", userInfo); // Xem thông tin người dùng đã nhận
-                setUserId(userInfo.user_id);
+
                 if (userInfo && typeof userInfo === 'object' && userInfo.user_id) {
                     // Kiểm tra userInfo có phải là một đối tượng và có user_id
                     setFormData(prevFormData => ({
@@ -192,6 +190,7 @@ export default function Checkout() {
                         }
                         return null; // Trả về null nếu không tìm thấy sản phẩm
                     }).filter(item => item !== null); // Loại bỏ các sản phẩm null
+
                     setProducts(combinedProducts);
                 } else {
                     console.error("Không tìm thấy sản phẩm nào.");
@@ -215,6 +214,7 @@ export default function Checkout() {
         }
         return products.reduce((total, item) => total + (item.unit_price * item.quantity), 0);
     };
+
     const total = (item) => {
         return item.unit_price * item.quantity;
     };
@@ -237,7 +237,7 @@ export default function Checkout() {
     };
 
     const handleChange = (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormData({
             ...formData,
             [name]: value,
@@ -246,98 +246,96 @@ export default function Checkout() {
 
     const handleSubmit = async (event) => {
         event.preventDefault(); // Ngăn chặn hành động mặc định của form
-    
+
         const totalAmount = calculateTotal();
-    
+
         // Reset errors
         const newErrors = {};
-    
-        // Kiểm tra Họ và Tên
+
+        // Kiểm tra các trường đầu vào
         if (!formData.name.trim()) {
             newErrors.name = "Họ và Tên không được để trống.";
         }
-    
-        // Kiểm tra Email
+
         if (!formData.email.trim()) {
             newErrors.email = "Email không được để trống.";
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = "Email không đúng định dạng.";
         }
-    
-        // Kiểm tra Số điện thoại
+
         if (!formData.phone.trim()) {
             newErrors.phone = "Số điện thoại không được để trống.";
         } else if (!/^\d{10}$/.test(formData.phone)) {
             newErrors.phone = "Số điện thoại phải có 10 chữ số.";
         }
-    
-        // Kiểm tra Địa chỉ
+
         const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
         if (!formData.address?.trim()) {
             newErrors.address = "Vui lòng nhập địa chỉ nhà.";
         } else if (!wardName || !districtName || !provinceName) {
             newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
         }
-    
+
         setErrors(newErrors);
-    
-        // Nếu có lỗi, dừng xử lý
+
         if (Object.keys(newErrors).length > 0) {
             return;
         }
-    
-        // Tạo một object mới chứa dữ liệu để gửi lên server
+
+        // Lấy cartIds từ URL params
+        const cartIds = new URLSearchParams(window.location.search).get("cartIds");
+        const cartIdsArray = cartIds ? cartIds.split(",") : [];  // Giả sử cartIds là một chuỗi phân tách bởi dấu phẩy
+
         const orderData = {
             order_id: `MDH_${Date.now()}`,
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
-            address: fullAddress, // Sử dụng địa chỉ đã nối
-            payment_method: formData.paymentMethod, // Thêm thông tin phương thức thanh toán
+            address: fullAddress,
+            payment_method: formData.paymentMethod,
             total_amount: totalAmount,
+            cart_ids: cartIdsArray,  // Thêm cartIds từ URL vào orderData
         };
-    
-        // Kiểm tra nếu phương thức thanh toán là MoMo
+
+        // Kiểm tra phương thức thanh toán
         if (orderData.payment_method === "2") {
-            
-            handleMomoPayment(orderData); // Gọi hàm xử lý thanh toán MoMo
+            handleMomoPayment(orderData);  // Xử lý thanh toán MoMo
         } else {
-            // Tiến hành xử lý thanh toán với các phương thức khác (nếu có)
             try {
-                const result = await checkout(orderData);
+                const result = await checkout(orderData);  // Gửi request với orderData có cart_ids
                 Swal.fire('Thành công', 'Thanh toán thành công.', 'success');
                 navigate(`/order-list`);
             } catch (error) {
                 Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
             }
         }
-    };  
+    };
 
- console.log(products);
+
+
 
     const handleMomoPayment = async (orderData) => {
-        const extradata = products.map(item => ({
-            product_id: item.id,
-            quantity: item.quantity,
-            user_id: user_id,
-            address: orderData.address, 
-            price: item.unit_price
-        }));
         try {
+            // Bước 1: Tạo đơn hàng trong cơ sở dữ liệu
+            const createdOrder = await checkout(orderData);
+
+            const cartIds = new URLSearchParams(window.location.search).get("cartIds");
+            const cartIdsArray = cartIds ? cartIds.split(",") : [];
+
+            // Bước 2 và 3: Xử lý thanh toán MoMo
             const orderInfo = {
                 amount: orderData.total_amount,
                 orderId: orderData.order_id,
+                cart_ids: cartIdsArray,
                 description: "Thanh toán đơn hàng qua MoMo",
-                extraData: JSON.stringify(extradata),
                 customerInfo: {
                     name: orderData.name,
                     email: orderData.email,
                     phone: orderData.phone,
                 },
             };
-    
+
             const payUrl = await momoCheckout(orderInfo);
-            console.log(orderInfo);
             if (payUrl) {
                 window.location.href = payUrl;
             } else {
@@ -349,8 +347,6 @@ export default function Checkout() {
         }
     };
 
-  
-    
     return (
         <div className="container py-5">
             <div className="row">
@@ -358,24 +354,24 @@ export default function Checkout() {
                 <>
                     {/* Hiển thị sản phẩm */}
                     <div className="col-md-6">
-                        <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Sản phẩm của
+                        <p className="mb-4 font-semibold" style={{ color: "#8c5e58", fontSize: "30px" }}>Sản phẩm của
                             bạn</p>
                         <div className="list-group">
                             {loading ? (
                                 <div className="d-flex flex-column align-items-center"
-                                     style={{marginTop: '10rem', marginBottom: '10rem'}}>
+                                    style={{ marginTop: '10rem', marginBottom: '10rem' }}>
                                     <FontAwesomeIcon icon={faSpinner} spin
-                                                     style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                                    <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
+                                        style={{ fontSize: '4rem', color: '#8c5e58' }} />
+                                    <p className="mt-3" style={{ color: '#8c5e58', fontSize: '18px' }}>Đang tải...</p>
                                 </div>
                             ) : (
                                 Array.isArray(products) && products.length > 0 ? (
                                     products.map(item => (
                                         <div key={item.id}
-                                             className="list-group-item d-flex justify-content-between align-items-center">
+                                            className="list-group-item d-flex justify-content-between align-items-center">
                                             <div className="d-flex align-items-center">
                                                 <img src={item.image} alt={item.name} className="img-thumbnail me-3"
-                                                     style={{width: "100px", height: "100px"}}/>
+                                                    style={{ width: "100px", height: "100px" }} />
                                                 <div>
                                                     <p style={{
                                                         color: "#8c5e58", overflow: "hidden", // Ẩn phần không hiển thị
@@ -384,11 +380,11 @@ export default function Checkout() {
                                                         maxHeight: "3em",
                                                     }}>{item.name.length > 100 ? item.name.substring(0, 100) + "..." : item.name}</p>
                                                     <p className="mb-0"
-                                                       style={{color: "#8c5e58"}}>{item.unit_price.toLocaleString("vi-VN", {
-                                                        style: "currency",
-                                                        currency: "VND",
-                                                    })} x {item.quantity}</p>
-                                                    <p style={{color: "#8c5e58"}}>Tổng: {total(item).toLocaleString("vi-VN", {
+                                                        style={{ color: "#8c5e58" }}>{item.unit_price.toLocaleString("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                        })} x {item.quantity}</p>
+                                                    <p style={{ color: "#8c5e58" }}>Tổng: {total(item).toLocaleString("vi-VN", {
                                                         style: "currency",
                                                         currency: "VND",
                                                     })}</p>
@@ -403,19 +399,19 @@ export default function Checkout() {
                         </div>
 
                         <p className="mt-4 font-semibold"
-                           style={{color: "#8c5e58"}}>Thành tiền: {calculateTotal().toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                        })}</p>
+                            style={{ color: "#8c5e58" }}>Thành tiền: {calculateTotal().toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            })}</p>
                     </div>
 
                     {/* Form thông tin người dùng */}
                     <div className="col-md-6">
-                        <p className="mb-4 font-semibold" style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin
+                        <p className="mb-4 font-semibold" style={{ color: "#8c5e58", fontSize: "30px" }}>Thông tin
                             thanh toán</p>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
-                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Họ và
+                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Họ và
                                     Tên</label>
                                 <input
                                     type="text"
@@ -424,12 +420,12 @@ export default function Checkout() {
                                     value={formData.name || ""}
                                     onChange={handleChange}
                                     required
-                                    style={{color: "#8c5e58"}}
+                                    style={{ color: "#8c5e58" }}
                                 />
                                 {errors.name && <div className="text-danger mt-2">{errors.name}</div>}
                             </div>
                             <div className="mb-3">
-                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Email</label>
+                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Email</label>
                                 <input
                                     type="email"
                                     className="form-control rounded"
@@ -437,12 +433,12 @@ export default function Checkout() {
                                     value={formData.email || ""}
                                     onChange={handleChange}
                                     required
-                                    style={{color: "#8c5e58"}}
+                                    style={{ color: "#8c5e58" }}
                                 />
                                 {errors.email && <div className="text-danger mt-2">{errors.email}</div>}
                             </div>
                             <div className="mb-3">
-                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Số điện
+                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Số điện
                                     thoại</label>
                                 <input
                                     type="tel"
@@ -451,21 +447,21 @@ export default function Checkout() {
                                     value={formData.phone || ""}
                                     onChange={handleChange}
                                     required
-                                    style={{color: "#8c5e58"}}
+                                    style={{ color: "#8c5e58" }}
                                 />
                                 {errors.phone && <div className="text-danger mt-2">{errors.phone}</div>}
                             </div>
                             <div className="mb-3">
-                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Địa
+                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Địa
                                     chỉ</label>
                                 <div className="d-flex justify-content-between">
-                                    <div className="form-group mb-2" style={{flex: 1, marginRight: "10px"}}>
+                                    <div className="form-group mb-2" style={{ flex: 1, marginRight: "10px" }}>
                                         <select
                                             className="form-control rounded"
                                             value={selectedProvince}
                                             onChange={handleProvinceChange}
                                             required
-                                            style={{backgroundColor: "white", color: "#8c5e58"}}
+                                            style={{ backgroundColor: "white", color: "#8c5e58" }}
                                         >
                                             <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
                                             {provinces.map((province) => (
@@ -476,13 +472,13 @@ export default function Checkout() {
                                         </select>
                                     </div>
 
-                                    <div className="form-group mb-2" style={{flex: 1, marginRight: "10px"}}>
+                                    <div className="form-group mb-2" style={{ flex: 1, marginRight: "10px" }}>
                                         <select
                                             className="form-control rounded"
                                             value={selectedDistrict}
                                             onChange={handleDistrictChange}
                                             required
-                                            style={{backgroundColor: "white", color: "#8c5e58"}}
+                                            style={{ backgroundColor: "white", color: "#8c5e58" }}
                                             disabled={!selectedProvince}
                                         >
                                             <option value="" className="font-bold">Chọn Quận/Huyện</option>
@@ -494,13 +490,13 @@ export default function Checkout() {
                                         </select>
                                     </div>
 
-                                    <div className="form-group mb-2" style={{flex: 1}}>
+                                    <div className="form-group mb-2" style={{ flex: 1 }}>
                                         <select
                                             className="form-control rounded"
                                             value={selectedWard}
                                             onChange={handleWardChange}
                                             required
-                                            style={{backgroundColor: "white", color: "#8c5e58"}}
+                                            style={{ backgroundColor: "white", color: "#8c5e58" }}
                                             disabled={!selectedDistrict}
                                         >
                                             <option value="" className="font-bold">Chọn Xã/Phường</option>
@@ -519,14 +515,14 @@ export default function Checkout() {
                                     placeholder={"Vui lòng nhập địa chỉ nhà..."}
                                     onChange={handleChange}
                                     required
-                                    style={{color: "#8c5e58"}}
+                                    style={{ color: "#8c5e58" }}
                                 />
                                 {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                             </div>
 
                             {/* Phương thức thanh toán với icon */}
                             <div className="mb-4">
-                                <label className="form-label font-semibold" style={{color: "#8c5e58"}}>Phương thức
+                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Phương thức
                                     thanh toán</label>
                                 <div className="d-flex">
                                     <div className="form-check me-3">
@@ -538,7 +534,7 @@ export default function Checkout() {
                                             checked={formData.paymentMethod === "1"}
                                             onChange={handleChange}
                                         />
-                                        <label className="form-check-label" style={{color: "#8c5e58"}}>
+                                        <label className="form-check-label" style={{ color: "#8c5e58" }}>
                                             <i className="fas fa-money-bill fa-2x"></i> Thanh toán khi nhận hàng
                                         </label>
                                     </div>
@@ -551,7 +547,7 @@ export default function Checkout() {
                                             checked={formData.paymentMethod === "2"}
                                             onChange={handleChange}
                                         />
-                                        <label className="form-check-label" style={{color: "#8c5e58"}}>
+                                        <label className="form-check-label" style={{ color: "#8c5e58" }}>
                                             <i className="fab fa-gg-circle fa-2x"></i> Momo
                                         </label>
                                     </div>
@@ -564,7 +560,7 @@ export default function Checkout() {
                                             checked={formData.paymentMethod === "3"}
                                             onChange={handleChange}
                                         />
-                                        <label className="form-check-label" style={{color: "#8c5e58"}}>
+                                        <label className="form-check-label" style={{ color: "#8c5e58" }}>
                                             <i className="fas fa-credit-card fa-2x"></i> Credit card
                                         </label>
                                     </div>

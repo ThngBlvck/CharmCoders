@@ -15,70 +15,76 @@ use Illuminate\Support\Facades\Auth;
 class OrderController extends Controller
 {
     // Tạo đơn hàng
-    public function store(StoreOrderRequest $request)
+    public function store(Request $request)
     {
         DB::beginTransaction();
 
         try {
-            // Dữ liệu đã xác thực từ StoreOrderRequest
-            $validated = $request->validated();
+            // Lấy cart_ids từ request
+            $cartIds = $request->input('cart_ids');
 
-            // Lấy ID người dùng đã đăng nhập
+            if (is_string($cartIds)) {
+                $cartIds = json_decode($cartIds, true);
+            }
+
+            if (!$cartIds || !is_array($cartIds)) {
+                return response()->json(['message' => 'Danh sách sản phẩm (cart_ids) không hợp lệ.'], 422);
+            }
+
             $userId = Auth::id();
 
-            // Lấy sản phẩm từ giỏ hàng của người dùng
-            $cartItems = Cart::where('user_id', $userId)->get();
+            if (!$userId) {
+                return response()->json(['message' => 'Người dùng chưa đăng nhập.'], 401);
+            }
 
-            // Kiểm tra nếu giỏ hàng rỗng
+            // Lấy các sản phẩm trong giỏ hàng
+            $cartItems = Cart::where('user_id', $userId)
+                ->whereIn('id', $cartIds)
+                ->get();
+
             if ($cartItems->isEmpty()) {
-                return response()->json([
-                    'message' => 'Giỏ hàng rỗng.',
-                ], 422);
+                return response()->json(['message' => 'Không tìm thấy sản phẩm nào trong giỏ hàng.'], 404);
             }
 
-            // Kiểm tra số lượng của các sản phẩm trong giỏ hàng
+            // Lấy danh sách sản phẩm để kiểm tra số lượng tồn kho
+            $productIds = $cartItems->pluck('product_id')->toArray();
+            $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
             foreach ($cartItems as $item) {
-                $product = Product::find($item->product_id);
-                if (!$product || $product->quantity < $item->quantity) {
-                    return response()->json([
-                        'message' => "Sản phẩm {$product->name} không đủ số lượng trong kho.",
-                    ], 422);
+                $product = $products->get($item->product_id);
+
+                if (!$product) {
+                    return response()->json(['message' => "Sản phẩm với ID {$item->product_id} không tồn tại."], 422);
                 }
+
+                if ($product->quantity < $item->quantity) {
+                    return response()->json(['message' => "Sản phẩm {$product->name} không đủ số lượng trong kho."], 409);
+                }
+
+                // Cập nhật số lượt mua (purchase_count)
+                $product->increment('purchase_count', $item->quantity); // Tăng purchase_count theo số lượng sản phẩm đã mua
             }
 
-            // Tính tổng tiền của giỏ hàng
-            $totalAmount = $cartItems->sum(function ($item) {
+            // Tính tổng tiền
+            $totalAmount = $cartItems->sum(function ($item) use ($products) {
+                $product = $products->get($item->product_id);
                 return $item->quantity * $item->price;
             });
 
-            // Lấy phương thức thanh toán và số điện thoại từ request
-            $paymentMethod = $validated['payment_method'] ?? '1'; // Giá trị mặc định nếu không có
-            $phone = $validated['phone'];  // Lấy số điện thoại từ request
-
-            // Nhận order_id từ request
-            $order_id = $validated['order_id'];  // Lấy order_id từ request
-
-            // Tạo đơn hàng mới
+            // Tạo đơn hàng
             $order = Order::create([
-                'order_id' => $order_id,  // Lưu order_id nhập vào
+                'order_id' => $request->input('order_id'),
                 'total_amount' => $totalAmount,
-                'address' => $validated['address'],
-                'status' => 0, // Trạng thái mặc định là đang xử lý
+                'address' => $request->input('address'),
+                'status' => 0,
                 'user_id' => $userId,
-                'payment_method' => $paymentMethod, // Lưu phương thức thanh toán
-                'phone' => $phone, // Lưu số điện thoại
+                'payment_method' => $request->input('payment_method'),
+                'phone' => $request->input('phone'),
             ]);
 
-            // Lưu sản phẩm vào chi tiết đơn hàng và trừ số lượng kho
-            $orderDetails = $cartItems->map(function ($item) use ($order) {
-                // Lấy sản phẩm từ bảng products
-                $product = Product::find($item->product_id);
-
-                if (!$product || $product->quantity < $item->quantity) {
-                    throw new \Exception("Sản phẩm {$product->name} không đủ số lượng trong kho.");
-                }
-
-                // Trừ số lượng sản phẩm trong kho
+            // Lưu chi tiết đơn hàng và cập nhật kho
+            $orderDetails = $cartItems->map(function ($item) use ($order, $products) {
+                $product = $products->get($item->product_id);
                 $product->decrement('quantity', $item->quantity);
 
                 return [
@@ -93,8 +99,8 @@ class OrderController extends Controller
 
             Order_detail::insert($orderDetails);
 
-            // Xóa giỏ hàng của người dùng sau khi tạo đơn hàng
-            Cart::where('user_id', $userId)->delete();
+            // Xóa các sản phẩm trong giỏ hàng
+            Cart::whereIn('id', $cartIds)->delete();
 
             DB::commit();
 
@@ -111,6 +117,8 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
+
 
 
     // Xem danh sách đơn hàng

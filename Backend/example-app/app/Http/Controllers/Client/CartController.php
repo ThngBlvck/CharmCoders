@@ -13,22 +13,25 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function getCart(Request $request)
+    public function getCart($ids) // Nhận IDs từ URL
     {
-        // Nhận thông tin người dùng đã đăng nhập
+        // Lấy thông tin người dùng đã đăng nhập
         $userId = auth()->id();
-        \Log::info('Auth user ID: ' . $userId);
 
-        // Kiểm tra xem `user_id` có tồn tại hay không
         if (!$userId) {
             return response()->json(['error' => 'Không có user_id được cung cấp!'], 400);
         }
 
-        // Lấy toàn bộ giỏ hàng của người dùng
-        $carts = Cart::where('user_id', $userId)->get();
+        // Chuyển chuỗi IDs thành mảng
+        $idArray = explode(',', $ids); // Tách danh sách ID từ đường dẫn
+
+        // Lấy các mục giỏ hàng theo danh sách ID và người dùng
+        $carts = Cart::where('user_id', $userId)
+            ->whereIn('id', $idArray) // Lọc theo danh sách ID
+            ->get();
 
         if ($carts->isEmpty()) {
-            return response()->json(['error' => 'Giỏ hàng của bạn trống!'], 400);
+            return response()->json(['error' => 'Không tìm thấy sản phẩm nào trong giỏ hàng!'], 404);
         }
 
         // Lấy thông tin người dùng
@@ -37,14 +40,12 @@ class CartController extends Controller
             return response()->json(['error' => 'Không tìm thấy người dùng!'], 404);
         }
 
-
-
         // Tính tổng số tiền trong giỏ hàng
         $totalAmount = $carts->sum(function ($cart) {
             return $cart->price * $cart->quantity;
         });
 
-        // Trả về thông tin giỏ hàng, người dùng và địa chỉ
+        // Trả về thông tin giỏ hàng và tổng số tiền
         return response()->json([
             'success' => 'Đang tiếp tục thanh toán!',
             'user' => [
@@ -56,6 +57,7 @@ class CartController extends Controller
             'total_amount' => $totalAmount,
         ]);
     }
+
 
     public function buyNow(Request $request, $productId)
     {

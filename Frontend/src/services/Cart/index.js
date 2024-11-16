@@ -35,11 +35,11 @@ export const updateCart = (id, quantity) => {
         data: { quantity }
     });
 };
-
 export const getCartsByIds = (ids) => {
-    const idsParam = ids.join(','); // nối các id thành một chuỗi, ngăn cách bằng dấu phẩy
+    const idsParam = ids.join(','); // Nối các id thành một chuỗi, ngăn cách bằng dấu phẩy
     return request({
         method: 'GET',
-        path: `${URL_CartId}?ids=${idsParam}`, // truyền chuỗi các id vào query parameter
+        path: `${URL_CartId}/${idsParam}`, // Truyền chuỗi các id vào URL path
     });
 };
+
