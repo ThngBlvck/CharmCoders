@@ -39,7 +39,7 @@ const ProductDetail = () => {
             setUserId(storedUserId);
         }
         fetchOneProduct();
-        fetchHotProducts();
+
     }, [id]);
 
 
@@ -59,48 +59,50 @@ const ProductDetail = () => {
         ],
     };
 
-    const fetchHotProducts = async () => {
-        try {
-            const result = await getHotProducts();
-            if (result && result.hot_products) {
-                setHotProducts(result.hot_products); // Kiểm tra và lưu danh sách sản phẩm hot vào state
-            } else {
-                toast.warning('Không có sản phẩm hot nào được tìm thấy.');
-            }
-        } catch (error) {
-            toast.error('Có lỗi xảy ra khi tải sản phẩm hot.');
-            console.error('Error fetching hot products:', error);
-        }
-    };
 
     const fetchOneProduct = async () => {
         setLoadingProduct(true);
         try {
+            // Lấy chi tiết sản phẩm
             const result = await getOneProduct(id);
             setProduct(result);
 
+            // Lấy thương hiệu
             if (result.brand_id) {
                 const brandResult = await getOneBrand(result.brand_id);
                 setBrandName(brandResult.name);
             }
 
+            // Lấy danh mục
             if (result.category_id) {
                 const categoryResult = await getOneCategory(result.category_id);
                 setCategoryName(categoryResult.name);
             }
 
+            // Lấy bình luận
             const commentsResult = await getCommentsByProductId(id);
             setComments(commentsResult);
 
-            const relatedProductsResult = await getRelatedProducts(id); // Lấy sản phẩm liên quan
+            // Lấy sản phẩm liên quan
+            const relatedProductsResult = await getRelatedProducts(id);
             setRelatedProducts(relatedProductsResult.related_products);
+
+            // Lấy sản phẩm hot
+            const hotProductsResult = await getHotProducts();
+            if (hotProductsResult && hotProductsResult.hot_products) {
+                setHotProducts(hotProductsResult.hot_products);
+            } else {
+                toast.warning('Không có sản phẩm hot nào được tìm thấy.');
+            }
         } catch (error) {
             toast.error('Có lỗi xảy ra khi tải sản phẩm.');
+            console.error('Error fetching product details:', error);
         } finally {
             setLoadingProduct(false);
             setLoadingComments(false);
         }
     };
+
 
     const handleQuantityChange = (e) => {
         const value = parseInt(e.target.value, 10);
@@ -595,7 +597,6 @@ const ProductDetail = () => {
                                     )}
                                 </div>
                             </div>
-
                         </div>
                         {/* Cột Sản Phẩm Hot */}
                         <div className="col-md-3">
@@ -618,10 +619,10 @@ const ProductDetail = () => {
                                 >
                                     Sản phẩm hot
                                 </h5>
-                                {hotProducts && hotProducts.length > 0 ? (
-                                    hotProducts.map((hotProduct, index) => (
+                                {hotProducts?.length > 0 ? (
+                                    hotProducts.map((hotProduct) => (
                                         <div
-                                            key={index}
+                                            key={hotProduct.id}
                                             className="d-flex align-items-center mb-3 hot-product-item"
                                             onClick={() => navigate(`/products/${hotProduct.id}`)}
                                             style={{
@@ -663,7 +664,7 @@ const ProductDetail = () => {
                                                         textOverflow: "ellipsis",
                                                         maxWidth: "150px",
                                                     }}
-                                                    title={hotProduct.name} // Hiển thị tên đầy đủ khi hover
+                                                    title={hotProduct.name}
                                                 >
                                                     {hotProduct.name}
                                                 </p>
@@ -675,15 +676,10 @@ const ProductDetail = () => {
                                                         fontWeight: "600",
                                                     }}
                                                 >
-                                                    {hotProduct.sale_price
-                                                        ? hotProduct.sale_price.toLocaleString("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
-                                                        })
-                                                        : hotProduct.unit_price.toLocaleString("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
-                                                        })}
+                                                    {(hotProduct.sale_price || hotProduct.unit_price).toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    })}
                                                 </p>
                                             </div>
                                         </div>
@@ -701,6 +697,7 @@ const ProductDetail = () => {
                                 )}
                             </div>
                         </div>
+
 
                     </div>
                     {/* Sản phẩm liên quan */}
@@ -725,7 +722,7 @@ const ProductDetail = () => {
                                 left: '-50px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
-                                backgroundColor: 'rgb(247,124,140)',
+                                backgroundColor: 'rgba(140, 94, 88, 0.8)',
                                 color: '#fff',
                                 border: 'none',
                                 borderRadius: '50%',
@@ -828,7 +825,7 @@ const ProductDetail = () => {
                                 right: '-50px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
-                                backgroundColor: 'rgb(247,124,140)',
+                                backgroundColor: 'rgba(140, 94, 88, 0.8)',
                                 color: '#fff',
                                 border: 'none',
                                 borderRadius: '50%',

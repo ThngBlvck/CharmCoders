@@ -102,15 +102,9 @@ export const getRelatedProducts = (id) => {
 
 
 // Hàm lấy danh sách sản phẩm hot nhất
-export const getHotProducts = async () => {
-    try {
-        const response = await request({
-            method: 'GET',
-            path: 'client/products/hot', // Đường dẫn API từ route
-        });
-        return response.data; // Trả về dữ liệu từ API
-    } catch (error) {
-        console.error('Error fetching hot products:', error);
-        throw error; // Ném lỗi để xử lý tại nơi gọi
-    }
+export const getHotProducts = () => {
+    return request({
+        method: 'GET',
+        path: 'client/products/hot', // Đường dẫn API từ route
+    });
 };
