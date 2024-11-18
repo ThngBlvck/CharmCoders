@@ -140,53 +140,54 @@ export default function Home() {
                                                             </p>
                                                         </NavLink>
 
-                                                        {/* Price Display */}
                                                         <div
                                                             className="d-flex justify-content-between align-items-center">
-                                                            {product.sale_price ? (
+                                                            {/* Kiểm tra có giá sale hay không */}
+                                                            {product.sale_price && product.sale_price < product.unit_price ? (
                                                                 <>
-                                                                    <p className="card-text mb-4 font-semibold" style={{
+                                                                    {/* Giá sản phẩm gốc bị gạch ngang */}
+                                                                    <p className="card-text mb-2 font-semibold" style={{
                                                                         color: '#8c5e58',
-                                                                        textDecoration: 'line-through'
+                                                                        textDecoration: 'line-through',
+                                                                        flex: 1
                                                                     }}>
-                                                                        {product.unit_price ? product.unit_price.toLocaleString("vi-VN", {
+                                                                        {product.unit_price.toLocaleString("vi-VN", {
                                                                             style: "currency",
-                                                                            currency: "VND",
-                                                                        }) : "Không có giá"}
+                                                                            currency: "VND"
+                                                                        })}
                                                                     </p>
-                                                                    <p className="card-text mb-4 font-semibold"
-                                                                       style={{color: '#e74c3c'}}>
+
+                                                                    {/* Giá sale nằm bên phải */}
+                                                                    <p className="card-text mb-2 font-semibold" style={{
+                                                                        color: '#e74c3c',
+                                                                        flex: 1,
+                                                                        textAlign: 'right'
+                                                                    }}>
                                                                         {product.sale_price.toLocaleString("vi-VN", {
                                                                             style: "currency",
-                                                                            currency: "VND",
+                                                                            currency: "VND"
                                                                         })}
                                                                     </p>
                                                                 </>
                                                             ) : (
-                                                                <p className="card-text mb-4 font-semibold"
-                                                                   style={{color: '#8c5e58'}}>
-                                                                    {product.unit_price ? product.unit_price.toLocaleString("vi-VN", {
+                                                                // Nếu không có giá sale, đơn giản là hiển thị giá gốc ở giữa
+                                                                <p className="card-text mb-2 font-semibold" style={{
+                                                                    color: '#8c5e58',
+                                                                    textAlign: 'center',
+                                                                    flex: 1
+                                                                }}>
+                                                                    {product.unit_price.toLocaleString("vi-VN", {
                                                                         style: "currency",
-                                                                        currency: "VND",
-                                                                    }) : "Không có giá"}
+                                                                        currency: "VND"
+                                                                    })}
                                                                 </p>
                                                             )}
                                                         </div>
 
-                                                        {/* Discount Amount */}
-                                                        {product.sale_price && (
-                                                            <p className="text-muted" style={{fontSize: '14px'}}>
-                                                                Tiết
-                                                                kiệm: {(product.unit_price - product.sale_price).toLocaleString("vi-VN", {
-                                                                style: "currency",
-                                                                currency: "VND"
-                                                            })}
-                                                            </p>
-                                                        )}
-
                                                         {product.quantity === 0 ? (
                                                             <p className="text-danger font-bold"
-                                                               style={{fontSize: '16px', marginTop: '10px'}}>Hết hàng</p>
+                                                               style={{fontSize: '16px', marginTop: '10px'}}>Hết
+                                                                hàng</p>
                                                         ) : (
                                                             <button
                                                                 className="btn btn-primary mr-2 font-bold w-100"

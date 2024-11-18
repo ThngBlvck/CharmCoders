@@ -28,25 +28,30 @@ export default function Products() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Nếu id có giá trị và khác 'all', cập nhật selectedCategory
-        if (id && id !== "all") {
-            setSelectedCategory(id);
-        }
-        fetchProducts();
         fetchCategories();
         fetchBrands();
-    }, [productId, searchTerm, selectedCategory, priceFilter, brandFilter, id]); // Không cần giải mã token, chỉ cần kiểm tra xem token có trong localStorage hay không
+    }, []); // Chỉ gọi một lần khi component mount
+
+    useEffect(() => {
+        fetchProducts();
+    }, [selectedCategory, brandFilter, priceFilter, searchTerm]); // Chỉ gọi lại khi thay đổi các điều kiện lọc
+
 
 
     const fetchProducts = async () => {
         setLoading(true); // Bắt đầu tải dữ liệu
         try {
             let result;
-            if (searchTerm.trim() === "" && selectedCategory === "all" && priceFilter === "all" && brandFilter === "all") {
-                result = await getProduct();
+            // Kiểm tra nếu không có bộ lọc nào được chọn, trả về tất cả sản phẩm
+            if (selectedCategory === "all" && brandFilter === "all" && priceFilter === "all") {
+                result = await getProduct(); // Lấy tất cả sản phẩm nếu không có bộ lọc nào
             } else {
-                const sanitizedSearchTerm = removeVietnameseTones(searchTerm);
-                result = await searchProduct(sanitizedSearchTerm, selectedCategory);
+                result = await getProduct({
+                    category: selectedCategory,
+                    brand: brandFilter,
+                    minPrice: minPrice, // Bạn có thể thêm bộ lọc giá nếu cần
+                    maxPrice: maxPrice
+                });
             }
 
             if (Array.isArray(result)) {
@@ -54,16 +59,15 @@ export default function Products() {
             } else if (result && result.products && Array.isArray(result.products)) {
                 setProducts(result.products);
             } else {
-                setProducts([]);
+                setProducts([]); // Không có sản phẩm nào
             }
         } catch (error) {
             console.error("Lỗi khi lấy danh mục sản phẩm:", error);
-            setProducts([]);
+            setProducts([]); // Xử lý lỗi khi lấy dữ liệu
         } finally {
             setLoading(false); // Kết thúc tải dữ liệu
         }
     };
-
 
     const fetchBrands = async () => {
         setLoading(true); // Bắt đầu tải dữ liệu
@@ -91,21 +95,30 @@ export default function Products() {
         }
     };
 
-    const productsPerPage = 12;
+
+
 
     const maxPrice = Math.max(...products.map(product => {
         const productPrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.unit_price);
         return productPrice;
     }));
 
+    const filteredProducts = products.filter(product => {
+        // Lọc theo danh mục
+        const matchCategory = selectedCategory === "all" || product.category_id === parseInt(selectedCategory);
 
-    const filteredProducts = products
-        .filter(product => selectedCategory === "all" || product.category_id === parseInt(selectedCategory)) // Lọc theo category_id
-        .filter(product => {
-            const productPrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.unit_price);
-            return productPrice >= minPrice && productPrice <= maxPrice;
-        })
-        .filter(product => brandFilter === "all" || product.brand_id === parseInt(brandFilter))
+        // Lọc theo thương hiệu
+        const matchBrand = brandFilter === "all" || product.brand_id === parseInt(brandFilter);
+
+        // Lọc theo giá
+        const productPrice = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.unit_price);
+        const matchPrice = productPrice >= minPrice && productPrice <= maxPrice;
+
+        // Chỉ trả về sản phẩm phù hợp cả 3 điều kiện
+        return matchCategory && matchBrand && matchPrice;
+    });
+
+    const productsPerPage = 12;
 
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -177,31 +190,6 @@ export default function Products() {
                         </select>
                     </div>
 
-                    {/* Lọc theo giá */}
-                    <div className="col-md-4 mb-3">
-                        <p style={{fontSize: "20px", color: "#8c5e58"}} className="font-bold">
-                            Chọn mức giá
-                        </p>
-                        <div className="d-flex align-items-center">
-                            {/* Giá thấp nhất */}
-                            <span style={{color: "#8c5e58", marginRight: "10px"}}>0 ₫</span>
-                            <input
-                                type="range"
-                                min="0"
-                                max={maxPrice}
-                                value={minPrice}
-                                onChange={(e) => setMinPrice(Number(e.target.value))}
-                                className="form-range"
-                                style={{flex: 1}}
-                            />
-                            {/* Giá cao nhất */}
-                            <span style={{color: "#8c5e58", marginLeft: "10px"}}>
-                                {maxPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
-                            </span>
-                        </div>
-                        <p>Giá: {minPrice.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}</p>
-                    </div>
-
                     {/* Lọc theo thương hiệu */}
                     <div className="col-md-4 mb-3">
                         <p style={{fontSize: "20px", color: "#8c5e58"}} className="font-bold">
@@ -227,6 +215,31 @@ export default function Products() {
                                 </option>
                             )}
                         </select>
+                    </div>
+
+                    {/* Lọc theo giá */}
+                    <div className="col-md-4 mb-3">
+                        <p style={{fontSize: "20px", color: "#8c5e58"}} className="font-bold">
+                            Chọn mức giá
+                        </p>
+                        <div className="d-flex align-items-center">
+                            {/* Giá thấp nhất */}
+                            <span style={{color: "#8c5e58", marginRight: "10px"}}>0 ₫</span>
+                            <input
+                                type="range"
+                                min="0"
+                                max={maxPrice}
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(Number(e.target.value))}
+                                className="form-range"
+                                style={{flex: 1}}
+                            />
+                            {/* Giá cao nhất */}
+                            <span style={{color: "#8c5e58", marginLeft: "10px"}}>
+                                {maxPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                            </span>
+                        </div>
+                        <p>Giá: {minPrice.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}</p>
                     </div>
                 </div>
             </div>
