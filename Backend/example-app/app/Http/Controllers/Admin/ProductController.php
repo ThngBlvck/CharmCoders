@@ -1,12 +1,14 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\AttributeValue;
 use App\Http\Requests\Admin\StoreProductRequest;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -25,14 +27,13 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
-
-
     // Tạo sản phẩm mới
     public function store(StoreProductRequest $request)
     {
+        // Xác thực dữ liệu
         $validatedData = $request->validated();
 
-
+        // Xử lý hình ảnh nếu có
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
@@ -40,9 +41,88 @@ class ProductController extends Controller
             $validatedData['image'] = asset('storage/images/products/' . $imageName);
         }
 
-        $product = Product::create($validatedData);
-        return response()->json($product, 201);
+        // Tạo sản phẩm và xử lý biến thể trong giao dịch
+        DB::transaction(function () use ($validatedData, $request) {
+            // Tạo sản phẩm
+            $product = Product::create($validatedData);
+
+            // Kiểm tra và xử lý biến thể sản phẩm nếu có
+            if ($request->filled('has_variants') && $request->boolean('has_variants') && $request->has('variants')) {
+                // Lấy dữ liệu biến thể và kiểm tra định dạng
+                $variants = $request->input('variants');
+                if (!is_array($variants)) {
+                    $variants = json_decode($variants, true); // Giải mã JSON nếu cần
+                }
+
+                if (!is_array($variants)) {
+                    throw new \InvalidArgumentException('Dữ liệu biến thể không hợp lệ.');
+                }
+
+                // Gọi hàm xử lý biến thể
+                $this->handleVariants($product, $variants, $validatedData);
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sản phẩm và biến thể đã được tạo thành công.',
+            'data' => $validatedData,
+        ], 201);
     }
+
+    // Xử lý logic thêm biến thể
+    private function handleVariants(Product $product, $variants, $defaultData)
+    {
+        // Kiểm tra nếu biến thể không phải chuỗi
+        if (!is_array($variants)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu biến thể không hợp lệ.',
+            ], 400);
+        }
+
+        foreach ($variants as $variantData) {
+            // Kiểm tra nếu thuộc tính cũng là mảng
+            if (isset($variantData['attributes']) && !is_array($variantData['attributes'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dữ liệu thuộc tính không hợp lệ.',
+                ], 400);
+            }
+
+            // Tạo hoặc cập nhật biến thể
+            $variant = $product->variants()->updateOrCreate(
+                ['sku' => $variantData['sku'] ?? Str::uuid()],
+                [
+                    'price' => $variantData['price'] ?? $defaultData['unit_price'],
+                    'quantity' => $variantData['quantity'] ?? $defaultData['quantity'],
+                ]
+            );
+
+            // Kiểm tra nếu có dữ liệu thuộc tính và giá trị thuộc tính
+            if (isset($variantData['attributes']) && is_array($variantData['attributes'])) {
+                foreach ($variantData['attributes'] as $index => $attributeId) {
+                    // Kiểm tra nếu có dữ liệu giá trị thuộc tính (attributes_value)
+                    if (isset($variantData['attributes_value'][$index])) {
+                        $attributeValueId = $variantData['attributes_value'][$index];
+                        $attributeValue = AttributeValue::where('id', $attributeValueId)
+                            ->where('attribute_id', $attributeId)
+                            ->first();
+
+                        if ($attributeValue) {
+                            $variant->attributeValues()->syncWithoutDetaching([$attributeValue->id]);
+                        }
+                    } else {
+                        // Nếu không có giá trị thuộc tính, bạn có thể xử lý mặc định ở đây nếu cần
+                        // Hoặc bạn có thể tạo giá trị mặc định nếu cần thiết
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
     // Hiển thị chi tiết sản phẩm
     public function show($id)
@@ -69,20 +149,53 @@ class ProductController extends Controller
             $validatedData['image'] = asset('storage/images/products/' . $imageName);
         }
 
-        $product->update($validatedData);
-        return response()->json($product, 200);
+        DB::transaction(function () use ($product, $validatedData, $request) {
+            // Cập nhật sản phẩm
+            $product->update($validatedData);
+
+            // Cập nhật hoặc thêm mới các biến thể nếu có
+            if ($product->has_variants && $request->has('variants')) {
+                foreach ($request->variants as $variantData) {
+                    $variant = $product->variants()->updateOrCreate(
+                        ['sku' => $variantData['sku']],
+                        [
+                            'price' => $variantData['price'],
+                            'quantity' => $variantData['quantity'],
+                        ]
+                    );
+
+                    if (isset($variantData['attributes'])) {
+                        $attributeValues = AttributeValue::whereIn('id', $variantData['attributes'])->get();
+
+                        foreach ($attributeValues as $attributeValue) {
+                            $variant->attributes()->updateOrCreate(
+                                ['attribute_value_id' => $attributeValue->id],
+                                ['attribute_id' => $attributeValue->attribute_id]
+                            );
+                        }
+                    }
+                }
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sản phẩm đã được cập nhật thành công.',
+        ], 200);
     }
 
     // Xóa sản phẩm
     public function destroy($id)
     {
-        $product = Product::find($id);
+        $product = Product::findOrFail($id);
 
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
-
-        $product->delete();
+        DB::transaction(function () use ($product) {
+            if ($product->image) {
+                Storage::disk('public')->delete(str_replace(asset('storage'), '', $product->image));
+            }
+            $product->variants()->delete();
+            $product->delete();
+        });
 
         return response()->json([
             'success' => true,
@@ -90,41 +203,28 @@ class ProductController extends Controller
         ], 200);
     }
 
-
-
- // Chức năng tìm kiếm sản phẩm
-    public function search(Request $request)
+    // Hiển thị danh sách biến thể của sản phẩm
+    public function showVariants($id)
     {
-        // Lấy từ khóa tìm kiếm từ request
-        $query = $request->input('query');
+        $product = Product::with('variants.attributes')->find($id);
 
-        // Nếu không có từ khóa tìm kiếm, trả về lỗi
-        if (!$query) {
+        if (!$product) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vui lòng cung cấp từ khóa tìm kiếm.',
-            ], 400);
-        }
-
-        // Tìm kiếm sản phẩm theo tên, nội dung hoặc các thuộc tính khác
-        $products = Product::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('content', 'LIKE', "%{$query}%")
-            ->orWhere('unit_price', 'LIKE', "%{$query}%")
-            ->get();
-
-        // Nếu không tìm thấy sản phẩm
-        if ($products->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không tìm thấy sản phẩm nào phù hợp.',
+                'message' => 'Không tìm thấy sản phẩm với ID được cung cấp.',
             ], 404);
         }
 
-        // Trả về danh sách sản phẩm phù hợp
+        if (!$product->has_variants) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sản phẩm này không có biến thể.',
+            ], 400);
+        }
+
         return response()->json([
             'success' => true,
-            'products' => $products,
-        ], 200);
+            'data' => $product->variants,
+        ]);
     }
-
 }
