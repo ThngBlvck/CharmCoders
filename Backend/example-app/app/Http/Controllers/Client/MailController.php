@@ -21,7 +21,7 @@ class MailController extends Controller
 
         try {
             // Gửi email bằng Mail facade
-            Mail::to('nguyentcpc05615@fpt.edu.vn') // Địa chỉ email nhận
+            Mail::to('glowmakers6996@gmail.com') // Địa chỉ email nhận
                 ->send(new SendMailContact(
                     $validated['name'],
                     $validated['email'],
