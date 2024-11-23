@@ -24,35 +24,35 @@ class StoreCommentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
-            'product_id' => 'required|exists:products,id',
+        return [
+            'blog_id' => 'required|exists:blogs,id',
             'content' => 'required|string|max:255',
             'status' => 'int',
         ];
-
-        return $rules;
     }
 
-    public function messages()
+    /**
+     * Custom validation messages.
+     */
+    public function messages(): array
     {
         return [
-            'product_id.required' => 'ID sản phẩm không được để trống.',
-            'product_id.exists' => 'ID sản phẩm không tồn tại.',
-            'product_id.unique' => 'ID sản phẩm đã tồn tại trong csdl.',
-            'user_id.required' => 'ID người dùng không được để trống.',
-            'user_id.exists' => 'ID người dùng không tồn tại.',
-            'user_id.unique' => 'ID người dùng đã tồn tại trong csdl.',
+            'blog_id.required' => 'ID bài viết không được để trống.',
+            'blog_id.exists' => 'ID bài viết không tồn tại.',
             'content.required' => 'Nội dung bình luận không được để trống.',
             'content.string' => 'Nội dung bình luận phải là chuỗi.',
+            'content.max' => 'Nội dung bình luận không được vượt quá 255 ký tự.',
         ];
     }
 
+    /**
+     * Handle a failed validation attempt.
+     */
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => $validator->errors()
-
+            'message' => $validator->errors(),
         ], 422));
     }
 }

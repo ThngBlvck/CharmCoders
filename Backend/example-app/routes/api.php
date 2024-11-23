@@ -30,6 +30,8 @@ use App\Http\Controllers\Client\{
     AddressController,
     MomoPaymentController,
     ShippingController,
+    PhoneController,
+    ReviewController
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -118,6 +120,11 @@ Route::prefix('client')->group(function () {
     Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
     Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
 
+    // Route gửi OTP yêu cầu xác thực người dùng
+    Route::post('/send-otp', [PhoneController::class, 'sendOtp'])->middleware('auth:api');
+    // Route xác thực OTP yêu cầu xác thực người dùng
+    Route::post('/verify-otp', [PhoneController::class, 'verifyOtp']) ->middleware('auth:api');
+    Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
 });
 
 // General user route (outside of client prefix)
@@ -131,8 +138,3 @@ Route::middleware('auth:api')->apiResource('comments', CommentController::class)
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
-
-
-
-
-
