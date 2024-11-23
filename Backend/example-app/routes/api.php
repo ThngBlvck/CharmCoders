@@ -14,7 +14,10 @@ use App\Http\Controllers\Admin\{
     CartController,
     ProductController,
     UserController,
-    ReportExportController
+    ReportExportController,
+    AttributeController,
+    AttributeValueController,
+    VariantController
 };
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
@@ -27,7 +30,6 @@ use App\Http\Controllers\Client\{
     AddressController,
     MomoPaymentController,
     ShippingController,
-    PhoneController
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -56,11 +58,16 @@ Route::prefix('admin')->group(function () {
     Route::get('brand/search', [BrandController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::get('blog/search', [BlogController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::get('blogCategory/search', [BlogCategoryController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
-    Route::apiResource('image', ImageController::class); // http://localhost:8000/api/client/search?query=teneanpham
-
+    Route::apiResource('image', ImageController::class);// http://localhost:8000/api/client/search?query=teneanpham
+    Route::apiResource('attributes', AttributeController::class);
+    Route::apiResource('attributes/{attributeId}/values', AttributeValueController::class);
+    Route::get('/{id}/variants', [ProductController::class, 'showVariants']);
+    Route::get('products/{id}/variants', [ProductController::class, 'showVariants']);
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
+        Route::apiResource('products/{productId}/variants', VariantController::class);
+
     });
     Route::middleware('auth:api')->post('request-export-report', [ReportExportController::class, 'export']);
     Route::apiResource('employee', UserController::class);
@@ -91,6 +98,7 @@ Route::prefix('client')->group(function () {
     Route::get('comments/product/{productId}', [CommentController::class, 'getCommentsByProductId']);
     Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
     Route::get('products/hot', [ClientProductController::class, 'getHotProducts']);
+    Route::get('products/{product}/variants', [ProductController::class, 'showVariants']);
     // Route để yêu cầu đặt lại mật khẩu qua API
 
     Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
@@ -110,10 +118,6 @@ Route::prefix('client')->group(function () {
     Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
     Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
 
-    // Route gửi OTP yêu cầu xác thực người dùng
-    Route::post('/send-otp', [PhoneController::class, 'sendOtp'])->middleware('auth:api');
-    // Route xác thực OTP yêu cầu xác thực người dùng
-    Route::post('/verify-otp', [PhoneController::class, 'verifyOtp']) ->middleware('auth:api');
 });
 
 // General user route (outside of client prefix)
@@ -127,3 +131,8 @@ Route::middleware('auth:api')->apiResource('comments', CommentController::class)
 Route::post('password/send-otp', [ResetPasswordController::class, 'sendOtp']);
 Route::post('password/verify-otp', [ResetPasswordController::class, 'verifyOtp']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
+
+
+
+
+

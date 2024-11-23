@@ -26,30 +26,48 @@ class StoreProductRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|string|max:255|unique:products,name',
-            'unit_price' => 'required|numeric',
-            'sale_price' => 'nullable|numeric',
-            'quantity' => 'required|integer',
-//             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'unit_price' => 'required|numeric|min:0', // Giá gốc phải là số dương hoặc bằng 0
+            'sale_price' => 'nullable|numeric|min:0', // Giá giảm phải là số dương hoặc bằng 0
+            'quantity' => 'required|integer|min:0', // Số lượng phải là số nguyên và lớn hơn hoặc bằng 0
+            'sku' => 'nullable|string|unique:products,sku', // SKU là chuỗi và duy nhất
             'content' => 'nullable|string',
-            'views' => 'nullable|integer',
+            'views' => 'nullable|integer|min:0', // Lượt xem phải là số nguyên và lớn hơn hoặc bằng 0
             'status' => 'required|boolean',
             'brand_id' => 'nullable|exists:brands,id',
             'category_id' => 'nullable|exists:categories,id',
+            // Kiểm tra nếu có biến thể
+            'has_variants' => 'nullable|boolean',
         ];
 
+        // Nếu là phương thức PUT hoặc PATCH (chỉnh sửa sản phẩm)
         if ($this->isMethod('put') || $this->isMethod('patch')) {
             $id = $this->route('product'); // Lấy ID của sản phẩm từ route nếu có
 
+            // Cập nhật quy tắc cho tên sản phẩm và SKU khi chỉnh sửa
             $rules['name'] = [
                 'required',
                 'string',
                 'max:255',
                 Rule::unique('products')->ignore($id),
             ];
+            $rules['sku'] = [
+                'nullable',
+                'string',
+                Rule::unique('products')->ignore($id),
+            ];
+        }
+
+        // Kiểm tra nếu có biến thể trong request, nếu có thì yêu cầu các thuộc tính biến thể
+        if ($this->has('variants')) {
+            $rules['variants.*.attributes'] = 'required|array'; // Kiểm tra thuộc tính của biến thể
+            $rules['variants.*.attributes.*'] = 'required|exists:attributes,id'; // Kiểm tra sự tồn tại của thuộc tính
+            $rules['variants.*.price'] = 'nullable|numeric|min:0'; // Giá của biến thể
+            $rules['variants.*.quantity'] = 'nullable|integer|min:0'; // Số lượng của biến thể
         }
 
         return $rules;
     }
+
 
     /**
      * Get custom messages for validator errors.
@@ -65,13 +83,17 @@ class StoreProductRequest extends FormRequest
             'name.unique' => 'Tên sản phẩm đã tồn tại.',
             'unit_price.required' => 'Giá gốc là bắt buộc.',
             'unit_price.numeric' => 'Giá gốc phải là số.',
+            'unit_price.min' => 'Giá gốc phải lớn hơn hoặc bằng 0.',
             'sale_price.numeric' => 'Giá giảm phải là số.',
+            'sale_price.min' => 'Giá giảm phải lớn hơn hoặc bằng 0.',
             'quantity.required' => 'Số lượng sản phẩm là bắt buộc.',
             'quantity.integer' => 'Số lượng sản phẩm phải là số nguyên.',
-//             'image.image' => 'File tải lên phải là một hình ảnh.',
-//             'image.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif.',
+            'quantity.min' => 'Số lượng sản phẩm phải lớn hơn hoặc bằng 0.',
+            'sku.string' => 'SKU phải là chuỗi ký tự.',
+            'sku.unique' => 'SKU này đã tồn tại.',
             'content.string' => 'Nội dung phải là chuỗi ký tự.',
             'views.integer' => 'Lượt xem phải là số nguyên.',
+            'views.min' => 'Lượt xem phải lớn hơn hoặc bằng 0.',
             'status.required' => 'Trạng thái sản phẩm là bắt buộc.',
             'status.boolean' => 'Trạng thái sản phẩm phải là giá trị đúng hoặc sai.',
             'brand_id.exists' => 'Thương hiệu không tồn tại.',
