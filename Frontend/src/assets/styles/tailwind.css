@@ -3038,3 +3038,7 @@ select {
 
 @media (min-width: 1536px) {
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { getComments, deleteComment, getProductWithUserNames } from "../../../../services/Comment"; // Adjust imports as necessary
 import Swal from 'sweetalert2'; // Import SweetAlert2
-import { PulseLoader } from 'react-spinners'; // Import PulseLoader từ react-spinners
+import { PulseLoader } from 'react-spinners';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons"; // Import PulseLoader từ react-spinners
 
 export default function Comment({ color, userId }) {
     const [comments, setComments] = useState([]);
@@ -10,7 +12,9 @@ export default function Comment({ color, userId }) {
     const [products, setProducts] = useState([]);
     const [users, setUsers] = useState({}); // State to hold user data
     const [loadingId, setLoadingId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true); // Thêm state loading
+    const productsPerPage = 5; // Số sản phẩm trên mỗi trang
 
     useEffect(() => {
         fetchComments();
@@ -132,11 +136,57 @@ export default function Comment({ color, userId }) {
         }
     };
 
+
+    const handlePageChange = (page) => {
+        if (page > 0 && page <= Math.ceil(comments.length / productsPerPage)) {
+            setCurrentPage(page);
+        }
+    };
+
+    const getPaginationPages = (currentPage, totalPages) => {
+        const maxVisiblePages = 3; // Số trang liền kề hiển thị
+        const pages = [];
+
+        if (totalPages <= maxVisiblePages + 2) {
+            // Nếu tổng số trang ít, hiển thị tất cả
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            // Luôn hiển thị trang đầu
+            pages.push(1);
+
+            if (currentPage > 3) {
+                // Nếu trang hiện tại cách đầu > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Thêm các trang liền kề (trang hiện tại và 2 bên)
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                // Nếu trang hiện tại cách cuối > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Luôn hiển thị trang cuối
+            pages.push(totalPages);
+        }
+
+        return pages;
+    };
+
+
     return (
         <div className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}>
             <div className="rounded-t mb-0 px-4 py-3 border-0 flex justify-between items-center">
-                <h3 className={`font-semibold text-lg ${color === "light" ? "text-blueGray-700" : "text-white"}`}>
-                    Bình luận
+                <h3 className={`font-bold text-2xl text-lg ${color === "light" ? "text-blueGray-700" : "text-white"}`
+                    } style={{fontFamily: 'Roboto, sans-serif'}} >
+                    - DANH SÁCH BÌNH LUẬN -
                 </h3>
                 {selectedComments.length > 0 && (
                     <button className="bg-red-500 text-white px-3 py-2 rounded" onClick={handleBulkDelete}>
@@ -217,6 +267,52 @@ export default function Comment({ color, userId }) {
                     </table>
                 </div>
             )}
+            {/* Phân trang */}
+            <div className="flex justify-center items-center mt-4 mb-4">
+                {/* Nút Previous */}
+                <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
+                >
+                    <FontAwesomeIcon icon={faChevronLeft}/>
+                </button>
+
+                {/* Danh sách số trang */}
+                <div className="flex space-x-1">
+                    {getPaginationPages(currentPage, Math.ceil(comments.length / productsPerPage)).map((page, index) =>
+                        page === "..." ? (
+                            <span
+                                key={`ellipsis-${index}`}
+                                className="w-10 h-10 flex items-center justify-center text-gray-500"
+                            >
+                                    ...
+                                </span>
+                        ) : (
+                            <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`w-10 h-10 flex items-center justify-center border rounded-full text-sm font-bold shadow ${
+                                    currentPage === page
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-100 text-gray-800"
+                                } hover:bg-blue-300 hover:shadow-lg transition duration-200`}
+                            >
+                                {page}
+                            </button>
+                        )
+                    )}
+                </div>
+
+                {/* Nút Next */}
+                <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === Math.ceil(comments.length / productsPerPage)}
+                    className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
+                >
+                    <FontAwesomeIcon icon={faChevronRight}/>
+                </button>
+            </div>
         </div>
     );
 }
