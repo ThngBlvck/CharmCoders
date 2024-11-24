@@ -147,18 +147,18 @@ const handleLogout = () => {
 
     return (
         <>
-            <div className="container-fluid topbar d-none d-lg-block">
+            <div className="container-fluid topbar d-none d-lg-block greenPt">
                 <div className="container px-0">
                     <div className="row align-items-center">
                         <div className="col-lg-12">
                             <div className="d-flex flex-wrap">
-                                <a href="#" className="me-4 text-light"><i
-                                    className="fas fa-map-marker-alt text-primary me-2"></i>Toà nhà FPT Polytechnic,
+                                <a href="#" className="me-4 text-header-dGreen"><i
+                                    className="fas fa-map-marker-alt ic me-2"></i>Toà nhà FPT Polytechnic,
                                     Đ. Số 22, Thường Thạnh, Cái Răng, Cần Thơ</a>
-                                <a href="#" className="me-4 text-light"><i
-                                    className="fas fa-phone-alt text-primary me-2"></i>+01234567890</a>
-                                <a href="#" className="text-light"><i
-                                    className="fas fa-envelope text-primary me-2"></i>glowmakers@gmail.com</a>
+                                <a href="#" className="me-4 text-header-dGreen"><i
+                                    className="fas fa-phone-alt ic me-2"></i>+01234567890</a>
+                                <a href="#" className="text-header-dGreen"><i
+                                    className="fas fa-envelope ic me-2"></i>glowmakers@gmail.com</a>
                             </div>
                         </div>
                     </div>
@@ -168,19 +168,18 @@ const handleLogout = () => {
                 <div className="container-fluid px-0">
                     <nav className="navbar navbar-expand-xl bg-light">
                         <NavLink to={`/home`} className="navbar-brand">
-                            <p className="text-primary display-5" style={{ marginLeft: "100px" }}>GlowMakers</p>
+                            <p className="text-header-dGreen display-5" style={{ marginLeft: "100px" }}>GlowMakers</p>
                         </NavLink>
                         <button className="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarCollapse">
-                            <span className="fa fa-bars text-primary"></span>
+                            <span className="fa fa-bars text-header-dGreen"></span>
                         </button>
                         <div className="collapse navbar-collapse py-3" id="navbarCollapse">
                             <div className="navbar-nav mx-auto border-top">
-                                <NavLink to={`/home`} className="nav-item nav-link font-semibold">Trang chủ</NavLink>
-                                <NavLink to={`/about`} className="nav-item nav-link font-semibold">Giới thiệu</NavLink>
-                                <NavLink to={`/products`} className="nav-item nav-link font-semibold">Sản phẩm</NavLink>
-                                <NavLink to={`/contact`} className="nav-item nav-link font-semibold">Liên hệ</NavLink>
-                                <NavLink to={`/post`} className="nav-item nav-link font-semibold">Bài viết</NavLink>
+                                <NavLink to={`/home`} className="nav-item nav-link font-semibold text-header-dGreen">Trang chủ</NavLink>
+                                <NavLink to={`/about`} className="nav-item nav-link font-semibold text-header-dGreen">Về chúng tôi</NavLink>
+                                <NavLink to={`/products`} className="nav-item nav-link font-semibold text-header-dGreen">Sản phẩm</NavLink>
+                                <NavLink to={`/post`} className="nav-item nav-link font-semibold text-header-dGreen">Bài viết</NavLink>
                             </div>
 
                             <div className="d-flex align-items-center flex-nowrap pt-xl-0"
@@ -215,7 +214,7 @@ const handleLogout = () => {
                                             cursor: "pointer"
                                         }}
                                     >
-                                        <i className="fas fa-search" style={{color: "#ff7e6b", fontSize: "1.5rem"}}></i>
+                                        <i className="fas fa-search ic" style={{fontSize: "1.5rem"}}></i>
                                     </span>
 
                                     {/* Dropdown gợi ý sản phẩm */}
@@ -255,14 +254,40 @@ const handleLogout = () => {
                                                             />
                                                         </div>
                                                         <div className="col-9">
-                                                            <p className="product-n" style={{
+                                                            <p className="product-n text-dGreen" style={{
                                                                 fontWeight: "bold",
                                                                 overflow: "hidden", // Ẩn phần không hiển thị
                                                                 textOverflow: "ellipsis", // Thêm dấu ... nếu dài hơn
                                                                 whiteSpace: "normal", // Cho phép xuống dòng
                                                                 maxHeight: "3em", // Giới hạn chiều cao để hiển thị 2 dòng
                                                             }}>{product.name.length > 50 ? product.name.substring(0, 50) + "..." : product.name}</p>
-                                                            <small>{product.unit_price.toLocaleString()} VND</small>
+                                                            <small className="text-dGreen">{product.sale_price && product.sale_price < product.unit_price ? (
+                                                                <div className="d-flex justify-start align-items-center">
+                                                                    {/* Giá gốc bị gạch ngang */}
+                                                                    <small className="text-muted text-decoration-line-through text-dGreen fs-12">
+                                                                        {product.unit_price.toLocaleString("vi-VN", {
+                                                                            style: "currency",
+                                                                            currency: "VND",
+                                                                        })}
+                                                                    </small>
+
+                                                                    {/* Giá sale */}
+                                                                    <small className="salePr font-semibold fs-14 ml-2">
+                                                                        {product.sale_price.toLocaleString("vi-VN", {
+                                                                            style: "currency",
+                                                                            currency: "VND",
+                                                                        })}
+                                                                    </small>
+                                                                </div>
+                                                            ) : (
+                                                                // Nếu không có giá sale, hiển thị giá gốc ở giữa
+                                                                <small className="text-dGreen font-semibold fs-14">
+                                                                    {product.unit_price.toLocaleString("vi-VN", {
+                                                                        style: "currency",
+                                                                        currency: "VND",
+                                                                    })}
+                                                                </small>
+                                                            )}</small>
                                                         </div>
                                                     </div>
                                                 </NavLink>
@@ -280,15 +305,14 @@ const handleLogout = () => {
                                                  color: "var(--bs-primary)",
                                                  position: "relative"
                                              }}>
-                                        <i className="fas fa-shopping-basket" style={{fontSize: "1.5rem"}}></i>
+                                        <i className="fas fa-shopping-basket ic" style={{fontSize: "1.5rem"}}></i>
                                         <span
-                                            className="font-bold"
+                                            className="font-bold bg-count"
                                             style={{
                                                 position: "absolute",
                                                 top: "-5px",
                                                 right: "-4px",
                                                 padding: "0.1rem 0.4rem",
-                                                backgroundColor: "#442e2b",
                                                 border: "solid 1px #ff7e6b",
                                                 borderRadius: "100%",
                                                 color: "white",
@@ -313,7 +337,7 @@ const handleLogout = () => {
                                         aria-expanded={isDropdownOpen}
                                         style={{width: "50px", height: "50px", color: "var(--bs-primary)"}}
                                     >
-                                        <i className="fas fa-user" style={{fontSize: "1.5rem"}}></i>
+                                        <i className="fas fa-user ic" style={{fontSize: "1.5rem"}}></i>
                                     </button>
                                     {/* Dropdown menu */}
                                     {isDropdownOpen && (
@@ -321,34 +345,30 @@ const handleLogout = () => {
                                             style={{left: "-68px", top: "40px"}}>
                                             <li>
                                                 <NavLink to="/profile" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item"
-                                                            style={{color: "#8c5e58"}}>
-                                                        <i className="fas fa-user me-2"></i>Tài khoản của bạn
+                                                    <button className="dropdown-item modal-item text-header-dGreen">
+                                                        <i className="fas fa-user me-2 ic"></i>Tài khoản của bạn
                                                     </button>
                                                 </NavLink>
                                             </li>
                                             <li>
                                                 <NavLink to="/order-list" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item"
-                                                            style={{color: "#8c5e58"}}>
-                                                        <i className="fas fa-box me-2"></i>Đơn hàng đã đặt
+                                                    <button className="dropdown-item modal-item text-header-dGreen">
+                                                        <i className="fas fa-box me-2 ic"></i>Đơn hàng đã đặt
                                                     </button>
                                                 </NavLink>
                                             </li>
                                             <li>
                                                 <NavLink to="/order-history" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item"
-                                                            style={{color: "#8c5e58"}}>
-                                                        <i className="fas fa-clock-rotate-left me-2"></i>Lịch sử đơn
+                                                    <button className="dropdown-item modal-item text-header-dGreen">
+                                                        <i className="fas fa-clock-rotate-left me-2 ic"></i>Lịch sử đơn
                                                         hàng
                                                     </button>
                                                 </NavLink>
                                             </li>
                                             <li>
                                                 <NavLink to="/address" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item"
-                                                            style={{color: "#8c5e58"}}>
-                                                        <i className="fas fa-location-dot me-2"></i>Địa chỉ
+                                                    <button className="dropdown-item modal-item text-header-dGreen">
+                                                        <i className="fas fa-location-dot me-2 ic"></i>Địa chỉ
                                                     </button>
                                                 </NavLink>
                                             </li>
@@ -358,10 +378,9 @@ const handleLogout = () => {
                                                     // Logic cho nút thoát
                                                     toggleDropdown();
                                                 }}>
-                                                    <button className="dropdown-item modal-item"
-                                                            onClick={handleLogout}
-                                                            style={{color: "#8c5e58"}}>
-                                                        <i className="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                                    <button className="dropdown-item modal-item text-header-dGreen"
+                                                            onClick={handleLogout}>
+                                                        <i className="fas fa-sign-out-alt me-2 ic"></i>Đăng xuất
                                                     </button>
                                                 </NavLink>
                                             </li>
@@ -370,9 +389,9 @@ const handleLogout = () => {
                                 </div>
                                 )}
                                 {!isLoggedIn && (
-                                    <button className="btn btn-primary w-50 font-semibold" style={{marginLeft: '20px'}}>
+                                    <button className="butn rounded px-2 w-100 font-semibold" style={{marginLeft: '20px'}}>
                                         <Link to="/login">
-                                            <p style={{fontSize: "14px", color: '#442e2b'}}>Đăng nhập</p>
+                                            <p className="fs-16">Đăng nhập</p>
                                         </Link>
                                     </button>
                                 )}

@@ -4,7 +4,9 @@ import "../../../assets/styles/css/bootstrap.min.css";
 import {getOrder} from "../../../services/Order";
 import {NavLink} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons"; // Giả sử bạn đã có API này
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function OrderManagement() {
     const [orders, setOrders] = useState([]);
@@ -35,11 +37,11 @@ export default function OrderManagement() {
     // Hàm để xác định màu của status
     const getStatusStyle = (status) => {
         if (status === 0) {
-            return {color: "#ff7e6b"}; // Màu cam
+            return {color: "#cd8f32"}; // Màu cam
         } else if (status === 1) {
-            return {color: "#f8a400"}; // Màu vàng
+            return {color: "#328ccd"}; // Màu vàng
         } else if (status === 2) {
-            return {color: "#82f699"};
+            return {color: "#32CD32"};
         }
         return {};
     };
@@ -52,12 +54,32 @@ export default function OrderManagement() {
     };
     return (
         <div className="container mt-5">
-            <p className="headingStyle font-semibold">Đơn hàng đã đặt</p>
+            <p className="headingStyle font-semibold text-dGreen">Đơn hàng đã đặt</p>
             {loading ? (
-                <div className="d-flex flex-column align-items-center"
-                     style={{marginTop: '10rem', marginBottom: '10rem'}}>
-                    <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                    <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
+                <div className="order-history-card mb-4 cardStyle shadow">
+                    <div className="headerStyle">
+                        <div className="headerRowStyle">
+                            <Skeleton width={200} height={20}/>
+                            <Skeleton width={150} height={20}/>
+                        </div>
+                    </div>
+                    <div className="bodyStyle">
+                        <Skeleton width={100} height={20}/>
+                        <Skeleton width={200} height={100}/>
+                        <Skeleton width={200} height={20}/>
+                        <Skeleton width={150} height={20}/>
+                    </div>
+                    <div className="footerStyle font-semibold row">
+                        <div className="col-4">
+                            <Skeleton width={150} height={20}/>
+                        </div>
+                        <div className="col-4 d-flex align-items-center justify-content-center">
+                            <Skeleton width={150} height={30}/>
+                        </div>
+                        <div className="col-4 text-right">
+                            <Skeleton width={150} height={20}/>
+                        </div>
+                    </div>
                 </div>
             ) : (
                 <>
@@ -65,12 +87,13 @@ export default function OrderManagement() {
                         // Lọc đơn hàng có status là 3 hoặc 4
                         orders.filter(order => [0, 1, 2, 5].includes(order.status)).length > 0 ? (
                             orders.filter(order => [0, 1, 2, 5].includes(order.status)).map((order) => (
-                                <div key={order.id} className="order-history-card mb-4 cardStyle">
+                                <div key={order.id} className="order-history-card mb-4 cardStyle shadow">
                                     <div className="headerStyle">
                                         <div className="headerRowStyle">
-                                            <strong>ID đơn hàng: {order.order_id}</strong>
-                                            <strong>Trạng thái đơn hàng: <span className="statusStyle"
-                                                                               style={getStatusStyle(order.status)}>
+                                            <strong className="text-dGreen">Mã đơn hàng: {order.order_id}</strong>
+                                            <strong className="text-dGreen">Trạng thái đơn hàng: <span
+                                                className="statusStyle"
+                                                style={getStatusStyle(order.status)}>
                                         {order.status === 0 ? 'Đang chờ xác nhận'
                                             : order.status === 1 ? 'Đang chuẩn bị hàng'
                                                 : order.status === 2 ? 'Đang giao'
@@ -101,11 +124,11 @@ export default function OrderManagement() {
                                                                 <div className="product-info">
                                                                     <NavLink to={`/products/${detail.product.id}`}>
                                                                         <div
-                                                                            className="product-name productNameStyle">
+                                                                            className="product-name productNameStyle text-dGreen">
                                                                             {detail.product.name}
                                                                         </div>
                                                                     </NavLink>
-                                                                    <div className="product-quantity quantityStyle">
+                                                                    <div className="product-quantity quantityStyle text-dGreen">
                                                                         x {detail.quantity}
                                                                     </div>
                                                                 </div>
@@ -121,16 +144,25 @@ export default function OrderManagement() {
                                                 {order.details.length > 2 && (
                                                     <div className="toggle-view text-center mt-2">
                                                         <button onClick={() => toggleShowAll(order.id)}
-                                                                className="btn btn-link"
-                                                                style={{color: "red", fontSize: "16px"}}>
-                                                            {showAllProducts[order.id] ? "Thu gọn" : "Xem thêm"}
+                                                                className="btn-see-more fs-16 rounded">
+                                                            {showAllProducts[order.id] ? (
+                                                                <>
+                                                                    Thu gọn <i
+                                                                    className="fa-solid fa-arrows-up-to-line"></i>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    Xem thêm <i
+                                                                    className="fa-solid fa-arrows-down-to-line"></i>
+                                                                </>
+                                                            )}
                                                         </button>
                                                     </div>
                                                 )}
                                             </>
                                         ) : (
-                                            <p className="font-semibold text-center"
-                                               style={{color: "#8c5e58", fontSize: "30px", marginTop: "30px"}}>Không
+                                            <p className="font-semibold text-center text-dGreen fs-30"
+                                               style={{marginTop: "30px"}}>Không
                                                 có
                                                 sản phẩm
                                                 trong đơn hàng này.</p>
@@ -141,23 +173,22 @@ export default function OrderManagement() {
                                         <div className="col-4">
                                             <span className="statusStyle">
                                                 {order.payment_method === 1 ? 'Thanh toán khi nhận hàng'
-                                                    : order.payment_method == 2 ? 'Thanh toán momo'
+                                                    : order.payment_method == 2 ? 'Thanh toán chuyển khoản'
                                                         : 'Không xác định'}</span>
                                         </div>
 
                                         {/* Cột 2 */}
-                                        <div className="col-4 text-center">
+                                        <div className="col-4 d-flex align-items-center justify-content-center">
                                             <NavLink to={`/order/${order.id}`}>
-                                                <button className="btn btn-primary font-semibold"
-                                                        style={{fontSize: '16px'}}>
+                                                <button className="butn p-3 font-semibold fs-16 rounded shadow">
                                                     <p>Xem chi tiết</p>
                                                 </button>
                                             </NavLink>
                                         </div>
 
                                         {/* Cột 3 */}
-                                        <div className="col-4 text-right">
-                                            <span style={{marginRight: "10px"}}>Tổng tiền:</span>
+                                        <div className="col-4 text-right ">
+                                            <span style={{marginRight: "10px"}} className="text-dGreen">Tổng tiền:</span>
                                             <span className="totalAmountStyle">
                                                 {order.total_amount.toLocaleString("vi-VN", {
                                                     style: "currency", currency: "VND",
@@ -169,13 +200,13 @@ export default function OrderManagement() {
 
                             ))
                         ) : (
-                            <p className="font-semibold text-center"
-                               style={{color: "#8c5e58", fontSize: "20px", marginTop: "30px"}}>Không có đơn hàng nào đã
+                            <p className="font-semibold text-center text-dGreen fs-20"
+                               style={{marginTop: "30px"}}>Không có đơn hàng nào đã
                                 đặt.</p>
                         )
                     ) : (
-                        <p className="font-semibold text-center"
-                           style={{color: "#8c5e58", fontSize: "20px", marginTop: "30px"}}>Không có đơn hàng nào.</p>
+                        <p className="font-semibold text-center text-dGreen fs-20"
+                           style={{marginTop: "30px"}}>Không có đơn hàng nào.</p>
                     )}
                 </>
             )}

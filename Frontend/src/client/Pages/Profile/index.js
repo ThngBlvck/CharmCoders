@@ -5,6 +5,8 @@ import {NavLink, useLocation} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {getUserInfo} from "../../../services/User";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Profile() {
     const location = useLocation();
@@ -71,21 +73,16 @@ export default function Profile() {
     return (
         <>
             <div className="container py-5">
-                {/* Hiển thị loading khi đang tải */}
-                {loading ? (
-                    <div className="d-flex flex-column align-items-center"
-                         style={{marginTop: '10rem', marginBottom: '10rem'}}>
-                        <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                        <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
-                    </div>
-                ) : (
                     <div className="row g-4 align-items-center">
                         <div className="col-lg-4 text-center">
                             <div className="d-flex justify-center">
+                                {loading ? (
+                                    <Skeleton circle width={250} height={250}/>
+                                ) : (
                                 <img
-                                    src={user.image}
+                                    src={user.image || `https://avatars.dicebear.com/api/initials/default.svg`}
                                     alt="User Avatar"
-                                    className="img-fluid rounded-circle mb-3"
+                                    className="img-fluid rounded-circle mb-3 shadow"
                                     style={{
                                         width: '250px',
                                         height: '250px',
@@ -93,55 +90,70 @@ export default function Profile() {
                                         objectPosition: 'center',
                                     }}
                                 />
+                                )}
                             </div>
+                                {!loading && (
                             <div className="text-center">
-                                <p style={{color: "#8c5e58"}} className="font-semibold">{user.name.length > 30 ? user.name.substring(0, 20) + "..." : user.name}</p>
+                                <p className="font-semibold text-dGreen">{user.name.length > 30 ? user.name.substring(0, 20) + "..." : user.name}</p>
                                 <NavLink to={`/edit-profile`}>
-                                    <button className="btn btn-primary mt-3 font-semibold" style={{color: '#442e2b'}}>
+                                    <button className="btn-tk mt-3 font-semibold rounded shadow">
                                         Chỉnh sửa thông tin
                                     </button>
                                 </NavLink>
                             </div>
+                        )}
                         </div>
                         <div className="col-lg-8">
-                            <div className="p-4 bg-light border rounded">
-                                <p className="font-semibold mb-4 text-center"
-                                   style={{color: "#8c5e58", fontSize: "30px"}}>Thông tin cá
-                                    nhân</p>
-                                <form className="row">
-                                    <div className="form-group mb-4 col-6">
-                                        <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                               className="font-semibold mb-2">Họ và Tên: <span
-                                            style={{color: "#bd8782", fontSize: "20px"}}>{user.name}</span></label>
+                            <div className="p-4 bg-light border rounded shadow">
+                                {loading ? (
+                                    <>
+                                        <p className="font-semibold mb-4 text-center text-dGreen fs-30"><Skeleton height={30} width="60%"/></p>
+                                        <div className="row">
+                                            <div className="form-group mb-4 col-6">
+                                                <Skeleton height={30} width="100%"/>
+                                            </div>
+                                            <div className="form-group mb-4 col-6">
+                                                <Skeleton height={30} width="100%"/>
+                                            </div>
+                                            <div className="form-group col-6">
+                                                <Skeleton height={30} width="100%"/>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <form className="row">
+                                    <p className="font-semibold mb-4 text-center text-dGreen fs-30">Thông tin cá
+                                            nhân</p>
+                                        <div className="form-group mb-4 col-6">
+                                            <label className="font-semibold mb-2 text-dGreen fs-20">Họ và Tên: <span
+                                                className="text-dGreen fs-20">{user.name}</span></label>
 
-                                    </div>
-                                    <div className="form-group mb-4 col-6">
-                                        <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                               className="font-semibold mb-2">Email: <span
-                                            style={{color: "#bd8782", fontSize: "20px"}}>{user.email}</span></label>
-                                    </div>
-                                    <div className="form-group col-6">
-                                        <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                               className="font-semibold mb-2">Số điện thoại: <span
-                                            style={{color: "#bd8782", fontSize: "20px"}}>{user.phone}</span></label>
-                                    </div>
-                                </form>
+                                        </div>
+                                        <div className="form-group mb-4 col-6">
+                                            <label className="font-semibold mb-2 text-dGreen fs-20">Email: <span
+                                                className="text-dGreen fs-20">{user.email}</span></label>
+                                        </div>
+                                        <div className="form-group col-6">
+                                            <label className="font-semibold mb-2 text-dGreen fs-20">Số điện thoại: <span
+                                                className="text-dGreen fs-20">{user.phone}</span></label>
+                                        </div>
+                                    </form>
+                                )}
                             </div>
-                            <div>
+                            {!loading && (
+                                <div>
                                 <NavLink to={`/change_password`}>
-                                    <button className="btn btn-primary mt-3 mx-2 font-semibold"
-                                            style={{color: '#442e2b'}}>
+                                    <button className="btn-tk mt-3 mx-2 font-semibold rounded btn-20 shadow">
                                         Đổi mật khẩu
                                     </button>
                                 </NavLink>
-                                <button className="btn btn-primary mt-3 mx-2 font-semibold bg-danger"
-                                        style={{color: '#fff'}}>
+                                <button className="btn-huy mt-3 mx-2 font-semibold bg-danger rounded btn-20 shadow">
                                     Xóa tài khoản
                                 </button>
                             </div>
+                            )}
                         </div>
                     </div>
-                )}
             </div>
         </>
     );

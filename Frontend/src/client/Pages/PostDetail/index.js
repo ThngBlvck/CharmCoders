@@ -6,6 +6,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment'; // To format the date
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const PostDetail = () => {
     const { id } = useParams();
@@ -41,21 +43,25 @@ const PostDetail = () => {
             <ToastContainer />
             {loadingPost ? (
                 <div className="d-flex flex-column align-items-center">
-                    <FontAwesomeIcon icon={faSpinner} spin style={{ fontSize: '4rem', color: '#8c5e58' }} />
-                    <p className="mt-3" style={{ color: '#8c5e58', fontSize: '18px' }}>Đang tải...</p>
+                    {/* Skeleton for the entire post */}
+                    <Skeleton height={50} width="60%"/> {/* Skeleton for the post title */}
+                    <div className="my-3">
+                        <Skeleton height={20} width="40%"/> {/* Skeleton for the author name */}
+                        <Skeleton height={20} width="30%"/> {/* Skeleton for the date */}
+                    </div>
+                    <Skeleton count={6} height={20}/> {/* Skeleton for content lines */}
                 </div>
             ) : post ? (
                 <div className="row d-flex justify-content-center">
                     <div className="col-md-8">
-                        <p className="text-center mb-4 font-semibold" style={{ color: '#8c5e58', fontSize: "30px" }}>
+                        <p className="text-center mb-4 font-semibold text-dGreen fs-30">
                             {post.title}
                         </p>
-                        <div className="text-center mb-4" style={{ color: '#8c5e58', fontSize: '18px' }}>
+                        <div className="text-center mb-4 text-dGreen fs-18">
                             <span>Tác giả: {authorName}</span> | <span>Ngày đăng: {moment(post.created_at).format('DD/MM/YYYY')}</span>
                         </div>
                         <div
-                            className="lead text-justify"
-                            style={{ color: '#62433f' }}
+                            className="lead text-justify text-black post-content"
                             dangerouslySetInnerHTML={{ __html: post.content }}
                         />
                     </div>

@@ -5,6 +5,8 @@ import {NavLink} from "react-router-dom";
 import {getOrder} from "../../../services/Order";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons"; // Giả sử bạn đã có API này
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function OrderHistory() {
     const [orders, setOrders] = useState([]);
@@ -35,9 +37,9 @@ export default function OrderHistory() {
     // Hàm để xác định màu của status
     const getStatusStyle = (status) => {
         if (status === 3) {
-            return {color: "#28a745"}; // Màu cam
+            return {color: "#32cd7d"}; // Màu cam
         } else if (status === 4) {
-            return {color: "#ff0000"}; // Màu vàng
+            return {color: "#cd3232"}; // Màu vàng
         }
         return {};
     };
@@ -51,12 +53,33 @@ export default function OrderHistory() {
 
     return (
         <div className="container mt-5">
-            <p className="headingStyle font-semibold">Lịch sử đơn hàng</p>
+            <p className="headingStyle font-semibold text-dGreen">Lịch sử đơn hàng</p>
             {loading ? (
-                <div className="d-flex flex-column align-items-center"
-                     style={{marginTop: '10rem', marginBottom: '10rem'}}>
-                    <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                    <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
+
+                <div className="order-history-card mb-4 cardStyle shadow">
+                    <div className="headerStyle">
+                        <div className="headerRowStyle">
+                            <Skeleton width={200} height={20}/>
+                            <Skeleton width={150} height={20}/>
+                        </div>
+                    </div>
+                    <div className="bodyStyle">
+                        <Skeleton width={100} height={20}/>
+                        <Skeleton width={200} height={100}/>
+                        <Skeleton width={200} height={20}/>
+                        <Skeleton width={150} height={20}/>
+                    </div>
+                    <div className="footerStyle font-semibold row">
+                        <div className="col-4">
+                            <Skeleton width={150} height={20}/>
+                        </div>
+                        <div className="col-4 d-flex align-items-center justify-content-center">
+                            <Skeleton width={150} height={30}/>
+                        </div>
+                        <div className="col-4 text-right">
+                            <Skeleton width={150} height={20}/>
+                        </div>
+                    </div>
                 </div>
             ) : (
                 <>
@@ -65,12 +88,13 @@ export default function OrderHistory() {
                         orders.filter(order => [3, 4].includes(order.status)).length > 0 ? (
                             orders.filter(order => [3, 4].includes(order.status)).map((order) => (
 
-                                <div key={order.id} className="order-history-card mb-4 cardStyle">
+                                <div key={order.id} className="order-history-card mb-4 cardStyle shadow">
                                     <div className="headerStyle">
                                         <div className="headerRowStyle">
-                                            <strong>ID đơn hàng: {order.id}</strong>
-                                            <strong>Trạng thái đơn hàng: <span className="statusStyle"
-                                                                               style={getStatusStyle(order.status)}>
+                                            <strong className="text-dGreen">Mã đơn hàng: {order.id}</strong>
+                                            <strong className="text-dGreen">Trạng thái đơn hàng: <span
+                                                className="statusStyle"
+                                                style={getStatusStyle(order.status)}>
                                         {order.status === 3 ? 'Đã nhận'
                                             : order.status === 4 ? 'Đã hủy'
                                                 : 'Không xác định'}
@@ -99,11 +123,12 @@ export default function OrderHistory() {
                                                                 <div className="product-info">
                                                                     <NavLink to={`/products/${detail.product.id}`}>
                                                                         <div
-                                                                            className="product-name productNameStyle">
+                                                                            className="product-name productNameStyle text-dGreen">
                                                                             {detail.product.name}
                                                                         </div>
                                                                     </NavLink>
-                                                                    <div className="product-quantity quantityStyle">
+                                                                    <div
+                                                                        className="product-quantity quantityStyle text-dGreen">
                                                                         x {detail.quantity}
                                                                     </div>
                                                                 </div>
@@ -119,16 +144,25 @@ export default function OrderHistory() {
                                                 {order.details.length > 2 && (
                                                     <div className="toggle-view text-center mt-2">
                                                         <button onClick={() => toggleShowAll(order.id)}
-                                                                className="btn btn-link"
-                                                                style={{color: "red", fontSize: "16px"}}>
-                                                            {showAllProducts[order.id] ? "Thu gọn" : "Xem thêm"}
+                                                                className="btn-see-more fs-16 rounded">
+                                                            {showAllProducts[order.id] ? (
+                                                                <>
+                                                                    Thu gọn <i
+                                                                    className="fa-solid fa-arrows-up-to-line"></i>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    Xem thêm <i
+                                                                    className="fa-solid fa-arrows-down-to-line"></i>
+                                                                </>
+                                                            )}
                                                         </button>
                                                     </div>
                                                 )}
                                             </>
                                         ) : (
-                                            <p className="font-semibold text-center"
-                                               style={{color: "#8c5e58", fontSize: "30px", marginTop: "30px"}}>Không
+                                            <p className="font-semibold text-center text-dGreen fs-30"
+                                               style={{marginTop: "30px"}}>Không
                                                 có
                                                 sản phẩm
                                                 trong đơn hàng này.</p>
@@ -144,10 +178,9 @@ export default function OrderHistory() {
                                         </div>
 
                                         {/* Cột 2 */}
-                                        <div className="col-4 text-center">
+                                        <div className="col-4 d-flex align-items-center justify-content-center">
                                             <NavLink to={`/order/${order.id}`}>
-                                                <button className="btn btn-primary font-semibold"
-                                                        style={{fontSize: '16px'}}>
+                                                <button className="butn p-3 font-semibold fs-16 rounded shadow">
                                                     <p>Xem chi tiết</p>
                                                 </button>
                                             </NavLink>
@@ -155,7 +188,8 @@ export default function OrderHistory() {
 
                                         {/* Cột 3 */}
                                         <div className="col-4 text-right">
-                                            <span style={{marginRight: "10px"}}>Tổng tiền:</span>
+                                            <span className="text-dGreen"
+                                                  style={{marginRight: "10px"}}>Tổng tiền:</span>
                                             <span className="totalAmountStyle">
                                                 {order.total_amount.toLocaleString("vi-VN", {
                                                     style: "currency", currency: "VND",
@@ -167,17 +201,15 @@ export default function OrderHistory() {
 
                             ))
                         ) : (
-                            <p className="text-center"
+                            <p className="text-center text-dGreen fs-20"
                                style={{
-                                   color: "#8c5e58",
-                                   fontSize: "20px",
                                    marginTop: "30px",
                                    marginBottom: "30px"
                                }}>Chưa có đơn hàng nào.</p>
                         )
                     ) : (
-                        <p className="text-center"
-                           style={{color: "#8c5e58", fontSize: "20px", marginTop: "30px", marginBottom: "30px"}}>Không
+                        <p className="text-center text-dGreen fs-20"
+                           style={{marginTop: "30px", marginBottom: "30px"}}>Không
                             có đơn hàng nào.</p>
                     )}
                 </>

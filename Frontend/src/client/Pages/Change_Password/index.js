@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
-import Swal from "sweetalert2";
 import { changePassword } from "../../../services/User"; // Adjust path if needed
 import { useNavigate } from "react-router-dom";
+import {toast} from "react-toastify";
 
 export default function ChangePassword() {
     const [formData, setFormData] = useState({
@@ -34,22 +34,13 @@ export default function ChangePassword() {
     };
 
     const handleSuccess = () => {
-        Swal.fire({
-            title: "Thành công!",
-            text: "Mật khẩu của bạn đã được thay đổi thành công.",
-            icon: "success",
-            confirmButtonText: "Đóng"
-        }).then(() => {
-            // Reset form fields
-            setFormData({
-                current_password: "",
-                new_password: "",
-                new_password_confirmation: ""
-            });
-
-            // Optionally navigate to another page
-            navigate("/profile"); // Redirect to profile page (or any other page)
+        toast.success("Mật khẩu của bạn đã được thay đổi thành công.");
+        setFormData({
+            current_password: "",
+            new_password: "",
+            new_password_confirmation: ""
         });
+        navigate("/profile");
     };
 
     const handleSubmit = async (e) => {
@@ -69,22 +60,13 @@ export default function ChangePassword() {
                 // Check if the response indicates success
                 if (response.status === 200) {
                     // Show success message
-                    Swal.fire({
-                        title: "Thành công!",
-                        text: "Mật khẩu của bạn đã được thay đổi thành công.",
-                        icon: "success",
-                        confirmButtonText: "Đóng"
-                    }).then(() => {
-                        // Reset form fields after success
-                        setFormData({
-                            current_password: "",
-                            new_password: "",
-                            new_password_confirmation: ""
-                        });
-
-                        // Redirect to the profile page (or any other page you want)
-                        navigate("/profile"); // Ensure navigate is called inside this .then()
+                    toast.success("Mật khẩu của bạn đã được thay đổi thành công.");
+                    setFormData({
+                        current_password: "",
+                        new_password: "",
+                        new_password_confirmation: ""
                     });
+                    navigate("/profile");
                 }
             } catch (error) {
                 // Log the error object
@@ -95,19 +77,19 @@ export default function ChangePassword() {
                     const errorMessage = error.response.data.error;
                     // Handle specific error for social login or other errors
                     if (errorMessage === "Không thể thay đổi mật khẩu cho tài khoản đăng nhập qua mạng xã hội.") {
-                        Swal.fire("Lỗi!", errorMessage, "error");
+                        toast.error(errorMessage);
                     } else {
                         // Handle other error messages
-                        Swal.fire("Lỗi!", errorMessage || "Có lỗi xảy ra khi đổi mật khẩu", "error");
+                        toast.error(errorMessage || "Có lỗi xảy ra khi đổi mật khẩu.");
                     }
                 } else {
                     // Fallback for unexpected errors
-                    Swal.fire("Lỗi!", "Có lỗi xảy ra khi đổi mật khẩu", "error");
+                    toast.error("Có lỗi xảy ra khi đổi mật khẩu.");
                 }
             }
         } else {
             // If validation fails, show an error message
-            Swal.fire("Lỗi!", "Vui lòng kiểm tra lại các trường nhập liệu", "error");
+            toast.error("Vui lòng kiểm tra lại các trường nhập liệu.");
         }
     };
 
@@ -117,40 +99,40 @@ export default function ChangePassword() {
         <div className="container py-5">
             <div className="row justify-content-center">
                 <div className="col-lg-6">
-                    <div className="p-4 bg-light border rounded shadow-sm">
-                        <h3 className="text-center mb-4" style={{ color: "#8c5e58" }}>Đổi mật khẩu</h3>
+                    <div className="p-4 bg-light border rounded shadow">
+                        <p className="text-center mb-4 text-dGreen fs-30 font-semibold">Đổi mật khẩu</p>
                         <form onSubmit={handleSubmit}>
                             <div className="form-group mb-3">
-                                <label htmlFor="current_password" className="form-label">Mật khẩu hiện tại</label>
+                                <label htmlFor="current_password" className="form-label text-dGreen font-semibold fs-16">Mật khẩu hiện tại</label>
                                 <input
                                     type="password"
                                     name="current_password"
                                     id="current_password"
-                                    className={`form-control ${errors.current_password ? "is-invalid" : ""}`}
+                                    className={`form-control rounded ${errors.current_password ? "is-invalid" : ""}`}
                                     value={formData.current_password}
                                     onChange={handleChange}
                                 />
                                 {errors.current_password && <div className="invalid-feedback">{errors.current_password}</div>}
                             </div>
                             <div className="form-group mb-3">
-                                <label htmlFor="new_password" className="form-label">Mật khẩu mới</label>
+                                <label htmlFor="new_password" className="form-label text-dGreen font-semibold fs-16">Mật khẩu mới</label>
                                 <input
                                     type="password"
                                     name="new_password"
                                     id="new_password"
-                                    className={`form-control ${errors.new_password ? "is-invalid" : ""}`}
+                                    className={`form-control rounded ${errors.new_password ? "is-invalid" : ""}`}
                                     value={formData.new_password}
                                     onChange={handleChange}
                                 />
                                 {errors.new_password && <div className="invalid-feedback">{errors.new_password}</div>}
                             </div>
                             <div className="form-group mb-3">
-                                <label htmlFor="new_password_confirmation" className="form-label">Xác nhận mật khẩu mới</label>
+                                <label htmlFor="new_password_confirmation" className="form-label text-dGreen font-semibold fs-16">Xác nhận mật khẩu mới</label>
                                 <input
                                     type="password"
                                     name="new_password_confirmation"
                                     id="new_password_confirmation"
-                                    className={`form-control ${errors.new_password_confirmation ? "is-invalid" : ""}`}
+                                    className={`form-control rounded ${errors.new_password_confirmation ? "is-invalid" : ""}`}
                                     value={formData.new_password_confirmation}
                                     onChange={handleChange}
                                 />
@@ -158,7 +140,7 @@ export default function ChangePassword() {
                                     <div className="invalid-feedback">{errors.new_password_confirmation}</div>
                                 )}
                             </div>
-                            <button type="submit" className="btn btn-primary w-100 font-semibold mt-3">
+                            <button type="submit" className="butn rounded shadow w-100 font-semibold mt-3">
                                 Xác nhận thay đổi
                             </button>
                         </form>

@@ -4,7 +4,6 @@ import {CartProvider} from './components/Cart';
 import Footer from "./components/Footer";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
-import Contact from "./Pages/Contact";
 import Products from "./Pages/Products";
 import ProductDetail from "./Pages/ProductDetail";
 import Header from "./components/Header";
@@ -30,7 +29,8 @@ import ChangePassword from "./Pages/Change_Password";
 import GoogleCallback from "./Pages/GoogleCallback";
 import OrderDetail from "./Pages/Order_Detail";
 import FacebookCallback from "./Pages/FacebookCallback";
-import Success from "./Pages/payment-result";
+import {ToastContainer} from "react-toastify";
+import PaymentResult from "./Pages/payment-result";
 
 
 
@@ -42,12 +42,22 @@ export default function Client() {
 
     return (
         <CartProvider>
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             {!is404Page && <Header />}
             <div className="container my-4">
                 <Routes>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/about" element={<About/>}/>
-                    <Route path="/contact" element={<Contact/>}/>
                     <Route path="/products" element={<Products/>}/>
                     <Route path="/products/:id" element={<ProductDetail/>}/>
                     <Route path="/profile" element={<Profile/>}/>
@@ -76,7 +86,7 @@ export default function Client() {
                     <Route path="/add-address" element={<Add_Address/>} />
                     <Route path="/edit-address/:id" element={<Edit_Address/>} />
 
-                    <Route path="payment-result" element={<Success/>} />
+                    <Route path="/payment-result" element={<PaymentResult/>} />
 
                     {/* Trang chủ khi vào đường dẫn gốc */}
                     <Route path="/" element={<Navigate to="/home" />} />

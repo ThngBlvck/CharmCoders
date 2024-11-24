@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getBlogCategory } from "../../../services/BlogCategory"; // Assuming these services exist
 import { getBlog } from "../../../services/Blog"; // Assuming these services exist
-import Swal from "sweetalert2";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import "../../../assets/styles/css/bootstrap.min.css";
+import {toast} from "react-toastify";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Post() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -30,7 +32,7 @@ export default function Post() {
             setCategories(result || []);
         } catch (error) {
             console.error("Error fetching categories:", error);
-            Swal.fire("Error", "Could not load categories. Please try again later.", "error");
+            toast.error("Không thể tải danh mục bài viết. Vui lòng thử lại sau.");
         } finally {
             setLoading(false); // Set loading false when fetching ends
         }
@@ -44,7 +46,7 @@ export default function Post() {
             setPosts(result || []);
         } catch (error) {
             console.error("Error fetching posts:", error);
-            Swal.fire("Error", "Could not load posts. Please try again later.", "error");
+            toast.error("Không thể tải bài viết. Vui lòng thử lại sau.");
         } finally {
             setLoading(false); // Set loading false when fetching ends
         }
@@ -64,65 +66,86 @@ export default function Post() {
 
     return (
         <div className="container py-2">
-            {/* Breadcrumb */}
-            <div className="container-fluid py-3" style={{ backgroundColor: "#fff7f8" }}>
-                <div className="container text-center py-5">
-                    <p className="mb-4 font-semibold" style={{ color: "#ffa69e", fontSize: "40px" }}>Bài viết</p>
-                    <ol className="breadcrumb justify-content-center mb-0">
-                        <li className="breadcrumb-item font-bold" style={{ color: "#ffa69e" }}>
-                            <NavLink to={`/home`}>Trang chủ</NavLink>
-                        </li>
-                        <li className="breadcrumb-item active font-bold" style={{ color: "#ffa69e" }}>Bài viết</li>
-                    </ol>
-                </div>
-            </div>
-
             {/* Content */}
             <div className="d-flex row justify-content-between mt-4">
                 {/* Left column - Post categories */}
                 <div className="col-md-3">
-                    <p style={{ fontSize: "20px", color: "#8c5e58" }} className="font-bold mb-3">Danh mục bài viết</p>
+                    <p className="font-bold mb-3 text-dGreen fs-20">Danh mục bài viết</p>
                     <ul className="list-group">
+                        {loading ? (
+                            <li className="list-group-item border-none">
+                                <Skeleton height={30} />
+                            </li>
+                        ) : (
                         <li className="list-group-item font-semibold d-flex align-items-center"
                             style={{ border: "none", cursor: "pointer" }} onClick={() => handleCategoryClick("all")}>
-                            <i className="fa fa-list-alt" aria-hidden="true" style={{ marginRight: "6px", color: "#8c5e58" }}></i>
-                            <p style={{ color: "#8c5e58", margin: 0 }}>Tất cả bài viết</p>
+                            <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
+                            <p className="text-dGreen" style={{ margin: 0 }}>Tất cả bài viết</p>
                         </li>
-                        {categories.map((category) => (
-                            <li className="list-group-item font-semibold d-flex align-items-center" key={category.id}
-                                style={{ border: "none", cursor: "pointer" }}
+                        )}
+                        {loading ? (
+                            // Skeleton for category list items
+
+                                <li className="list-group-item border-none">
+                                    <Skeleton height={30} />
+                                </li>
+
+                        ) : (
+                        categories.map((category) => (
+                            <li className="list-group-item font-semibold d-flex align-items-center border-none cursor-pointer" key={category.id}
                                 onClick={() => handleCategoryClick(category.id)}>
-                                <i className="fa fa-list-alt" aria-hidden="true" style={{ marginRight: "6px", color: "#8c5e58" }}></i>
-                                <p style={{ color: "#8c5e58", margin: 0 }}>{category.name}</p>
+                                <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
+                                <p className="text-dGreen" style={{ margin: 0 }}>{category.name}</p>
                             </li>
-                        ))}
+                            ))
+                        )}
                     </ul>
                 </div>
 
                 {/* Right column - Posts and pagination */}
                 <div className="col-md-9 row">
-                    <p style={{ fontSize: "20px", color: "#8c5e58" }} className="font-bold mb-3 text-center">Danh sách bài viết</p>
+                    <p className="font-bold mb-3 text-center text-dGreen fs-20">Danh sách bài viết</p>
                     {loading ? (
-                        <div className="text-center">
-                            <FontAwesomeIcon icon={faSpinner} spin size="2x" />
-                            <p>Đang tải...</p>
+                        <div className="row">
+                            {/* Skeleton for the post list */}
+                            {[...Array(6)].map((_, index) => (
+                                <div key={index} className="col-12 col-md-4 mb-4">
+                                    <div className="card bg-hover shadow"
+                                         style={{borderRadius: '15px', padding: '20px'}}>
+                                        {/* Skeleton for image */}
+                                        <Skeleton height={200} width="100%"/>
+                                        <div className="card-body">
+                                            <Skeleton height={20} width="80%"/>
+                                            <Skeleton height={20} width="60%"/>
+                                            <Skeleton height={20} width="50%"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : (
                         currentPosts.length > 0 ? (
                             currentPosts.map((post) => (
-                                <div className="col-12 col-md-6 mb-4" key={post.id}>
-                                    <div className="card bg-hover" style={{ borderRadius: '15px', padding: '20px' }}>
+                                <div className="col-12 col-md-4 mb-4" key={post.id}>
+                                    <div className="card bg-hover shadow"
+                                         style={{borderRadius: '15px', padding: '20px'}}>
                                         <NavLink to={`/postdetail/${post.id}`}>
-                                            <img src={post.image} className="card-img-top" alt={post.title} style={{ maxHeight: '400px', objectFit: 'cover' }} />
+                                            <img src={post.image} className="card-img-top img-fluid rounded"
+                                                 alt={post.title} style={{
+                                                width: '100%', // Đặt chiều rộng cố định
+                                                height: '200px', // Đặt chiều cao cố định
+                                                objectFit: 'cover', // Đảm bảo hình ảnh được cắt gọn để vừa khít ô
+                                                borderRadius: '10px' // Tùy chọn: Làm tròn góc ảnh
+                                            }}/>
                                         </NavLink>
                                         <div className="card-body">
                                             <NavLink to={`/postdetail/${post.id}`}>
-                                                <p className="card-title font-semibold text-center" style={{ color: "#8c5e58", fontSize: "1.2rem" }}>
-                                                    {post.title}
+                                                <p className="card-title font-semibold text-center text-dGreen fs-18">
+                                                    {post.title.length > 30 ? post.title.substring(0, 20) + "..." : post.title}
                                                 </p>
                                             </NavLink>
-                                            <p className="card-text align-content-start" style={{ color: "#8c5e58", marginBottom: '1rem' }}>{post.summary}</p>
-                                            <button className="btn btn-primary w-100 font-bold" style={{ color: "#442e2b" }} onClick={() => navigate(`/postdetail/${post.id}`)}>
+                                            <p className="card-text align-content-start text-dGreen" style={{ marginBottom: '1rem' }}>{post.summary}</p>
+                                            <button className="butn w-100 font-bold rounded shadow" onClick={() => navigate(`/postdetail/${post.id}`)}>
                                                 Xem chi tiết
                                             </button>
                                         </div>

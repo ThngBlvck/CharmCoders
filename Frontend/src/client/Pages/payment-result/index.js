@@ -24,14 +24,16 @@ export default function PaymentResult() {
             <div className="row justify-content-center">
                 <div className="col-lg-6">
                     <div className="border rounded p-4 shadow bg-light text-center">
-                        <i className="fas fa-check-circle text-success" style={{ fontSize: '50px' }}></i>
-                        <h2 className="mt-4" style={{ color: '#8c5e58' }}>Thanh Toán Thành Công!</h2>
-                        <p className="mt-3" style={{ color: '#8c5e58', fontSize: "18px" }}>
-                            Cảm ơn bạn đã hoàn tất thanh toán. Chúng tôi sẽ xử lý đơn hàng của bạn ngay lập tức.
+                        <i className="fas fa-check-circle text-success fs-50"></i>
+                        <p className="mt-4 text-dGreen font-semibold fs-20">Đặt Hàng Thành Công!</p>
+                        <p className="mt-3 text-dGreen fs-18">
+                            Cảm ơn bạn đã mua hàng của chúng tôi. Chúng tôi sẽ xử lý đơn hàng của bạn ngay lập tức.
                         </p>
-                        <a href="/home" className="btn btn-primary mt-4" style={{ backgroundColor: '#8c5e58', borderColor: '#8c5e58' }}>
-                            Về Trang Chủ
-                        </a>
+                        <div className="d-flex justify-center">
+                            <a href="/home" className="butn rounded shadow w-40 mt-4">
+                                Về Trang Chủ
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
