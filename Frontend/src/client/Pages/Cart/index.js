@@ -5,8 +5,10 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import {deleteCart, getCart, updateCart} from "../../../services/Cart";
 import {getOneProduct} from "../../../services/Comment";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import Swal from 'sweetalert2';
 import debounce from 'lodash.debounce';
+import {toast} from "react-toastify";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Cart() {
     const [products, setProducts] = useState([]);
@@ -175,17 +177,7 @@ export default function Cart() {
 
     const handleBuy = () => {
         if (selectedItems.length === 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Không có sản phẩm',
-                text: 'Cần có sản phẩm để thanh toán.',
-                confirmButtonColor: '#8c5e58',
-                confirmButtonText: 'OK',
-                customClass: {
-                    title: 'swal2-title-custom',
-                    content: 'swal2-content-custom'
-                }
-            });
+            toast.warn("Cần có sản phẩm để thanh toán.");
             return;
         }
 
@@ -194,36 +186,74 @@ export default function Cart() {
     };
 
     return (
-        <div className="container py-4">
-            <p className="text-center font-semibold"
-               style={{color: "#8c5e58", marginBottom: "30px", fontSize: "30px"}}>Giỏ hàng</p>
+        <div className="container rounded">
+            <p className="text-center font-semibold text-dGreen fs-30"
+               style={{ marginBottom: "30px"}}>Giỏ hàng</p>
 
-            <div className="cart-header d-flex">
-                <div className="cart-header-item" style={{width: "10%", textAlign: "center"}}>
+            <div className="cart-header d-flex bg-carts">
+                <div className="cart-header-item checkbox-shadow" style={{width: "10%", textAlign: "center"}}>
                     <input
                         type="checkbox"
                         checked={isSelectAll}
                         onChange={handleSelectAll}
                     />
                 </div>
-                <div className="cart-header-item" style={{width: "30%"}}>Sản phẩm</div>
-                <div className="cart-header-item" style={{width: "15%", textAlign: "right"}}>Giá tiền</div>
-                <div className="cart-header-item" style={{width: "15%", textAlign: "center"}}>Số lượng</div>
-                <div className="cart-header-item" style={{width: "15%", textAlign: "right"}}>Thành tiền</div>
-                <div className="cart-header-item" style={{width: "15%", textAlign: "center"}}>Thao tác</div>
+                <div className="cart-header-item text-dGreen" style={{width: "30%"}}>Sản phẩm</div>
+                <div className="cart-header-item text-dGreen" style={{width: "15%", textAlign: "right"}}>Giá tiền</div>
+                <div className="cart-header-item text-dGreen" style={{width: "15%", textAlign: "center"}}>Số lượng</div>
+                <div className="cart-header-item text-dGreen" style={{width: "15%", textAlign: "right"}}>Thành tiền</div>
+                <div className="cart-header-item text-dGreen" style={{width: "15%", textAlign: "center"}}>Thao tác</div>
             </div>
 
             {loading ? (
-                <div className="d-flex flex-column align-items-center"
-                     style={{marginTop: '10rem', marginBottom: '10rem'}}>
-                    <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                    <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
-                </div>
+                <ul className="list-group">
+                    {Array.from({length: 3}).map((_, index) => (
+                        <li
+                            key={index}
+                            className="list-group-item d-flex align-items-center justify-content-between py-3"
+                            style={{
+                                borderBottom: "1px solid #ddd",
+                                marginBottom: "20px",
+                            }}
+                        >
+                            {/* Skeleton cho checkbox */}
+                            <div style={{width: "10%", textAlign: "center"}}>
+                                <Skeleton circle={true} width={20} height={20}/>
+                            </div>
+
+                            {/* Skeleton cho sản phẩm */}
+                            <div className="d-flex align-items-center" style={{width: "30%"}}>
+                                <Skeleton width={80} height={80} style={{marginRight: "15px"}}/>
+                                <Skeleton width="60%"/>
+                            </div>
+
+                            {/* Skeleton cho giá tiền */}
+                            <div style={{width: "15%", textAlign: "right"}}>
+                                <Skeleton width="80%"/>
+                            </div>
+
+                            {/* Skeleton cho số lượng */}
+                            <div style={{width: "15%", textAlign: "center"}}>
+                                <Skeleton width={60} height={30}/>
+                            </div>
+
+                            {/* Skeleton cho thành tiền */}
+                            <div style={{width: "15%", textAlign: "right"}}>
+                                <Skeleton width="80%"/>
+                            </div>
+
+                            {/* Skeleton cho thao tác */}
+                            <div style={{width: "15%", textAlign: "center"}}>
+                                <Skeleton circle={true} width={30} height={30}/>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             ) : (
                 <>
                     {products.length === 0 ? (
-                        <p className="font-semibold text-center"
-                           style={{color: "#8c5e58", fontSize: "30px", marginTop: "30px"}}>Giỏ hàng của bạn trống
+                        <p className="font-semibold text-center mb-4 text-dGreen fs-30"
+                           style={{marginTop: "30px"}}>Giỏ hàng của bạn trống
                             !!!</p>
                     ) : (
                         <>
@@ -263,31 +293,27 @@ export default function Cart() {
                                                 whiteSpace: "normal",
                                                 maxHeight: "4.5em",
                                             }}>
-                                                <p style={{
+                                                <p className="text-dGreen font-bold" style={{
                                                     marginBottom: "5px",
-                                                    color: "#8c5e58",
-                                                    fontWeight: "bold"
                                                 }}>{item.name}</p>
                                             </div>
                                         </NavLink>
                                     </div>
 
-                                    <div className="cart-item-price" style={{
+                                    <div className="cart-item-price text-dGreen font-bold" style={{
                                         width: "15%",
                                         textAlign: "right",
-                                        color: "#8c5e58",
-                                        fontWeight: "bold"
                                     }}>
                                         {item.sale_price ? (
                                             <div>
-                                                <span style={{textDecoration: "line-through", color: "#6c4d36"}}>
+                                                <span className="text-dGreen" style={{textDecoration: "line-through"}}>
                                                     {item.unit_price.toLocaleString("vi-VN", {
                                                         style: "currency",
                                                         currency: "VND"
                                                     })}
                                                 </span>
                                                 <br/>
-                                                <span style={{color: "#f76c5e", fontWeight: "bold"}}>
+                                                <span className="font-bold salePr">
                                                     {item.sale_price.toLocaleString("vi-VN", {
                                                         style: "currency",
                                                         currency: "VND"
@@ -295,7 +321,7 @@ export default function Cart() {
                                                 </span>
                                             </div>
                                         ) : (
-                                            <span style={{color: "#8c5e58", fontWeight: "bold"}}>
+                                            <span className="font-bold text-dGreen">
                                                 {item.unit_price.toLocaleString("vi-VN", {
                                                     style: "currency",
                                                     currency: "VND"
@@ -318,12 +344,10 @@ export default function Cart() {
                                         />
                                     </div>
 
-                                    <div className="cart-item-total"
+                                    <div className="cart-item-total font-bold text-dGreen"
                                          style={{
                                              width: "15%",
                                              textAlign: "right",
-                                             color: "#8c5e58",
-                                             fontWeight: "bold"
                                          }}>
                                         {(
                                             (item.sale_price && !isNaN(item.sale_price) ? item.sale_price : item.unit_price)
@@ -335,7 +359,7 @@ export default function Cart() {
                                     </div>
 
                                     <div className="cart-item-remove" style={{width: "15%", textAlign: "center"}}>
-                                        <button className="btn btn-link" style={{padding: "0", color: "#f77c8c"}}
+                                        <button className="text-dGreen" style={{padding: "0"}}
                                                 onClick={() => removeItem(item.id)}>
                                             <i className="fas fa-trash"></i> Xóa
                                         </button>
@@ -347,16 +371,10 @@ export default function Cart() {
                 </>
             )}
 
-            <div className="cart-summary d-flex justify-content-between align-items-center"
-                 style={{
-                     backgroundColor: "#feeef0",
-                     padding: "20px",
-                     borderRadius: "10px",
-                     marginBottom: "20px"
-                 }}>
+            <div className="cart-summary d-flex justify-content-between align-items-center bg-carts footer-carts">
                 <div>
                     {selectedItems.length > 0 && ( // Chỉ hiển thị nút xóa khi có sản phẩm được chọn
-                        <button className="btn btn-primary font-semibold"
+                        <button className="butn font-semibold rounded shadow"
                                 style={{marginRight: "20px", width: "220px"}} // Đặt chiều rộng của nút
                                 onClick={removeSelectedItems}>
                             Xóa sản phẩm đã chọn ({selectedItems.length})
@@ -365,18 +383,16 @@ export default function Cart() {
                 </div>
 
                 <div className="d-flex justify-content-end align-items-center" style={{width: "100%"}}>
-                    <p className="font-semibold"
-                       style={{color: "#8c5e58", fontSize: "18px", margin: "10px"}}>
-                        Tạm tính: <span
-                        style={{color: "red"}}>{calculateTotal().toLocaleString("vi-VN", {
+                    <p className="font-semibold text-dGreen fs-18"
+                       style={{margin: "10px"}}>
+                        Tạm tính: <span className="priceAmount">{calculateTotal().toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
                     })}</span>
                     </p>
-                    <button className="btn btn-primary font-semibold"
+                    <button className="butn font-semibold rounded shadow fs-16 btn-20"
                             style={{
                                 padding: "10px 20px",
-                                fontSize: "16px",
                                 borderRadius: "5px"
                             }}
                             onClick={handleBuy}>

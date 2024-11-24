@@ -66,14 +66,13 @@ export default function Register() {
             <div className="row justify-content-center">
                 <div className="col-lg-6">
                     <form onSubmit={handleSubmit} className="border rounded p-4 shadow bg-light">
-                        <p className="text-center mb-4 font-bold" style={{color: '#8c5e58', fontSize: "30px"}}>Đăng
+                        <p className="text-center mb-2 font-bold text-dGreen fs-30">Đăng
                             Ký</p>
                         <div className="mb-3">
-                            <label htmlFor="email" className="form-label font-semibold"
-                                   style={{color: '#8c5e58'}}>Họ và Tên</label>
+                            <label htmlFor="email" className="form-label font-semibold text-dGreen">Họ và Tên</label>
                             <input
                                 type="text"
-                                className="form-control border-0 shadow-sm"
+                                className="form-control border-0 shadow-sm rounded"
                                 id="fullName"
                                 name="fullName"
                                 value={formData.fullName}
@@ -87,11 +86,10 @@ export default function Register() {
                             )}
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="email" className="form-label font-semibold"
-                                   style={{color: '#8c5e58'}}>Email</label>
+                            <label htmlFor="email" className="form-label font-semibold text-dGreen">Email</label>
                             <input
                                 type="text"
-                                className="form-control border-0 shadow-sm"
+                                className="form-control border-0 shadow-sm rounded"
                                 id="email"
                                 name="email"
                                 value={formData.email}
@@ -105,11 +103,10 @@ export default function Register() {
                             )}
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="password" className="form-label font-semibold"
-                                   style={{color: '#8c5e58'}}>Mật khẩu</label>
+                            <label htmlFor="password" className="form-label font-semibold text-dGreen">Mật khẩu</label>
                             <input
                                 type="password"
-                                className="form-control border-0 shadow-sm"
+                                className="form-control border-0 shadow-sm rounded"
                                 id="password"
                                 name="password"
                                 value={formData.password}
@@ -123,11 +120,10 @@ export default function Register() {
 
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="confirmPassword" className="form-label font-semibold"
-                                   style={{color: '#8c5e58'}}>Xác nhận Mật khẩu</label>
+                            <label htmlFor="confirmPassword" className="form-label font-semibold text-dGreen">Xác nhận Mật khẩu</label>
                             <input
                                 type="password"
-                                className="form-control border-0 shadow-sm"
+                                className="form-control border-0 shadow-sm rounded"
                                 id="confirmPassword"
                                 name="confirmPassword"
                                 value={formData.confirmPassword}
@@ -140,12 +136,11 @@ export default function Register() {
                                 </div>
                             )}
                         </div>
-                        <button type="submit" className="btn btn-primary w-100 font-semibold mt-1"
-                                style={{color: '#442e2b'}}>Đăng Ký
+                        <button type="submit" className="butn shadow rounded w-100 font-semibold mt-1">Đăng Ký
                         </button>
                         <div className="mt-3 text-center">
-                            <p className="font-semibold" style={{color: '#8c5e58'}}>Bạn đã có tài khoản? <a
-                                href="/login" className="text-decoration-none font-bold" style={{color: '#8c5e58'}}>Đăng
+                            <p className="font-semibold text-dGreen">Bạn đã có tài khoản? <a
+                                href="/login" className="text-decoration-none font-bold lg-now">Đăng
                                 nhập ngay</a></p>
                         </div>
                     </form>

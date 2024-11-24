@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getAddress, deleteAddress } from "../../../../services/Address";
 import Swal from "sweetalert2";
 import {toast} from "react-toastify";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function List_Address() {
     const [loading, setLoading] = useState(true);
@@ -24,7 +26,6 @@ export default function List_Address() {
         } catch (err) {
             console.error('Error fetching addresses:', err);
             setAddresses([]); // Đảm bảo addresses không bị undefined
-            Swal.fire('Lỗi', 'Lỗi khi tải danh sách địa chỉ. Vui lòng thử lại.', 'error');
         } finally {
             setLoading(false); // Kết thúc tải dữ liệu
         }
@@ -50,8 +51,7 @@ export default function List_Address() {
 
                 // Cập nhật lại danh sách địa chỉ sau khi xóa
                 setAddresses(prevAddresses => prevAddresses.filter(address => address.id !== id));
-
-                Swal.fire('Thành công', 'Xóa địa chỉ thành công.', 'success');
+                toast.success("Xóa địa chỉ thành công.");
             } catch (error) {
                 console.error("Lỗi khi xóa địa chỉ:", error);
                 toast.error("Không thể xóa địa chỉ.");
@@ -63,37 +63,52 @@ export default function List_Address() {
         <div className="container">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <p
-                    style={{ fontSize: "24px", color: "#8c5e58", marginBottom: "30px" }}
-                    className="text-center font-semibold flex-grow-1 m-0"
+                    className="text-center font-semibold flex-grow-1 m-0 text-dGreen fs-24 mb-3"
                 >
                     Địa Chỉ Của Tôi
                 </p>
                 <NavLink to={`/add-address`}>
-                    <button className="btn btn-primary font-semibold" style={{ color: '#442e2b' }}>
+                    <button className="butn w-100 py-3 px-3 rounded font-semibold shadow">
                         Thêm địa chỉ
                     </button>
                 </NavLink>
             </div>
             {loading ? (
-                <div className="d-flex flex-column align-items-center" style={{ marginTop: '10rem', marginBottom: '10rem' }}>
-                    <FontAwesomeIcon icon={faSpinner} spin style={{ fontSize: '4rem', color: '#8c5e58' }} />
-                    <p className="mt-3" style={{ color: '#8c5e58', fontSize: '18px' }}>Đang tải...</p>
-                </div>
+                <ul className="list-group">
+                    {Array.from({length: 5}).map((_, index) => (
+                        <li
+                            key={index}
+                            className="list-group-item d-flex justify-content-between align-items-center text-dGreen"
+                        >
+                            <Skeleton width="60%" height="20px"/>
+                            <div className="d-flex justify-content-evenly">
+                                <Skeleton circle={true} width={40} height={40}/>
+                                <Skeleton
+                                    circle={true}
+                                    width={40}
+                                    height={40}
+                                    style={{marginLeft: "10px"}}
+                                />
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             ) : (
                 <ul className="list-group">
                     {addresses.map((address) => (
                         <li
                             key={address.id}
-                            className="list-group-item d-flex justify-content-between align-items-center"
+                            className="list-group-item d-flex justify-content-between align-items-center text-dGreen"
                         >
                             {address.address}
-                            <div>
+                            <div className="d-flex justify-content-evenly">
                                 <NavLink to={`/edit-address/${address.id}`}>
-                                    <button className="btn btn-primary font-semibold" style={{color: '#442e2b'}}>
+                                    <button className="btn-tk btn-address rounded font-semibold shadow">
                                         <i className="fa-solid fa-pen"></i>
                                     </button>
                                 </NavLink>
-                                <button className="btn btn-primary font-semibold" style={{color: '#442e2b', marginLeft: '10px'}} onClick={() => handleDelete(address.id)}>
+                                <button className="btn-huy btn-address rounded font-semibold shadow"
+                                        style={{marginLeft: '10px'}} onClick={() => handleDelete(address.id)}>
                                     <i className="fa-solid fa-trash"></i>
                                 </button>
                             </div>

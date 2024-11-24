@@ -4,8 +4,10 @@ import "../../../assets/styles/css/bootstrap.min.css";
 import {NavLink, useLocation, useNavigate} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {getUserInfo, changeProfile} from "../../../services/User";
-import Swal from "sweetalert2";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import {toast} from "react-toastify";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Edit_Profile() {
     const location = useLocation();
@@ -140,9 +142,8 @@ export default function Edit_Profile() {
 
         try {
             await changeProfile(formData); // Gửi request lên server
-            Swal.fire('Thành công', 'Cập nhật thông tin thành công.', 'success').then(() => {
-                navigate('/profile'); // Chuyển hướng sang trang profile sau khi thông báo thành công
-            });
+            toast.success("Cập nhật thông tin thành công.");
+            navigate('/profile');
         } catch (error) {
             console.error("Lỗi khi cập nhật thông tin:", error);
         } finally {
@@ -153,21 +154,16 @@ export default function Edit_Profile() {
     return (
         <>
             <div className="container py-5">
-                {/* Hiển thị loading nếu đang trong trạng thái loading */}
-                {loading ? (
-                    <div className="d-flex flex-column align-items-center"
-                         style={{marginTop: '10rem', marginBottom: '10rem'}}>
-                        <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                        <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
-                    </div>
-                ) : (
-                    <div className="row g-4 align-items-center">
-                        <div className="col-lg-4 text-center">
-                            <div className="d-flex flex-column align-items-center position-relative">
+                <div className="row g-4 align-items-center">
+                    <div className="col-lg-4 text-center">
+                        <div className="d-flex flex-column align-items-center position-relative">
+                            {loading ? (
+                                <Skeleton circle width={250} height={250}/>
+                            ) : (
                                 <img
                                     src={selectedImage || user.image || "https://via.placeholder.com/300"}
                                     alt="User Avatar"
-                                    className="img-fluid rounded-circle mb-3"
+                                    className="img-fluid rounded-circle mb-3 shadow"
                                     style={{
                                         width: '250px',
                                         height: '250px',
@@ -175,37 +171,51 @@ export default function Edit_Profile() {
                                         objectPosition: 'center',
                                     }}
                                 />
-                                <label htmlFor="file-upload"
-                                       className="position-absolute bottom-0 start-50 translate-middle-x mb-3"
-                                       style={{cursor: 'pointer'}}>
-                                    <i className="fa-solid fa-camera" style={{fontSize: '30px', color: '#000'}}></i>
-                                </label>
-                                <input
-                                    id="file-upload"
-                                    type="file"
-                                    className="d-none"
-                                    accept="image/jpeg, image/png, image/jpg, image/gif" // Chỉ nhận ảnh
-                                    onChange={handleImageChange}
-                                />
-                            </div>
+                            )}
+                            {!loading && (
+                                <>
+                                    <label htmlFor="file-upload"
+                                           className="position-absolute bottom-0 start-50 translate-middle-x mb-3"
+                                           style={{cursor: 'pointer'}}>
+                                        <i className="fa-solid fa-camera fs-30 ic"></i>
+                                    </label>
+                                    <input
+                                        id="file-upload"
+                                        type="file"
+                                        className="d-none"
+                                        accept="image/jpeg, image/png, image/jpg, image/gif" // Chỉ nhận ảnh
+                                        onChange={handleImageChange}
+                                    />
+                                </>
+                            )}
+                        </div>
+                        {!loading && (
                             <div className="text-center">
                                 <NavLink to={`/profile`}>
-                                    <button className="btn btn-primary mt-3 font-semibold"
-                                            style={{color: '#442e2b'}}>
+                                    <button className="btn-tk mt-3 font-semibold rounded shadow">
                                         Hủy bỏ
                                     </button>
                                 </NavLink>
                             </div>
-                        </div>
-                        <div className="col-lg-8">
-                            <div className="p-4 bg-light border rounded">
-                                <p className="font-semibold mb-4 text-center"
-                                   style={{color: "#8c5e58", fontSize: "30px"}}>Chỉnh sửa thông tin cá
-                                    nhân</p>
+                        )}
+                    </div>
+                    <div className="col-lg-8">
+                        <div className="p-4 bg-light border rounded shadow">
+                            <p className="font-semibold mb-4 text-center text-dGreen fs-30">
+                                {loading ? <Skeleton width={300} height={30}/> : "Chỉnh sửa thông tin cá nhân"}
+                            </p>
+                            {loading ? (
+                                <>
+                                    <Skeleton width="20%" height={40} className="mb-3"/>
+                                    <Skeleton width="100%" height={40} className="mb-3"/>
+                                    <div className="d-flex justify-center">
+                                        <Skeleton width={150} height={40} className="text-center"/>
+                                    </div>
+                                </>
+                            ) : (
                                 <form>
                                     <div className="form-group mb-2">
-                                        <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                               className="font-semibold mb-2">Họ và tên:</label>
+                                        <label className="font-semibold mb-2 text-dGreen fs-30">Họ và tên:</label>
                                         <input
                                             type="text"
                                             className="form-control rounded"
@@ -215,16 +225,18 @@ export default function Edit_Profile() {
                                         />
                                         {errors.name && <div className="text-danger mt-2">{errors.name}</div>}
                                     </div>
-                                    <button className="btn btn-primary w-100 mt-3 font-semibold" type="submit"
-                                            style={{color: '#442e2b', fontSize: "20px"}}
-                                            onClick={handleSubmit} disabled={loading}>
-                                        {loading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
-                                    </button>
+                                    <div className="text-center">
+                                        <button className="btn-tk btn-20 mt-3 font-semibold fs-20 rounded shadow"
+                                                type="submit"
+                                                onClick={handleSubmit} disabled={loading}>
+                                            {loading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
+                                        </button>
+                                    </div>
                                 </form>
-                            </div>
+                            )}
                         </div>
                     </div>
-                )}
+                </div>
             </div>
         </>
     );

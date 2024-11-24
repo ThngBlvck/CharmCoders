@@ -8,9 +8,12 @@ import Slider from "react-slick";
 import {faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {getProduct, searchProduct, getCheckoutData} from "../../../services/Product";
 import {getBrand} from '../../../services/Brand';
-import Swal from "sweetalert2";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {addToCart} from "../../../services/Cart";
+import {toast} from "react-toastify";
+import Swal from "sweetalert2";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Home() {
     const {id} = useParams();
@@ -59,7 +62,7 @@ export default function Home() {
         } catch (err) {
             console.error('Error fetching brands:', err);
             setBrands([]);
-            Swal.fire('Lỗi', 'Lỗi khi tải danh sách nhãn hàng. Vui lòng thử lại.', 'error');
+            toast.error("Lỗi khi tải danh sách nhãn hàng. Vui lòng thử lại.");
         }
         setLoading(false); // Tắt trạng thái loading
     };
@@ -90,52 +93,80 @@ export default function Home() {
     };
 
     const handleBuyNow = async (productId, quantity) => {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Yêu cầu đăng nhập',
+                text: 'Bạn cần đăng nhập để mua sản phẩm.',
+                confirmButtonText: 'Đăng nhập',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigate("/login"); // Chuyển hướng đến trang đăng nhập
+                }
+            });
+            return;
+        }
+
         console.log(`Adding to cart with data: {product_id: ${productId}, quantity: ${quantity}}`);
         try {
             const response = await addToCart(productId, quantity);
-            Swal.fire('Thành công', 'Thêm vào giỏ hàng thành công.', 'success');
+            toast.success("Sản phẩm đã được thêm vào giỏ hàng.");
             navigate(`/cart?productId=${productId}`);
         } catch (error) {
             console.error('Lỗi khi thêm vào giỏ hàng:', error); // Lưu ý không ghi log đối tượng toàn bộ
+            toast.error("Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.");
         }
     };
 
     return (
         <>
             {loading ? (
-                <div className="d-flex flex-column align-items-center"
-                     style={{marginTop: '10rem', marginBottom: '10rem'}}>
-                    <FontAwesomeIcon icon={faSpinner} spin style={{fontSize: '4rem', color: '#8c5e58'}}/>
-                    <p className="mt-3" style={{color: '#8c5e58', fontSize: '18px'}}>Đang tải...</p>
+                <div className="row">
+                    {Array.from({length: 8}).map((_, index) => (
+                        <div key={index} className="col-md-6 col-lg-3 mb-3">
+                            <div className="card text-center p-2 shadow rounded">
+                                <Skeleton height={150} className="img-fluid rounded img-pro"/>
+                                <div className="card-body">
+                                    <Skeleton height={20} width="80%" style={{marginBottom: "10px"}}/>
+                                    <Skeleton height={20} width="60%"/>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    <div className="container-fluid about py-2 shadow mb-3 mt-3 rounded">
+                        <Skeleton height={300} width="100%"/>
+                    </div>
+                    <div className="container-fluid about py-2 shadow mb-3 mt-3 rounded">
+                        <Skeleton height={300} width="100%"/>
+                    </div>
                 </div>
             ) : (
                 <>
-                    <div className="container-fluid services py-1 d-flex">
+                    <div className="container-fluid py-1 d-flex">
                         <div className="container py-5">
                             <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
-                                <p className="fs-4 text-center text-primary font-bold custom-font">GlowMakers</p>
-                                <p className="font-bold" style={{color: '#8c5e58', fontSize: "30px"}}>Các sản phẩm mới
+                                <p className="fs-4 text-center text-dGreen font-bold">GlowMakers</p>
+                                <p className="font-bold text-dGreen fs-30">Các sản phẩm mới
                                     nhất</p>
                             </div>
                             <div className="row g-4">
-                                <div className="row">
+                            <div className="row">
                                     {products && products.length > 0 ? (
                                         products.map((product, index) => (
                                             <div key={product.id} className="col-md-6 col-lg-3 mb-3">
-                                                <div className="card text-center bg-hover"
-                                                     style={{borderRadius: '15px', padding: '20px'}}>
+                                                <div className="card text-center bg-hover shadow rounded p-2">
                                                     <NavLink to={`/products/${product.id}`}>
                                                         <img
                                                             src={product.image || "https://via.placeholder.com/500"}
-                                                            className="card-img-top img-fluid rounded"
+                                                            className="card-img-top img-fluid rounded img-pro"
                                                             alt="Product"
-                                                            style={{maxHeight: '200px', objectFit: 'cover'}}
                                                         />
                                                     </NavLink>
                                                     <div className="card-body">
                                                         <NavLink to={`/products/${product.id}`}>
-                                                            <p className="card-title font-semibold"
-                                                               style={{color: '#8c5e58'}}>
+                                                            <p className="card-title font-semibold text-dGreen">
                                                                 {product.name.length > 30 ? product.name.substring(0, 20) + "..." : product.name}
                                                             </p>
                                                         </NavLink>
@@ -146,11 +177,7 @@ export default function Home() {
                                                             {product.sale_price && product.sale_price < product.unit_price ? (
                                                                 <>
                                                                     {/* Giá sản phẩm gốc bị gạch ngang */}
-                                                                    <p className="card-text mb-2 font-semibold" style={{
-                                                                        color: '#8c5e58',
-                                                                        textDecoration: 'line-through',
-                                                                        flex: 1
-                                                                    }}>
+                                                                    <p className="card-text mb-2 font-semibold text-dGreen text-decoration-line-through flex-1 fs-14">
                                                                         {product.unit_price.toLocaleString("vi-VN", {
                                                                             style: "currency",
                                                                             currency: "VND"
@@ -158,11 +185,7 @@ export default function Home() {
                                                                     </p>
 
                                                                     {/* Giá sale nằm bên phải */}
-                                                                    <p className="card-text mb-2 font-semibold" style={{
-                                                                        color: '#e74c3c',
-                                                                        flex: 1,
-                                                                        textAlign: 'right'
-                                                                    }}>
+                                                                    <p className="card-text mb-2 font-semibold salePr fs-16 flex-1">
                                                                         {product.sale_price.toLocaleString("vi-VN", {
                                                                             style: "currency",
                                                                             currency: "VND"
@@ -171,11 +194,7 @@ export default function Home() {
                                                                 </>
                                                             ) : (
                                                                 // Nếu không có giá sale, đơn giản là hiển thị giá gốc ở giữa
-                                                                <p className="card-text mb-2 font-semibold" style={{
-                                                                    color: '#8c5e58',
-                                                                    textAlign: 'center',
-                                                                    flex: 1
-                                                                }}>
+                                                                <p className="card-text mb-2 font-semibold text-dGreen text-center flex-1 fs-16">
                                                                     {product.unit_price.toLocaleString("vi-VN", {
                                                                         style: "currency",
                                                                         currency: "VND"
@@ -185,20 +204,18 @@ export default function Home() {
                                                         </div>
 
                                                         {product.quantity === 0 ? (
-                                                            <p className="text-danger font-bold"
-                                                               style={{fontSize: '16px', marginTop: '10px'}}>Hết
+                                                            <p className="text-danger font-bold fs-16"
+                                                               style={{marginTop: '10px'}}>Hết
                                                                 hàng</p>
                                                         ) : (
                                                             <button
-                                                                className="btn btn-primary mr-2 font-bold w-100"
+                                                                className="butn mr-2 font-semibold w-100 fs-14 rounded"
                                                                 style={{
                                                                     padding: '16px',
-                                                                    fontSize: '14px',
-                                                                    color: '#442e2b',
-                                                                    borderRadius: '5px',
-                                                                    width: '150px',
+                                                                    width: '140px',
                                                                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                                                                    backgroundColor: product.quantity === 0 ? "#dcdcdc" : "#ffa69e", // Disabled button color when out of stock
+                                                                    backgroundColor: product.quantity === 0 ? "#dcdcdc" : "#228B22", // Disabled button color when out of stock
+                                                                    color: product.quantity === 0 ? "black" : "white",
                                                                     cursor: product.quantity === 0 ? "not-allowed" : "pointer"
                                                                 }}
                                                                 onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}
@@ -211,29 +228,24 @@ export default function Home() {
                                                     </div>
                                                 </div>
                                             </div>
-
                                         ))
                                     ) : (
-                                        <p className="text-center">Không có sản phẩm để hiển thị</p>
+                                        <p className="text-center text-dGreen">Không có sản phẩm để hiển thị</p>
                                     )}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="container-fluid about py-2">
+                    <div className="container-fluid about py-2 shadow mb-3 rounded">
                         <div className="container py-5">
                             <div className="row g-5 align-items-center">
                                 {/* Hình ảnh bên trái */}
                                 <div className="col-lg-5">
                                     <div className="video">
-                                        <img src="https://via.placeholder.com/400x300" className="img-fluid rounded"
-                                             alt="About Us"/>
-                                        <div
-                                            className="position-absolute rounded border-5 border-top border-start border-white"
-                                            style={{bottom: '0', right: '0'}}>
-                                            <img src="https://via.placeholder.com/200x150" className="img-fluid rounded"
-                                                 alt="Extra Image"/>
+                                        <img src="toner.png" className="img-fluid rounded"/>
+                                        <div className="position-absolute rounded border-top border-start border-white bottom-0 right-0">
+                                            <img src="toner.png" width={"200px"} className="img-fluid rounded"/>
                                         </div>
 
                                     </div>
@@ -242,11 +254,10 @@ export default function Home() {
                                 {/* Nội dung giới thiệu */}
                                 <div className="col-lg-7">
                                     <div>
-                                        <p className="fs-4 text-primary font-semibold custom-font">Về Chúng Tôi</p>
-                                        <p className="mb-4 font-bold"
-                                           style={{color: '#8c5e58', fontSize: "30px"}}>GlowMakers –
+                                        <p className="fs-4 text-dGreen font-semibold">Về Chúng Tôi</p>
+                                        <p className="mb-4 font-bold text-dGreen fs-30">GlowMakers –
                                             Cửa hàng mỹ phẩm dưỡng da, dưỡng môi chính hãng.</p>
-                                        <p className="mb-4" style={{color: '#8c5e58'}}>
+                                        <p className="mb-4 text-dGreen">
                                             GlowMakers là cửa hàng mỹ phẩm chuyên cung cấp các sản phẩm dưỡng da và
                                             dưỡng môi
                                             cao cấp, mang lại vẻ đẹp tự nhiên và rạng rỡ cho phái đẹp. Với sứ mệnh giúp
@@ -256,7 +267,7 @@ export default function Home() {
                                             xuất từ thiên nhiên, phù hợp cho mọi loại da...
                                         </p>
                                         <NavLink to="/about"
-                                                 className="btn btn-primary btn-primary-outline-0 rounded-pill py-3 px-5">
+                                                 className="butn w-25 rounded py-3 px-5 font-semibold shadow">
                                             Xem thêm
                                         </NavLink>
                                     </div>
@@ -265,18 +276,24 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <div className="container-fluid py-5" style={{backgroundColor: "#f9f9f9"}}>
+                    <div className="container-fluid py-5 bg-brand shadow mt-3 rounded">
                         <div className="container text-center">
-                            <p className="font-bold mb-5" style={{color: "#8c5e58", fontSize: "30px"}}>Các thương
+                            <p className="font-bold mb-5 text-dGreen fs-30">Các thương
                                 hiệu</p>
                             <Slider className="mb-5 position-relative" {...sliderSettings}>
-                                {brands.length > 0 ? (
+                                {loading ? (
+                                    Array.from({ length: 5 }).map((_, index) => (
+                                        <div key={index} className="text-center">
+                                            <Skeleton width={150} height={150} circle={true} />
+                                            <Skeleton height={20} width={100} className="mt-2" />
+                                        </div>
+                                    ))
+                                ) : brands.length > 0 ? (
                                     brands.map((brand) => (
                                         <div key={brand.id}
                                              className="text-center d-flex flex-column align-items-center card-style">
-                                            <div className="brand-card w-100" style={{
+                                            <div className="brand-card w-100 bg-white" style={{
                                                 padding: "15px",
-                                                backgroundColor: "#fff",
                                                 borderRadius: "15px",
                                                 boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                                                 maxWidth: "170px",
@@ -296,10 +313,8 @@ export default function Home() {
                                                          objectFit: "contain" // Giữ nguyên tỷ lệ của hình ảnh
                                                      }}/>
                                             </div>
-                                            <p className="mt-2" style={{
-                                                color: "#8c5e58",
+                                            <p className="mt-2 text-dGreen fs-16" style={{
                                                 fontWeight: "bold",
-                                                fontSize: "16px",
                                                 textTransform: "uppercase"
                                             }}>
                                                 {brand.name}
@@ -307,12 +322,9 @@ export default function Home() {
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-center">Không có thương hiệu nào.</p>
+                                    <p className="text-center text-dGreen">Không có thương hiệu nào.</p>
                                 )}
                             </Slider>
-                            <NavLink to="/brands" className="btn btn-secondary rounded-pill py-3 px-5 mt-1">
-                                Xem Tất Cả
-                            </NavLink>
                         </div>
                     </div>
                 </>

@@ -5,7 +5,7 @@ import {NavLink, useLocation, useNavigate} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import {postAddress} from "../../../../services/Address";
-import Swal from "sweetalert2";
+import { toast } from 'react-toastify';
 
 export default function Add_Address() {
     const location = useLocation();
@@ -152,10 +152,10 @@ export default function Add_Address() {
         // Gọi hàm checkout với dữ liệu đã chuẩn bị
         try {
             const result = await postAddress(addressData);
-            Swal.fire('Thành công', 'Thêm địa chỉ thành công.', 'success');
+            toast.success("Thêm địa chỉ thành công.");
             navigate(`/address`);
         } catch (error) {
-            Swal.fire('Thất bại', 'Thêm địa chỉ thất bại.', 'error');
+            toast.error("Thêm địa chỉ thất bại.");
         }
     };
 
@@ -164,20 +164,17 @@ export default function Add_Address() {
             <div className="container py-5">
                 <div className="row g-4 justify-center">
                     <div className="col-8">
-                        <div className="p-4 bg-light border rounded">
-                            <p className="font-semibold mb-4 text-center"
-                               style={{color: "#8c5e58", fontSize: "30px"}}>Thêm Địa Chỉ</p>
+                        <div className="p-4 bg-light border rounded shadow">
+                            <p className="font-semibold mb-2 text-center text-dGreen fs-30">Thêm Địa Chỉ</p>
                             <form>
-                                <label style={{color: "#8c5e58", fontSize: "20px"}}
-                                       className="font-semibold mb-2">Địa Chỉ:</label>
+                                <label className="font-semibold mb-2 text-dGreen fs-20">Địa Chỉ:</label>
                                 <div className="d-flex justify-content-between">
                                     <div className="form-group mb-2" style={{flex: 1, marginRight: "10px"}}>
                                         <select
-                                            className="form-control rounded"
+                                            className="form-control rounded text-dGreen bg-white"
                                             value={selectedProvince}
                                             onChange={handleProvinceChange}
                                             required
-                                            style={{backgroundColor: "white", color: "#8c5e58"}}
                                         >
                                             <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
                                             {provinces.map((province) => (
@@ -190,11 +187,10 @@ export default function Add_Address() {
 
                                     <div className="form-group mb-2" style={{flex: 1, marginRight: "10px"}}>
                                         <select
-                                            className="form-control rounded"
+                                            className="form-control rounded text-dGreen bg-white"
                                             value={selectedDistrict}
                                             onChange={handleDistrictChange}
                                             required
-                                            style={{backgroundColor: "white", color: "#8c5e58"}}
                                             disabled={!selectedProvince}
                                         >
                                             <option value="" className="font-bold">Chọn Quận/Huyện</option>
@@ -208,11 +204,10 @@ export default function Add_Address() {
 
                                     <div className="form-group mb-2" style={{flex: 1}}>
                                         <select
-                                            className="form-control rounded"
+                                            className="form-control rounded text-dGreen bg-white"
                                             value={selectedWard}
                                             onChange={handleWardChange}
                                             required
-                                            style={{backgroundColor: "white", color: "#8c5e58"}}
                                             disabled={!selectedDistrict}
                                         >
                                             <option value="" className="font-bold">Chọn Xã/Phường</option>
@@ -235,11 +230,12 @@ export default function Add_Address() {
                                     />
                                     {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                                 </div>
-                                <button className="btn btn-primary w-100 mt-3 font-semibold" type="submit"
-                                        style={{color: '#442e2b', fontSize: "20px"}}
-                                        onClick={handleSubmit}>
-                                    Thêm
-                                </button>
+                                <div className="d-flex justify-center">
+                                    <button className="butn w-25 rounded font-semibold fs-20 shadow" type="submit"
+                                            onClick={handleSubmit}>
+                                        Thêm
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>

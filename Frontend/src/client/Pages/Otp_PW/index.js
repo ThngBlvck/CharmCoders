@@ -96,24 +96,24 @@ export default function VerifyOtpAndResetPassword({ email }) {
 
     return (
         <div className="container py-5">
-            <h2 className="text-center mb-4">Xác Nhận OTP và Đặt Lại Mật Khẩu</h2>
+            <p className="text-center mb-4 text-dGreen fs-30 font-semibold">Xác Nhận OTP</p>
             <div className="row justify-content-center">
                 <div className="col-lg-6">
                     {!otpVerified ? (
                         // OTP Verification Form
                         <form onSubmit={handleSubmitOtp} className="border rounded p-4 shadow bg-light">
                             <div className="mb-3">
-                                <label htmlFor="otp" className="form-label">Mã OTP</label>
+                                <label htmlFor="otp" className="form-label text-dGreen font-semibold fs-16">Mã OTP</label>
                                 <input
                                     type="text"
-                                    className="form-control border"
+                                    className="form-control border rounded"
                                     id="otp"
                                     value={otp}
                                     onChange={handleChangeOtp}
                                     required
                                 />
                             </div>
-                            <button type="submit" className="btn btn-primary w-100">Xác Nhận OTP</button>
+                            <button type="submit" className="butn rounded shadow font-semibold w-100">Xác Nhận OTP</button>
                             {message && <div className="mt-3 alert alert-success">{message}</div>}
                             {error && <div className="mt-3 alert alert-danger">{error}</div>}
                         </form>
@@ -121,10 +121,10 @@ export default function VerifyOtpAndResetPassword({ email }) {
                         // Password Reset Form (after OTP is verified)
                         <form onSubmit={handleSubmitNewPassword} className="border rounded p-4 shadow bg-light">
                             <div className="mb-3">
-                                <label htmlFor="newPassword" className="form-label">Mật Khẩu Mới</label>
+                                <label htmlFor="newPassword" className="form-label text-dGreen font-semibold fs-16">Mật Khẩu Mới</label>
                                 <input
                                     type="password"
-                                    className="form-control border"
+                                    className="form-control border rounded"
                                     id="newPassword"
                                     value={newPassword}
                                     onChange={handleChangeNewPassword}
@@ -132,17 +132,17 @@ export default function VerifyOtpAndResetPassword({ email }) {
                                 />
                             </div>
                             <div className="mb-3">
-                                <label htmlFor="confirmPassword" className="form-label">Xác Nhận Mật Khẩu</label>
+                                <label htmlFor="confirmPassword" className="form-label text-dGreen font-semibold fs-16">Xác Nhận Mật Khẩu</label>
                                 <input
                                     type="password"
-                                    className="form-control border"
+                                    className="form-control border rounded"
                                     id="confirmPassword"
                                     value={confirmPassword}
                                     onChange={handleChangeConfirmPassword}
                                     required
                                 />
                             </div>
-                            <button type="submit" className="btn btn-primary w-100">Đặt Lại Mật Khẩu</button>
+                            <button type="submit" className="butn rounded shadow font-semibold w-100">Đặt Lại Mật Khẩu</button>
                             {message && <div className="mt-3 alert alert-success">{message}</div>}
                             {error && <div className="mt-3 alert alert-danger">{error}</div>}
                         </form>

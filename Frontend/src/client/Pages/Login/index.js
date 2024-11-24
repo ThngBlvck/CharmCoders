@@ -88,13 +88,13 @@ export default function Login() {
             <div className="row justify-content-center">
                 <div className="col-lg-6">
                     <form onSubmit={handleSubmit} className="border rounded p-4 shadow bg-light">
-                        <p className="text-center mb-4 font-bold" style={{ color: '#8c5e58', fontSize: "30px" }}>Đăng Nhập</p>
+                        <p className="text-center mb-2 font-bold text-dGreen fs-30">Đăng Nhập</p>
 
                         <div className="mb-3">
-                            <label htmlFor="email" className="form-label font-semibold" style={{ color: '#8c5e58' }}>Email</label>
+                            <label htmlFor="email" className="form-label font-semibold text-dGreen">Email</label>
                             <input
                                 type="email"
-                                className="form-control border-0 shadow-sm"
+                                className="form-control border-0 shadow-sm rounded"
                                 id="email"
                                 name="email"
                                 value={formData.email}
@@ -108,10 +108,10 @@ export default function Login() {
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="password" className="form-label font-semibold" style={{ color: '#8c5e58' }}>Mật khẩu</label>
+                            <label htmlFor="password" className="form-label font-semibold text-dGreen">Mật khẩu</label>
                             <input
                                 type="password"
-                                className="form-control border-0 shadow-sm"
+                                className="form-control border-0 shadow-sm rounded"
                                 id="password"
                                 name="password"
                                 value={formData.password}
@@ -125,12 +125,14 @@ export default function Login() {
                         </div>
 
                         <div className="mt-3">
-                            <a href="/forgot-password" className="text-decoration-none font-semibold" style={{ color: '#8c5e58' }}>Quên mật khẩu?</a>
+                            <a href="/forgot-password" className="text-decoration-none font-semibold text-dGreen">Quên mật khẩu?</a>
                         </div>
 
-                        <button type="submit" className="btn btn-primary w-100 font-semibold mt-3" style={{ color: '#442e2b' }} disabled={loading}>
-                            {loading ? "Đang xử lý..." : "Đăng Nhập"}
-                        </button>
+                        <div className="d-flex justify-center">
+                            <button type="submit" className="butn rounded w-100 font-semibold mt-3 shadow" disabled={loading}>
+                                {loading ? "Đang xử lý..." : "Đăng Nhập"}
+                            </button>
+                        </div>
 
                         {errorMessage && (
                             <div className="text-danger mt-3" role="alert">
@@ -140,21 +142,21 @@ export default function Login() {
 
                         {/* Social Login Buttons */}
                         {/* Social Login Buttons */}
-                        <div className="text-center mt-4">
-                            <p className="font-semibold" style={{ color: '#8c5e58' }}>Hoặc đăng nhập bằng</p>
+                        <div className="text-center mt-2">
+                            <p className="font-semibold mb-2 text-dGreen">Hoặc đăng nhập bằng</p>
                             <div className="d-flex justify-content-center gap-3">
-                                <a href={GoogleloginUrl} className="btn btn-danger d-flex align-items-center px-3 py-2 rounded-pill" style={{ gap: '8px' }}>
+                                <a href={GoogleloginUrl} className="gg shadow d-flex align-items-center px-3 py-2 rounded-pill" style={{ gap: '8px' }}>
                                     <i className="fab fa-google"></i> Google
                                 </a>
-                                <a href={FacebookloginUrl} className="btn btn-info d-flex align-items-center px-3 py-2 rounded-pill" style={{ gap: '8px' }}>
+                                <a href={FacebookloginUrl} className="fb shadow d-flex align-items-center px-3 py-2 rounded-pill" style={{ gap: '8px' }}>
                                     <i className="fab fa-facebook-f"></i> Facebook
                                 </a>
                             </div>
                         </div>
 
 
-                        <div className="mt-3 text-center">
-                            <p className="font-semibold" style={{ color: '#8c5e58' }}>Bạn chưa có tài khoản? <a href="/register" className="text-decoration-none font-bold" style={{ color: '#8c5e58' }}>Đăng ký ngay</a></p>
+                        <div className="mt-2 text-center">
+                            <p className="font-semibold text-dGreen">Bạn chưa có tài khoản? <a href="/register" className="text-decoration-none font-bold text-dGreen rt-now">Đăng ký ngay</a></p>
                         </div>
                     </form>
                 </div>

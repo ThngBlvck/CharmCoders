@@ -10,7 +10,9 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { getUserInfo } from "../../../services/User";
 import { checkout, momoCheckout } from '../../../services/Checkout';
 import axios from "axios";
-import Swal from "sweetalert2";
+import { toast } from 'react-toastify';
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Checkout() {
     const [formData, setFormData] = useState({
@@ -209,15 +211,35 @@ export default function Checkout() {
         }
     };
 
+    const total = (item) => {
+        // Sử dụng sale_price nếu tồn tại, nếu không thì lấy unit_price
+        const price = item.sale_price || item.unit_price;
+        return price * item.quantity;
+    };
+
     const calculateTotal = () => {
         if (!Array.isArray(products) || products.length === 0) {
             return 0; // Trả về 0 nếu không phải là mảng hoặc mảng rỗng
         }
-        return products.reduce((total, item) => total + (item.unit_price * item.quantity), 0);
+        return products.reduce((total, item) => {
+            // Sử dụng sale_price nếu tồn tại, nếu không thì lấy unit_price
+            const price = item.sale_price || item.unit_price;
+            return total + (price * item.quantity);
+        }, 0);
     };
 
-    const total = (item) => {
-        return item.unit_price * item.quantity;
+    // Hàm tính tổng tiền tiết kiệm
+    const calculateSavings = () => {
+        if (!Array.isArray(products) || products.length === 0) {
+            return 0; // Trả về 0 nếu không phải là mảng hoặc mảng rỗng
+        }
+        return products.reduce((savings, item) => {
+            // Kiểm tra nếu có sale_price thì tính phần tiết kiệm
+            if (item.sale_price) {
+                return savings + ((item.unit_price - item.sale_price) * item.quantity);
+            }
+            return savings;
+        }, 0);
     };
 
     const fetchUserInfo = async () => {
@@ -304,10 +326,10 @@ export default function Checkout() {
         } else {
             try {
                 const result = await checkout(orderData);  // Gửi request với orderData có cart_ids
-                Swal.fire('Thành công', 'Thanh toán thành công.', 'success');
-                navigate(`/order-list`);
+                toast.success("Thanh toán thành công.");
+                navigate(`/payment-result?resultCode=0`);
             } catch (error) {
-                Swal.fire('Thất bại', 'Thanh toán thất bại.', 'error');
+                toast.error("Thanh toán thất bại.");
             }
         }
     };
@@ -341,11 +363,11 @@ export default function Checkout() {
             if (payUrl) {
                 window.location.href = payUrl;
             } else {
-                Swal.fire("Lỗi", "Không nhận được URL thanh toán MoMo.", "error");
+                toast.error("Không nhận được đường dẫn thanh toán MoMo.");
             }
         } catch (error) {
             console.error("Lỗi thanh toán MoMo:", error);
-            Swal.fire("Lỗi", "Không thể tạo đơn hàng. Vui lòng thử lại.", "error");
+            toast.error("Không thể tạo đơn hàng. Vui lòng thử lại.");
         }
     };
 
@@ -356,114 +378,142 @@ export default function Checkout() {
                 <>
                     {/* Hiển thị sản phẩm */}
                     <div className="col-md-6">
-                        <p className="mb-4 font-semibold" style={{ color: "#8c5e58", fontSize: "30px" }}>Sản phẩm của
+                        <p className="mb-4 font-semibold text-dGreen fs-30">Sản phẩm của
                             bạn</p>
                         <div className="list-group">
                             {loading ? (
-                                <div className="d-flex flex-column align-items-center"
-                                    style={{ marginTop: '10rem', marginBottom: '10rem' }}>
-                                    <FontAwesomeIcon icon={faSpinner} spin
-                                        style={{ fontSize: '4rem', color: '#8c5e58' }} />
-                                    <p className="mt-3" style={{ color: '#8c5e58', fontSize: '18px' }}>Đang tải...</p>
-                                </div>
+                                Array.from({ length: 3 }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="list-group-item d-flex justify-content-between align-items-center"
+                                    >
+                                        {/* Skeleton cho hình ảnh sản phẩm */}
+                                        <div className="d-flex align-items-center">
+                                            <Skeleton
+                                                className="me-3"
+                                                width={80}
+                                                height={80}
+                                                style={{ borderRadius: "5px" }}
+                                            />
+                                            {/* Skeleton cho thông tin sản phẩm */}
+                                            <div>
+                                                <Skeleton width="70%" height={20} className="mb-2" />
+                                                <Skeleton width="50%" height={15} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
                             ) : (
                                 Array.isArray(products) && products.length > 0 ? (
                                     products.map(item => (
                                         <div key={item.id}
-                                            className="list-group-item d-flex justify-content-between align-items-center">
+                                             className="list-group-item d-flex justify-content-between align-items-center">
                                             <div className="d-flex align-items-center">
-                                                <img src={item.image} alt={item.name} className="img-thumbnail me-3"
-                                                    style={{ width: "100px", height: "100px" }} />
+                                                <img src={item.image} alt={item.name} className="img-thumbnail me-3 img-checkout"/>
                                                 <div>
-                                                    <p style={{
-                                                        color: "#8c5e58", overflow: "hidden", // Ẩn phần không hiển thị
-                                                        textOverflow: "ellipsis", // Thêm dấu ... nếu dài hơn
-                                                        whiteSpace: "normal", // Cho phép xuống dòng
-                                                        maxHeight: "3em",
-                                                    }}>{item.name.length > 100 ? item.name.substring(0, 100) + "..." : item.name}</p>
-                                                    <p className="mb-0"
-                                                        style={{ color: "#8c5e58" }}>{item.unit_price.toLocaleString("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
-                                                        })} x {item.quantity}</p>
-                                                    <p style={{ color: "#8c5e58" }}>Tổng: {total(item).toLocaleString("vi-VN", {
-                                                        style: "currency",
-                                                        currency: "VND",
-                                                    })}</p>
+                                                    <p className="text-dGreen name-checkout">
+                                                        {item.name.length > 100 ? item.name.substring(0, 100) + "..." : item.name}
+                                                    </p>
+                                                    <p className="mb-0 text-dGreen">
+                                                        {item.sale_price ? (
+                                                            <>
+                                                            <span className="text-decoration-line-through text-dGreen fs-14">
+                                                                {item.unit_price.toLocaleString("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND"
+                                                                })}
+                                                            </span>
+                                                                {" "}
+                                                                <span className="font-bold salePr fs-16">
+                                                                {item.sale_price.toLocaleString("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND"
+                                                                })}
+                                                            </span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-dGreen fs-16">
+                                                                {item.unit_price.toLocaleString("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND"
+                                                                })}
+                                                            </span>
+                                                        )}
+                                                        {" x "}{item.quantity}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <p>Không có sản phẩm nào.</p>
+                                    <p className="text-dGreen font-semibold fs-20">Không có sản phẩm nào.</p>
                                 )
                             )}
                         </div>
 
-                        <p className="mt-4 font-semibold"
-                            style={{ color: "#8c5e58" }}>Thành tiền: {calculateTotal().toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                            })}</p>
+                        <p className="mt-4 font-semibold text-dGreen">Thành tiền: {calculateTotal().toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                        })}</p>
+                        <span className="text-dGreen">(Tiết kiệm: {calculateSavings().toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND"
+                        })})</span>
                     </div>
 
                     {/* Form thông tin người dùng */}
                     <div className="col-md-6">
-                        <p className="mb-4 font-semibold" style={{ color: "#8c5e58", fontSize: "30px" }}>Thông tin
+                        <p className="mb-4 font-semibold text-dGreen fs-30">Thông tin
                             thanh toán</p>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
-                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Họ và
+                                <label className="form-label font-semibold text-dGreen">Họ và
                                     Tên</label>
                                 <input
                                     type="text"
-                                    className="form-control rounded"
+                                    className="form-control rounded text-dGreen"
                                     name="name"
                                     value={formData.name || ""}
                                     onChange={handleChange}
                                     required
-                                    style={{ color: "#8c5e58" }}
                                 />
                                 {errors.name && <div className="text-danger mt-2">{errors.name}</div>}
                             </div>
                             <div className="mb-3">
-                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Email</label>
+                                <label className="form-label font-semibold text-dGreen">Email</label>
                                 <input
                                     type="email"
-                                    className="form-control rounded"
+                                    className="form-control rounded text-dGreen"
                                     name="email"
                                     value={formData.email || ""}
                                     onChange={handleChange}
                                     required
-                                    style={{ color: "#8c5e58" }}
                                 />
                                 {errors.email && <div className="text-danger mt-2">{errors.email}</div>}
                             </div>
                             <div className="mb-3">
-                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Số điện
+                                <label className="form-label font-semibold text-dGreen">Số điện
                                     thoại</label>
                                 <input
                                     type="tel"
-                                    className="form-control rounded"
+                                    className="form-control rounded text-dGreen"
                                     name="phone"
                                     value={formData.phone || ""}
                                     onChange={handleChange}
                                     required
-                                    style={{ color: "#8c5e58" }}
                                 />
                                 {errors.phone && <div className="text-danger mt-2">{errors.phone}</div>}
                             </div>
                             <div className="mb-3">
-                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Địa
+                                <label className="form-label font-semibold text-dGreen">Địa
                                     chỉ</label>
                                 <div className="d-flex justify-content-between">
-                                    <div className="form-group mb-2" style={{ flex: 1, marginRight: "10px" }}>
+                                    <div className="form-group mb-2 flex-1 mr-1">
                                         <select
-                                            className="form-control rounded"
+                                            className="form-control rounded bg-white text-dGreen"
                                             value={selectedProvince}
                                             onChange={handleProvinceChange}
                                             required
-                                            style={{ backgroundColor: "white", color: "#8c5e58" }}
                                         >
                                             <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
                                             {provinces.map((province) => (
@@ -474,13 +524,12 @@ export default function Checkout() {
                                         </select>
                                     </div>
 
-                                    <div className="form-group mb-2" style={{ flex: 1, marginRight: "10px" }}>
+                                    <div className="form-group mb-2 flex-1 mr-1">
                                         <select
-                                            className="form-control rounded"
+                                            className="form-control rounded bg-white text-dGreen"
                                             value={selectedDistrict}
                                             onChange={handleDistrictChange}
                                             required
-                                            style={{ backgroundColor: "white", color: "#8c5e58" }}
                                             disabled={!selectedProvince}
                                         >
                                             <option value="" className="font-bold">Chọn Quận/Huyện</option>
@@ -494,11 +543,10 @@ export default function Checkout() {
 
                                     <div className="form-group mb-2" style={{ flex: 1 }}>
                                         <select
-                                            className="form-control rounded"
+                                            className="form-control rounded bg-white text-dGreen"
                                             value={selectedWard}
                                             onChange={handleWardChange}
                                             required
-                                            style={{ backgroundColor: "white", color: "#8c5e58" }}
                                             disabled={!selectedDistrict}
                                         >
                                             <option value="" className="font-bold">Chọn Xã/Phường</option>
@@ -512,19 +560,18 @@ export default function Checkout() {
                                 </div>
                                 <input
                                     type="text"
-                                    className="form-control rounded"
+                                    className="form-control rounded text-dGreen"
                                     name="address"
                                     placeholder={"Vui lòng nhập địa chỉ nhà..."}
                                     onChange={handleChange}
                                     required
-                                    style={{ color: "#8c5e58" }}
                                 />
                                 {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                             </div>
 
                             {/* Phương thức thanh toán với icon */}
                             <div className="mb-4">
-                                <label className="form-label font-semibold" style={{ color: "#8c5e58" }}>Phương thức
+                                <label className="form-label font-semibold text-dGreen">Phương thức
                                     thanh toán</label>
                                 <div className="d-flex">
                                     <div className="form-check me-3">
@@ -536,8 +583,8 @@ export default function Checkout() {
                                             checked={formData.paymentMethod === "1"}
                                             onChange={handleChange}
                                         />
-                                        <label className="form-check-label" style={{ color: "#8c5e58" }}>
-                                            <i className="fas fa-money-bill fa-2x"></i> Thanh toán khi nhận hàng
+                                        <label className="form-check-label text-dGreen">
+                                            Thanh toán khi nhận hàng
                                         </label>
                                     </div>
                                     <div className="form-check me-3">
@@ -549,29 +596,32 @@ export default function Checkout() {
                                             checked={formData.paymentMethod === "2"}
                                             onChange={handleChange}
                                         />
-                                        <label className="form-check-label" style={{ color: "#8c5e58" }}>
-                                            <i className="fab fa-gg-circle fa-2x"></i> Momo
+                                        <label className="form-check-label text-dGreen">
+                                            Thanh toán qua Momo
                                         </label>
                                     </div>
-                                    <div className="form-check">
-                                        <input
-                                            type="radio"
-                                            className="form-check-input"
-                                            name="paymentMethod"
-                                            value="3"
-                                            checked={formData.paymentMethod === "3"}
-                                            onChange={handleChange}
-                                        />
-                                        <label className="form-check-label" style={{ color: "#8c5e58" }}>
-                                            <i className="fas fa-credit-card fa-2x"></i> Credit card
-                                        </label>
-                                    </div>
+                                    {/*<div className="form-check">*/}
+                                    {/*    <input*/}
+                                    {/*        type="radio"*/}
+                                    {/*        className="form-check-input"*/}
+                                    {/*        name="paymentMethod"*/}
+                                    {/*        value="3"*/}
+                                    {/*        checked={formData.paymentMethod === "3"}*/}
+                                    {/*        onChange={handleChange}*/}
+                                    {/*    />*/}
+                                    {/*    <label className="form-check-label text-dGreen">*/}
+                                    {/*        <i className="fas fa-credit-card fa-2x"></i> Credit card*/}
+                                    {/*    </label>*/}
+                                    {/*</div>*/}
                                 </div>
                             </div>
 
-                            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>Xác nhận thanh
-                                toán
-                            </button>
+                            <div className="d-flex justify-center">
+                                <button type="submit" className="butn w-40 rounded shadow" onClick={handleSubmit}>Xác
+                                    nhận thanh
+                                    toán
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </>

@@ -1,23 +1,25 @@
-import React, { useEffect, useState,useRef  } from 'react';
-import { useNavigate, useParams } from "react-router-dom";
-import { getOneProduct, getRelatedProducts,getHotProducts } from "../../../services/Product";
-import { getOneBrand } from "../../../services/Brand";
-import { getOneCategory } from "../../../services/Category";
-import { addToCart } from "../../../services/Cart";
-import { getCommentsByProductId, addComment, deleteComment } from "../../../services/Comment";
-import { ToastContainer, toast } from 'react-toastify';
+import React, {useEffect, useState, useRef} from 'react';
+import {useNavigate, useParams} from "react-router-dom";
+import {getOneProduct, getRelatedProducts, getHotProducts} from "../../../services/Product";
+import {getOneBrand} from "../../../services/Brand";
+import {getOneCategory} from "../../../services/Category";
+import {addToCart} from "../../../services/Cart";
+import {getCommentsByProductId, addComment, deleteComment} from "../../../services/Comment";
+import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import "../../../assets/styles/css/productdt/index.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
 import '@fontsource/roboto';
 import Swal from "sweetalert2";
 import Slider from "react-slick";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const ProductDetail = () => {
-    const { id } = useParams();
+    const {id} = useParams();
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]); // Sản phẩm liên quan
     const [brandName, setBrandName] = useState("");
@@ -43,7 +45,6 @@ const ProductDetail = () => {
     }, [id]);
 
 
-
     const sliderSettings = {
         dots: false,
         infinite: true,
@@ -53,9 +54,9 @@ const ProductDetail = () => {
         draggable: false,
         swipe: false,
         responsive: [
-            { breakpoint: 1024, settings: { slidesToShow: 3 } },
-            { breakpoint: 768, settings: { slidesToShow: 2 } },
-            { breakpoint: 480, settings: { slidesToShow: 1 } },
+            {breakpoint: 1024, settings: {slidesToShow: 3}},
+            {breakpoint: 768, settings: {slidesToShow: 2}},
+            {breakpoint: 480, settings: {slidesToShow: 1}},
         ],
     };
 
@@ -135,22 +136,10 @@ const ProductDetail = () => {
         try {
             const response = await addToCart(productId, quantity);
             console.log('Thêm vào giỏ hàng thành công:', response);
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Thành công',
-                text: 'Sản phẩm đã được thêm vào giỏ hàng.',
-                confirmButtonText: 'OK',
-            });
+            toast.success("Sản phẩm đã được thêm vào giỏ hàng.");
         } catch (error) {
             console.error('Lỗi khi thêm vào giỏ hàng:', error);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi',
-                text: 'Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.',
-                confirmButtonText: 'OK',
-            });
+            toast.error("Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.");
         }
     };
 
@@ -174,24 +163,11 @@ const ProductDetail = () => {
         console.log(`Adding to cart with data: {product_id: ${productId}, quantity: ${quantity}}`);
         try {
             const response = await addToCart(productId, quantity);
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Thành công',
-                text: 'Sản phẩm đã được thêm vào giỏ hàng.',
-                confirmButtonText: 'OK',
-            }).then(() => {
-                navigate(`/cart?productId=${productId}`);
-            });
+            toast.success("Sản phẩm đã được thêm vào giỏ hàng.");
+            navigate(`/cart?productId=${productId}`);
         } catch (error) {
             console.error('Lỗi khi thêm vào giỏ hàng:', error);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi',
-                text: 'Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.',
-                confirmButtonText: 'OK',
-            });
+            toast.error("Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.");
         }
     };
 
@@ -200,12 +176,7 @@ const ProductDetail = () => {
         const value = e.target.value;
 
         if (value.length > 500) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Cảnh báo',
-                text: 'Nội dung bình luận không được vượt quá 500 ký tự.',
-                confirmButtonText: 'OK',
-            });
+            toast.warn("Nội dung bình luận không được vượt quá 500 ký tự.");
             return;
         }
 
@@ -232,12 +203,7 @@ const ProductDetail = () => {
         }
 
         if (!newComment.trim()) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Cảnh báo',
-                text: 'Bình luận không thể để trống!',
-                confirmButtonText: 'OK',
-            });
+            toast.warn("Vui lòng nhập nội dung bình luận.");
             return;
         }
 
@@ -250,34 +216,18 @@ const ProductDetail = () => {
         try {
             await addComment(commentData);
             setNewComment("");
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Thành công',
-                text: 'Bình luận đã được thêm thành công!',
-                confirmButtonText: 'OK',
-            });
+            toast.success("Bình luận đã được thêm thành công.");
 
             const commentsResult = await getCommentsByProductId(id);
             setComments(commentsResult);
         } catch (error) {
             console.error("Error adding comment:", error);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi',
-                text: 'Không thể thêm bình luận.',
-                confirmButtonText: 'OK',
-            });
+            toast.error("Lỗi. Không thể thêm bình luận.");
         }
     };
     const handleDeleteComment = async (commentId) => {
         if (!token) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Cảnh báo',
-                text: 'Bạn cần đăng nhập để xóa bình luận!',
-            });
+            toast.warn("Bạn cần đăng nhập để xóa bình luận.");
             return;
         }
 
@@ -294,23 +244,14 @@ const ProductDetail = () => {
         if (result.isConfirmed) {
             try {
                 await deleteComment(commentId);
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Thành công',
-                    text: 'Bình luận đã được xóa thành công!',
-                });
+                toast.success("Bình luận đã được xóa thành công.");
 
                 // Lấy lại danh sách bình luận sau khi xóa
                 const commentsResult = await getCommentsByProductId(id);
                 setComments(commentsResult);
             } catch (error) {
                 console.error("Error deleting comment:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Lỗi',
-                    text: 'Bạn không thể xóa bình luận này.',
-                });
+                toast.error("Lỗi. Không thể xóa bình luận này.");
             }
         }
     };
@@ -318,16 +259,7 @@ const ProductDetail = () => {
 
     return (
         <div className="container my-5">
-            <ToastContainer />
             {loadingProduct ? (
-                <div
-                    className="d-flex flex-column align-items-center"
-                    style={{ marginTop: "10rem", marginBottom: "10rem" }}
-                >
-                    <FontAwesomeIcon icon={faSpinner} spin style={{ fontSize: "4rem", color: "#8c5e58" }} />
-                    <p className="mt-3" style={{ color: "#8c5e58", fontSize: "18px" }}>Đang tải...</p>
-                </div>
-            ) : product ? (
                 <div>
                     <div className="row">
                         {/* Cột Chi Tiết Sản Phẩm */}
@@ -335,303 +267,94 @@ const ProductDetail = () => {
                             <div className="row">
                                 {/* Hình ảnh sản phẩm */}
                                 <div className="col-md-5">
-                                    <img
-                                        src={product.image}
-                                        alt="Product"
-                                        className="img-fluid rounded"
-                                        style={{
-                                            maxHeight: "400px",
-                                            objectFit: "cover",
-                                            width: "100%",
-                                        }}
-                                    />
+                                    <Skeleton height={300} width="100%"/>
                                 </div>
                                 {/* Nội dung chi tiết sản phẩm */}
                                 <div className="col-md-7 d-flex flex-column align-content-start">
-                                    <p
-                                        className="mb-3"
-                                        style={{fontSize: "26px", color: "#8c5e58", fontWeight: "bold"}}
-                                    >
-                                        {product.name}
+                                    <p className="mb-2 text-dGreen fs-26 font-bold">
+                                        <Skeleton height={20} width="100%"/>
                                     </p>
                                     {/* Giá sản phẩm */}
-                                    <div className="mb-3" style={{color: "#8c5e58"}}>
-                                        <strong>Giá:</strong>
-                                        {product.sale_price ? (
-                                            <div className="d-flex flex-column">
-                                            <span
-                                                style={{
-                                                    fontSize: "20px",
-                                                    textDecoration: "line-through",
-                                                    color: "#6c4d36",
-                                                }}
-                                            >
-                                                {product.unit_price.toLocaleString("vi-VN", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                })}
-                                            </span>
-                                                <span
-                                                    style={{
-                                                        fontSize: "22px",
-                                                        color: "#f76c5e",
-                                                        fontWeight: "bold",
-                                                    }}
-                                                >
-                                                {(
-                                                    product.unit_price - product.sale_price
-                                                ).toLocaleString("vi-VN", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                })}
-                                            </span>
-                                            </div>
-                                        ) : (
-                                            <span
-                                                style={{
-                                                    fontSize: "22px",
-                                                    color: "#f76c5e",
-                                                    fontWeight: "bold",
-                                                }}
-                                            >
-                                            {product.unit_price.toLocaleString("vi-VN", {
-                                                style: "currency",
-                                                currency: "VND",
-                                            })}
-                                        </span>
-                                        )}
+                                    <div className="mb-2 text-dGreen">
+                                        <Skeleton height={20} width="100%"/>
                                     </div>
-                                    {/* Thông tin bổ sung */}
-                                    <p className="mb-3" style={{color: "#8c5e58"}}>
-                                        <strong>Thương hiệu:</strong> {brandName}
-                                    </p>
-                                    <p className="mb-3" style={{color: "#8c5e58"}}>{product.weight}</p>
                                     {/* Chọn số lượng và nút hành động */}
                                     <div className="mt-2 d-flex justify-content-start align-items-center mb-3">
-                                    <span style={{color: "#8c5e58", fontSize: "16px"}}>
-                                        <strong>Số lượng:</strong>
-                                    </span>
-                                        <input
-                                            type="number"
-                                            value={cart[product.id] || 1}
-                                            onChange={handleQuantityChange}
-                                            min="1"
-                                            max={product.quantity}
-                                            className="form-control mx-2 rounded"
-                                            style={{width: "80px", fontSize: "16px"}}
-                                        />
+                                        <Skeleton height={20} width="100%"/>
                                     </div>
                                     {/* Nút thêm vào giỏ và mua ngay */}
                                     <div className="d-flex justify-content-start">
-                                        {product.quantity === 0 ? (
-                                            <p
-                                                className="text-danger font-bold"
-                                                style={{
-                                                    fontSize: "16px",
-                                                    marginTop: "10px",
-                                                    paddingLeft: "10px",
-                                                    marginRight: "10px",
-                                                }}
-                                            >
-                                                Hết hàng
-                                            </p>
-                                        ) : (
-                                            <>
-                                                <button
-                                                    className="btn btn-primary mr-2 font-semibold"
-                                                    style={{
-                                                        padding: "16px",
-                                                        fontSize: "14px",
-                                                        color: "#442e2b",
-                                                        borderRadius: "5px",
-                                                        width: "150px",
-                                                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                                                        backgroundColor: "#ffa69e",
-                                                        cursor: "pointer",
-                                                        marginRight: "10px",
-                                                    }}
-                                                    onClick={() =>
-                                                        handleBuyNow(product.id, cart[product.id] || 1)
-                                                    }
-                                                >
-                                                    <p>
-                                                        <i
-                                                            className="fa fa-shopping-cart"
-                                                            aria-hidden="true"
-                                                            style={{marginRight: "6px"}}
-                                                        ></i>
-                                                        Mua ngay
-                                                    </p>
-                                                </button>
-                                                <button
-                                                    className="btn btn-secondary font-semibold"
-                                                    style={{
-                                                        fontSize: "14px",
-                                                        padding: "16px",
-                                                        borderRadius: "5px",
-                                                        width: "150px",
-                                                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                                                    }}
-                                                    onClick={() =>
-                                                        handleAddToCart(product.id, cart[product.id] || 1)
-                                                    }
-                                                >
-                                                    <p>
-                                                        <i
-                                                            className="fa fa-shopping-basket"
-                                                            aria-hidden="true"
-                                                            style={{marginRight: "6px"}}
-                                                        ></i>
-                                                        Thêm vào giỏ
-                                                    </p>
-                                                </button>
-                                            </>
-                                        )}
+                                        <Skeleton height={40} width="40%"/>
+                                        <Skeleton height={40} width="40%"/>
                                     </div>
                                 </div>
+                                {/* Thông tin chi tiết sản phẩm */}
+                                <div className="product-details">
+                                    <Skeleton height={20} width="100%"/>
+                                    <ul>
+                                        <li><Skeleton height={20} width="100%"/></li>
+                                        <li><Skeleton height={20} width="100%"/></li>
+                                        <li><Skeleton height={20} width="100%"/></li>
+                                        <li><Skeleton height={20} width="100%"/></li>
+                                        <li></li>
+                                    </ul>
+                                </div>
                             </div>
+
                             {/* Phần bình luận */}
                             <div className="comments-section mt-5">
-                                <h5 style={{fontWeight: "bold", color: "#8c5e58"}}>Bình luận</h5>
-                                <div
-                                    className="p-4 border rounded"
-                                    style={{
-                                        border: "1px solid #ddd",
-                                        backgroundColor: "#fff",
-                                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                                    }}
-                                >
-                                    <form
-                                        onSubmit={handleSubmitComment}
-                                        className="p-3 mb-4 border rounded"
-                                    >
+                                <Skeleton height={20} width="100%"/>
+                                <div className="p-4 border rounded bg-white shadow">
+                                    <form onSubmit={handleSubmitComment} className="p-3 mb-4 border rounded">
                                         <div className="form-group">
-                                            <label
-                                                htmlFor="newComment"
-                                                style={{
-                                                    fontWeight: "bold",
-                                                    fontSize: "16px",
-                                                }}
-                                            >
-                                                Viết bình luận:
+                                            <label htmlFor="newComment" className="font-bold fs-14 text-dGreen">
+                                                <Skeleton height={20} width="100%"/>
                                             </label>
                                             <textarea
-                                                className="form-control"
+                                                className="form-control comment-resize"
                                                 id="newComment"
                                                 value={newComment}
                                                 onChange={(e) => setNewComment(e.target.value)}
                                                 rows="3"
-                                                style={{resize: "none"}}
                                             />
                                         </div>
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary mt-2"
-                                            style={{
-                                                backgroundColor: "#f77c8c",
-                                                border: "none",
-                                            }}
-                                        >
-                                            Gửi bình luận
-                                        </button>
+                                        <Skeleton height={40} width="40%"/>
                                     </form>
                                     {/* Hiển thị danh sách bình luận */}
-                                    {loadingComments ? (
-                                        <div className="d-flex justify-content-center mt-5">
-                                            <FontAwesomeIcon
-                                                icon={faSpinner}
-                                                spin
-                                                style={{fontSize: "2rem"}}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="mt-4">
-                                            {comments.length > 0 ? (
-                                                comments.map((comment) => (
+
+                                    <div className="mt-4">
+                                        {comments.length > 0 ? (
+                                            comments.map((comment) => (
+                                                <div key={comment.id} className="mb-3 p-3 rounded border">
                                                     <div
-                                                        key={comment.id}
-                                                        className="mb-3 p-3 rounded border"
-                                                    >
-                                                        <div
-                                                            className="d-flex justify-content-between align-items-start">
-                                                            <div>
-                                                                <p
-                                                                    style={{
-                                                                        fontSize: "14px",
-                                                                        marginBottom: "4px",
-                                                                        fontWeight: "bold",
-                                                                    }}
-                                                                >
-                                                                    {comment.user_name}
-                                                                </p>
-                                                                <p style={{fontSize: "13px"}}>
-                                                                    {comment.content}
-                                                                </p>
-                                                            </div>
-                                                            <button
-                                                                onClick={() =>
-                                                                    handleDeleteComment(comment.id)
-                                                                }
-                                                                style={{
-                                                                    background: "none",
-                                                                    border: "none",
-                                                                    color: "#e74c3c",
-                                                                    cursor: "pointer",
-                                                                }}
-                                                                title="Xóa bình luận"
-                                                            >
-                                                                <FontAwesomeIcon
-                                                                    icon={faTrash}
-                                                                    style={{fontSize: "16px"}}
-                                                                />
-                                                            </button>
+                                                        className="d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <Skeleton height={20} width="100%"/>
                                                         </div>
+                                                        <Skeleton height={40} width="40%"/>
                                                     </div>
-                                                ))
-                                            ) : (
-                                                <p style={{fontSize: "13px"}}>
-                                                    Không có bình luận nào.
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <Skeleton height={60} width="100%" />
+                                        )}
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                         {/* Cột Sản Phẩm Hot */}
                         <div className="col-md-3">
-                            <div
-                                className="hot-products-section p-3 border rounded"
-                                style={{
-                                    backgroundColor: "#fff",
-                                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                                }}
-                            >
-                                <h5
-                                    style={{
-                                        fontFamily: "'Roboto', sans-serif",
-                                        fontSize: "20px",
-                                        fontWeight: "700",
-                                        color: "#8c5e58",
-                                        marginBottom: "20px",
-                                        textAlign: "center",
-                                    }}
-                                >
-                                    Sản phẩm hot
-                                </h5>
+                            <div className="hot-products-section p-3 border rounded shadow bg-white">
+                                <p className="fs-20 font-bold text-dGreen mb-2 text-center">
+                                    <Skeleton height={20} width="100%"/>
+                                </p>
                                 {hotProducts?.length > 0 ? (
                                     hotProducts.map((hotProduct) => (
                                         <div
                                             key={hotProduct.id}
-                                            className="d-flex align-items-center mb-3 hot-product-item"
+                                            className="d-flex align-items-center mb-3 hot-product-item p-1 rounded product-hot shadow"
                                             onClick={() => navigate(`/products/${hotProduct.id}`)}
-                                            style={{
-                                                cursor: "pointer",
-                                                padding: "10px",
-                                                transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                                                borderBottom: "1px solid #ddd",
-                                                borderRadius: "8px",
-                                            }}
                                             onMouseEnter={(e) => {
                                                 e.currentTarget.style.transform = "scale(1.02)";
                                                 e.currentTarget.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
@@ -641,103 +364,270 @@ const ProductDetail = () => {
                                                 e.currentTarget.style.boxShadow = "none";
                                             }}
                                         >
-                                            <img
-                                                src={hotProduct.image}
-                                                alt={hotProduct.name}
-                                                style={{
-                                                    width: "60px",
-                                                    height: "60px",
-                                                    objectFit: "cover",
-                                                    borderRadius: "8px",
-                                                    marginRight: "10px",
-                                                }}
-                                            />
+                                            <Skeleton height={20} width="100%"/>
                                             <div>
-                                                <p
-                                                    style={{
-                                                        fontSize: "14px",
-                                                        fontWeight: "bold",
-                                                        margin: 0,
-                                                        color: "#442e2b",
-                                                        overflow: "hidden",
-                                                        whiteSpace: "nowrap",
-                                                        textOverflow: "ellipsis",
-                                                        maxWidth: "150px",
-                                                    }}
-                                                    title={hotProduct.name}
-                                                >
-                                                    {hotProduct.name}
+                                                <p className="fs-14 font-bold m-0 text-dGreen overflow-hidden whitespace-nowrap name-pro-hot"
+                                                   title={hotProduct.name}>
+                                                    <Skeleton height={20} width="100%"/>
                                                 </p>
-                                                <p
-                                                    style={{
-                                                        fontSize: "14px",
-                                                        color: "#e74c3c",
-                                                        margin: "5px 0 0",
-                                                        fontWeight: "600",
-                                                    }}
-                                                >
-                                                    {(hotProduct.sale_price || hotProduct.unit_price).toLocaleString("vi-VN", {
-                                                        style: "currency",
-                                                        currency: "VND",
-                                                    })}
+                                                <p className="fs-14 text-dGreen font-semibold">
+                                                    <Skeleton height={20} width="100%"/>
                                                 </p>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <p
-                                        style={{
-                                            fontSize: "14px",
-                                            color: "#8c5e58",
-                                            textAlign: "center",
-                                        }}
-                                    >
+                                    <Skeleton height={60} width="100%" />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            ) : product ? (
+                <div>
+                    <div className="row">
+                        {/* Cột Chi Tiết Sản Phẩm */}
+                        <div className="col-md-9">
+                            <div className="row">
+                                {/* Hình ảnh sản phẩm */}
+                                <div className="col-md-5">
+                                    <img src={product.image} alt="Product" className="img-fluid rounded img-product"/>
+                                </div>
+                                {/* Nội dung chi tiết sản phẩm */}
+                                <div className="col-md-7 d-flex flex-column align-content-start">
+                                    <p className="mb-2 text-dGreen fs-26 font-bold">
+                                        {product.name}
+                                    </p>
+                                    {/* Giá sản phẩm */}
+                                    <div className="mb-2 text-dGreen">
+                                        <strong>Giá: </strong>
+                                        {product.sale_price ? (
+                                            <div className="d-flex flex-row align-items-center">
+                                                <span className="fs-16 text-decoration-line-through text-dGreen mr-2">
+                                                    {product.unit_price.toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    })}
+                                                </span>
+                                                <span className="fs-16 salePr font-bold">
+                                                    {(product.sale_price).toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    })}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="fs-16 text-dGreen font-bold">
+                                                {product.unit_price.toLocaleString("vi-VN", {
+                                                    style: "currency",
+                                                    currency: "VND",
+                                                })}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {/* Chọn số lượng và nút hành động */}
+                                    <div className="mt-2 d-flex justify-content-start align-items-center mb-3">
+                                    <span className="text-dGreen fs-16">
+                                        <strong>Số lượng:</strong>
+                                    </span>
+                                        <input
+                                            type="number"
+                                            value={cart[product.id] || 1}
+                                            onChange={handleQuantityChange}
+                                            min="1"
+                                            max={product.quantity}
+                                            className="form-control mx-2 rounded fs-16 w-16"
+                                        />
+                                    </div>
+                                    {/* Nút thêm vào giỏ và mua ngay */}
+                                    <div className="d-flex justify-content-start">
+                                        {product.quantity === 0 ? (
+                                            <p className="text-danger font-bold fs-16 mt-1 pl-1 mr-1">
+                                                Hết hàng
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <button className="butn mr-2 w-25 rounded font-semibold shadow"
+                                                        onClick={() =>
+                                                            handleBuyNow(product.id, cart[product.id] || 1)}>
+                                                    <p>
+                                                        <i className="fa fa-shopping-cart" aria-hidden="true"
+                                                           style={{marginRight: "6px"}}></i>
+                                                        Mua ngay
+                                                    </p>
+                                                </button>
+                                                <button className="butn mr-2 w-30 rounded font-semibold shadow"
+                                                        onClick={() =>
+                                                            handleAddToCart(product.id, cart[product.id] || 1)}>
+                                                    <p>
+                                                        <i className="fa fa-shopping-basket" aria-hidden="true"
+                                                           style={{marginRight: "6px"}}></i>
+                                                        Thêm vào giỏ
+                                                    </p>
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                {/* Thông tin chi tiết sản phẩm */}
+                                <div className="product-details">
+                                    <p className="font-semibold mt-3 mb-2 text-dGreen fs-20">Thông tin chi tiết sản
+                                        phẩm:</p>
+                                    <ul>
+                                        <li><span className="text-dGreen fs-16"><strong>Tên sản phẩm:</strong></span>
+                                            <span className="text-dGreen"> {product.name}</span></li>
+                                        <li><span className="text-dGreen fs-16"><strong>Giá sản phẩm:</strong></span>
+                                            <span className="text-dGreen"> {product.unit_price.toLocaleString("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                            })}</span></li>
+                                        <li><span className="text-dGreen fs-16"><strong>Thương hiệu:</strong></span>
+                                            <span className="text-dGreen"> {categoryName}</span></li>
+                                        <li><span className="text-dGreen fs-16"><strong>Danh mục:</strong></span> <span
+                                            className="text-dGreen"> {brandName}</span></li>
+                                        <li><span className="text-dGreen -fs16"><strong>Mô tả sản phẩm:</strong>
+                                            </span>{" "}
+                                            <span
+                                                className="text-dGreen product-content d-block"> {product.content}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            {/* Phần bình luận */}
+                            <div className="comments-section mt-5">
+                                <p className="text-dGreen font-semibold fs-20 mb-2">Bình luận</p>
+                                <div className="p-4 border rounded bg-white shadow">
+                                    <form onSubmit={handleSubmitComment} className="p-3 mb-4 border rounded">
+                                        <div className="form-group">
+                                            <label htmlFor="newComment" className="font-bold fs-14 text-dGreen">
+                                                Viết bình luận:
+                                            </label>
+                                            <textarea
+                                                className="form-control comment-resize"
+                                                id="newComment"
+                                                value={newComment}
+                                                onChange={(e) => setNewComment(e.target.value)}
+                                                rows="3"
+                                            />
+                                        </div>
+                                        <button type="submit" className="butn rounded w-16 mt-2 shadow border-none">
+                                            Gửi
+                                        </button>
+                                    </form>
+                                    {/* Hiển thị danh sách bình luận */}
+
+                                    <div className="mt-4">
+                                        {comments.length > 0 ? (
+                                            comments.map((comment) => (
+                                                <div key={comment.id} className="mb-3 p-3 rounded border">
+                                                    <div
+                                                        className="d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <p className="fs-14 text-dGreen mb-1 font-bold">
+                                                                {comment.user_name}
+                                                            </p>
+                                                            <p className="fs-14 text-dGreen">
+                                                                {comment.content}
+                                                            </p>
+                                                        </div>
+                                                        <button onClick={() => handleDeleteComment(comment.id)}
+                                                                className="border-none bg-none del-comment fs-14"
+                                                                title="Xóa bình luận">
+                                                            <FontAwesomeIcon icon={faTrash}/> Xóa
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-dGreen fs-14">
+                                                Không có bình luận nào.
+                                            </p>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        {/* Cột Sản Phẩm Hot */}
+                        <div className="col-md-3">
+                            <div className="hot-products-section p-3 border rounded shadow bg-white">
+                                <p className="fs-20 font-bold text-dGreen mb-2 text-center">
+                                    Sản phẩm hot
+                                </p>
+                                {hotProducts?.length > 0 ? (
+                                    hotProducts.map((hotProduct) => (
+                                        <div
+                                            key={hotProduct.id}
+                                            className="d-flex align-items-center mb-3 hot-product-item p-1 rounded product-hot shadow"
+                                            onClick={() => navigate(`/products/${hotProduct.id}`)}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.transform = "scale(1.02)";
+                                                e.currentTarget.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform = "scale(1)";
+                                                e.currentTarget.style.boxShadow = "none";
+                                            }}
+                                        >
+                                            <img src={hotProduct.image} alt={hotProduct.name}
+                                                 className="rounded mr-1 img-pro-hot"/>
+                                            <div>
+                                                <p className="fs-14 font-bold m-0 text-dGreen overflow-hidden whitespace-nowrap name-pro-hot"
+                                                   title={hotProduct.name}>
+                                                    {hotProduct.name}
+                                                </p>
+                                                <p className="fs-14 text-dGreen font-semibold">
+                                                    {hotProduct.sale_price && hotProduct.sale_price < hotProduct.unit_price ? (
+                                                        // Khi có giá sale
+                                                        <div
+                                                            className="d-flex align-items-center justify-content-start">
+                                                            {/* Giá gốc bị gạch ngang */}
+                                                            <p className="fs-12 text-dGreen font-semibold text-decoration-line-through mr-2">
+                                                                {hotProduct.unit_price.toLocaleString("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND",
+                                                                })}
+                                                            </p>
+
+                                                            {/* Giá sale */}
+                                                            <p className="fs-14 salePr font-semibold">
+                                                                {hotProduct.sale_price.toLocaleString("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND",
+                                                                })}
+                                                            </p>
+                                                        </div>
+                                                    ) : (
+                                                        // Khi không có giá sale
+                                                        <p className="fs-14 text-dGreen font-semibold">
+                                                            {hotProduct.unit_price.toLocaleString("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND",
+                                                            })}
+                                                        </p>
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="fs-14 text-dGreen text-center">
                                         Không có sản phẩm hot.
                                     </p>
                                 )}
                             </div>
                         </div>
-
-
                     </div>
                     {/* Sản phẩm liên quan */}
-                    <div className="related-products mt-5" style={{position: 'relative'}}>
-                        <h5
-                            style={{
-                                fontFamily: "'Roboto', sans-serif",
-                                fontSize: "20px",
-                                fontWeight: "700",
-                                color: "#8c5e58",
-                                marginBottom: "20px",
-                            }}
-                        >
+                    <div className="related-products mt-5 position-relative">
+                        <p className="fs-20 font-bold text-dGreen mb-2">
                             Sản phẩm liên quan
-                        </h5>
+                        </p>
 
                         {/* Nút điều hướng Trái */}
-                        <button
-                            onClick={() => sliderRef.current.slickPrev()}
-                            style={{
-                                position: 'absolute',
-                                left: '-50px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                backgroundColor: 'rgba(140, 94, 88, 0.8)',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '45px',
-                                height: '45px',
-                                cursor: 'pointer',
-                                zIndex: 2,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                                transition: 'all 0.3s ease',
-                            }}
-
-                        >
+                        <button onClick={() => sliderRef.current.slickPrev()} className="btn-slide-pro-left">
                             <FontAwesomeIcon icon={faChevronLeft}/>
                         </button>
 
@@ -747,106 +637,62 @@ const ProductDetail = () => {
                                 relatedProducts.map((relatedProduct) => (
                                     <div key={relatedProduct.id} style={{padding: '10px'}}>
                                         <div
-                                            className="p-3 border rounded"
-                                            style={{
-                                                backgroundColor: '#fff',
-                                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-                                                borderRadius: '12px',
-                                                textAlign: 'center',
-                                                transition: 'transform 0.3s ease',
-                                                height: '300px',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                justifyContent: 'space-between',
-                                            }}
+                                            className="p-3 border rounded bg-white shadow text-center d-flex flex-column justify-between pro-lq"
                                             onClick={() =>
                                                 navigate(`/products/${relatedProduct.id}`)
-                                            }
-                                        >
-                                            <img
-                                                src={relatedProduct.image}
-                                                alt={relatedProduct.name}
-                                                style={{
-                                                    width: '100%',
-                                                    height: '180px',
-                                                    objectFit: 'cover',
-                                                    borderRadius: '10px',
-                                                    marginBottom: '10px',
-                                                }}
-                                            />
-                                            <p
-                                                style={{
-                                                    fontSize: '14px',
-                                                    fontWeight: '500',
-                                                    margin: '0 0 5px 0',
-                                                }}
-                                            >
+                                            }>
+                                            <img src={relatedProduct.image} alt={relatedProduct.name}
+                                                 className="object-fit-cover mb-1 rounded img-pro-lq"/>
+                                            <p className="fs-14 text-dGreen font-semibold">
                                                 {relatedProduct.name}
                                             </p>
-                                            <p
-                                                style={{
-                                                    fontSize: '14px',
-                                                    color: '#e74c3c',
-                                                    fontWeight: '600',
-                                                    margin: '0',
-                                                }}
-                                            >
-                                                {relatedProduct.sale_price
-                                                    ? relatedProduct.sale_price.toLocaleString('vi-VN', {
-                                                        style: 'currency',
-                                                        currency: 'VND',
-                                                    })
-                                                    : relatedProduct.unit_price.toLocaleString('vi-VN', {
-                                                        style: 'currency',
-                                                        currency: 'VND',
-                                                    })}
-                                            </p>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                {relatedProduct.sale_price && relatedProduct.sale_price < relatedProduct.unit_price ? (
+                                                    // Khi có giá sale
+                                                    <>
+                                                        {/* Giá gốc bị gạch ngang */}
+                                                        <p className="fs-12 text-dGreen font-semibold m-0 text-decoration-line-through mr-1 flex-1">
+                                                            {relatedProduct.unit_price.toLocaleString("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND",
+                                                            })}
+                                                        </p>
+                                                        {/* Giá sale */}
+                                                        <p className="fs-14 salePr font-semibold m-0 flex-1">
+                                                            {relatedProduct.sale_price.toLocaleString("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND",
+                                                            })}
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    // Khi không có giá sale
+                                                    <p className="fs-14 text-dGreen font-semibold m-0 text-center flex-1">
+                                                        {relatedProduct.unit_price.toLocaleString("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                        })}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <p
-                                    style={{
-                                        fontSize: '14px',
-                                        color: '#8c5e58',
-                                        textAlign: 'center',
-                                    }}
-                                >
+                                <p className="fs-14 text-dGreen text-center">
                                     Không có sản phẩm liên quan.
                                 </p>
                             )}
                         </Slider>
 
                         {/* Nút điều hướng Phải */}
-                        <button
-                            onClick={() => sliderRef.current.slickNext()}
-                            style={{
-                                position: 'absolute',
-                                right: '-50px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                backgroundColor: 'rgba(140, 94, 88, 0.8)',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '45px',
-                                height: '45px',
-                                cursor: 'pointer',
-                                zIndex: 2,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                                transition: 'all 0.3s ease',
-                            }}
-
-                        >
+                        <button onClick={() => sliderRef.current.slickNext()} className="btn-slide-pro-right">
                             <FontAwesomeIcon icon={faChevronRight}/>
                         </button>
                     </div>
                 </div>
             ) : (
-                <p>Sản phẩm không tồn tại.</p>
+                <p className="text-dGreen fs-20 text-center">Sản phẩm không tồn tại.</p>
             )}
         </div>
     );

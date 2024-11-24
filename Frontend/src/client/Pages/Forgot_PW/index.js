@@ -36,27 +36,27 @@ export default function ForgotPassword() {
 
     return (
         <div className="container py-5">
-            <h2 className="text-center mb-4">Quên Mật Khẩu</h2>
+            <p className="text-center mb-4 fs-30 font-semibold text-dGreen">Quên Mật Khẩu</p>
             <div className="row justify-content-center">
                 <div className="col-lg-6">
                     <form onSubmit={handleSubmit} className="border rounded p-4 shadow bg-light">
                         <div className="mb-3">
-                            <label htmlFor="email" className="form-label">Email</label>
+                            <label htmlFor="email" className="form-label text-dGreen fs-20">Email</label>
                             <input
                                 type="email"
-                                className="form-control border" // Thêm border cho input
+                                className="form-control border rounded" // Thêm border cho input
                                 id="email"
                                 value={email}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary w-100">Gửi Đường Dẫn Đặt Lại Mật Khẩu</button>
+                        <button type="submit" className="butn rounded shadow w-100">Gửi Đường Dẫn Đặt Lại Mật Khẩu</button>
                         {message && <div className="mt-3 alert alert-success">{message}</div>}
                         {errorMessage && <div className="mt-3 alert alert-danger">{errorMessage}</div>} {/* Show error message if any */}
                     </form>
                     <div className="mt-3 text-center">
-                        <p>Đã nhớ mật khẩu? <a href="/login" className="text-decoration-none">Đăng nhập ngay</a></p>
+                        <p className="text-dGreen">Đã nhớ mật khẩu? <a href="/login" className="text-decoration-none font-semibold lg-now">Đăng nhập ngay</a></p>
                     </div>
                 </div>
             </div>
