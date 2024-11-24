@@ -4,11 +4,10 @@ import "../../../assets/styles/css/bootstrap.min.css";
 import {getOrder} from "../../../services/Order";
 import {NavLink} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner, faCopy} from "@fortawesome/free-solid-svg-icons";
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 export default function OrderManagement() {
     const [orders, setOrders] = useState([]);
     const [showAllProducts, setShowAllProducts] = useState({});
@@ -53,12 +52,6 @@ export default function OrderManagement() {
             [orderId]: !prevState[orderId],
         }));
     };
-    const handleCopyOrderId = (orderId) => {
-        navigator.clipboard.writeText(orderId)
-            .then(() => toast.success("Đã sao chép mã đơn hàng!"))
-            .catch((err) => toast.error("Lỗi khi sao chép: " + err.message));
-    };
-
     return (
         <div className="container mt-5">
             <p className="headingStyle font-semibold text-dGreen">Đơn hàng đã đặt</p>
@@ -96,17 +89,8 @@ export default function OrderManagement() {
                             orders.filter(order => [0, 1, 2, 5].includes(order.status)).map((order) => (
                                 <div key={order.id} className="order-history-card mb-4 cardStyle shadow">
                                     <div className="headerStyle">
-                                        <div className="headerRowStyle d-flex align-items-center">
-                                            <strong className="text-dGreen">
-                                                Mã đơn hàng: {order.order_id}
-                                                <button
-                                                    className="btn btn-link text-dGreen p-0 mr-2"
-                                                    onClick={() => handleCopyOrderId(order.order_id)}
-                                                >
-                                                    <FontAwesomeIcon icon={faCopy}/>
-                                                </button>
-                                            </strong>
-
+                                        <div className="headerRowStyle">
+                                            <strong className="text-dGreen">Mã đơn hàng: {order.order_id}</strong>
                                             <strong className="text-dGreen">Trạng thái đơn hàng: <span
                                                 className="statusStyle"
                                                 style={getStatusStyle(order.status)}>
@@ -122,7 +106,7 @@ export default function OrderManagement() {
                                     <div className="bodyStyle">
                                         {order.details && order.details.length > 0 ? (
                                             <>
-                                            {order.details
+                                                {order.details
                                                     .slice(0, showAllProducts[order.id] ? order.details.length : 2)
                                                     .map((detail) => (
                                                         <div key={detail.product.id}
@@ -188,7 +172,7 @@ export default function OrderManagement() {
                                         {/* Cột 1 */}
                                         <div className="col-4">
                                             <span className="statusStyle">
-                                                {order.payment_method == 1 ? 'Thanh toán khi nhận hàng'
+                                                {order.payment_method === 1 ? 'Thanh toán khi nhận hàng'
                                                     : order.payment_method == 2 ? 'Thanh toán chuyển khoản'
                                                         : 'Không xác định'}</span>
                                         </div>

@@ -170,7 +170,11 @@ const handleLogout = () => {
                         <NavLink to={`/home`} className="navbar-brand">
                             <p className="text-header-dGreen display-5" style={{ marginLeft: "100px" }}>GlowMakers</p>
                         </NavLink>
-                        <div className="navbar-collapse py-3" id="navbarCollapse">
+                        <button className="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarCollapse">
+                            <span className="fa fa-bars text-header-dGreen"></span>
+                        </button>
+                        <div className="collapse navbar-collapse py-3" id="navbarCollapse">
                             <div className="navbar-nav mx-auto border-top">
                                 <NavLink to={`/home`} className="nav-item nav-link font-semibold text-header-dGreen">Trang chủ</NavLink>
                                 <NavLink to={`/about`} className="nav-item nav-link font-semibold text-header-dGreen">Về chúng tôi</NavLink>
