@@ -15,7 +15,12 @@ module.exports = {
       "./public/*.js",
     ],
     options: {
-      safelist: [],
+      safelist: [
+        'text-header-dGreen',
+        'fs-16',
+        'bg-count',
+        'font-semibold',
+      ],
     },
   },
   theme: {

@@ -31,7 +31,9 @@ import OrderDetail from "./Pages/Order_Detail";
 import FacebookCallback from "./Pages/FacebookCallback";
 import {ToastContainer} from "react-toastify";
 import PaymentResult from "./Pages/payment-result";
-
+import "../assets/styles/css/bootstrap.min.css"
+import "../assets/styles/css/style.css"
+import "../assets/styles/css/productdt/index.css"
 
 
 

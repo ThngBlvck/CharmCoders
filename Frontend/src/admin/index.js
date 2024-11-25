@@ -49,6 +49,7 @@ import OrderDetail from "./Pages/Order/OrderDetail";
 import EditOrder from "./Pages/Order/Edit";
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
+import "../assets/styles/tailwind.css"
 
 export default function Admin() {
     const location = useLocation();

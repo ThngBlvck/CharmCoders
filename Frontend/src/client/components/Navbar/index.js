@@ -1,6 +1,6 @@
 import React from "react";
-// import "../../../assets/styles/css/style.css";
-// import "../../../assets/styles/css/bootstrap.min.css";
+import "../../../assets/styles/css/style.css";
+import "../../../assets/styles/css/bootstrap.min.css";
 
 
 export default function Navbar() {
