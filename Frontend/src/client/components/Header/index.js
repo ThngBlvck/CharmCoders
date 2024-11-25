@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
-import "../../../assets/styles/css/style.css";
-import "../../../assets/styles/css/bootstrap.min.css";
+// import "../../../assets/styles/css/style.css";
+// import "../../../assets/styles/css/bootstrap.min.css";
 import {Link, NavLink, useNavigate} from "react-router-dom";
 import { logout } from "../../../services/User";
 import { getCart } from "../../../services/Cart";

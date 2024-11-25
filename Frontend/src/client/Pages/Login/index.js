@@ -35,11 +35,7 @@ export default function Login() {
             const response = await login(formData);
             if (response && response.token) {
                 localStorage.setItem('token', response.token);
-                if(response.role == "user"){
-                    window.location.href = "/home";
-                }else {
-                    window.location.href = "/admin";
-                }
+                window.location.href = "/home";
             } else {
                 setErrorMessage("Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
             }

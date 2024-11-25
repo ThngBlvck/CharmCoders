@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "../../../assets/styles/css/style.css";
-import "../../../assets/styles/css/bootstrap.min.css";
+// import "../../../assets/styles/css/style.css";
+// import "../../../assets/styles/css/bootstrap.min.css";
 import { getUserInfo } from "../../../services/User";
 import { getCategory } from "../../../services/Category";
 
