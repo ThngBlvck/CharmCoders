@@ -275,33 +275,33 @@ export default function BlogList({ color }) {
                             {displayedBlogs.length > 0 ? (
                                 displayedBlogs.map((blog, index) => (
                                     <tr key={blog.id}>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedBlogs.includes(blog.id)}
                                                 onChange={() => handleSelectBlog(blog.id)}
                                             />
                                         </td>
-                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+                                        <th className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4 text-left flex items-center">
                                             <span className="ml-3 font-bold">{index + 1}</span>
                                         </th>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             <img
                                                 src={blog.image || '/placeholder-image.png'}
                                                 alt={blog.title}
                                                 className="h-16 w-16 object-cover rounded"
                                             />
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             {blog.title}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             {blog.category_name}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             {blog.status === 1 ? 'Hiển thị' : 'Ẩn'}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             <button
                                                 className="text-blue-500 hover:text-blue-700 px-2"
                                                 onClick={() => handleEditClick(blog.id)}
