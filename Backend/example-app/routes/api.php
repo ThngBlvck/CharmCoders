@@ -137,6 +137,7 @@ Route::prefix('client')->group(function () {
 // General user route (outside of client prefix)
 Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
+ Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
 
 // Password reset routes
 
