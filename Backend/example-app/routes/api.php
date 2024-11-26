@@ -17,7 +17,8 @@ use App\Http\Controllers\Admin\{
     ReportExportController,
     AttributeController,
     AttributeValueController,
-    VariantController
+    VariantController,
+    BannerController
 };
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
@@ -65,6 +66,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('attributes/{attributeId}/values', AttributeValueController::class);
     Route::get('/{id}/variants', [ProductController::class, 'showVariants']);
     Route::get('products/{id}/variants', [ProductController::class, 'showVariants']);
+    Route::apiResource('banners', BannerController::class);
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
@@ -123,7 +125,7 @@ Route::prefix('client')->group(function () {
     // Route gửi OTP yêu cầu xác thực người dùng
     Route::post('/send-otp', [PhoneController::class, 'sendOtp'])->middleware('auth:api');
     // Route xác thực OTP yêu cầu xác thực người dùng
-    Route::post('/verify-otp', [PhoneController::class, 'verifyOtp']) ->middleware('auth:api');
+    Route::post('/verify-otp', [PhoneController::class, 'verifyOtp'])->middleware('auth:api');
     Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
 });
 
