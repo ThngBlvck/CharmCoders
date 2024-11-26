@@ -923,6 +923,12 @@
 .text-dGreen {
     color: #1a611a !important;
 }
+.text-dGreen-comment {
+    color: black !important; /* Màu chữ đen */
+    background-color: #29a329 !important; /* Nền xanh */
+}
+
+
 
 .salePr {
     color: #cd3c32;
