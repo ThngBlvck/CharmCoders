@@ -929,6 +929,12 @@
 }
 
 
+.text-dGreen-comment {
+    color: black !important; /* Màu chữ đen */
+    background-color: #29a329 !important; /* Nền xanh */
+}
+
+
 
 .text-del {
     color: #cd3232;
