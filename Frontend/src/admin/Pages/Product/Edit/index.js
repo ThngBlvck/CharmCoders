@@ -71,9 +71,9 @@ export default function EditProduct({ color = "light" }) {
     useEffect(() => {
         // Cập nhật trạng thái dựa trên số lượng
         if (quantity > 0) {
-            setValue("status", "0"); // Còn hàng
+            setValue("status", "1"); // Còn hàng
         } else {
-            setValue("status", "1"); // Hết hàng
+            setValue("status", "0"); // Hết hàng
         }
     }, [quantity, setValue]);
 
@@ -265,8 +265,8 @@ export default function EditProduct({ color = "light" }) {
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 disabled
                             >
-                                <option value="0">Còn hàng</option>
-                                <option value="1">Hết hàng</option>
+                                <option value="1">Còn hàng</option>
+                                <option value="0">Hết hàng</option>
                             </select>
                         </div>
                     </div>

@@ -3,6 +3,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { getProduct, deleteProduct, searchProduct } from "../../../../services/Product";
 import Swal from 'sweetalert2';
 import { PulseLoader } from 'react-spinners'; // Import PulseLoader từ react-spinners
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+
 
 export default function ProductCategoryList() {
     const [products, setProduct] = useState([]);
@@ -12,7 +15,7 @@ export default function ProductCategoryList() {
     const [displayedProducts, setDisplayedProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true); // Thêm state loading
-    const productsPerPage = 3; // Số sản phẩm trên mỗi trang
+    const productsPerPage = 5; // Số sản phẩm trên mỗi trang
 
     useEffect(() => {
         fetchProducts();
@@ -148,13 +151,51 @@ export default function ProductCategoryList() {
         }
     };
 
+    const getPaginationPages = (currentPage, totalPages) => {
+        const maxVisiblePages = 3; // Số trang liền kề hiển thị
+        const pages = [];
+
+        if (totalPages <= maxVisiblePages + 2) {
+            // Nếu tổng số trang ít, hiển thị tất cả
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            // Luôn hiển thị trang đầu
+            pages.push(1);
+
+            if (currentPage > 3) {
+                // Nếu trang hiện tại cách đầu > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Thêm các trang liền kề (trang hiện tại và 2 bên)
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                // Nếu trang hiện tại cách cuối > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Luôn hiển thị trang cuối
+            pages.push(totalPages);
+        }
+
+        return pages;
+    };
 
     return (
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex flex-wrap items-center">
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                        <h3 className="font-semibold text-lg text-blueGray-700">SẢN PHẨM</h3>
+                        <h3 className="font-bold text-2xl text-lg text-blueGray-700"
+                            style={{fontFamily: 'Roboto, sans-serif'}} // Áp dụng font chữ Roboto
+                        >- DANH SÁCH SẢN PHẨM -</h3>
                     </div>
                     <NavLink to={`/admin/product/add`}
                              className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -185,26 +226,25 @@ export default function ProductCategoryList() {
                     <table className="items-center w-full bg-transparent border-collapse table-fixed">
                         <thead>
                         <tr>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                            <th className="w-16 px-2 py-2 border border-solid text-xs uppercase font-semibold text-center">
                                 <input
                                     type="checkbox"
                                     onChange={handleSelectAll}
                                     checked={selectedProducts.length === products.length}
                                 />
-                                <span className="ml-2">Chọn tất cả</span>
                             </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình
+                            <th className="w-16 px-2 py-2 border border-solid text-x text-center uppercase font-bold text-left">STT</th>
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Tên</th>
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Hình
                                 ảnh
                             </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Giá
                                 gốc
                             </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Giá
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Giá
                                 sale
                             </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Thao
                                 tác
                             </th>
                         </tr>
@@ -213,31 +253,31 @@ export default function ProductCategoryList() {
                         {displayedProducts.length > 0 ? (
                             displayedProducts.map((product, index) => (
                                 <tr key={product.id}>
-                                    <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
+                                    <td className="border-t-0 px-6 py-5 align-middle text-center items-center">
                                         <input
                                             type="checkbox"
                                             checked={selectedProducts.includes(product.id)}
                                             onChange={() => handleSelectProduct(product.id)}
                                         />
                                     </td>
-                                    <td>
-                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                    <span className="ml-3 text-blueGray-600">
-                                        {index + 1}
-                                    </span>
-                                        </th>
+                                    <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
+                                        <div className="flex justify-center items-center">
+                                            <span className="text-blueGray-600">{index + 1}</span>
+                                        </div>
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        {product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                        {product.name.length > 20 ? product.name.substring(0, 20) + "..." : product.name}
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                        <img src={product.image} alt={product.name} className="h-12 w-12 rounded"/>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                        <div className="flex justify-center items-center h-full">
+                                            <img src={product.image} alt={product.name} className="h-12 w-12 rounded"/>
+                                        </div>
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{product.unit_price.toLocaleString()} VND</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">{product.unit_price.toLocaleString()} VND</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
                                         {product.sale_price !== null ? product.sale_price.toLocaleString() + " VND" : "Không có"}
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                    <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
                                         <button className="text-blue-500 hover:text-blue-700 px-2"
                                                 onClick={() => handleViewDetail(product.id)}>
                                             <i className="fas fa-eye text-xl"></i>
@@ -268,28 +308,49 @@ export default function ProductCategoryList() {
             )}
 
             {/* Phân trang */}
-            <div className="flex justify-center items-center mt-4">
+            <div className="flex justify-center items-center mt-4 mb-4">
                 {/* Nút Previous */}
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
                 >
-                    &#9664; {/* Mũi tên trái */}
+                    <FontAwesomeIcon icon={faChevronLeft}/>
                 </button>
 
-                {/* Trang hiện tại */}
-                <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
-        Trang {currentPage} / {Math.ceil(products.length / productsPerPage) || 1}
-    </span>
+                {/* Danh sách số trang */}
+                <div className="flex space-x-1">
+                    {getPaginationPages(currentPage, Math.ceil(products.length / productsPerPage)).map((page, index) =>
+                            page === "..." ? (
+                                <span
+                                    key={`ellipsis-${index}`}
+                                    className="w-10 h-10 flex items-center justify-center text-gray-500"
+                                >
+                                    ...
+                                </span>
+                            ) : (
+                                <button
+                                    key={page}
+                                    onClick={() => handlePageChange(page)}
+                                    className={`w-10 h-10 flex items-center justify-center border rounded-full text-sm font-bold shadow ${
+                                        currentPage === page
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-gray-100 text-gray-800"
+                                    } hover:bg-blue-300 hover:shadow-lg transition duration-200`}
+                                >
+                                    {page}
+                                </button>
+                            )
+                    )}
+                </div>
 
                 {/* Nút Next */}
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === Math.ceil(products.length / productsPerPage)}
-                    className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
                 >
-                    &#9654; {/* Mũi tên phải */}
+                    <FontAwesomeIcon icon={faChevronRight}/>
                 </button>
             </div>
 

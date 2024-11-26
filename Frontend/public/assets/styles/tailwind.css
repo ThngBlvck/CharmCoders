@@ -6,11 +6,7 @@
 Document
 ========
 */
-@tailwind base;
 
-@tailwind components;
-
-@tailwind utilities;
 /**
 Use a better box model (opinionated).
 */

@@ -4,6 +4,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { getCategory, deleteCategory, searchCategory } from "../../../../services/Category";
 import Swal from 'sweetalert2';
 import { PulseLoader } from "react-spinners"; // Hàm lấy danh sách danh mục
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProductCategory({ color = "light" }) {
     const [categories, setCategories] = useState([]);
@@ -11,7 +13,7 @@ export default function ProductCategory({ color = "light" }) {
     const [searchTerm, setSearchTerm] = useState(""); // State lưu trữ từ khóa tìm kiếm
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 3; // Số sản phẩm trên mỗi trang
+    const productsPerPage = 5; // Số sản phẩm trên mỗi trang
     const [loading, setLoading] = useState(true); // Thêm state loading
     const [displayedProducts, setDisplayedProducts] = useState([]);
     useEffect(() => {
@@ -147,14 +149,61 @@ export default function ProductCategory({ color = "light" }) {
     };
 
     const getStatusText = (status) => {
-        return status === 1 ? "Hiện" : "Ẩn"; // Chuyển đổi trạng thái
+        return (
+            <span
+                className={`shadow md:shadow-lg inline-block px-3 py-1 rounded border-2 ${
+                    status === 1 ? "border-green-500" : "border-red-500"
+                }`}
+            >
+      {status === 1 ? "Hiện" : "Ẩn"}
+    </span>
+        );
     };
+
 
     const handlePageChange = (page) => {
         if (page > 0 && page <= Math.ceil(categories.length / productsPerPage)) {
             setCurrentPage(page);
         }
     };
+
+    const getPaginationPages = (currentPage, totalPages) => {
+        const maxVisiblePages = 3; // Số trang liền kề hiển thị
+        const pages = [];
+
+        if (totalPages <= maxVisiblePages + 2) {
+            // Nếu tổng số trang ít, hiển thị tất cả
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            // Luôn hiển thị trang đầu
+            pages.push(1);
+
+            if (currentPage > 3) {
+                // Nếu trang hiện tại cách đầu > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Thêm các trang liền kề (trang hiện tại và 2 bên)
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                // Nếu trang hiện tại cách cuối > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Luôn hiển thị trang cuối
+            pages.push(totalPages);
+        }
+
+        return pages;
+    };
+
 
     return (
         <>
@@ -169,11 +218,12 @@ export default function ProductCategory({ color = "light" }) {
                         <div className="relative w-full px-4 max-w-full flex-grow flex-1">
                             <h3
                                 className={
-                                    "font-semibold text-lg " +
+                                    "font-bold text-2xl text-lg " +
                                     (color === "light" ? "text-blueGray-700" : "text-white")
                                 }
+                                style={{ fontFamily: 'Roboto, sans-serif' }} // Áp dụng font chữ Roboto
                             >
-                                DANH MỤC SẢN PHẨM
+                               - DANH MỤC SẢN PHẨM -
                             </h3>
                         </div>
                         <NavLink to={`/admin/category_product/add`}
@@ -203,21 +253,25 @@ export default function ProductCategory({ color = "light" }) {
                         <table className="items-center w-full bg-transparent border-collapse table-fixed">
                             <thead>
                             <tr>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                <th className="w-16 px-2 py-2 border border-solid text-xs uppercase font-semibold text-center">
                                     <input
                                         type="checkbox"
                                         onChange={handleSelectAll}
-                                        checked={selectedCategories.length === setDisplayedProducts.length}
+                                        checked={
+                                            selectedCategories.length > 0 &&
+                                            selectedCategories.length === displayedProducts.length
+                                        }
                                     />
                                 </th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên
+
+                                <th className="w-16 px-2 py-2 border border-solid text-xs text-center uppercase font-bold text-left">STT</th>
+                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Tên
                                     danh mục
                                 </th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng
+                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Trạng
                                     thái
                                 </th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành
+                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Hành
                                     động
                                 </th>
                             </tr>
@@ -226,19 +280,24 @@ export default function ProductCategory({ color = "light" }) {
                             {displayedProducts.length > 0 ? (
                                 displayedProducts.map((category, index) => (
                                     <tr key={category.id}>
-                                        <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedCategories.includes(category.id)}
-                                                onChange={() => handleSelectCategory(category.id)}
-                                            />
+                                        <td className="border-t-0 px-6 py-5 align-middle text-center">
+                                            <div className="flex justify-center items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCategories.includes(category.id)}
+                                                    onChange={() => handleSelectCategory(category.id)}
+                                                />
+                                            </div>
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{index + 1}</td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                            {category.name.length > 30 ? category.name.substring(0, 30) + "..." : category.name}
+
+                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">{index + 1}</td>
+                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                        {category.name.length > 30 ? category.name.substring(0, 30) + "..." : category.name}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">{getStatusText(category.status)}</td>
-                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                            {getStatusText(category.status)}
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
                                             <button
                                                 className="text-blue-500 hover:text-blue-700 px-2"
                                                 onClick={() => handleEdit(category.id)}
@@ -264,28 +323,52 @@ export default function ProductCategory({ color = "light" }) {
                         </table>
 
                         {/* Phân trang */}
-                        <div className="flex justify-center items-center mt-4">
+                        <div className="flex justify-center items-center mt-4 mb-4">
                             {/* Nút Previous */}
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
                             >
-                                &#9664; {/* Mũi tên trái */}
+                                <FontAwesomeIcon icon={faChevronLeft} />
                             </button>
 
-                            {/* Trang hiện tại */}
-                            <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
-                                Trang {currentPage} / {Math.ceil(categories.length / productsPerPage) || 1}</span>
+                            {/* Danh sách số trang */}
+                            <div className="flex space-x-1">
+                                {getPaginationPages(currentPage, Math.ceil(categories.length / productsPerPage)).map((page, index) =>
+                                        page === "..." ? (
+                                            <span
+                                                key={`ellipsis-${index}`}
+                                                className="w-10 h-10 flex items-center justify-center text-gray-500"
+                                            >
+                                                ...
+                                            </span>
+                                        ) : (
+                                            <button
+                                                key={page}
+                                                onClick={() => handlePageChange(page)}
+                                                className={`w-10 h-10 flex items-center justify-center border rounded-full text-sm font-bold shadow ${
+                                                    currentPage === page
+                                                        ? "bg-blue-500 text-white"
+                                                        : "bg-gray-100 text-gray-800"
+                                                } hover:bg-blue-300 hover:shadow-lg transition duration-200`}
+                                            >
+                                                {page}
+                                            </button>
+                                        )
+                                )}
+                            </div>
+
                             {/* Nút Next */}
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === Math.ceil(categories.length / productsPerPage)}
-                                className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
                             >
-                                &#9654; {/* Mũi tên phải */}
+                                <FontAwesomeIcon icon={faChevronRight} />
                             </button>
                         </div>
+
                         {/* Nút xóa hàng loạt */}
                         {selectedCategories.length > 0 && (
                             <div className="mb-4 px-4">

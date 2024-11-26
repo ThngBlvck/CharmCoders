@@ -162,7 +162,7 @@
 .carousel-item {
     position: relative;
     min-height: 100vh
-    
+
 }
 
 .carousel-item img {
@@ -269,7 +269,7 @@
 /*** Youtube Video start ***/
 .video {
     position: relative;
-    padding-right: 70px; 
+    padding-right: 70px;
     padding-bottom: 70px;
     border-radius: 10px;
 }
@@ -414,11 +414,11 @@
 
 .counter-section .counter-item .counter-content .svg-img {
     position: absolute;
-    bottom: 0; 
-    left: 50%; 
-    transform: translateX(-50%); 
-    margin-bottom: -50px; 
-    margin-left: -45px; 
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: -50px;
+    margin-left: -45px;
     transform: rotate(180deg);
 }
 
@@ -481,7 +481,7 @@
     transition: 0.5s;
     opacity: 0;
     z-index: 2;
-    
+
 }
 
 .gallery .gallery-img:hover .gallery-overlay,

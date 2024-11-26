@@ -4,6 +4,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { getBlog, deleteBlog,searchBlog  } from '../../../../services/Blog';
 import Swal from 'sweetalert2';
 import { PulseLoader } from "react-spinners"; // Hàm lấy danh sách danh mục
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 export default function BlogList({ color }) {
     const [blogs, setBlogs] = useState([]);
@@ -165,6 +167,44 @@ export default function BlogList({ color }) {
         }
     };
 
+    const getPaginationPages = (currentPage, totalPages) => {
+        const maxVisiblePages = 3; // Số trang liền kề hiển thị
+        const pages = [];
+
+        if (totalPages <= maxVisiblePages + 2) {
+            // Nếu tổng số trang ít, hiển thị tất cả
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            // Luôn hiển thị trang đầu
+            pages.push(1);
+
+            if (currentPage > 3) {
+                // Nếu trang hiện tại cách đầu > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Thêm các trang liền kề (trang hiện tại và 2 bên)
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                // Nếu trang hiện tại cách cuối > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Luôn hiển thị trang cuối
+            pages.push(totalPages);
+        }
+
+        return pages;
+    };
+
+
     return (
         <>
             <div
@@ -178,11 +218,12 @@ export default function BlogList({ color }) {
                         <div className="relative w-full px-4 max-w-full flex-grow flex-1">
                             <h3
                                 className={
-                                    "font-semibold text-lg " +
+                                    "font-bold text-2xl text-lg " +
                                     (color === "light" ? "text-blueGray-700" : "text-white")
                                 }
+                                style={{ fontFamily: 'Roboto, sans-serif' }} // Áp dụng font chữ Roboto
                             >
-                                DANH SÁCH BÀI VIẾT
+                               - DANH SÁCH BÀI VIẾT -
                             </h3>
                         </div>
                         <NavLink
@@ -215,20 +256,19 @@ export default function BlogList({ color }) {
                         <table className="items-center w-full bg-transparent border-collapse table-fixed">
                             <thead>
                             <tr>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                <th className="w-16 px-2 py-2 border border-solid text-center uppercase font-semibold ">
                                     <input
                                         type="checkbox"
                                         checked={selectAll}
                                         onChange={handleSelectAll}
                                     />
-                                    <span className="ml-2">Chọn tất cả</span>
                                 </th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình ảnh</th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tiêu đề</th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Danh mục</th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Trạng thái</th>
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hành động</th>
+                                <th className="w-16 px-2 py-2 border border-solid text-center uppercase font-semibold ">STT</th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Hình ảnh</th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Tiêu đề</th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Danh mục</th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Trạng thái</th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Hành động</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -287,26 +327,49 @@ export default function BlogList({ color }) {
                             </tbody>
                         </table>
                         {/* Phân trang */}
-                        <div className="flex justify-center items-center mt-4">
+                        <div className="flex justify-center items-center mt-4 mb-4">
                             {/* Nút Previous */}
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
                             >
-                                &#9664; {/* Mũi tên trái */}
+                                <FontAwesomeIcon icon={faChevronLeft}/>
                             </button>
 
-                            {/* Trang hiện tại */}
-                            <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
-                                Trang {currentPage} / {Math.ceil(blogs.length / blogsPerPage) || 1}</span>
+                            {/* Danh sách số trang */}
+                            <div className="flex space-x-1">
+                                {getPaginationPages(currentPage, Math.ceil(blogs.length / blogsPerPage)).map((page, index) =>
+                                        page === "..." ? (
+                                            <span
+                                                key={`ellipsis-${index}`}
+                                                className="w-10 h-10 flex items-center justify-center text-gray-500"
+                                            >
+                                    ...
+                                </span>
+                                        ) : (
+                                            <button
+                                                key={page}
+                                                onClick={() => handlePageChange(page)}
+                                                className={`w-10 h-10 flex items-center justify-center border rounded-full text-sm font-bold shadow ${
+                                                    currentPage === page
+                                                        ? "bg-blue-500 text-white"
+                                                        : "bg-gray-100 text-gray-800"
+                                                } hover:bg-blue-300 hover:shadow-lg transition duration-200`}
+                                            >
+                                                {page}
+                                            </button>
+                                        )
+                                )}
+                            </div>
+
                             {/* Nút Next */}
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === Math.ceil(blogs.length / blogsPerPage)}
-                                className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
                             >
-                                &#9654; {/* Mũi tên phải */}
+                                <FontAwesomeIcon icon={faChevronRight}/>
                             </button>
                         </div>
                     </div>

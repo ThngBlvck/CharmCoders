@@ -3,7 +3,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { getUser, deleteUser, searchUser } from "../../../../services/User";
 import { getRole } from "../../../../services/Role";
 import Swal from 'sweetalert2';
-import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
+import {PulseLoader} from "react-spinners";
+import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"; // Hàm lấy danh sách danh mục
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
@@ -174,13 +176,56 @@ export default function UserList() {
         }
     };
 
+    const getPaginationPages = (currentPage, totalPages) => {
+        const maxVisiblePages = 3; // Số trang liền kề hiển thị
+        const pages = [];
+
+        if (totalPages <= maxVisiblePages + 2) {
+            // Nếu tổng số trang ít, hiển thị tất cả
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            // Luôn hiển thị trang đầu
+            pages.push(1);
+
+            if (currentPage > 3) {
+                // Nếu trang hiện tại cách đầu > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Thêm các trang liền kề (trang hiện tại và 2 bên)
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+
+            if (currentPage < totalPages - 2) {
+                // Nếu trang hiện tại cách cuối > 2, thêm "..."
+                pages.push("...");
+            }
+
+            // Luôn hiển thị trang cuối
+            pages.push(totalPages);
+        }
+
+        return pages;
+    };
+
+
 
     return (
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex flex-wrap items-center">
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                        <h3 className="font-semibold text-lg text-blueGray-700">Người dùng</h3>
+                        <h3 className={
+                            "font-bold text-2xl text-lg "
+                        }
+                            style={{ fontFamily: 'Roboto, sans-serif' }} // Áp dụng font chữ Roboto
+                        >- DANH SÁCH NGƯỜI DÙNG -</h3>
+
                     </div>
                     {userRole === "admin" && (
                         <NavLink to={`/admin/user/add`}
@@ -210,9 +255,9 @@ export default function UserList() {
                         <thead>
                         <tr>
                             {userRole !== "admin" ? (
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left"></th>
+                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left"></th>
                             ) : (
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">
+                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">
                                     <input
                                         type="checkbox"
                                         onChange={handleSelectAll}
@@ -220,25 +265,25 @@ export default function UserList() {
                                     />
                                 </th>
                             )}
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">STT</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Tên</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Hình
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">STT</th>
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Tên</th>
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Hình
                                 ảnh
                             </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Email</th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Số
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Email</th>
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Số
                                 điện thoại
                             </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Địa
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Địa
                                 chỉ
                             </th>
-                            <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Quyền
+                            <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Quyền
                                 Người Dùng
                             </th>
                             {userRole !== "admin" ? (
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">...</th>
+                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">...</th>
                             ) : (
-                                <th className="px-6 py-3 border border-solid text-xs uppercase font-semibold text-left">Thao
+                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Thao
                                     tác</th>
                             )
                             }
@@ -248,7 +293,7 @@ export default function UserList() {
                         {displayedUsers.length > 0 ? (
                             displayedUsers.map((user, index) => (
                                 <tr key={user.id}>
-                                    <td className="border-t-0 px-6 py-5 align-middle text-left flex items-center">
+                                    <td className="border-t-0 px-6 py-5 align-middle text-center items-center">
                                         {/* Hiển thị checkbox cho nhân viên (role_id == 2) và người dùng khác không phải là admin (role_id khác 1) */}
                                         {user.role_id === 3 && userRole === "admin" ? (
                                             <input
@@ -260,24 +305,27 @@ export default function UserList() {
                                             <span className="w-4 h-4"/>
                                         )}
                                     </td>
-                                    <td>
-                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
-                                            <span className="ml-3 text-blueGray-600">{index + 1}</span>
-                                        </th>
+                                    <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
+                                        <div className="flex justify-center items-center">
+                                            <span className="text-blueGray-600">{index + 1}</span>
+                                        </div>
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.name}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
-                                        {user.image ? (
-                                            <img src={user.image} alt={user.name} className="w-12 h-12 rounded-full"/>
-                                        ) : (
-                                            <i className="fas fa-user-circle text-3xl text-gray-400"/>
-                                        )}
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.name}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">
+                                        <div className="flex justify-center items-center h-full">
+                                            {user.image ? (
+                                                <img src={user.image} alt={user.name}
+                                                     className="w-12 h-12 rounded-full"/>
+                                            ) : (
+                                                <i className="fas fa-user-circle text-3xl text-gray-400"/>
+                                            )}
+                                        </div>
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.email}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.phone}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{user.address}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">{getRoleName(user.role_id)}</td>
-                                    <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.email}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.phone}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.address}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{getRoleName(user.role_id)}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">
                                         {userRole === "admin" && user.role_id == 3 && (
                                             <>
                                                 <button
@@ -308,20 +356,41 @@ export default function UserList() {
             )}
 
             {/* Phân trang */}
-            <div className="flex justify-center items-center mt-4">
+            <div className="flex justify-center items-center mt-4 mb-4">
                 {/* Nút Previous */}
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                     className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                    &#9664; {/* Mũi tên trái */}
+                    <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
 
-                {/* Trang hiện tại */}
-                <span className="px-4 py-2 mx-1 bg-gray-100 text-gray-800 border rounded">
-                    Trang {currentPage} / {Math.ceil(users.length / usersPerPage) || 1}
-                </span>
+                {/* Danh sách số trang */}
+                <div className="flex space-x-1">
+                    {getPaginationPages(currentPage, Math.ceil(users.length / usersPerPage)).map((page, index) =>
+                        page === "..." ? (
+                            <span
+                                key={`ellipsis-${index}`}
+                                className="w-10 h-10 flex items-center justify-center text-gray-500"
+                            >
+                                                ...
+                                            </span>
+                        ) : (
+                            <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`w-10 h-10 flex items-center justify-center border rounded-full text-sm font-bold shadow ${
+                                    currentPage === page
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-100 text-gray-800"
+                                } hover:bg-blue-300 hover:shadow-lg transition duration-200`}
+                            >
+                                {page}
+                            </button>
+                        )
+                    )}
+                </div>
 
                 {/* Nút Next */}
                 <button
@@ -329,15 +398,15 @@ export default function UserList() {
                     disabled={currentPage === Math.ceil(users.length / usersPerPage)}
                     className="px-4 py-2 mx-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                    &#9654; {/* Mũi tên phải */}
+                    <FontAwesomeIcon icon={faChevronRight} />
                 </button>
             </div>
 
             {userRole === "admin" && selectedUsers.length > 0 && (
-                <div className="flex justify-end p-4">
+                <div className="mb-4 px-4">
                     <button
                         onClick={handleDeleteSelected}
-                        className="bg-red-500 text-white px-4 py-2 rounded"
+                        className="bg-red-500 text-white text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150"
                     >
                         Xóa đã chọn
                     </button>
