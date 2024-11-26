@@ -17,7 +17,10 @@ class AddressRequest extends FormRequest
     public function rules()
     {
         return [
-            'address' => 'required|string|max:255', 
+            'address' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'ward' => 'required|string|max:255',
         ];
     }
 
@@ -27,7 +30,18 @@ class AddressRequest extends FormRequest
             'address.required' => 'Địa chỉ không được để trống.',
             'address.string' => 'Địa chỉ phải là chuỗi ký tự.',
             'address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
-     
+            
+            'province.required' => 'Tỉnh/Thành phố không được để trống.',
+            'province.string' => 'Tỉnh/Thành phố phải là chuỗi ký tự.',
+            'province.max' => 'Tỉnh/Thành phố không được vượt quá 255 ký tự.',
+            
+            'district.required' => 'Quận/Huyện không được để trống.',
+            'district.string' => 'Quận/Huyện phải là chuỗi ký tự.',
+            'district.max' => 'Quận/Huyện không được vượt quá 255 ký tự.',
+            
+            'ward.required' => 'Phường/Xã không được để trống.',
+            'ward.string' => 'Phường/Xã phải là chuỗi ký tự.',
+            'ward.max' => 'Phường/Xã không được vượt quá 255 ký tự.',
         ];
     }
 

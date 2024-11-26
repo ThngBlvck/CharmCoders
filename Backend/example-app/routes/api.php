@@ -127,6 +127,8 @@ Route::prefix('client')->group(function () {
     // Route xác thực OTP yêu cầu xác thực người dùng
     Route::post('/verify-otp', [PhoneController::class, 'verifyOtp'])->middleware('auth:api');
     Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
+
+    Route::middleware('auth:api')->delete('/user/delete', [UserController::class, 'deleteUser']);
 });
 
 // General user route (outside of client prefix)
