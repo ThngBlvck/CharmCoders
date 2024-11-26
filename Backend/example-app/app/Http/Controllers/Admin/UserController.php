@@ -157,6 +157,37 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function deleteUser()
+    {
+        // Lấy ID của người dùng hiện tại
+        $userId = auth()->id();
+
+        // Tìm người dùng theo ID
+        $user = User::find($userId);
+
+        // Kiểm tra nếu người dùng không tồn tại
+        if (!$user) {
+            return response()->json(['error' => 'Người dùng không tồn tại'], 404);
+        }
+
+        // Kiểm tra nếu người dùng không phải là nhân viên (role_id = 3)
+        if ($user->role_id != 1) {
+            return response()->json(['error' => 'Chỉ có thể hủy tài khoản user'], 403);
+        }
+
+        // Kiểm tra đơn hàng của người dùng
+        $hasInvalidOrders = $user->orders()->whereNotIn('status', [3, 4])->exists();
+
+        if ($hasInvalidOrders) {
+            return response()->json(['error' => 'Không thể xóa người dùng vì họ có đơn hàng không hợp lệ'], 403);
+        }
+
+        // Thực hiện xóa người dùng
+        $user->delete();
+
+        return response()->json(['message' => 'Người dùng đã được xóa thành công'], 200);
+    }
+
 
     public function search(Request $request)
     {

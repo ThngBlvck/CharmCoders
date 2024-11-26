@@ -172,7 +172,7 @@ export default function OrderManagement() {
                                         {/* Cột 1 */}
                                         <div className="col-4">
                                             <span className="statusStyle">
-                                                {order.payment_method === 1 ? 'Thanh toán khi nhận hàng'
+                                                {order.payment_method == 1 ? 'Thanh toán khi nhận hàng'
                                                     : order.payment_method == 2 ? 'Thanh toán chuyển khoản'
                                                         : 'Không xác định'}</span>
                                         </div>
