@@ -131,7 +131,6 @@ Route::prefix('client')->group(function () {
 
         Route::get('/reviews/{id}', [ReviewController::class, 'getReviewById']);
 
-
     Route::middleware('auth:api')->delete('/user/delete', [UserController::class, 'deleteUser']);
 });
 
