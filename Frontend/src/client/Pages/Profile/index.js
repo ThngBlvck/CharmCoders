@@ -257,6 +257,11 @@ export default function Profile() {
                                         <label className="font-semibold mb-2 text-dGreen fs-20">
                                             <span>Số điện thoại:</span>
                                         </label>
+                                        <NavLink to={`/edit_phone`}>
+                                            <button className="btn-edit-phone">
+                                                <i className="fas fa-pencil-alt"></i> {/* Edit icon */}
+                                            </button>
+                                        </NavLink>
                                         <span className="text-dGreen fs-20 ml-4">{user.phone}</span>
                                     </div>
                                 </form>
