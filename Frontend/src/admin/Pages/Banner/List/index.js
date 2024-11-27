@@ -125,26 +125,26 @@ export default function Banner({ color }) {
                     <table className="items-center w-full bg-transparent border-collapse">
                         <thead>
                         <tr>
-                            <th className="px-6 py-3 border text-left text-xs uppercase font-semibold">STT</th>
-                            <th className="px-6 py-3 border text-left text-xs uppercase font-semibold">Hình ảnh</th>
-                            <th className="px-6 py-3 border text-left text-xs uppercase font-semibold">Trạng thái</th>
-                            <th className="px-6 py-3 border text-left text-xs uppercase font-semibold">Hành động</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">STT</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Hình ảnh</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Trạng thái</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
                         {displayedBanners.length > 0 ? (
                             displayedBanners.map((banner, index) => (
                                 <tr key={banner.id}>
-                                    <td className="px-6 py-3 text-left">{index + 1}</td>
-                                    <td className="px-6 py-3 text-left">
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">{index + 1}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
                                         <img
                                             src={banner.image_path}
                                             alt={banner.name}
                                             className="w-16 h-16 object-cover"
                                         />
                                     </td>
-                                    <td className="px-6 py-3 text-left">{renderStatus(banner.status)}</td>
-                                    <td className="px-6 py-3 text-left">
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">{renderStatus(banner.status)}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
                                         <button
                                             className="text-blue-500 hover:text-blue-700 px-2"
                                             onClick={() => handleEditClick(banner.id)}
