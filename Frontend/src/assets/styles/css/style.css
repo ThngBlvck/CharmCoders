@@ -1012,6 +1012,13 @@
     height: 40px;
 }
 
+.btn-tkp {
+    background-color: #2bab2b !important;
+    color: white !important;
+    width: 40%;
+    height: 40px;
+}
+
 .btn-tk {
     background-color: #32CD32;
     color: white;
@@ -1387,6 +1394,23 @@ input[type="range"]::-ms-thumb {
     margin-left: 8px;
 }
 
+
+.btn-edit-phone {
+    background: none;
+    border: none;
+    color: #45a049;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-edit-phone i {
+    margin-left: 8px;
+}
+
+.btn-edit-phone:hover {
+    color: #387e3a;
+}
 .btn-edit-phone:hover {
     color: #387e3a;
 }
