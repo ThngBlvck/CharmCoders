@@ -4,19 +4,19 @@ import {getOneProduct, getRelatedProducts, getHotProducts} from "../../../servic
 import {getOneBrand} from "../../../services/Brand";
 import {getOneCategory} from "../../../services/Category";
 import {addToCart} from "../../../services/Cart";
-import {getCommentsByProductId, addComment, deleteComment} from "../../../services/Comment";
+import {addReview, getReviews, updateReview,  getReviewById} from "../../../services/Review";
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import "../../../assets/styles/css/productdt/index.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
 import '@fontsource/roboto';
 import Swal from "sweetalert2";
 import Slider from "react-slick";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+
 
 const ProductDetail = () => {
     const {id} = useParams();
@@ -26,14 +26,22 @@ const ProductDetail = () => {
     const [categoryName, setCategoryName] = useState("");
     const [cart, setCart] = useState({});
     const [userId, setUserId] = useState(null);
-    const [comments, setComments] = useState([]);
-    const [loadingComments, setLoadingComments] = useState(true);
     const [loadingProduct, setLoadingProduct] = useState(true);
-    const [newComment, setNewComment] = useState("");
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
     const sliderRef = useRef(null);
-    const [hotProducts, setHotProducts] = useState([]); // Thêm state để lưu danh sách sản phẩm hot
+    const [loadingReviews, setLoadingReviews] = useState(true);  // Loading reviews state
+    const [reviews, setReviews] = useState([]); // Reviews data
+    const [hotProducts, setHotProducts] = useState([]); // Hot products data
+    const [rating, setRating] = useState(0); // Product rating
+    const [comment, setComment] = useState(""); // Nhận xét của người dùng
+    const [editRating, setEditRating] = useState(0);  // Stores the rating for editing
+    const [editComment, setEditComment] = useState("");  // Stores the comment for editing
+    const [editingReview, setEditingReview] = useState(false);  // Tracks if the user is editing a review
+    const [userName, setUserName] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [editingReviewId, setEditingReviewId] = useState(null);  // Store the id of the review being edited
+    const [review_id, setReview_id] = useState(null);
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
@@ -47,16 +55,26 @@ const ProductDetail = () => {
 
     const sliderSettings = {
         dots: false,
-        infinite: true,
+        infinite: relatedProducts.length >= 5, // Chỉ cho phép infinite nếu có 5 item trở lên
         speed: 500,
-        slidesToShow: 4,
+        slidesToShow: Math.min(relatedProducts.length, 5), // Luôn luôn hiển thị 5 item
         slidesToScroll: 1,
-        draggable: false,
-        swipe: false,
+        arrows: false,
+        autoplay: relatedProducts.length >= 5, // Chỉ tự động chạy khi có 5 item trở lên
+        autoplaySpeed: 2000,
         responsive: [
-            {breakpoint: 1024, settings: {slidesToShow: 3}},
-            {breakpoint: 768, settings: {slidesToShow: 2}},
-            {breakpoint: 480, settings: {slidesToShow: 1}},
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 2, // Tối đa hiển thị 2 item cho kích thước màn hình nhỏ hơn 768px
+                },
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1, // Luôn hiển thị 1 item cho kích thước màn hình nhỏ hơn 480px
+                },
+            },
         ],
     };
 
@@ -80,29 +98,31 @@ const ProductDetail = () => {
                 setCategoryName(categoryResult.name);
             }
 
-            // Lấy bình luận
-            const commentsResult = await getCommentsByProductId(id);
-            setComments(commentsResult);
-
-            // Lấy sản phẩm liên quan
+            // Fetch related products
             const relatedProductsResult = await getRelatedProducts(id);
             setRelatedProducts(relatedProductsResult.related_products);
 
-            // Lấy sản phẩm hot
+            // Fetch hot products
             const hotProductsResult = await getHotProducts();
             if (hotProductsResult && hotProductsResult.hot_products) {
                 setHotProducts(hotProductsResult.hot_products);
             } else {
-                toast.warning('Không có sản phẩm hot nào được tìm thấy.');
+                toast.warning('No hot products found.');
             }
+
+            // Fetch product reviews
+            const reviewsData = await getReviews(id);
+            setReviews(reviewsData);
+
         } catch (error) {
-            toast.error('Có lỗi xảy ra khi tải sản phẩm.');
+            toast.error('There was an error loading the product.');
             console.error('Error fetching product details:', error);
         } finally {
             setLoadingProduct(false);
-            setLoadingComments(false);
+            setLoadingReviews(false);  // Set reviews loading state to false after data is fetched
         }
     };
+
 
 
     const handleQuantityChange = (e) => {
@@ -171,23 +191,13 @@ const ProductDetail = () => {
         }
     };
 
-
-    const handleNewCommentChange = (e) => {
-        const value = e.target.value;
-
-        if (value.length > 500) {
-            toast.warn("Nội dung bình luận không được vượt quá 500 ký tự.");
-            return;
-        }
-
-        setNewComment(value);
-    };
-
-
-    const handleSubmitComment = async (e) => {
+    const handleSubmitReview = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem("token");
+        setIsSubmitting(true);
 
+        const userId = localStorage.getItem("userId");
+
+        // Kiểm tra đăng nhập
         if (!token) {
             Swal.fire({
                 icon: 'warning',
@@ -196,64 +206,119 @@ const ProductDetail = () => {
                 confirmButtonText: 'Đăng nhập',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    navigate("/login"); // Chuyển hướng đến trang đăng nhập
+                    navigate("/login");
                 }
             });
+            setIsSubmitting(false);
             return;
         }
 
-        if (!newComment.trim()) {
-            toast.warn("Vui lòng nhập nội dung bình luận.");
+        // Kiểm tra xem có đủ đánh giá và nhận xét không
+        if (rating === 0 || comment === "") {
+            toast.error("Vui lòng cung cấp cả đánh giá sao và nhận xét.");
+            setIsSubmitting(false);
             return;
         }
 
-        const commentData = {
-            product_id: id,
+        const reviewData = {
+            rating,
+            comment,
+            product_id: product.id,
             user_id: userId,
-            content: newComment,
         };
 
         try {
-            await addComment(commentData);
-            setNewComment("");
-            toast.success("Bình luận đã được thêm thành công.");
+            let response;
 
-            const commentsResult = await getCommentsByProductId(id);
-            setComments(commentsResult);
+            // Nếu có reviewId, gọi API cập nhật đánh giá
+            if (editingReviewId) {
+                response = await updateReview(editingReviewId, reviewData);
+                if (response && response.review) {
+                    const updatedReviews = reviews.map((review) =>
+                        review.id === editingReviewId ? response.review : review
+                    );
+                    setReviews(updatedReviews);
+                    setEditingReview(false);
+                    setEditingReviewId(null);
+                    setRating(0);
+                    setComment("");
+                    toast.success("Đánh giá đã được chỉnh sửa thành công!");
+                }
+            } else {
+                // Nếu không có reviewId, gọi API thêm mới đánh giá
+                response = await addReview(reviewData);
+
+                // Xử lý các lỗi từ backend theo status code
+                if (response) {
+                    switch (response.status) {
+                        case 403:
+                            // Kiểm tra lỗi từ backend "Bạn chưa mua sản phẩm này hoặc hóa đơn chưa hoàn tất."
+                            if (response.data && response.data.message === 'Bạn chưa mua sản phẩm này hoặc hóa đơn chưa hoàn tất.') {
+                                toast.error("Bạn chưa mua sản phẩm này hoặc hóa đơn chưa hoàn tất.");
+                            } else if (response.data && response.data.message === 'Bạn đã đánh giá sản phẩm này rồi.') {
+                                toast.error("Bạn đã đánh giá sản phẩm này rồi.");
+                            } else {
+                                toast.error("Có lỗi xảy ra khi gửi đánh giá.");
+                            }
+                            break;
+                        case 500:
+                            toast.error("Lỗi máy chủ. Vui lòng thử lại sau.");
+                            break;
+                        default:
+                            toast.error("Có lỗi xảy ra khi gửi đánh giá.");
+                            break;
+                    }
+                } else if (response && response.review) {
+                    setReviews([...reviews, response.review]);
+                    setRating(0);
+                    setComment("");
+                    toast.success("Đánh giá thành công!");
+                }
+            }
         } catch (error) {
-            console.error("Error adding comment:", error);
-            toast.error("Lỗi. Không thể thêm bình luận.");
+            console.error("Có lỗi khi gửi hoặc chỉnh sửa đánh giá:", error);
+
+            // Bắt lỗi nếu có từ server, xử lý theo status code
+            if (error.response) {
+                switch (error.response.status) {
+                    case 403:
+                        toast.error("Bạn chưa mua sản phẩm này hoặc hóa đơn chưa hoàn tất.");
+                        break;
+                    case 500:
+                        toast.error("Lỗi máy chủ. Vui lòng thử lại sau.");
+                        break;
+                    default:
+                        toast.error("Có lỗi xảy ra khi gửi hoặc chỉnh sửa đánh giá.");
+                        break;
+                }
+            } else {
+                toast.error("Có lỗi xảy ra khi gửi hoặc chỉnh sửa đánh giá.");
+            }
+        } finally {
+            setIsSubmitting(false);
         }
     };
-    const handleDeleteComment = async (commentId) => {
-        if (!token) {
-            toast.warn("Bạn cần đăng nhập để xóa bình luận.");
-            return;
-        }
 
-        const result = await Swal.fire({
-            title: 'Bạn có chắc chắn muốn xóa bình luận này?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Có',
-            cancelButtonText: 'Không',
-            confirmButtonColor: '#e74c3c', // Màu cho nút xác nhận
-            cancelButtonColor: '#6c757d', // Màu cho nút hủy
-        });
 
-        if (result.isConfirmed) {
-            try {
-                await deleteComment(commentId);
-                toast.success("Bình luận đã được xóa thành công.");
 
-                // Lấy lại danh sách bình luận sau khi xóa
-                const commentsResult = await getCommentsByProductId(id);
-                setComments(commentsResult);
-            } catch (error) {
-                console.error("Error deleting comment:", error);
-                toast.error("Lỗi. Không thể xóa bình luận này.");
-            }
-        }
+
+
+
+
+    const handleEditReview = (reviewId) => {
+        // Cập nhật reviewId khi chọn chỉnh sửa
+        setEditingReviewId(reviewId);
+        setEditingReview(true); // Kích hoạt chế độ chỉnh sửa
+        const review = reviews.find(r => r.id === reviewId);
+        setRating(review.rating);  // Thiết lập lại rating
+        setComment(review.comment);  // Thiết lập lại comment
+    };
+
+
+    const handleCancelEdit = () => {
+        setEditingReview(null); // Hủy chỉnh sửa
+        setRating(0);
+        setComment('');
     };
 
 
@@ -316,47 +381,7 @@ const ProductDetail = () => {
                                 </div>
                             </div>
 
-                            {/* Phần bình luận */}
-                            <div className="comments-section mt-5">
-                                <Skeleton height={20} width="100%"/>
-                                <div className="p-4 border rounded bg-white shadow">
-                                    <form onSubmit={handleSubmitComment} className="p-3 mb-4 border rounded">
-                                        <div className="form-group">
-                                            <label htmlFor="newComment" className="font-bold fs-14 text-dGreen">
-                                                <Skeleton height={20} width="100%"/>
-                                            </label>
-                                            <textarea
-                                                className="form-control comment-resize"
-                                                id="newComment"
-                                                value={newComment}
-                                                onChange={(e) => setNewComment(e.target.value)}
-                                                rows="3"
-                                            />
-                                        </div>
-                                        <Skeleton height={40} width="40%"/>
-                                    </form>
-                                    {/* Hiển thị danh sách bình luận */}
 
-                                    <div className="mt-4">
-                                        {comments.length > 0 ? (
-                                            comments.map((comment) => (
-                                                <div key={comment.id} className="mb-3 p-3 rounded border">
-                                                    <div
-                                                        className="d-flex justify-content-between align-items-start">
-                                                        <div>
-                                                            <Skeleton height={20} width="100%"/>
-                                                        </div>
-                                                        <Skeleton height={40} width="40%"/>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <Skeleton height={60} width="100%"/>
-                                        )}
-                                    </div>
-
-                                </div>
-                            </div>
                         </div>
                         {/* Cột Sản Phẩm Hot */}
                         <div className="col-md-3">
@@ -510,60 +535,103 @@ const ProductDetail = () => {
                                 </div>
                             </div>
 
-                            {/* Phần bình luận */}
-                            <div className="comments-section mt-5">
-                                <p className="text-dGreen font-semibold fs-20 mb-2">Bình luận</p>
-                                <div className="p-4 border rounded bg-white shadow">
-                                    <form onSubmit={handleSubmitComment} className="p-3 mb-4 border rounded">
+                            <div className="reviews font-semibold mt-3 mb-2 text-dGreen">
+                                <h2 className="text-dGreen form-label">Đánh giá</h2>
+
+                                {/* Form đánh giá */}
+                                <div className="review-form text-dGreen">
+                                    <h3 className="text-dGreen form-label">
+                                        {editingReview ? "Chỉnh sửa đánh giá" : "Để lại đánh giá của bạn"}
+                                    </h3>
+
+                                    <form onSubmit={handleSubmitReview}>
                                         <div className="form-group">
-                                            <label htmlFor="newComment" className="font-bold fs-14 text-dGreen">
-                                                Viết bình luận:
-                                            </label>
-                                            <textarea
-                                                className="form-control comment-resize"
-                                                id="newComment"
-                                                value={newComment}
-                                                onChange={(e) => setNewComment(e.target.value)}
-                                                rows="3"
-                                            />
+                                            <label htmlFor="rating" className="form-label text-dGreen">Đánh giá
+                                                (Sao):</label>
+                                            <div className="rating-input">
+                                                {/* Rating input */}
+                                                {Array.from({length: 5}, (_, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className={index < rating ? "filled-star" : "empty-star"}
+                                                        onClick={() => setRating(index + 1)}
+                                                    >
+                            &#9733;
+                        </span>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <button type="submit" className="butn rounded w-16 mt-2 shadow border-none">
-                                            Gửi
-                                        </button>
+
+                                        <div className="form-group">
+                                            <label htmlFor="comment" className="form-label text-dGreen">Nhận
+                                                xét:</label>
+                                            <textarea
+                                                id="comment"
+                                                value={comment}
+                                                onChange={(e) => setComment(e.target.value)}
+                                                className="form-textarea"
+                                                placeholder="Viết nhận xét của bạn tại đây"
+                                                required
+                                            ></textarea>
+                                        </div>
+
+                                        {/* Nút gửi hoặc cập nhật đánh giá */}
+                                        <div className="button-group">
+                                            <button type="submit" className="btn-submit" disabled={isSubmitting}>
+                                                {isSubmitting ? "Đang gửi..." : editingReviewId ? "Cập nhật đánh giá" : "Gửi đánh giá"}
+                                            </button>
+
+                                            {editingReview && (
+                                                <button
+                                                    type="button"
+                                                    className="btn-cancel"
+                                                    onClick={handleCancelEdit} // Hủy chế độ chỉnh sửa
+                                                >
+                                                    Hủy
+                                                </button>
+                                            )}
+                                        </div>
                                     </form>
-                                    {/* Hiển thị danh sách bình luận */}
-
-                                    <div className="mt-4">
-                                        {comments.length > 0 ? (
-                                            comments.map((comment) => (
-                                                <div key={comment.id} className="mb-3 p-3 rounded border">
-                                                    <div
-                                                        className="d-flex justify-content-between align-items-start">
-                                                        <div>
-                                                            <p className="fs-14 text-dGreen mb-1 font-bold">
-                                                                {comment.user_name}
-                                                            </p>
-                                                            <p className="fs-14 text-dGreen">
-                                                                {comment.content}
-                                                            </p>
-                                                        </div>
-                                                        <button onClick={() => handleDeleteComment(comment.id)}
-                                                                className="border-none bg-none del-comment fs-14"
-                                                                title="Xóa bình luận">
-                                                            <FontAwesomeIcon icon={faTrash}/> Xóa
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <p className="text-dGreen fs-14">
-                                                Không có bình luận nào.
-                                            </p>
-                                        )}
-                                    </div>
-
                                 </div>
+
+                                {/* Hiển thị các đánh giá hiện tại */}
+                                {reviews.length ? (
+                                    <ul className="review-list">
+                                        {reviews.map((review) => (
+                                            <li key={review.id} className="review-item mt-3 mb-2">
+                                                <div className="d-flex justify-content-between review-header">
+                                                    <div>
+                                                        <strong
+                                                            className="review-username text-dGreen">{review.user_name}</strong>
+                                                        <div className="review-rating">
+                                                            {/* Hiển thị rating dưới dạng sao */}
+                                                            {Array.from({length: 5}, (_, index) => (
+                                                                <span
+                                                                    key={index}
+                                                                    className={index < review.rating ? "filled-star" : "empty-star"}
+                                                                >
+                                        &#9733;
+                                    </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        className="btn-edit"
+                                                        onClick={() => handleEditReview(review.id)} // Gọi hàm chỉnh sửa và truyền ID
+                                                    >
+                                                        <i className="fas fa-pencil-alt"></i>
+                                                    </button>
+                                                </div>
+                                                <div className="review-comment">{review.comment}</div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>Chưa có đánh giá nào.</p>
+                                )}
                             </div>
+
+
                         </div>
                         {/* Cột Sản Phẩm Hot */}
                         <div className="col-md-3">
