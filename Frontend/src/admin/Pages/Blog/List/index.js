@@ -282,7 +282,7 @@ export default function BlogList({ color }) {
                                                 onChange={() => handleSelectBlog(blog.id)}
                                             />
                                         </td>
-                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+                                        <th className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
                                             <span className="ml-3 font-bold">{index + 1}</span>
                                         </th>
                                         <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
@@ -292,16 +292,19 @@ export default function BlogList({ color }) {
                                                 className="h-16 w-16 object-cover rounded"
                                             />
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4"
+                                            style={{maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                                            }}>
                                             {blog.title}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+
+                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
                                             {blog.category_name}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
                                             {blog.status === 1 ? 'Hiển thị' : 'Ẩn'}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
                                             <button
                                                 className="text-blue-500 hover:text-blue-700 px-2"
                                                 onClick={() => handleEditClick(blog.id)}
@@ -320,7 +323,7 @@ export default function BlogList({ color }) {
                             ) : (
                                 <tr>
                                     <td colSpan="7" className="text-center py-4">
-                                        Không có bài viết nào
+                                    Không có bài viết nào
                                     </td>
                                 </tr>
                             )}

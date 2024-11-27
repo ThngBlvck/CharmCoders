@@ -214,7 +214,7 @@ export default function Sidebar() {
                                     }`}
                                     to="/admin/banner"
                                 >
-                                    <i className={`fas fa-user-tag mr-2 text-sm ${location.pathname === "/admin/banner" ? "opacity-75" : "text-blueGray-300"}`}></i>
+                                    <i className={`fas fa-file-image mr-2 text-sm ${location.pathname === "/admin/banner" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Hình nền
                                 </Link>
                             </li>

@@ -104,17 +104,17 @@ export default function Comment({ color, userId }) {
                     <table className="items-center w-full bg-transparent border-collapse">
                         <thead>
                         <tr>
-                            <th className="px-6 py-3 border text-xs uppercase font-semibold text-left">ID</th>
-                            <th className="px-6 py-3 border text-xs uppercase font-semibold text-left">Nội dung</th>
-                            <th className="px-6 py-3 border text-xs uppercase font-semibold text-left">Tên bài viết</th>
-                            <th className="px-6 py-3 border text-xs uppercase font-semibold text-left">Người bình luận</th>
-                            <th className="px-6 py-3 border text-xs uppercase font-semibold text-left">Hành động</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">STT</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Nội dung</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Tên bài viết</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Người bình luận</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
                         {paginatedComments.map((comment, index) => (
                             <tr key={comment.id}>
-                                <td className="border-t-0 px-6 text-left">{comment.id}</td>
+                                <td className="border-t-0 px-6 text-left">{index + 1}</td>
                                 <td className="border-t-0 px-6 text-left">{comment.content}</td>
                                 <td className="border-t-0 px-6 text-left">{comment.blogTitle}</td>
                                 <td className="border-t-0 px-6 text-left">{comment.user_name}</td>
