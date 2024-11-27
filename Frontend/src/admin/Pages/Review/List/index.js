@@ -180,31 +180,19 @@ export default function Reviews({ color }) {
                         <table className="items-center w-full bg-transparent border-collapse table-fixed">
                             <thead>
                             <tr>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "2%"}}
-                                >
-                                    STT
+                                <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
+                                    style={{width: '5%'}}>STT
+                                </th>
+                                <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
+                                    style={{width: '10%'}}>Đánh giá
+                                </th>
+                                <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
+                                    style={{width: '70%'}}>Nội dung
+                                </th>
+                                <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
+                                    style={{width: '15%'}}>Người Đánh Giá
                                 </th>
 
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "5%"}}
-                                >
-                                    Đánh giá
-                                </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "25%"}}
-                                >
-                                    Nội dung
-                                </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
-                                    (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "10%"}}
-                                >
-                                    Tên người dùng
-                                </th>
                             </tr>
                             </thead>
                             <tbody>
