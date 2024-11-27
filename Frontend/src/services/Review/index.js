@@ -1,12 +1,13 @@
 import request from '../../api'; // Assuming you're using axios or similar library
-const URL_Review = 'client/review'; // Update this with the correct API path for reviews
+const URL_Review = 'client/review';
+const URL_ReviewA = 'admin/review'; // Update this with the correct API path for reviews
 const URL_Reviews = 'client/reviews';
-
+const URL_Review1 = 'client/review1';
 
 export const getReviews = async (product_id) => {
     return request({
         method: 'GET',
-        path: `${URL_Review}/${product_id}`,  // Đường dẫn API để lấy đánh giá theo product_id
+        path: `${URL_Review1}/${product_id}`,  // Đường dẫn API để lấy đánh giá theo product_id
     });
 };
 
@@ -14,7 +15,7 @@ export const getReviews = async (product_id) => {
 export const getReviewsAdmin = async () => {
     return request({
         method: 'GET',
-        path: `${URL_Review}`,
+        path: `${URL_ReviewA}`,
     });
 };
 
