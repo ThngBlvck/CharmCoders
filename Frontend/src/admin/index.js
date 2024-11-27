@@ -53,6 +53,7 @@ import OrderDetail from "./Pages/Order/OrderDetail";
 import EditOrder from "./Pages/Order/Edit";
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
+import Reviews from "./Pages/Review/List";
 import "../assets/styles/tailwind.css"
 
 export default function Admin() {
@@ -113,6 +114,8 @@ export default function Admin() {
                         <Route path="banner" element={<Banner />} />
                         <Route path="banner/add" element={<AddBanner />} />
                         <Route path="banner/edit/:id" element={<EditBanner />} />
+
+                        <Route path="review" element={<Reviews />} />
 
                         {/* Default and 404 Route */}
                         <Route path="/" element={<Navigate to="/admin/dashboard" />} />
