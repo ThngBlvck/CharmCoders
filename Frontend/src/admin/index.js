@@ -117,6 +117,10 @@ export default function Admin() {
 
                         <Route path="review" element={<Reviews />} />
 
+                        <Route path="banner" element={<Banner />} />
+                        <Route path="banner/add" element={<AddBanner />} />
+                        <Route path="banner/edit/:id" element={<EditBanner />} />
+
                         {/* Default and 404 Route */}
                         <Route path="/" element={<Navigate to="/admin/dashboard" />} />
                         <Route path="/404" element={<Page404 />} />
