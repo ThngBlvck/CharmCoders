@@ -191,6 +191,19 @@ export default function Sidebar() {
                                     Vai trò
                                 </Link>
                             </li>
+                            <li className="items-center">
+                                <Link
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/banner"
+                                            ? "text-lightBlue-500 hover:text-lightBlue-600"
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
+                                    to="/admin/banner"
+                                >
+                                    <i className={`fas fa-user-tag mr-2 text-sm ${location.pathname === "/admin/banner" ? "opacity-75" : "text-blueGray-300"}`}></i>
+                                    Hình nền
+                                </Link>
+                            </li>
                         </ul>
 
                         {/* Auth Layout Pages */}

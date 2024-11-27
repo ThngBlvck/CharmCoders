@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { getOrderById, updateOrder } from '../../../../services/Order'; // Adjust to your actual service
-import Swal from 'sweetalert2';
+import { getOrderById, updateOrder } from "../../../../services/Order"; // Adjust to your actual service
+import Swal from "sweetalert2";
 
 export default function EditOrderStatus() {
     const { id } = useParams();
@@ -10,7 +10,7 @@ export default function EditOrderStatus() {
 
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
         defaultValues: {
-            status: '',
+            status: "",
         },
     });
 
@@ -24,37 +24,38 @@ export default function EditOrderStatus() {
             if (result) {
                 setValue("status", result.status);
             } else {
-                Swal.fire('Lỗi', 'Không tìm thấy đơn hàng này.', 'error');
-                navigate('/admin/order');
+                Swal.fire("Lỗi", "Không tìm thấy đơn hàng này.", "error");
+                navigate("/admin/order");
             }
         } catch (err) {
-            console.error('Error fetching order data:', err);
-            Swal.fire('Lỗi', 'Lỗi khi tải đơn hàng. Vui lòng thử lại.', 'error');
-            navigate('/admin/order');
+            console.error("Error fetching order data:", err);
+            Swal.fire("Lỗi", "Lỗi khi tải đơn hàng. Vui lòng thử lại.", "error");
+            navigate("/admin/order");
         }
     };
 
     const onSubmit = async (data) => {
         try {
-            const updatedData = data.status; // Send status as JSON
+            const updatedData = { status: parseInt(data.status) }; // Ensure the status is sent as an integer
             await updateOrder(id, updatedData);
-            Swal.fire('Thành công', 'Cập nhật trạng thái đơn hàng thành công.', 'success').then(() => {
-                navigate('/admin/order');
+            Swal.fire("Thành công", "Cập nhật trạng thái đơn hàng thành công.", "success").then(() => {
+                navigate("/admin/order");
             });
         } catch (err) {
-            console.error('Error updating order status:', err);
-            Swal.fire('Lỗi', 'Lỗi khi cập nhật trạng thái đơn hàng. Vui lòng thử lại.', 'error');
+            console.error("Error updating order status:", err);
+            Swal.fire("Lỗi", "Lỗi khi cập nhật trạng thái đơn hàng. Vui lòng thử lại.", "error");
         }
     };
-
-
 
     return (
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex items-center">
-                    <h3 className="font-semibold text-lg text-blueGray-700">
-                        Cập nhật trạng thái đơn hàng
+                    <h3
+                        className="font-bold text-2xl text-blueGray-700"
+                        style={{ fontFamily: "Roboto, sans-serif" }}
+                    >
+                        CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG
                     </h3>
                 </div>
             </div>
@@ -70,24 +71,31 @@ export default function EditOrderStatus() {
                             className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
                         >
                             <option value="">Chọn trạng thái</option>
+                            <option value="0">Đang chờ xác nhận</option>
                             <option value="1">Đang chuẩn bị hàng</option>
                             <option value="2">Đang giao</option>
+                            <option value="3">Đã nhận hàng</option>
+                            <option value="4">Đã hủy</option>
                         </select>
-                        {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
+                        {errors.status && (
+                            <p className="text-red-500 text-xs italic">{errors.status.message}</p>
+                        )}
                     </div>
 
                     <div className="flex items-center justify-between">
                         <button
                             type="submit"
-                            className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${
+                                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? "Đang cập nhật..." : "Cập nhật"}
                         </button>
                         <button
                             type="button"
-                            className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-                            onClick={() => navigate('/admin/order')}
+                            className="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                            onClick={() => navigate("/admin/order")}
                         >
                             Hủy bỏ
                         </button>

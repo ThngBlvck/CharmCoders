@@ -47,7 +47,8 @@ export default function ProductDetail() {
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white px-6 py-6">
             {product ? (
                 <div className="bg-white shadow-md rounded-lg p-6">
-                    <h3 className="text-2xl font-semibold mb-4">Chi Tiết Sản Phẩm: {product.name}</h3>
+                    <h3 className="font-bold text-2xl text-blueGray-700"
+                        style={{ fontFamily: "Roboto, sans-serif" }}>Chi Tiết Sản Phẩm: {product.name}</h3>
                     <div className="flex">
                         {/* Hình ảnh nằm trong card riêng */}
                         <div className="w-1/2 pr-4">

@@ -1,43 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import PropTypes from "prop-types";
-import { getOneBrand, updateBrand } from "../../../../services/Brand"; // Adjust to your actual service
 import Swal from "sweetalert2";
-import { PulseLoader } from "react-spinners"; // Import PulseLoader
+import { getOneBanner, updateBanner } from "../../../../services/Banner";
+import { PulseLoader } from "react-spinners";
 
-export default function EditBrand() {
+export default function EditBanner() {
     const { id } = useParams();
     const navigate = useNavigate();
 
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
         defaultValues: {
-            brandName: "",
             status: "",
         },
     });
 
     const [loading, setLoading] = useState(true);
+    const [currentImage, setCurrentImage] = useState(null);
 
     useEffect(() => {
-        fetchBrandData(id);
+        fetchBannerData(id);
     }, [id]);
 
-    const fetchBrandData = async (id) => {
+    const fetchBannerData = async (id) => {
         setLoading(true);
         try {
-            const result = await getOneBrand(id);
+            const result = await getOneBanner(id);
             if (result) {
-                setValue("brandName", result.name || "");
-                setValue("status", result.status || "");
+                setValue("status", result.status || ""); // Đặt giá trị trạng thái
+                setCurrentImage(result.image); // Lưu URL ảnh hiện tại
             } else {
-                Swal.fire("Lỗi", "Không tìm thấy nhãn hàng này.", "error");
-                navigate("/admin/brand");
+                Swal.fire("Lỗi", "Không tìm thấy banner này.", "error");
+                navigate("/admin/banner");
             }
         } catch (err) {
-            console.error("Error fetching brand data:", err);
-            Swal.fire("Lỗi", "Lỗi khi tải nhãn hàng. Vui lòng thử lại.", "error");
-            navigate("/admin/brand");
+            console.error("Error fetching banner data:", err);
+            Swal.fire("Lỗi", "Lỗi khi tải banner. Vui lòng thử lại.", "error");
+            navigate("/admin/banner");
         } finally {
             setLoading(false);
         }
@@ -46,17 +45,20 @@ export default function EditBrand() {
     const onSubmit = async (data) => {
         try {
             const formData = new FormData();
-            formData.append("name", data.brandName);
-            formData.append("status", data.status);
+            formData.append("status", data.status); // Thêm trạng thái
             formData.append("_method", "PUT");
 
-            await updateBrand(id, formData);
-            Swal.fire("Thành công", "Cập nhật nhãn hàng thành công.", "success").then(() => {
-                navigate("/admin/brand");
+            if (data.image?.[0]) {
+                formData.append("image", data.image[0]); // Thêm file hình ảnh nếu có
+            }
+
+            await updateBanner(id, formData);
+            Swal.fire("Thành công", "Cập nhật banner thành công.", "success").then(() => {
+                navigate("/admin/banner");
             });
         } catch (err) {
-            console.error("Error updating brand:", err);
-            Swal.fire("Lỗi", "Lỗi khi cập nhật nhãn hàng. Vui lòng thử lại.", "error");
+            console.error("Error updating banner:", err);
+            Swal.fire("Lỗi", "Lỗi khi cập nhật banner. Vui lòng thử lại.", "error");
         }
     };
 
@@ -64,11 +66,8 @@ export default function EditBrand() {
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex items-center">
-                    <h3
-                        className="font-bold text-2xl text-blueGray-700"
-                        style={{ fontFamily: "Roboto, sans-serif" }}
-                    >
-                        CẬP NHẬT NHÃN HÀNG
+                    <h3 className="font-bold text-2xl text-blueGray-700">
+                        CẬP NHẬT BANNER
                     </h3>
                 </div>
             </div>
@@ -79,23 +78,7 @@ export default function EditBrand() {
             ) : (
                 <div className="block w-full overflow-x-auto px-4 py-4">
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="mb-4">
-                            <label className="block text-blueGray-600 text-sm font-bold mb-2">
-                                Tên nhãn hàng
-                            </label>
-                            <input
-                                type="text"
-                                {...register("brandName", { required: "Tên nhãn hàng là bắt buộc" })}
-                                className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
-                                placeholder="Nhập tên nhãn hàng"
-                            />
-                            {errors.brandName && (
-                                <p className="text-red-500 text-xs italic">
-                                    {errors.brandName.message}
-                                </p>
-                            )}
-                        </div>
-
+                        {/* Trạng thái */}
                         <div className="mb-4">
                             <label className="block text-blueGray-600 text-sm font-bold mb-2">
                                 Trạng thái
@@ -113,6 +96,18 @@ export default function EditBrand() {
                             )}
                         </div>
 
+                        <div className="mb-4">
+                            <label className="block text-blueGray-600 text-sm font-bold mb-2">
+                                Hình ảnh mới
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                {...register("image")}
+                                className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
+                            />
+                        </div>
+
                         <div className="flex items-center justify-between">
                             <button
                                 type="submit"
@@ -126,7 +121,7 @@ export default function EditBrand() {
                             <button
                                 type="button"
                                 className="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                onClick={() => navigate("/admin/brand")}
+                                onClick={() => navigate("/admin/banner")}
                             >
                                 Hủy bỏ
                             </button>
@@ -137,10 +132,3 @@ export default function EditBrand() {
         </div>
     );
 }
-
-EditBrand.propTypes = {
-    color: PropTypes.oneOf(["light", "dark"]),
-};
-EditBrand.defaultProps = {
-    color: "light",
-};
