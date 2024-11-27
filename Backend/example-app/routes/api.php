@@ -87,11 +87,11 @@ Route::middleware(['web'])->group(function () {
 });
 Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->group(function () {
-        Route::apiResource('orders', OrderClient::class);
-        Route::get('/getAllCart/{ids}', [CartClient::class, 'getCart']);
-        Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
-        Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
-        Route::get('/user', [UserController::class, 'getUser']);
+         Route::apiResource('orders', OrderClient::class);
+                Route::get('/getAllCart/{ids}', [CartClient::class, 'getCart']);
+                Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
+                Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
+                Route::get('/user', [UserController::class, 'getUser']);
 
                 #payment
                 Route::post('/checkout', [PaymentController::class, 'checkout']);
@@ -127,9 +127,10 @@ Route::prefix('client')->group(function () {
         Route::post('/send-otp', [PhoneController::class, 'sendOtp'])->middleware('auth:api');
         // Route xác thực OTP yêu cầu xác thực người dùng
         Route::post('/verify-otp', [PhoneController::class, 'verifyOtp']) ->middleware('auth:api');
-        Route::get('/review/{product_id}', [ReviewController::class, 'index']);
-        Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
-        Route::get('/reviews/{product_id}', [ReviewController::class, 'GetReviewByProductId']);
+        Route::get('review/{product_id}', [ReviewController::class, 'GetRatingByProductId']);
+
+        Route::get('/reviews/{id}', [ReviewController::class, 'getReviewById']);
+
 
     Route::middleware('auth:api')->delete('/user/delete', [UserController::class, 'deleteUser']);
 });
