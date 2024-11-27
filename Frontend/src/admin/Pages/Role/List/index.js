@@ -49,21 +49,19 @@ export default function Role({ color }) {
                     <div className="flex flex-wrap items-center">
                         <div className="relative w-full px-4 max-w-full flex-grow flex-1">
                             <h3
-                                className={
-                                    "font-semibold text-lg " +
-                                    (color === "light" ? "text-blueGray-700" : "text-white")
-                                }
+                                className="font-bold text-2xl text-blueGray-700"
+                                style={{ fontFamily: "Roboto, sans-serif" }}
                             >
-                                QUẢN LÝ VAI TRÒ
+                                -QUẢN LÝ VAI TRÒ-
                             </h3>
                         </div>
-                        <NavLink
-                            to={`/admin/role/add`}
-                            className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                            type="button"
-                        >
-                            Thêm vai trò
-                        </NavLink>
+                        {/*<NavLink*/}
+                        {/*    to={`/admin/role/add`}*/}
+                        {/*    className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"*/}
+                        {/*    type="button"*/}
+                        {/*>*/}
+                        {/*    Thêm vai trò*/}
+                        {/*</NavLink>*/}
                     </div>
                 </div>
                 { loading ? (

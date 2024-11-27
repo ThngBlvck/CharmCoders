@@ -22,17 +22,19 @@ export default function OrderDetail() {
             console.error("Lỗi khi lấy chi tiết đơn hàng:", error);
         }
     };
-
+    console.log(orderData)
     return (
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white px-6 py-6">
             {orderData ? (
                 <div className="bg-white shadow-md rounded-lg p-6 flex">
                     {/* Left side: User and Order Information */}
                     <div className="w-1/2 pr-6">
-                        <h3 className="text-2xl font-semibold mb-4">Chi Tiết Đơn Hàng: #{orderData.id}</h3>
+                        <h3 className="font-bold text-2xl text-blueGray-700"
+                            style={{ fontFamily: "Roboto, sans-serif" }}>Chi Tiết Đơn Hàng: #{orderData.id}</h3>
                         {orderData.user && (
                             <div className="mb-4">
-                                <h2 className="text-2xl font-semibold mb-4">Thông Tin Khách Hàng:</h2>
+                                <h2 className="font-bold text-2xl text-blueGray-700"
+                                    style={{ fontFamily: "Roboto, sans-serif" }}>Thông Tin Khách Hàng:</h2>
                                 <p className="text-lg font-semibold mb-2">Tên Người Dùng: {orderData.user.name}</p>
                                 <p className="text-lg font-semibold mb-2">Số Điện Thoại: {orderData.phone}</p>
                             </div>
@@ -47,7 +49,8 @@ export default function OrderDetail() {
 
                     {/* Right side: Product Information */}
                     <div className="w-1/2 pl-6">
-                        <h4 className="text-xl font-semibold mt-6">Sản phẩm trong đơn hàng:</h4>
+                        <h4 className="font-bold text-2xl text-blueGray-700"
+                            style={{ fontFamily: "Roboto, sans-serif" }}>Sản phẩm trong đơn hàng:</h4>
                         {orderData.details && orderData.details.length > 0 ? (
                             orderData.details.map((detail) => (
                                 <div key={detail.id} className="flex items-center mt-4 border-b pb-4">

@@ -1300,3 +1300,11 @@ input[type="range"]::-ms-thumb {
     white-space: normal;
     max-height: 3em;
 }
+.headerRowStyle .btn-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* Kích thước biểu tượng */
+    margin-right: 580px; /* Khoảng cách giữa nút và mã đơn hàng */
+    padding: 0; /* Loại bỏ padding mặc định */
+}

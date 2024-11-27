@@ -1,14 +1,14 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { postBrand } from "../../../../services/Brand";
+import { postBanner } from "../../../../services/Banner";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { ToastContainer } from 'react-toastify';
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from 'sweetalert2';
 import 'react-toastify/dist/ReactToastify.css';
-import { PulseLoader } from 'react-spinners'; // Import PulseLoader từ react-spinners
+import { PulseLoader } from 'react-spinners';
 
-export default function AddBrand({ color = "light" }) {
+export default function AddBanner({ color = "light" }) {
     const {
         register,
         handleSubmit,
@@ -17,42 +17,48 @@ export default function AddBrand({ color = "light" }) {
     } = useForm();
 
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true); // Thêm state loading
+    const [loading, setLoading] = useState(true);
+    const [selectedImages, setSelectedImages] = useState([]); // Lưu danh sách các hình ảnh đã chọn
+
+    const handleImageChange = (event) => {
+        const files = Array.from(event.target.files);
+        setSelectedImages(files);
+    };
 
     const onSubmit = async (data) => {
-        if (!data.brandName.trim()) {
-            Swal.fire('Lỗi', 'Tên nhãn hàng không được bỏ trống.', 'error');
-            return;
-        }
-
         if (!data.status) {
             Swal.fire('Lỗi', 'Vui lòng chọn trạng thái.', 'error');
             return;
         }
 
-        if (!data.image[0]) {
-            Swal.fire('Lỗi', 'Vui lòng chọn hình ảnh.', 'error');
+        if (!selectedImages.length) {
+            Swal.fire('Lỗi', 'Vui lòng chọn ít nhất một hình ảnh.', 'error');
             return;
         }
-        setLoading(true)
+
+        setLoading(true);
         try {
             const formData = new FormData();
-            formData.append("name", data.brandName);
             formData.append("status", data.status);
-            formData.append("image", data.image[0]);
 
-            await postBrand(formData);
+            // Lặp qua tất cả các hình ảnh đã chọn và thêm vào FormData
+            selectedImages.forEach((file) => {
+                formData.append("images[]", file);
+            });
 
-            Swal.fire('Thành công', 'Thêm nhãn hàng thành công.', 'success').then(() => {
+            await postBanner(formData);
+
+            Swal.fire('Thành công', 'Thêm banner thành công.', 'success').then(() => {
                 reset();
-                navigate('/admin/brand');
+                setSelectedImages([]);
+                navigate('/admin/banner');
             });
 
         } catch (err) {
-            console.error('Error adding brand:', err);
-            Swal.fire('Lỗi', 'Lỗi khi thêm nhãn hàng. Vui lòng thử lại.', 'error');
+            console.error('Error adding banner:', err);
+            Swal.fire('Lỗi', 'Lỗi khi thêm banner. Vui lòng thử lại.', 'error');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
@@ -62,47 +68,58 @@ export default function AddBrand({ color = "light" }) {
                 <div className="rounded-t mb-0 px-4 py-3 border-0">
                     <div className="flex flex-wrap items-center">
                         <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                            <h3 className="font-bold text-2xl text-blueGray-700"
-                                style={{ fontFamily: "Roboto, sans-serif" }}>
-                                THÊM NHÃN HÀNG
+                            <h3 className={
+                                "font-bold text-2xl text-lg " +
+                                (color === "light" ? "text-blueGray-700" : "text-white")
+                            } style={{ fontFamily: 'Roboto, sans-serif' }} // Áp dụng font chữ Roboto
+                            >
+                                THÊM BANNER
                             </h3>
                         </div>
                     </div>
                 </div>
-                { isSubmitting ? (
+                {isSubmitting ? (
                     <div className="flex justify-center items-center py-4">
-                        <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                        <PulseLoader color="#4A90E2" loading={loading} size={15} />
                     </div>
                 ) : (
                     <div className="p-4">
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">Tên nhãn hàng</label>
-                                <input
-                                    type="text"
-                                    {...register("brandName", {required: "Tên nhãn hàng là bắt buộc"})}
-                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    placeholder="Nhập tên nhãn hàng"
-                                />
-                                {errors.brandName &&
-                                    <p className="text-red-500 text-xs italic">{errors.brandName.message}</p>}
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh nhãn hàng</label>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Hình nền</label>
                                 <input
                                     type="file"
-                                    {...register("image", {required: "Vui lòng chọn hình ảnh"})}
+                                    {...register("image_path")}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     accept="image/*"
+                                    multiple
+                                    onChange={handleImageChange}
                                 />
-                                {errors.image && <p className="text-red-500 text-xs italic">{errors.image.message}</p>}
+                                {errors.image_path && <p className="text-red-500 text-xs italic">{errors.image_path.message}</p>}
                             </div>
+
+                            {/* Xem trước danh sách các hình ảnh đã chọn */}
+                            {selectedImages.length > 0 && (
+                                <div className="mb-4">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh đã chọn:</label>
+                                    <div className="flex flex-wrap gap-4">
+                                        {selectedImages.map((image, index) => (
+                                            <div key={index} className="w-20 h-20 border rounded overflow-hidden">
+                                                <img
+                                                    src={URL.createObjectURL(image)}
+                                                    alt={`selected-${index}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
                                 <select
-                                    {...register("status", {required: "Vui lòng chọn trạng thái"})}
+                                    {...register("status", { required: "Vui lòng chọn trạng thái" })}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 >
                                     <option value="">Chọn trạng thái</option>
@@ -119,12 +136,12 @@ export default function AddBrand({ color = "light" }) {
                                     className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                                     disabled={isSubmitting}
                                 >
-                                    {isSubmitting ? "Đang thêm..." : "Thêm nhãn hàng"}
+                                    {isSubmitting ? "Đang thêm..." : "Thêm banner"}
                                 </button>
                                 <button
                                     type="button"
                                     className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-                                    onClick={() => navigate('/admin/brand')}
+                                    onClick={() => navigate('/admin/banner')}
                                 >
                                     Hủy bỏ
                                 </button>
@@ -133,11 +150,11 @@ export default function AddBrand({ color = "light" }) {
                     </div>
                 )}
             </div>
-            <ToastContainer/>
+            <ToastContainer />
         </>
     );
 }
 
-AddBrand.propTypes = {
+AddBanner.propTypes = {
     color: PropTypes.oneOf(["light", "dark"]),
 };
