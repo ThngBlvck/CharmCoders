@@ -25,7 +25,7 @@ import List_Address from "./Pages/Address/List_Address";
 import Add_Address from "./Pages/Address/Add_Address";
 import Edit_Address from "./Pages/Address/Edit_Address";
 import ChangePassword from "./Pages/Change_Password";
-
+import ChangePhone from "./Pages/ChangePhone";
 import GoogleCallback from "./Pages/GoogleCallback";
 import OrderDetail from "./Pages/Order_Detail";
 import FacebookCallback from "./Pages/FacebookCallback";
@@ -87,6 +87,10 @@ export default function Client() {
                     <Route path="/address" element={<List_Address/>} />
                     <Route path="/add-address" element={<Add_Address/>} />
                     <Route path="/edit-address/:id" element={<Edit_Address/>} />
+
+                    <Route path="/edit_phone" element={<ChangePhone/>} />
+
+
 
                     <Route path="/payment-result" element={<PaymentResult/>} />
 
