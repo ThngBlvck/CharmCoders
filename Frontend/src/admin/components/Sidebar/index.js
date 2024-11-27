@@ -181,6 +181,20 @@ export default function Sidebar() {
                             <li className="items-center">
                                 <Link
                                     className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/review"
+                                            ? "text-lightBlue-500 hover:text-lightBlue-600"
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
+                                    to="/admin/review"
+                                >
+                                    <i className={`fas fas fa-star mr-2 text-sm ${location.pathname === "/admin/review" ? "opacity-75" : "text-blueGray-300"}`}></i>
+                                    Đánh giá
+                                </Link>
+                            </li>
+
+                            <li className="items-center">
+                                <Link
+                                    className={`text-xs uppercase py-3 font-bold block ${
                                         location.pathname === "/admin/role"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500"

@@ -4,8 +4,7 @@ const URL_Product = 'admin/products';
 const URL_Search = 'admin/product/search';  // Thay đổi URL nếu cần
 const URL_Checkout = 'client/buy-now';
 const URL_MomoPayment = 'momo-payment';
-const URL_related = 'client/related-products';
-const URL_HotProducts = 'client/products/hot';
+
 
 // Hàm tìm kiếm sản phẩm
 export const searchProduct = (query) => {

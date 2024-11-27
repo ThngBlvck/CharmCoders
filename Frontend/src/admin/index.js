@@ -49,7 +49,9 @@ import OrderDetail from "./Pages/Order/OrderDetail";
 import EditOrder from "./Pages/Order/Edit";
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
+import Reviews from "./Pages/Review/List";
 import "../assets/styles/tailwind.css"
+
 
 export default function Admin() {
     const location = useLocation();
@@ -105,6 +107,8 @@ export default function Admin() {
                         <Route path="role" element={<Role />} />
                         <Route path="role/add" element={<AddRole />} />
                         <Route path="role/edit/:id" element={<EditRole />} />
+
+                        <Route path="review" element={<Reviews />} />
 
                         {/* Default and 404 Route */}
                         <Route path="/" element={<Navigate to="/admin/dashboard" />} />
