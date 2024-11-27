@@ -73,12 +73,12 @@ export default function Profile() {
     return (
         <>
             <div className="container py-5">
-                    <div className="row g-4 align-items-center">
-                        <div className="col-lg-4 text-center">
-                            <div className="d-flex justify-center">
-                                {loading ? (
-                                    <Skeleton circle width={250} height={250}/>
-                                ) : (
+                <div className="row g-4 align-items-center">
+                    <div className="col-lg-4 text-center">
+                        <div className="d-flex justify-center">
+                            {loading ? (
+                                <Skeleton circle width={250} height={250} />
+                            ) : (
                                 <img
                                     src={user.image || `https://avatars.dicebear.com/api/initials/default.svg`}
                                     alt="User Avatar"
@@ -90,9 +90,9 @@ export default function Profile() {
                                         objectPosition: 'center',
                                     }}
                                 />
-                                )}
-                            </div>
-                                {!loading && (
+                            )}
+                        </div>
+                        {!loading && (
                             <div className="text-center">
                                 <p className="font-semibold text-dGreen">{user.name.length > 30 ? user.name.substring(0, 20) + "..." : user.name}</p>
                                 <NavLink to={`/edit-profile`}>
@@ -102,46 +102,54 @@ export default function Profile() {
                                 </NavLink>
                             </div>
                         )}
-                        </div>
-                        <div className="col-lg-8">
-                            <div className="p-4 bg-light border rounded shadow">
-                                {loading ? (
-                                    <>
-                                        <p className="font-semibold mb-4 text-center text-dGreen fs-30"><Skeleton height={30} width="60%"/></p>
-                                        <div className="row">
-                                            <div className="form-group mb-4 col-6">
-                                                <Skeleton height={30} width="100%"/>
-                                            </div>
-                                            <div className="form-group mb-4 col-6">
-                                                <Skeleton height={30} width="100%"/>
-                                            </div>
-                                            <div className="form-group col-6">
-                                                <Skeleton height={30} width="100%"/>
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <form className="row">
-                                    <p className="font-semibold mb-4 text-center text-dGreen fs-30">Thông tin cá
-                                            nhân</p>
+                    </div>
+                    <div className="col-lg-8">
+                        <div className="p-4 bg-light border rounded shadow">
+                            {loading ? (
+                                <>
+                                    <p className="font-semibold mb-4 text-center text-dGreen fs-30">
+                                        <Skeleton height={30} width="60%" />
+                                    </p>
+                                    <div className="row">
                                         <div className="form-group mb-4 col-6">
-                                            <label className="font-semibold mb-2 text-dGreen fs-20">Họ và Tên: <span
-                                                className="text-dGreen fs-20">{user.name}</span></label>
-
+                                            <Skeleton height={30} width="100%" />
                                         </div>
                                         <div className="form-group mb-4 col-6">
-                                            <label className="font-semibold mb-2 text-dGreen fs-20">Email: <span
-                                                className="text-dGreen fs-20">{user.email}</span></label>
+                                            <Skeleton height={30} width="100%" />
                                         </div>
                                         <div className="form-group col-6">
-                                            <label className="font-semibold mb-2 text-dGreen fs-20">Số điện thoại: <span
-                                                className="text-dGreen fs-20">{user.phone}</span></label>
+                                            <Skeleton height={30} width="100%" />
                                         </div>
-                                    </form>
-                                )}
-                            </div>
-                            {!loading && (
-                                <div>
+                                    </div>
+                                </>
+                            ) : (
+                                <form className="row">
+                                    <p className="font-semibold mb-4 text-center text-dGreen fs-30">Thông tin cá nhân</p>
+                                    <div className="form-group mb-4 col-6">
+                                        <label className="font-semibold mb-2 text-dGreen fs-20">
+                                            Họ và Tên: <span className="text-dGreen fs-20">{user.name}</span>
+                                        </label>
+                                    </div>
+                                    <div className="form-group mb-4 col-6">
+                                        <label className="font-semibold mb-2 text-dGreen fs-20">
+                                            Email: <span className="text-dGreen fs-20">{user.email}</span>
+                                        </label>
+                                    </div>
+                                    <div className="form-group col-6 d-flex justify-content-between align-items-center">
+                                        <label className="font-semibold mb-2 text-dGreen fs-20">
+                                            Số điện thoại: <span className="text-dGreen fs-20">{user.phone}</span>
+                                        </label>
+                                        <NavLink to={`/edit_phone`}>
+                                            <button className="btn-edit-phone">
+                                                <i className="fas fa-pencil-alt"></i> {/* Edit icon */}
+                                            </button>
+                                        </NavLink>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+                        {!loading && (
+                            <div>
                                 <NavLink to={`/change_password`}>
                                     <button className="btn-tk mt-3 mx-2 font-semibold rounded btn-20 shadow">
                                         Đổi mật khẩu
@@ -151,10 +159,11 @@ export default function Profile() {
                                     Xóa tài khoản
                                 </button>
                             </div>
-                            )}
-                        </div>
+                        )}
                     </div>
+                </div>
             </div>
         </>
     );
+
 }
