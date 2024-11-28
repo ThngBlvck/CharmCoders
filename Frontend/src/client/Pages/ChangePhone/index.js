@@ -71,9 +71,9 @@ const EditPhone = () => {
             <div className="row justify-content-center">
                 <div className="col-lg-6">
                     <div className="p-4 bg-light border rounded shadow">
-                        <h3 className="font-semibold mb-4 text-center text-success fs-30">
+                        <p className="font-semibold mb-4 text-center text-success fs-30">
                             Chỉnh sửa số điện thoại
-                        </h3>
+                        </p>
 
                         <form onSubmit={handleSubmit}>
                             {/* Trường nhập Số điện thoại */}
