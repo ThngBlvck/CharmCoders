@@ -115,7 +115,7 @@ const ProductDetail = () => {
             setReviews(reviewsData);
 
         } catch (error) {
-            toast.error('There was an error loading the product.');
+            // toast.error('There was an error loading the product.');
             console.error('Error fetching product details:', error);
         } finally {
             setLoadingProduct(false);

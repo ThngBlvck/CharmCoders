@@ -49,10 +49,13 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         // Lấy các sản phẩm cùng danh mục và cùng thương hiệu, loại trừ sản phẩm hiện tại
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('brand_id', $product->brand_id)  // Thêm điều kiện brand_id
-            ->where('id', '!=', $product->id)  // Loại trừ sản phẩm hiện tại
-            ->get(['id', 'name', 'image', 'unit_price', 'sale_price']);
+        $relatedProducts = Product::where(function($query) use ($product) {
+            $query->where('category_id', $product->category_id)  // Cùng danh mục
+                  ->orWhere('brand_id', $product->brand_id);      // Hoặc cùng nhãn hàng
+        })
+        ->where('id', '!=', $product->id)  // Loại trừ sản phẩm hiện tại
+        ->get(['id', 'name', 'image', 'unit_price', 'sale_price']);
+
 
         // Trả về JSON
         return response()->json([
