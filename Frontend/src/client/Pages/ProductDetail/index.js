@@ -107,7 +107,7 @@ const ProductDetail = () => {
             if (hotProductsResult && hotProductsResult.hot_products) {
                 setHotProducts(hotProductsResult.hot_products);
             } else {
-                toast.warning('No hot products found.');
+                toast.warning('Không tìm thấy sản phẩm hot.');
             }
 
             // Fetch product reviews
@@ -299,12 +299,6 @@ const ProductDetail = () => {
         }
     };
 
-
-
-
-
-
-
     const handleEditReview = (reviewId) => {
         // Cập nhật reviewId khi chọn chỉnh sửa
         setEditingReviewId(reviewId);
@@ -314,13 +308,11 @@ const ProductDetail = () => {
         setComment(review.comment);  // Thiết lập lại comment
     };
 
-
     const handleCancelEdit = () => {
         setEditingReview(null); // Hủy chỉnh sửa
         setRating(0);
         setComment('');
     };
-
 
     return (
         <div className="container my-5">

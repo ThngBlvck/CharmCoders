@@ -3,7 +3,7 @@ import "../../../assets/styles/css/bootstrap.min.css";
 import {NavLink, useNavigate, useLocation} from "react-router-dom";
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import {deleteCart, getCart, updateCart} from "../../../services/Cart";
-import {getOneProduct} from "../../../services/Comment";
+import {getOneProduct} from "../../../services/Product";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import debounce from 'lodash.debounce';
 import {toast} from "react-toastify";

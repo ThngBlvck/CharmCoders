@@ -1069,6 +1069,13 @@
     background-color: #ab2b2b !important
 }
 
+.btn-copy {
+    height: 40px;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
 .btn-20 {
     width: 20%;
 }

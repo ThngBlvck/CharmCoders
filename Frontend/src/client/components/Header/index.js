@@ -176,9 +176,9 @@ export default function Header() {
                         <div className="navbar-collapse py-3" id="navbarCollapse">
                             <div className="navbar-nav mx-auto border-top">
                                 <NavLink to={`/home`} className="nav-item nav-link font-semibold text-header-dGreen">Trang chủ</NavLink>
-                                <NavLink to={`/about`} className="nav-item nav-link font-semibold text-header-dGreen">Về chúng tôi</NavLink>
                                 <NavLink to={`/products`} className="nav-item nav-link font-semibold text-header-dGreen">Sản phẩm</NavLink>
                                 <NavLink to={`/post`} className="nav-item nav-link font-semibold text-header-dGreen">Bài viết</NavLink>
+                                <NavLink to={`/about`} className="nav-item nav-link font-semibold text-header-dGreen">Về chúng tôi</NavLink>
                             </div>
 
                             <div className="d-flex align-items-center flex-nowrap pt-xl-0"

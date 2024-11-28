@@ -4,9 +4,10 @@ import "../../../assets/styles/css/bootstrap.min.css";
 import {getOrder} from "../../../services/Order";
 import {NavLink} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import {faSpinner, faCopy} from "@fortawesome/free-solid-svg-icons";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import {toast} from "react-toastify";
 
 export default function OrderManagement() {
     const [orders, setOrders] = useState([]);
@@ -82,6 +83,12 @@ export default function OrderManagement() {
         }));
     };
 
+    const handleCopyOrderId = (orderId) => {
+        navigator.clipboard.writeText(orderId)
+            .then(() => toast.success("Đã sao chép mã đơn hàng!"))
+            .catch((err) => toast.error("Lỗi khi sao chép: " + err.message));
+    };
+
     return (
         <div className="container mt-5">
             <p className="headingStyle font-semibold text-dGreen">Đơn hàng của bạn</p>
@@ -136,20 +143,30 @@ export default function OrderManagement() {
                         filteredOrders.map((order) => (
                             <div key={order.id} className="order-history-card mb-4 cardStyle shadow">
                                 <div className="headerStyle">
-                                    <div className="headerRowStyle">
-                                        <strong className="text-dGreen">Mã đơn hàng: {order.order_id}</strong>
-                                        <strong className="text-dGreen">Trạng thái đơn hàng: <span
-                                            className="statusStyle"
-                                            style={getStatusStyle(order.status)}>
-                                        {order.status === 0 ? "Đang chờ xác nhận"
-                                            : order.status === 1 ? "Đang chuẩn bị hàng"
-                                                : order.status === 2 ? "Đang giao"
-                                                    : order.status === 3 ? "Đã giao"
-                                                        : order.status === 4 ? "Đã hủy"
-                                                            : order.status === 5 ? 'Đã thanh toán'
-                                                                : 'Không xác định'}
-                                        </span>
-                                        </strong>
+                                    <div className="headerRowStyle row">
+                                        <div className="d-flex justify-start col-8">
+                                            <button
+                                                className="btn-copy text-dGreen mr-2"
+                                                onClick={() => handleCopyOrderId(order.order_id)}
+                                            >
+                                                <FontAwesomeIcon icon={faCopy}/>
+                                            </button>
+                                            <strong className="text-dGreen">Mã đơn hàng: {order.order_id}</strong>
+                                        </div>
+                                        <div className="d-flex justify-end col-4">
+                                            <strong className="text-dGreen">Trạng thái đơn hàng: <span
+                                                className="statusStyle"
+                                                style={getStatusStyle(order.status)}>
+                                                    {order.status === 0 ? "Đang chờ xác nhận"
+                                                        : order.status === 1 ? "Đang chuẩn bị hàng"
+                                                            : order.status === 2 ? "Đang giao"
+                                                                : order.status === 3 ? "Đã giao"
+                                                                    : order.status === 4 ? "Đã hủy"
+                                                                        : order.status === 5 ? 'Đã thanh toán'
+                                                                            : 'Không xác định'}
+                                                </span>
+                                            </strong>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="bodyStyle">
@@ -197,11 +214,11 @@ export default function OrderManagement() {
                                                             className="btn-see-more fs-16 rounded">
                                                         {showAllProducts[order.id] ? (
                                                             <>
-                                                                <i className="fa-solid fa-arrows-up-to-line"></i>
+                                                                <i className="fa-solid fa-arrow-up"></i>
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <i className="fa-solid fa-arrows-down-to-line"></i>
+                                                                <i className="fa-solid fa-arrow-down"></i>
                                                             </>
                                                         )}
                                                     </button>

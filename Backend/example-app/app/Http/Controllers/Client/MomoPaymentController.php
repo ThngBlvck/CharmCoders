@@ -79,7 +79,7 @@ class MomoPaymentController extends Controller
                 'order_id' => $data['orderId'],
                 'user_id' => $user_id,
                 'total_amount' => $data['amount'],
-                'status' => 5,
+                'status' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
                 'address' => $address,
