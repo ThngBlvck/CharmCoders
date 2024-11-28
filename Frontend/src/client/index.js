@@ -3,6 +3,7 @@ import {Routes, Route, Navigate,useLocation} from "react-router-dom";
 import {CartProvider} from './components/Cart';
 import Footer from "./components/Footer";
 import Home from "./Pages/Home";
+import Contact from "./Pages/Contact";
 import About from "./Pages/About";
 import Products from "./Pages/Products";
 import ProductDetail from "./Pages/ProductDetail";
@@ -31,8 +32,6 @@ import FacebookCallback from "./Pages/FacebookCallback";
 import {ToastContainer} from "react-toastify";
 import PaymentResult from "./Pages/payment-result";
 
-import {ToastContainer} from "react-toastify";
-import PaymentResult from "./Pages/payment-result";
 import "../assets/styles/css/bootstrap.min.css"
 import "../assets/styles/css/style.css"
 import "../assets/styles/css/productdt/index.css"
