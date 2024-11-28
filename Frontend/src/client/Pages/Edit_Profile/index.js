@@ -161,7 +161,7 @@ export default function Edit_Profile() {
                                 <Skeleton circle width={250} height={250}/>
                             ) : (
                                 <img
-                                    src={selectedImage || user.image || "https://via.placeholder.com/300"}
+                                    src={selectedImage || user.image || "user_default.png"}
                                     alt="User Avatar"
                                     className="img-fluid rounded-circle mb-3 shadow"
                                     style={{

@@ -2,13 +2,13 @@ import React, {useEffect, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import {faSpinner} from '@fortawesome/free-solid-svg-icons';
 import {getCheckoutData, getProduct, searchProduct} from "../../../services/Product";
 import {getCategory} from "../../../services/Category";
 import {getBrand} from '../../../services/Brand';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {addToCart} from "../../../services/Cart";
-import { toast } from 'react-toastify';
+import {toast} from 'react-toastify';
 import Swal from "sweetalert2";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -37,7 +37,6 @@ export default function Products() {
     useEffect(() => {
         fetchProducts();
     }, [selectedCategory, brandFilter, priceFilter, searchTerm]); // Chỉ gọi lại khi thay đổi các điều kiện lọc
-
 
 
     const fetchProducts = async () => {
@@ -96,8 +95,6 @@ export default function Products() {
             setLoading(false); // Kết thúc tải dữ liệu
         }
     };
-
-
 
 
     const maxPrice = Math.max(...products.map(product => {
@@ -171,7 +168,7 @@ export default function Products() {
                             Danh mục sản phẩm
                         </p>
                         <select
-                            className="form-select"
+                            className="form-select rounded"
                             value={selectedCategory}
                             onChange={handleFilterChange(setSelectedCategory)}
                         >
@@ -198,7 +195,7 @@ export default function Products() {
                             Lọc theo thương hiệu
                         </p>
                         <select
-                            className="form-select"
+                            className="form-select rounded"
                             value={brandFilter}
                             onChange={handleFilterChange(setBrandFilter)}
                         >
@@ -238,7 +235,10 @@ export default function Products() {
                             />
                             {/* Giá cao nhất */}
                             <span className="text-dGreen" style={{marginLeft: "10px"}}>
-                                {maxPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                                {(!maxPrice || maxPrice === -Infinity ? 0 : maxPrice).toLocaleString("vi-VN", {
+                                    style: "currency",
+                                    currency: "VND"
+                                })}
                             </span>
                         </div>
                         <p>Giá: {minPrice.toLocaleString("vi-VN", {style: "currency", currency: "VND"})}</p>
@@ -248,9 +248,10 @@ export default function Products() {
 
             {/* Hiển thị sản phẩm */}
             <div className="container">
-                {loading ? (
-                    <div className="row">
-                        {Array.from({length: 12}).map((_, index) => (
+                <div className="row">
+                    {loading ? (
+
+                        Array.from({length: 12}).map((_, index) => (
                             <div key={index} className="col-md-6 col-lg-3 mb-3">
                                 <div className="card text-center p-2 shadow rounded">
                                     <Skeleton height={150} className="img-fluid rounded img-pro"/>
@@ -260,114 +261,105 @@ export default function Products() {
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <>
-                        <div className="row">
-                            {currentProducts && currentProducts.length > 0 ? (
-                                currentProducts.map((product) => (
-                                    <div key={product.id} className="col-md-6 col-lg-3 mb-4">
-                                        <div className="card text-center bg-hover shadow p-2 rounded">
-                                            <NavLink to={`/products/${product.id}`}>
-                                                <img
-                                                    src={product.image}
-                                                    className="card-img-top img-fluid rounded img-pro"
-                                                    alt="Product"
-                                                />
-                                            </NavLink>
-                                            <div className="card-body">
-                                                <NavLink to={`/products/${product.id}`}
-                                                         className="text-decoration-none">
-                                                    <p className="card-title font-semibold text-dGreen">
-                                                        {product.name.length > 30 ? product.name.substring(0, 20) + "..." : product.name}
+                        ))
+
+                    ) : currentProducts.length > 0 ? (
+                        currentProducts.map((product) => (
+                            <div key={product.id} className="col-md-6 col-lg-3 mb-4">
+                                <div className="card text-center bg-hover shadow p-2 rounded">
+                                    <NavLink to={`/products/${product.id}`}>
+                                        <img
+                                            src={product.image}
+                                            className="card-img-top img-fluid rounded img-pro"
+                                            alt="Product"
+                                        />
+                                    </NavLink>
+                                    <div className="card-body">
+                                        <NavLink to={`/products/${product.id}`}
+                                                 className="text-decoration-none">
+                                            <p className="card-title font-semibold text-dGreen">
+                                                {product.name.length > 30 ? product.name.substring(0, 20) + "..." : product.name}
+                                            </p>
+                                        </NavLink>
+
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            {/* Kiểm tra có giá sale hay không */}
+                                            {product.sale_price && product.sale_price < product.unit_price ? (
+                                                <>
+                                                    {/* Giá sản phẩm gốc bị gạch ngang */}
+                                                    <p className="card-text mb-2 font-semibold text-dGreen text-decoration-line-through flex-1 fs-14">
+                                                        {product.unit_price.toLocaleString("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND"
+                                                        })}
                                                     </p>
-                                                </NavLink>
 
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    {/* Kiểm tra có giá sale hay không */}
-                                                    {product.sale_price && product.sale_price < product.unit_price ? (
-                                                        <>
-                                                            {/* Giá sản phẩm gốc bị gạch ngang */}
-                                                            <p className="card-text mb-2 font-semibold text-dGreen text-decoration-line-through flex-1 fs-14">
-                                                                {product.unit_price.toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND"
-                                                                })}
-                                                            </p>
-
-                                                            {/* Giá sale nằm bên phải */}
-                                                            <p className="card-text mb-2 font-semibold salePr flex-1 fs-16">
-                                                                {product.sale_price.toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND"
-                                                                })}
-                                                            </p>
-                                                        </>
-                                                    ) : (
-                                                        // Nếu không có giá sale, đơn giản là hiển thị giá gốc ở giữa
-                                                        <p className="card-text mb-2 font-semibold text-dGreen flex-1 text-center fs-16">
-                                                            {product.unit_price.toLocaleString("vi-VN", {
-                                                                style: "currency",
-                                                                currency: "VND"
-                                                            })}
-                                                        </p>
-                                                    )}
-                                                </div>
-
-                                                {/* Nút Mua ngay */}
-                                                {product.quantity === 0 ? (
-                                                    <p className="text-dGreen font-bold fs-16 mt-1">Hết hàng</p>
-                                                ) : (
-                                                    <button
-                                                        className="butn mr-2 font-semibold w-100 fs-14 rounded"
-                                                        style={{
-                                                            padding: '16px',
-                                                            width: '140px',
-                                                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                                                            backgroundColor: product.quantity === 0 ? "#dcdcdc" : "#228B22", // Disabled button color when out of stock
-                                                            color: product.quantity === 0 ? "black" : "white",
-                                                            cursor: product.quantity === 0 ? "not-allowed" : "pointer",
-                                                        }}
-                                                        onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}
-                                                        disabled={product.quantity === 0}  // Disable the button if out of stock
-                                                    >
-                                                        <p><i className="fa fa-shopping-cart" aria-hidden="true"
-                                                              style={{marginRight: "6px"}}></i>Mua ngay</p>
-                                                    </button>
-                                                )}
-                                            </div>
+                                                    {/* Giá sale nằm bên phải */}
+                                                    <p className="card-text mb-2 font-semibold salePr flex-1 fs-16">
+                                                        {product.sale_price.toLocaleString("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND"
+                                                        })}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                // Nếu không có giá sale, đơn giản là hiển thị giá gốc ở giữa
+                                                <p className="card-text mb-2 font-semibold text-dGreen flex-1 text-center fs-16">
+                                                    {product.unit_price.toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND"
+                                                    })}
+                                                </p>
+                                            )}
                                         </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-center" style={{fontSize: '30px', color: '#8c5e58'}}>Không có sản
-                                    phẩm!</p>
-                            )}
-                        </div>
 
-                        {/* Phân trang */}
-                        <div className="d-flex justify-content-center mt-4">
-                            {Array.from({length: totalPages}, (_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentPage(index + 1)}
-                                    className={`butn-page mx-1 ${index + 1 === currentPage ? "butn" : "butn-border"}`}
-                                >
-                                    {index + 1}
-                                </button>
-                            ))}
-                        </div>
-                    </>
-                )}
+                                        {/* Nút Mua ngay */}
+                                        {product.quantity === 0 ? (
+                                            <p className="text-dGreen font-bold fs-16 mt-1">Hết hàng</p>
+                                        ) : (
+                                            <button
+                                                className="butn mr-2 font-semibold w-100 fs-14 rounded"
+                                                style={{
+                                                    padding: '16px',
+                                                    width: '140px',
+                                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                                    backgroundColor: product.quantity === 0 ? "#dcdcdc" : "#228B22", // Disabled button color when out of stock
+                                                    color: product.quantity === 0 ? "black" : "white",
+                                                    cursor: product.quantity === 0 ? "not-allowed" : "pointer",
+                                                }}
+                                                onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}
+                                                disabled={product.quantity === 0}  // Disable the button if out of stock
+                                            >
+                                                <p><i className="fa fa-shopping-cart" aria-hidden="true"
+                                                      style={{marginRight: "6px"}}></i>Mua ngay</p>
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center fs-30 text-dGreen">Không có sản
+                            phẩm!</p>
+                    )}
+                </div>
+
+                {/* Phân trang */}
+                <div className="d-flex justify-content-center mt-4">
+                    {Array.from({length: totalPages}, (_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => setCurrentPage(index + 1)}
+                            className={`butn-page mx-1 ${index + 1 === currentPage ? "butn" : "butn-border"}`}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+                </div>
+
+                )
             </div>
 
         </>
     );
-}
-
-function removeVietnameseTones(str) {
-    str = str.replace(/[\u0300-\u036f]/g, ""); // Remove accents
-    str = str.replace(/đ/g, "d").replace(/Đ/g, "D"); // Replace Vietnamese special character
-    return str;
 }

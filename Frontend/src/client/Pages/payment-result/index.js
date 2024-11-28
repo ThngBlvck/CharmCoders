@@ -29,10 +29,22 @@ export default function PaymentResult() {
                         <p className="mt-3 text-dGreen fs-18">
                             Cảm ơn bạn đã mua hàng của chúng tôi. Chúng tôi sẽ xử lý đơn hàng của bạn ngay lập tức.
                         </p>
-                        <div className="d-flex justify-center">
-                            <a href="/home" className="butn rounded shadow w-40 mt-4">
-                                Về Trang Chủ
-                            </a>
+                        <div className="d-flex justify-center gap-2">
+                            <div>
+                                <a href="/home" className="butn rounded shadow w-40 mt-4">
+                                    Về Trang Chủ
+                                </a>
+                            </div>
+                            <div>
+                                <a href="/products" className="butn rounded shadow w-40 mt-4">
+                                    Mua Thêm
+                                </a>
+                            </div>
+                            <div>
+                                <a href="/order-list" className="butn rounded shadow w-40 mt-4">
+                                    Xem Đơn Hàng
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -3,6 +3,7 @@ import "../../../assets/styles/css/bootstrap.min.css"; // Giữ lại nếu cầ
 import "../../../assets/styles/css/style.css";
 import { register } from "../../../services/User";
 import { useNavigate } from "react-router-dom";
+import {toast} from "react-toastify";
 
 export default function Register() {
     const [formData, setFormData] = useState({
@@ -38,7 +39,7 @@ export default function Register() {
 
             const data = await register(dataToSend);
             console.log("Đăng ký thành công:", data);
-            setSuccessMessage("Đăng ký thành công!");
+            setSuccessMessage("Đăng ký thành công.");
 
             // Reset form data
             setFormData({
@@ -47,6 +48,7 @@ export default function Register() {
                 password: "",
                 confirmPassword: "",
             });
+            toast.success("Đăng ký thành công.");
             navigate("/login");
         } catch (error) {
             // Xử lý lỗi từ backend

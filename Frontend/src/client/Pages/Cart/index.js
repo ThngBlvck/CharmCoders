@@ -358,9 +358,8 @@ export default function Cart() {
                                         })}
                                     </div>
 
-                                    <div className="cart-item-remove" style={{width: "15%", textAlign: "center"}}>
-                                        <button className="text-dGreen" style={{padding: "0"}}
-                                                onClick={() => removeItem(item.id)}>
+                                    <div className="cart-item-remove text-center" style={{width: "15%"}}>
+                                        <button className="text-del p-0" onClick={() => removeItem(item.id)}>
                                             <i className="fas fa-trash"></i> Xóa
                                         </button>
                                     </div>
@@ -374,7 +373,7 @@ export default function Cart() {
             <div className="cart-summary d-flex justify-content-between align-items-center bg-carts footer-carts">
                 <div>
                     {selectedItems.length > 0 && ( // Chỉ hiển thị nút xóa khi có sản phẩm được chọn
-                        <button className="butn font-semibold rounded shadow"
+                        <button className="butn-del font-semibold rounded shadow"
                                 style={{marginRight: "20px", width: "220px"}} // Đặt chiều rộng của nút
                                 onClick={removeSelectedItems}>
                             Xóa sản phẩm đã chọn ({selectedItems.length})
@@ -390,7 +389,7 @@ export default function Cart() {
                         currency: "VND",
                     })}</span>
                     </p>
-                    <button className="butn font-semibold rounded shadow fs-16 btn-20"
+                    <button className="butn font-semibold w-40 rounded shadow fs-16 btn-20"
                             style={{
                                 padding: "10px 20px",
                                 borderRadius: "5px"

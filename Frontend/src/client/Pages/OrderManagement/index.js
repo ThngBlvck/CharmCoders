@@ -10,6 +10,8 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 export default function OrderManagement() {
     const [orders, setOrders] = useState([]);
+    const [filteredOrders, setFilteredOrders] = useState([]); // Danh sách đã lọc
+    const [statusFilter, setStatusFilter] = useState(0); // Mặc định lọc theo status = 0
     const [showAllProducts, setShowAllProducts] = useState({});
     const [loading, setLoading] = useState(false);
 
@@ -23,6 +25,7 @@ export default function OrderManagement() {
                 // Kiểm tra dữ liệu đơn hàng
                 if (response.data && Array.isArray(response.data)) {
                     setOrders(response.data);  // Cập nhật state orders
+                    setFilteredOrders(response.data.filter(order => order.status === 0));
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách đơn hàng:", error);
@@ -42,8 +45,34 @@ export default function OrderManagement() {
             return {color: "#328ccd"}; // Màu vàng
         } else if (status === 2) {
             return {color: "#32CD32"};
+        } else if (status === 3) {
+            return {color: "#32cd7d"};
+        } else if (status === 4) {
+            return {color: "#cd3232"};
         }
         return {};
+    };
+
+    const filterOrders = (status) => {
+        setStatusFilter(status);
+        setFilteredOrders(orders.filter(order => order.status === status));
+    };
+
+    const getNoOrderMessage = (status) => {
+        switch (status) {
+            case 0:
+                return "Không có đơn hàng nào đã đặt.";
+            case 1:
+                return "Không có đơn hàng nào đang được xử lý.";
+            case 2:
+                return "Không có đơn hàng nào đang giao.";
+            case 3:
+                return "Không có đơn hàng nào đã nhận.";
+            case 4:
+                return "Không có đơn hàng nào đã hủy.";
+            default:
+                return "Không có đơn hàng.";
+        }
     };
 
     const toggleShowAll = (orderId) => {
@@ -52,9 +81,29 @@ export default function OrderManagement() {
             [orderId]: !prevState[orderId],
         }));
     };
+
     return (
         <div className="container mt-5">
-            <p className="headingStyle font-semibold text-dGreen">Đơn hàng đã đặt</p>
+            <p className="headingStyle font-semibold text-dGreen">Đơn hàng của bạn</p>
+            <div className="filter-buttons mb-4">
+                {[
+                    {status: 0, label: "Đang chờ xác nhận"},
+                    {status: 1, label: "Đang chuẩn bị hàng"},
+                    {status: 2, label: "Đang giao"},
+                    {status: 3, label: "Đã giao"},
+                    {status: 4, label: "Đã hủy"},
+                ].map((filter) => (
+                    <button
+                        key={filter.status}
+                        onClick={() => filterOrders(filter.status)}
+                        className={`btn fs-16 rounded me-2 ${
+                            statusFilter === filter.status ? "btn-success" : "btn-outline-success"
+                        }`}
+                    >
+                        {filter.label}
+                    </button>
+                ))}
+            </div>
             {loading ? (
                 <div className="order-history-card mb-4 cardStyle shadow">
                     <div className="headerStyle">
@@ -83,130 +132,125 @@ export default function OrderManagement() {
                 </div>
             ) : (
                 <>
-                    {orders.length > 0 ? (
-                        // Lọc đơn hàng có status là 3 hoặc 4
-                        orders.filter(order => [0, 1, 2, 5].includes(order.status)).length > 0 ? (
-                            orders.filter(order => [0, 1, 2, 5].includes(order.status)).map((order) => (
-                                <div key={order.id} className="order-history-card mb-4 cardStyle shadow">
-                                    <div className="headerStyle">
-                                        <div className="headerRowStyle">
-                                            <strong className="text-dGreen">Mã đơn hàng: {order.order_id}</strong>
-                                            <strong className="text-dGreen">Trạng thái đơn hàng: <span
-                                                className="statusStyle"
-                                                style={getStatusStyle(order.status)}>
-                                        {order.status === 0 ? 'Đang chờ xác nhận'
-                                            : order.status === 1 ? 'Đang chuẩn bị hàng'
-                                                : order.status === 2 ? 'Đang giao'
-                                                    : order.status === 5 ? 'Đã thanh toán'
-                                                        : 'Không xác định'}
+                    {filteredOrders.length > 0 ? (
+                        filteredOrders.map((order) => (
+                            <div key={order.id} className="order-history-card mb-4 cardStyle shadow">
+                                <div className="headerStyle">
+                                    <div className="headerRowStyle">
+                                        <strong className="text-dGreen">Mã đơn hàng: {order.order_id}</strong>
+                                        <strong className="text-dGreen">Trạng thái đơn hàng: <span
+                                            className="statusStyle"
+                                            style={getStatusStyle(order.status)}>
+                                        {order.status === 0 ? "Đang chờ xác nhận"
+                                            : order.status === 1 ? "Đang chuẩn bị hàng"
+                                                : order.status === 2 ? "Đang giao"
+                                                    : order.status === 3 ? "Đã giao"
+                                                        : order.status === 4 ? "Đã hủy"
+                                                            : order.status === 5 ? 'Đã thanh toán'
+                                                                : 'Không xác định'}
                                         </span>
-                                            </strong>
-                                        </div>
+                                        </strong>
                                     </div>
-                                    <div className="bodyStyle">
-                                        {order.details && order.details.length > 0 ? (
-                                            <>
-                                                {order.details
-                                                    .slice(0, showAllProducts[order.id] ? order.details.length : 2)
-                                                    .map((detail) => (
-                                                        <div key={detail.product.id}
-                                                             className="product-item productRowStyle">
-                                                            <div className="d-flex productDetailsStyle">
-                                                                <div className="imageContainerStyle">
-                                                                    <NavLink to={`/products/${detail.product.id}`}>
-                                                                        <img
-                                                                            src={detail.product.image || "https://via.placeholder.com/100"}
-                                                                            alt={detail.product.name}
-                                                                            className="imageStyle"
-                                                                        />
-                                                                    </NavLink>
-                                                                </div>
-                                                                <div className="product-info">
-                                                                    <NavLink to={`/products/${detail.product.id}`}>
-                                                                        <div
-                                                                            className="product-name productNameStyle text-dGreen">
-                                                                            {detail.product.name}
-                                                                        </div>
-                                                                    </NavLink>
-                                                                    <div className="product-quantity quantityStyle text-dGreen">
-                                                                        x {detail.quantity}
-                                                                    </div>
-                                                                </div>
+                                </div>
+                                <div className="bodyStyle">
+                                    {order.details && order.details.length > 0 ? (
+                                        <>
+                                            {order.details
+                                                .slice(0, showAllProducts[order.id] ? order.details.length : 2)
+                                                .map((detail) => (
+                                                    <div key={detail.product.id}
+                                                         className="product-item productRowStyle">
+                                                        <div className="d-flex productDetailsStyle">
+                                                            <div className="imageContainerStyle">
+                                                                <NavLink to={`/products/${detail.product.id}`}>
+                                                                    <img
+                                                                        src={detail.product.image || "https://via.placeholder.com/100"}
+                                                                        alt={detail.product.name}
+                                                                        className="imageStyle"
+                                                                    />
+                                                                </NavLink>
                                                             </div>
-                                                            <div className="product-price text-right priceStyle">
-                                                                {(detail.price * detail.quantity).toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND",
-                                                                })}
+                                                            <div className="product-info">
+                                                                <NavLink to={`/products/${detail.product.id}`}>
+                                                                    <div
+                                                                        className="product-name productNameStyle text-dGreen">
+                                                                        {detail.product.name}
+                                                                    </div>
+                                                                </NavLink>
+                                                                <div
+                                                                    className="product-quantity quantityStyle text-dGreen">
+                                                                    x {detail.quantity}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    ))}
-                                                {order.details.length > 2 && (
-                                                    <div className="toggle-view text-center mt-2">
-                                                        <button onClick={() => toggleShowAll(order.id)}
-                                                                className="btn-see-more fs-16 rounded">
-                                                            {showAllProducts[order.id] ? (
-                                                                <>
-                                                                    Thu gọn <i
-                                                                    className="fa-solid fa-arrows-up-to-line"></i>
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    Xem thêm <i
-                                                                    className="fa-solid fa-arrows-down-to-line"></i>
-                                                                </>
-                                                            )}
-                                                        </button>
+                                                        <div className="product-price text-right priceStyle">
+                                                            {(detail.price * detail.quantity).toLocaleString("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND",
+                                                            })}
+                                                        </div>
                                                     </div>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <p className="font-semibold text-center text-dGreen fs-30"
-                                               style={{marginTop: "30px"}}>Không
-                                                có
-                                                sản phẩm
-                                                trong đơn hàng này.</p>
-                                        )}
-                                    </div>
-                                    <div className="footerStyle font-semibold row">
-                                        {/* Cột 1 */}
-                                        <div className="col-4">
+                                                ))}
+                                            {order.details.length > 2 && (
+                                                <div className="toggle-view text-center mt-2">
+                                                    <button onClick={() => toggleShowAll(order.id)}
+                                                            className="btn-see-more fs-16 rounded">
+                                                        {showAllProducts[order.id] ? (
+                                                            <>
+                                                                <i className="fa-solid fa-arrows-up-to-line"></i>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <i className="fa-solid fa-arrows-down-to-line"></i>
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <p className="font-semibold text-center text-dGreen fs-30"
+                                           style={{marginTop: "30px"}}>Không
+                                            có
+                                            sản phẩm
+                                            trong đơn hàng này.</p>
+                                    )}
+                                </div>
+                                <div className="footerStyle font-semibold row">
+                                    {/* Cột 1 */}
+                                    <div className="col-4">
                                             <span className="statusStyle">
                                                 {order.payment_method == 1 ? 'Thanh toán khi nhận hàng'
                                                     : order.payment_method == 2 ? 'Thanh toán chuyển khoản'
                                                         : 'Không xác định'}</span>
-                                        </div>
+                                    </div>
 
-                                        {/* Cột 2 */}
-                                        <div className="col-4 d-flex align-items-center justify-content-center">
-                                            <NavLink to={`/order/${order.id}`}>
-                                                <button className="butn p-3 font-semibold fs-16 rounded shadow">
-                                                    <p>Xem chi tiết</p>
-                                                </button>
-                                            </NavLink>
-                                        </div>
+                                    {/* Cột 2 */}
+                                    <div className="col-4 d-flex align-items-center justify-content-center">
+                                        <NavLink to={`/order/${order.id}`}>
+                                            <button className="butn p-3 font-semibold fs-16 rounded shadow">
+                                                <p>Xem chi tiết</p>
+                                            </button>
+                                        </NavLink>
+                                    </div>
 
-                                        {/* Cột 3 */}
-                                        <div className="col-4 text-right ">
-                                            <span style={{marginRight: "10px"}} className="text-dGreen">Tổng tiền:</span>
-                                            <span className="totalAmountStyle">
+                                    {/* Cột 3 */}
+                                    <div className="col-4 text-right ">
+                                            <span style={{marginRight: "10px"}}
+                                                  className="text-dGreen">Tổng tiền:</span>
+                                        <span className="totalAmountStyle">
                                                 {order.total_amount.toLocaleString("vi-VN", {
                                                     style: "currency", currency: "VND",
                                                 })}
                                             </span>
-                                        </div>
                                     </div>
                                 </div>
+                            </div>
 
-                            ))
-                        ) : (
-                            <p className="font-semibold text-center text-dGreen fs-20"
-                               style={{marginTop: "30px"}}>Không có đơn hàng nào đã
-                                đặt.</p>
-                        )
+                        ))
                     ) : (
                         <p className="font-semibold text-center text-dGreen fs-20"
-                           style={{marginTop: "30px"}}>Không có đơn hàng nào.</p>
+                           style={{marginTop: "30px"}}>{getNoOrderMessage(statusFilter)}</p>
                     )}
                 </>
             )}

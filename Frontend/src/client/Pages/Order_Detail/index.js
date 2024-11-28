@@ -92,7 +92,7 @@ export default function OrderDetail() {
                 setOrder(updatedOrder);
                 console.log("Đơn hàng đã hủy");
                 toast.success("Hủy đơn hàng thành công.");
-                navigate('/order-history');
+                navigate('/order-list');
             } catch (error) {
                 console.error("Lỗi khi hủy đơn hàng:", error);
                 toast.error("Không thể hủy đơn hàng.");
@@ -120,7 +120,7 @@ export default function OrderDetail() {
                 setOrder(updatedOrder);
                 console.log("Đơn hàng đã được nhận");
                 toast.success("Xác nhận đơn hàng thành công.");
-                navigate('/order-history');
+                navigate('/order-list');
             } catch (error) {
                 console.error("Lỗi khi xác nhận đơn hàng:", error);
                 toast.error("Không thể xác nhận đơn hàng.");
@@ -205,24 +205,23 @@ export default function OrderDetail() {
                         <div className="row">
                             <div className="col-6 text-dGreen">
                                 <div className="mb-3"><span
-                                    className="font-semibold">Mã đơn hàng: </span>{order?.order_id}</div>
-                                <div className="mb-3"><span className="font-semibold">Trạng thái đơn hàng: </span>
-
+                                    className="font-semibold mr-2">Mã đơn hàng:</span>{order?.order_id}</div>
+                                <div className="mb-3"><span className="font-semibold mr-2">Trạng thái đơn hàng:</span>
                                     <span className="statusStyle font-semibold" style={getStatusStyle(order.status)}>
-                                  {order.status === 0 ? 'Đang chờ xác nhận' :
-                                      order.status === 1 ? 'Đang chuẩn bị hàng' :
-                                          order.status === 2 ? 'Đang giao' :
-                                              order.status === 3 ? 'Đã nhận' :
-                                                  order.status === 4 ? 'Đã hủy' : 'Trạng thái không xác định'}
+                                      {order.status === 0 ? 'Đang chờ xác nhận' :
+                                          order.status === 1 ? 'Đang chuẩn bị hàng' :
+                                              order.status === 2 ? 'Đang giao' :
+                                                  order.status === 3 ? 'Đã nhận' :
+                                                      order.status === 4 ? 'Đã hủy' : 'Trạng thái không xác định'}
                                 </span>
                                 </div>
                             </div>
                             <div className="col-6 text-dGreen">
                                 <div className="mb-3">
-                                    <span className="font-semibold">Họ tên: </span><span>{user?.name}</span>
+                                    <span className="font-semibold mr-2">Họ tên:</span><span>{user?.name}</span>
                                 </div>
                                 <div className="mb-3">
-                                    <span className="font-semibold">Số điện thoại: </span><span>{order?.phone}</span>
+                                    <span className="font-semibold mr-2">Số điện thoại:</span><span>{order?.phone}</span>
                                 </div>
                             </div>
                         </div>
@@ -231,7 +230,7 @@ export default function OrderDetail() {
                         <div className="row">
                             <div className="col-12 mb-3 text-dGreen">
                                 <i className="fa fa-location-dot text-dGreen" style={{marginRight: "8px"}}></i>
-                                <span className="font-semibold">Địa chỉ giao hàng: </span>{order?.address}
+                                <span className="font-semibold mr-2">Địa chỉ giao hàng:</span>{order?.address}
                             </div>
                         </div>
                     </div>

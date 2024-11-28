@@ -122,8 +122,7 @@ export default function Add_Address() {
         // Reset errors
         const newErrors = {};
 
-        // Kiểm tra Địa chỉ
-        const fullAddress = `${address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
+
         if (!address?.trim()) {
             newErrors.address = "Vui lòng nhập địa chỉ nhà.";
         } else if (!wardName || !districtName || !provinceName) {
@@ -139,9 +138,12 @@ export default function Add_Address() {
 
         // Tạo một object mới chứa dữ liệu để gửi lên server
         const addressData = {
-            address: fullAddress, // Sử dụng địa chỉ đã nối
+            address: address,
+            province: provinceName,
+            district: districtName,
+            ward: wardName
         };
-        console.log(addressData)
+        console.log("aa:",addressData)
 
         // Kiểm tra xem địa chỉ có phải là chuỗi không
         if (typeof addressData.address !== "string" || addressData.address.length === 0) {
@@ -153,7 +155,7 @@ export default function Add_Address() {
         try {
             const result = await postAddress(addressData);
             toast.success("Thêm địa chỉ thành công.");
-            navigate(`/address`);
+            navigate(`/profile`);
         } catch (error) {
             toast.error("Thêm địa chỉ thất bại.");
         }
@@ -178,7 +180,7 @@ export default function Add_Address() {
                                         >
                                             <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
                                             {provinces.map((province) => (
-                                                <option key={province.code} value={province.code}>
+                                                <option key={province.code} value={province.code} name="province">
                                                     {province.name}
                                                 </option>
                                             ))}
@@ -195,7 +197,7 @@ export default function Add_Address() {
                                         >
                                             <option value="" className="font-bold">Chọn Quận/Huyện</option>
                                             {districts.map((district) => (
-                                                <option key={district.code} value={district.code}>
+                                                <option key={district.code} value={district.code} name="district">
                                                     {district.name}
                                                 </option>
                                             ))}
@@ -212,7 +214,7 @@ export default function Add_Address() {
                                         >
                                             <option value="" className="font-bold">Chọn Xã/Phường</option>
                                             {wards.map((ward) => (
-                                                <option key={ward.code} value={ward.code}>
+                                                <option key={ward.code} value={ward.code} name="ward">
                                                     {ward.name}
                                                 </option>
                                             ))}

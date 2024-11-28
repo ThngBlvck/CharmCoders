@@ -16,7 +16,7 @@ export default function Page404() {
                             <p className="mb-4 text-dGreen">Rất tiếc, trang bạn tìm kiếm không tồn tại ở trang web của
                                 chúng tôi! Có thể truy cập trang chủ của chúng tôi hoặc thử sử dụng tìm kiếm?</p>
                             <div className="d-flex justify-center">
-                                <Link className="butn rounded-pill w-40 py-3 px-5"
+                                <Link className="butn rounded-pill w-50 py-3 px-5"
                                       to="/home">Quay Về Trang Chủ</Link>
                             </div>
                         </div>

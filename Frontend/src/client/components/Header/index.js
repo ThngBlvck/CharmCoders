@@ -72,8 +72,7 @@ export default function Header() {
         // Chuyển tất cả về dạng lowercase để so sánh không phân biệt chữ hoa/chữ thường
         const searchTerms = input.toLowerCase().split(" ");
         const targetLower = target.toLowerCase();
-
-        // Kiểm tra xem tất cả các từ trong searchTerm có nằm trong target hay không
+// Kiểm tra xem tất cả các từ trong searchTerm có nằm trong target hay không
         return searchTerms.every(term => targetLower.includes(term));
     };
 
@@ -122,23 +121,23 @@ export default function Header() {
         }
     };
 
-    
-const handleLogout = () => {
-    // Đăng xuất Google
-    googleLogout();
-    
-    // Tiếp tục đăng xuất khỏi hệ thống
-    logout()
-        .then(() => {
-            localStorage.removeItem("token"); // Xóa token
-            setIsLoggedIn(false); // Cập nhật trạng thái đăng nhập
-            setIsDropdownOpen(false); // Đóng dropdown
-            navigate("/login"); // Điều hướng đến trang đăng nhập
-        })
-        .catch(err => {
-            console.error("Đăng xuất thất bại:", err);
-        });
-};
+
+    const handleLogout = () => {
+        // Đăng xuất Google
+        googleLogout();
+
+        // Tiếp tục đăng xuất khỏi hệ thống
+        logout()
+            .then(() => {
+                localStorage.removeItem("token"); // Xóa token
+                setIsLoggedIn(false); // Cập nhật trạng thái đăng nhập
+                setIsDropdownOpen(false); // Đóng dropdown
+                navigate("/login"); // Điều hướng đến trang đăng nhập
+            })
+            .catch(err => {
+                console.error("Đăng xuất thất bại:", err);
+            });
+    };
 
     // Hàm để mở hoặc đóng dropdown
     const toggleDropdown = () => {
@@ -168,9 +167,9 @@ const handleLogout = () => {
                 <div className="container-fluid px-0">
                     <nav className="navbar navbar-expand-xl bg-light">
                         <NavLink to={`/home`} className="navbar-brand">
-                            <p className="text-header-dGreen display-5" style={{ marginLeft: "100px" }}>GlowMakers</p>
+                            <img src="logo_web.png" className="logo-header"/>
                         </NavLink>
-                        <div className="navbar-collapse py-3" id="navbarCollapse">
+                        <div className="navbar-collapse" id="navbarCollapse">
                             <div className="navbar-nav mx-auto border-top">
                                 <NavLink to={`/home`} className="nav-item nav-link font-semibold text-header-dGreen">Trang chủ</NavLink>
                                 <NavLink to={`/about`} className="nav-item nav-link font-semibold text-header-dGreen">Về chúng tôi</NavLink>
@@ -236,8 +235,8 @@ const handleLogout = () => {
                                                     onClick={() => setSearchTerm("")} // Reset lại thanh tìm kiếm khi click
                                                 >
 
-                                                    <div className="row">
-                                                        <div className="col-3">
+                                                    <div className="row shadow rounded">
+                                                        <div className="col-3 d-flex align-items-center">
                                                             <img
                                                                 src={product.image}
                                                                 alt={product.name}
@@ -294,7 +293,7 @@ const handleLogout = () => {
 
                                 {/* Icon giỏ hàng */}
                                 {isLoggedIn && (
-                                    <NavLink to={`/cart`} className="btn ms-2"
+                                    <NavLink to={`/cart`} className="butn-ic ms-2"
                                              style={{
                                                  width: "50px",
                                                  height: "50px",
@@ -322,74 +321,57 @@ const handleLogout = () => {
 
                                 {/* Dropdown tài khoản */}
                                 {isLoggedIn && (
-                                <div className="dropdown ms-2"
-                                     onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
-                                     onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
-                                >
-                                    <button
-                                        className="btn"
-                                        type="button"
-                                        id="dropdownMenuButton"
-                                        aria-expanded={isDropdownOpen}
-                                        style={{width: "50px", height: "50px", color: "var(--bs-primary)"}}
+                                    <div className="dropdown ms-2"
+                                         onMouseEnter={() => setIsDropdownOpen(true)} // Hiện dropdown khi hover
+                                         onMouseLeave={() => setIsDropdownOpen(false)} // Ẩn dropdown khi không hover
                                     >
-                                        <i className="fas fa-user ic" style={{fontSize: "1.5rem"}}></i>
-                                    </button>
-                                    {/* Dropdown menu */}
-                                    {isDropdownOpen && (
-                                        <ul className="dropdown-menu show" aria-labelledby="dropdownMenuButton"
-                                            style={{left: "-68px", top: "40px"}}>
-                                            <li>
-                                                <NavLink to="/profile" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item text-header-dGreen">
-                                                        <i className="fas fa-user me-2 ic"></i>Tài khoản của bạn
-                                                    </button>
-                                                </NavLink>
-                                            </li>
-                                            <li>
-                                                <NavLink to="/order-list" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item text-header-dGreen">
-                                                        <i className="fas fa-box me-2 ic"></i>Đơn hàng đã đặt
-                                                    </button>
-                                                </NavLink>
-                                            </li>
-                                            <li>
-                                                <NavLink to="/order-history" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item text-header-dGreen">
-                                                        <i className="fas fa-clock-rotate-left me-2 ic"></i>Lịch sử đơn
-                                                        hàng
-                                                    </button>
-                                                </NavLink>
-                                            </li>
-                                            <li>
-                                                <NavLink to="/address" onClick={() => setIsDropdownOpen(false)}>
-                                                    <button className="dropdown-item modal-item text-header-dGreen">
-                                                        <i className="fas fa-location-dot me-2 ic"></i>Địa chỉ
-                                                    </button>
-                                                </NavLink>
-                                            </li>
-                                            <li>
+                                        <button
+                                            className="butn-ic"
+                                            type="button"
+                                            id="dropdownMenuButton"
+                                            aria-expanded={isDropdownOpen}
+                                            style={{width: "50px", height: "50px", color: "var(--bs-primary)"}}
+                                        >
+                                            <i className="fas fa-user ic" style={{fontSize: "1.5rem"}}></i>
+                                        </button>
+                                        {/* Dropdown menu */}
+                                        {isDropdownOpen && (
+                                            <ul className="dropdown-menu show" aria-labelledby="dropdownMenuButton"
+                                                style={{left: "-68px", top: "40px"}}>
+                                                <li>
+                                                    <NavLink to="/profile" onClick={() => setIsDropdownOpen(false)}>
+                                                        <button className="dropdown-item modal-item text-header-dGreen">
+                                                            <i className="fas fa-user me-2 ic"></i>Thông tin cá nhân
+                                                        </button>
+                                                    </NavLink>
+                                                </li>
+                                                <li>
+                                                    <NavLink to="/order-list" onClick={() => setIsDropdownOpen(false)}>
+                                                        <button className="dropdown-item modal-item text-header-dGreen">
+                                                            <i className="fas fa-box me-2 ic"></i>Đơn hàng của bạn
+                                                        </button>
+                                                    </NavLink>
+                                                </li>
+                                                <li>
 
-                                                <NavLink to="" onClick={() => {
-                                                    // Logic cho nút thoát
-                                                    toggleDropdown();
-                                                }}>
-                                                    <button className="dropdown-item modal-item text-header-dGreen"
-                                                            onClick={handleLogout}>
-                                                        <i className="fas fa-sign-out-alt me-2 ic"></i>Đăng xuất
-                                                    </button>
-                                                </NavLink>
-                                            </li>
-                                        </ul>
-                                    )}
-                                </div>
+                                                    <NavLink to="" onClick={() => {
+                                                        // Logic cho nút thoát
+                                                        toggleDropdown();
+                                                    }}>
+                                                        <button className="dropdown-item modal-item text-header-dGreen"
+                                                                onClick={handleLogout}>
+                                                            <i className="fas fa-sign-out-alt me-2 ic"></i>Đăng xuất
+                                                        </button>
+                                                    </NavLink>
+                                                </li>
+                                            </ul>
+                                        )}
+                                    </div>
                                 )}
                                 {!isLoggedIn && (
-                                    <button className="butn rounded px-2 w-100 font-semibold" style={{marginLeft: '20px'}}>
-                                        <Link to="/login">
-                                            <p className="fs-16">Đăng nhập</p>
-                                        </Link>
-                                    </button>
+                                    <Link to="/login" className="butn rounded px-2 w-100 font-semibold shadow" style={{marginLeft: '20px'}}>
+                                        <p className="fs-16">Đăng nhập</p>
+                                    </Link>
                                 )}
                             </div>
                         </div>
