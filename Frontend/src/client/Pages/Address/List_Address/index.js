@@ -59,6 +59,14 @@ export default function List_Address() {
         }
     };
 
+    const fullAddress = ({ address, ward, district, province }) => {
+        // Tạo mảng chứa các thành phần không bị undefined, null hoặc chuỗi rỗng
+        const parts = [address?.trim(), ward?.trim(), district?.trim(), province?.trim()].filter(Boolean);
+
+        // Ghép các thành phần với dấu phẩy và khoảng trắng
+        return parts.join(", ");
+    };
+
     return (
         <div className="container">
             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -95,12 +103,13 @@ export default function List_Address() {
                 </ul>
             ) : (
                 <ul className="list-group">
-                    {addresses.map((address) => (
+                    {addresses.length > 0 ? (
+                        addresses.map((address) => (
                         <li
                             key={address.id}
                             className="list-group-item d-flex justify-content-between align-items-center text-dGreen"
                         >
-                            {address.address}
+                            {fullAddress(address)}
                             <div className="d-flex justify-content-evenly">
                                 <NavLink to={`/edit-address/${address.id}`}>
                                     <button className="btn-tk btn-address rounded font-semibold shadow">
@@ -113,7 +122,10 @@ export default function List_Address() {
                                 </button>
                             </div>
                         </li>
-                    ))}
+                        ))
+                    ) : (
+                        <p className="text-dGreen fs-20 text-center mt-2 mb-3">Chưa có địa chỉ. Vui lòng thêm địa chỉ của bạn.</p>
+                    )}
                 </ul>
             )}
         </div>

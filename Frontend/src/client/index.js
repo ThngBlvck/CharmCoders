@@ -21,7 +21,6 @@ import OrderHistory from "./Pages/OrderHistory";
 import Page404 from "./Pages/404";
 import VerifyOtp from "./Pages/Otp_PW";
 import Edit_Profile from "./Pages/Edit_Profile";
-import List_Address from "./Pages/Address/List_Address";
 import Add_Address from "./Pages/Address/Add_Address";
 import Edit_Address from "./Pages/Address/Edit_Address";
 import ChangePassword from "./Pages/Change_Password";
@@ -88,7 +87,6 @@ export default function Client() {
                     <Route path="/auth/google" element={isAuthenticated() ? <Navigate to="/home" />:<GoogleCallback />}></Route>
                     <Route path="/auth/facebook" element={isAuthenticated() ? <Navigate to="/home" />:<FacebookCallback />}></Route>
 
-                    <Route path="/address" element={<List_Address/>} />
                     <Route path="/add-address" element={<Add_Address/>} />
                     <Route path="/edit-address/:id" element={<Edit_Address/>} />
 

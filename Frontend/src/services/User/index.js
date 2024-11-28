@@ -6,6 +6,7 @@ const URL_RESET_PASSWORD = 'password/reset'; // Đường dẫn API cho việc r
 const URL_Search = 'admin/user/search';
 const URL_User_INFO = "client/user";
 const URL_Profile_Change = "client/profile";
+const URL_Account_Delete = "client/user/delete";
 
 const URL_Change_password = "client/changepassword";
 // Phương thức gửi OTP
@@ -171,6 +172,14 @@ export const changeProfile = (data) => {
         data
     });
 };
+
+export const deleteAccount = () => {
+    return request({
+        method: 'DELETE',
+        path: `${URL_Account_Delete}`
+    });
+};
+
 // Hàm tìm kiếm nhân viên
 export const searchUser = (query) => {
     return request({

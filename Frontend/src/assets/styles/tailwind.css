@@ -44,6 +44,11 @@ html {
 Sections
 ========
 */
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
 
 /**
 Remove the margin in all browsers.

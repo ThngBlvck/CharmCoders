@@ -230,7 +230,7 @@ export default function Home() {
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-center text-dGreen">Không có sản phẩm để hiển thị</p>
+                                        <p className="text-center fs-30 text-dGreen">Không có sản phẩm để hiển thị</p>
                                     )}
                                 </div>
                             </div>

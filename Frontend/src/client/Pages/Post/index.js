@@ -13,6 +13,7 @@ export default function Post() {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedCategory, setSelectedCategory] = useState("all"); // "all" for all categories
     const [categories, setCategories] = useState([]);
+    const [allPosts, setAllPosts] = useState([]); // Lưu toàn bộ bài viết
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true); // Loading state
 
@@ -30,6 +31,7 @@ export default function Post() {
         try {
             const result = await getBlogCategory();
             setCategories(result || []);
+            console.log(result)
         } catch (error) {
             console.error("Error fetching categories:", error);
             toast.error("Không thể tải danh mục bài viết. Vui lòng thử lại sau.");
@@ -40,15 +42,17 @@ export default function Post() {
 
     // Fetch posts based on selected category
     const fetchPosts = async () => {
-        setLoading(true); // Set loading true when fetching starts
+        setLoading(true);
         try {
-            const result = await getBlog(selectedCategory);
-            setPosts(result || []);
+            const result = await getBlog(); // Gọi API lấy toàn bộ bài viết
+            setAllPosts(result || []); // Lưu toàn bộ bài viết
+            setPosts(result || []); // Hiển thị tất cả bài viết ban đầu
+            console.log(result)
         } catch (error) {
             console.error("Error fetching posts:", error);
             toast.error("Không thể tải bài viết. Vui lòng thử lại sau.");
         } finally {
-            setLoading(false); // Set loading false when fetching ends
+            setLoading(false);
         }
     };
 
@@ -60,8 +64,14 @@ export default function Post() {
 
     // Handle category selection
     const handleCategoryClick = (categoryId) => {
-        setSelectedCategory(categoryId);
-        setCurrentPage(1); // Reset to page 1 when category changes
+        console.log("Selected Category ID:", categoryId);
+        if (categoryId === "all") {
+            setPosts(allPosts);
+        } else {
+            const filteredPosts = allPosts.filter(post => post.category_id === Number(categoryId));
+            console.log("Filtered Posts:", filteredPosts);
+            setPosts(filteredPosts);
+        }
     };
 
     return (
@@ -77,26 +87,25 @@ export default function Post() {
                                 <Skeleton height={30} />
                             </li>
                         ) : (
-                        <li className="list-group-item font-semibold d-flex align-items-center"
-                            style={{ border: "none", cursor: "pointer" }} onClick={() => handleCategoryClick("all")}>
+                        <li className={`list-group-item font-semibold d-flex align-items-center border-none cursor-pointer ${selectedCategory === "all" ? "active-category" : ""}`}
+                            onClick={() => handleCategoryClick("all")}>
                             <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
-                            <p className="text-dGreen" style={{ margin: 0 }}>Tất cả bài viết</p>
+                            <p className="text-dGreen m-0">Tất cả bài viết</p>
                         </li>
                         )}
                         {loading ? (
                             // Skeleton for category list items
-
-                                <li className="list-group-item border-none">
-                                    <Skeleton height={30} />
-                                </li>
-
-                        ) : (
-                        categories.map((category) => (
-                            <li className="list-group-item font-semibold d-flex align-items-center border-none cursor-pointer" key={category.id}
-                                onClick={() => handleCategoryClick(category.id)}>
-                                <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
-                                <p className="text-dGreen" style={{ margin: 0 }}>{category.name}</p>
+                            <li className="list-group-item border-none">
+                                <Skeleton height={30} />
                             </li>
+                        ) : (
+                            categories.map((category) => (
+                                <li className={`list-group-item font-semibold d-flex align-items-center border-none cursor-pointer ${selectedCategory === category.id ? "active-category" : ""}`}
+                                    key={category.id}
+                                    onClick={() => handleCategoryClick(category.id)}>
+                                    <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
+                                    <p className="text-dGreen" style={{ margin: 0 }}>{category.name}</p>
+                                </li>
                             ))
                         )}
                     </ul>

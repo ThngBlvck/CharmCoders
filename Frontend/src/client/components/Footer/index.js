@@ -3,6 +3,7 @@ import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
 import { getUserInfo } from "../../../services/User";
 import { getCategory } from "../../../services/Category";
+import {NavLink} from "react-router-dom";
 
 export default function Footer() {
     const [categories, setCategories] = useState([]);
@@ -74,7 +75,9 @@ export default function Footer() {
                     <div className="row g-5">
                         <div className="col-3 col-lg-3 col-xl-3">
                             <div className="footer-item d-flex flex-column">
-                                <p className="text-dGreen font-bold mb-4 fs-2rem">GlowMakers</p>
+                                <NavLink to={`/home`} className="navbar-brand">
+                                    <img src="logo_web.png" className="logo-footer"/>
+                                </NavLink>
                                 <p className="font-bold title text-dGreen fs-16">Liên hệ
                                     chúng tôi</p>
                                 <p className="text-dGreen fs-14">
@@ -90,7 +93,7 @@ export default function Footer() {
                                     Thanh toán khi nhận hàng
                                 </label>
                                 <label className="form-check-label mb-2 text-dGreen">
-                                    Thanh toán qua Momo
+                                    Thanh toán qua MoMo
                                 </label>
                             </div>
                         </div>

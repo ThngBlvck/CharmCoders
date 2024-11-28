@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { makeMomoPayment } from '../../../services/Product'; // Import service
-import { getCartsByIds } from '../../../services/Cart';
-import { getProductsByIds } from "../../../services/Product";
+import React, {useEffect, useState} from "react";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {makeMomoPayment} from '../../../services/Product'; // Import service
+import {getCartsByIds} from '../../../services/Cart';
+import {getProductsByIds} from "../../../services/Product";
 import "../../../assets/styles/css/bootstrap.min.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { getUserInfo } from "../../../services/User";
-import { checkout, momoCheckout } from '../../../services/Checkout';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import {getUserInfo} from "../../../services/User";
+import {checkout, momoCheckout} from '../../../services/Checkout';
 import axios from "axios";
-import { toast } from 'react-toastify';
+import {toast} from 'react-toastify';
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import {getAddress} from "../../../services/Address";
 
 export default function Checkout() {
     const [formData, setFormData] = useState({
@@ -22,7 +23,7 @@ export default function Checkout() {
         address: "",
         paymentMethod: "cashOnDelivery", // Mặc định là thanh toán khi nhận hàng
     });
-    const { cartIds } = useParams();
+    const {cartIds} = useParams();
     const [products, setProducts] = useState([]);
     const location = useLocation();
     const [loading, setLoading] = useState(false); // Thêm state loading
@@ -35,11 +36,13 @@ export default function Checkout() {
     const [selectedProvince, setSelectedProvince] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
+    const [selectedAddress, setSelectedAddress] = useState("");
     const [provinceName, setProvinceName] = useState("");
     const [districtName, setDistrictName] = useState("");
     const [wardName, setWardName] = useState("");
 
     const [address, setAddress] = useState('');
+    const [addresses, setAddresses] = useState([]);
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
     const [user_id, setUserId] = useState([]);
@@ -74,7 +77,44 @@ export default function Checkout() {
         if (cartIds.length > 0) {
             fetchCartsByIds(cartIds);
         }
+        fetchAddresses();
     }, [location.search]);
+
+    const fetchAddresses = async () => {
+        setLoading(true); // Bắt đầu tải dữ liệu
+        try {
+            const result = await getAddress();
+            setAddresses(result || []); // Nếu result là null thì dùng mảng rỗng
+            console.log("Addresses List:", addresses);
+        } catch (err) {
+            console.error('Error fetching addresses:', err);
+            setAddresses([]); // Đảm bảo addresses không bị undefined
+        } finally {
+            setLoading(false); // Kết thúc tải dữ liệu
+        }
+    };
+
+    const fullAddressUser = ({address, ward, district, province}) => {
+        // Tạo mảng chứa các thành phần không bị undefined, null hoặc chuỗi rỗng
+        const parts = [address?.trim(), ward?.trim(), district?.trim(), province?.trim()].filter(Boolean);
+
+        // Ghép các thành phần với dấu phẩy và khoảng trắng
+        return parts.join(", ");
+    };
+
+    const handleAddressChange = (e) => {
+        const selectedId = e.target.value;  // Lấy giá trị id từ select
+        console.log("Selected ID:", selectedId);  // Log giá trị id đã chọn
+
+        const address = addresses.find((address) => address.id === Number(selectedId));  // Tìm address tương ứng
+        console.log("Found Address:", address);  // Log đối tượng address
+
+        if (address) {
+            setSelectedAddress(address);  // Cập nhật selectedAddress nếu tìm thấy
+        } else {
+            console.log("Không tìm thấy địa chỉ với ID:", selectedId);
+        }
+    };
 
     // Lấy danh sách tỉnh khi component được mount
     useEffect(() => {
@@ -260,7 +300,7 @@ export default function Checkout() {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData({
             ...formData,
             [name]: value,
@@ -292,11 +332,13 @@ export default function Checkout() {
             newErrors.phone = "Số điện thoại phải có 10 chữ số.";
         }
 
-        const fullAddress = `${formData.address?.trim() || ""}, ${wardName || ""}, ${districtName || ""}, ${provinceName || ""}`.trim();
-        if (!formData.address?.trim()) {
-            newErrors.address = "Vui lòng nhập địa chỉ nhà.";
-        } else if (!wardName || !districtName || !provinceName) {
-            newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+        // Kiểm tra địa chỉ chỉ khi người dùng chưa chọn địa chỉ từ danh sách
+        if (!selectedAddress) {
+            if (!formData.address?.trim()) {
+                newErrors.address = "Vui lòng nhập địa chỉ nhà.";
+            } else if (!wardName || !districtName || !provinceName) {
+                newErrors.address = "Vui lòng chọn đầy đủ Tỉnh/Thành, Quận/Huyện và Xã/Phường.";
+            }
         }
 
         setErrors(newErrors);
@@ -309,16 +351,26 @@ export default function Checkout() {
         const cartIds = new URLSearchParams(window.location.search).get("cartIds");
         const cartIdsArray = cartIds ? cartIds.split(",") : [];  // Giả sử cartIds là một chuỗi phân tách bởi dấu phẩy
 
+        const getFullAddressFromForm = () => {
+            if (provinceName?.trim() && districtName?.trim() && wardName?.trim() && formData.address?.trim()) {
+                return `${formData.address.trim()}, ${wardName.trim()}, ${districtName.trim()}, ${provinceName.trim()}`;
+            }
+            return ""; // Nếu chưa đủ dữ liệu, trả về chuỗi trống
+        };
+
         const orderData = {
             order_id: `MDH_${Date.now()}`,
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
-            address: fullAddress,
+            address: selectedAddress ? fullAddressUser(selectedAddress) : getFullAddressFromForm(),
             payment_method: formData.paymentMethod,
             total_amount: totalAmount,
             cart_ids: cartIdsArray,  // Thêm cartIds từ URL vào orderData
         };
+
+        // Log dữ liệu orderData
+        console.log("Order Data:", orderData);
 
         // Kiểm tra phương thức thanh toán
         if (orderData.payment_method === "2") {
@@ -329,13 +381,11 @@ export default function Checkout() {
                 toast.success("Thanh toán thành công.");
                 navigate(`/payment-result?resultCode=0`);
             } catch (error) {
+                console.error("Thanh toán thất bại: ", error);
                 toast.error("Thanh toán thất bại.");
             }
         }
     };
-
-
-
 
     const handleMomoPayment = async (orderData) => {
         const extradata = products.map(item => ({
@@ -382,7 +432,7 @@ export default function Checkout() {
                             bạn</p>
                         <div className="list-group">
                             {loading ? (
-                                Array.from({ length: 3 }).map((_, index) => (
+                                Array.from({length: 3}).map((_, index) => (
                                     <div
                                         key={index}
                                         className="list-group-item d-flex justify-content-between align-items-center"
@@ -393,12 +443,12 @@ export default function Checkout() {
                                                 className="me-3"
                                                 width={80}
                                                 height={80}
-                                                style={{ borderRadius: "5px" }}
+                                                style={{borderRadius: "5px"}}
                                             />
                                             {/* Skeleton cho thông tin sản phẩm */}
                                             <div>
-                                                <Skeleton width="70%" height={20} className="mb-2" />
-                                                <Skeleton width="50%" height={15} />
+                                                <Skeleton width="70%" height={20} className="mb-2"/>
+                                                <Skeleton width="50%" height={15}/>
                                             </div>
                                         </div>
                                     </div>
@@ -409,7 +459,8 @@ export default function Checkout() {
                                         <div key={item.id}
                                              className="list-group-item d-flex justify-content-between align-items-center">
                                             <div className="d-flex align-items-center">
-                                                <img src={item.image} alt={item.name} className="img-thumbnail me-3 img-checkout"/>
+                                                <img src={item.image} alt={item.name}
+                                                     className="img-thumbnail me-3 img-checkout"/>
                                                 <div>
                                                     <p className="text-dGreen name-checkout">
                                                         {item.name.length > 100 ? item.name.substring(0, 100) + "..." : item.name}
@@ -417,7 +468,8 @@ export default function Checkout() {
                                                     <p className="mb-0 text-dGreen">
                                                         {item.sale_price ? (
                                                             <>
-                                                            <span className="text-decoration-line-through text-dGreen fs-14">
+                                                            <span
+                                                                className="text-decoration-line-through text-dGreen fs-14">
                                                                 {item.unit_price.toLocaleString("vi-VN", {
                                                                     style: "currency",
                                                                     currency: "VND"
@@ -451,10 +503,11 @@ export default function Checkout() {
                             )}
                         </div>
 
-                        <p className="mt-4 font-semibold text-dGreen">Thành tiền: {calculateTotal().toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                        })}</p>
+                        <p className="mt-4 font-semibold text-dGreen">Thành
+                            tiền: {calculateTotal().toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                            })}</p>
                         <span className="text-dGreen">(Tiết kiệm: {calculateSavings().toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND"
@@ -505,68 +558,88 @@ export default function Checkout() {
                                 {errors.phone && <div className="text-danger mt-2">{errors.phone}</div>}
                             </div>
                             <div className="mb-3">
-                                <label className="form-label font-semibold text-dGreen">Địa
-                                    chỉ</label>
-                                <div className="d-flex justify-content-between">
+                                <label className="form-label font-semibold text-dGreen">Địa chỉ</label>
+                                {addresses.length > 0 ? (
                                     <div className="form-group mb-2 flex-1 mr-1">
                                         <select
                                             className="form-control rounded bg-white text-dGreen"
-                                            value={selectedProvince}
-                                            onChange={handleProvinceChange}
+                                            value={selectedAddress ? selectedAddress.id : ""}
+                                            onChange={handleAddressChange}
                                             required
                                         >
-                                            <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
-                                            {provinces.map((province) => (
-                                                <option key={province.code} value={province.code}>
-                                                    {province.name}
+                                            <option value="" className="font-bold">Chọn Địa chỉ</option>
+                                            {addresses.map((address) => (
+                                                <option key={address.id} value={address.id}>
+                                                    {fullAddressUser(address)}
                                                 </option>
                                             ))}
                                         </select>
+                                        {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                                     </div>
+                                ) : (
+                                    <div>
+                                        <div className="d-flex justify-content-between">
+                                            <div className="form-group mb-2 flex-1 mr-1">
+                                                <select
+                                                    className="form-control rounded bg-white text-dGreen"
+                                                    value={selectedProvince}
+                                                    onChange={handleProvinceChange}
+                                                    required
+                                                >
+                                                    <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
+                                                    {provinces.map((province) => (
+                                                        <option key={province.code} value={province.code}>
+                                                            {province.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
 
-                                    <div className="form-group mb-2 flex-1 mr-1">
-                                        <select
-                                            className="form-control rounded bg-white text-dGreen"
-                                            value={selectedDistrict}
-                                            onChange={handleDistrictChange}
-                                            required
-                                            disabled={!selectedProvince}
-                                        >
-                                            <option value="" className="font-bold">Chọn Quận/Huyện</option>
-                                            {districts.map((district) => (
-                                                <option key={district.code} value={district.code}>
-                                                    {district.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                            <div className="form-group mb-2 flex-1 mr-1">
+                                                <select
+                                                    className="form-control rounded bg-white text-dGreen"
+                                                    value={selectedDistrict}
+                                                    onChange={handleDistrictChange}
+                                                    required
+                                                    disabled={!selectedProvince}
+                                                >
+                                                    <option value="" className="font-bold">Chọn Quận/Huyện</option>
+                                                    {districts.map((district) => (
+                                                        <option key={district.code} value={district.code}>
+                                                            {district.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
 
-                                    <div className="form-group mb-2" style={{ flex: 1 }}>
-                                        <select
-                                            className="form-control rounded bg-white text-dGreen"
-                                            value={selectedWard}
-                                            onChange={handleWardChange}
+                                            <div className="form-group mb-2" style={{flex: 1}}>
+                                                <select
+                                                    className="form-control rounded bg-white text-dGreen"
+                                                    value={selectedWard}
+                                                    onChange={handleWardChange}
+                                                    required
+                                                    disabled={!selectedDistrict}
+                                                >
+                                                    <option value="" className="font-bold">Chọn Xã/Phường</option>
+                                                    {wards.map((ward) => (
+                                                        <option key={ward.code} value={ward.code}>
+                                                            {ward.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            className="form-control rounded text-dGreen"
+                                            name="address"
+                                            placeholder={"Vui lòng nhập địa chỉ nhà..."}
+                                            onChange={handleChange}
                                             required
-                                            disabled={!selectedDistrict}
-                                        >
-                                            <option value="" className="font-bold">Chọn Xã/Phường</option>
-                                            {wards.map((ward) => (
-                                                <option key={ward.code} value={ward.code}>
-                                                    {ward.name}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        />
+                                        {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                                     </div>
-                                </div>
-                                <input
-                                    type="text"
-                                    className="form-control rounded text-dGreen"
-                                    name="address"
-                                    placeholder={"Vui lòng nhập địa chỉ nhà..."}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
+                                )}
                             </div>
 
                             {/* Phương thức thanh toán với icon */}
@@ -597,7 +670,7 @@ export default function Checkout() {
                                             onChange={handleChange}
                                         />
                                         <label className="form-check-label text-dGreen">
-                                            Thanh toán qua Momo
+                                            Thanh toán qua MoMo
                                         </label>
                                     </div>
                                     {/*<div className="form-check">*/}

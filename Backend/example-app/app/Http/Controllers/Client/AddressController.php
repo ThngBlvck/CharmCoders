@@ -85,6 +85,9 @@ class AddressController extends Controller
         $address = new Address();
         $address->user_id = $userId;
         $address->address = $request->input('address');
+        $address->province = $request->input('province');
+        $address->district = $request->input('district');
+        $address->ward = $request->input('ward');
 
         $address->save();
 
@@ -106,6 +109,9 @@ class AddressController extends Controller
         }
 
         $address->address = $request->input('address');
+        $address->province = $request->input('province');
+        $address->district = $request->input('district');
+        $address->ward = $request->input('ward');
 
         $address->save();
 

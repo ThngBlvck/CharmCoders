@@ -68,10 +68,10 @@ export default function About() {
                         {/* Hình ảnh bên trái */}
                         <div className="col-lg-5">
                             <div className="video">
-                                <img src="toner.png" className="img-fluid rounded"/>
+                                <img src="toner.png" className="img-fluid rounded shadow"/>
                                 <div
                                     className="position-absolute rounded border-top border-start border-white bottom-0 right-0">
-                                    <img src="toner.png" width={"200px"} className="img-fluid rounded"/>
+                                    <img src="toner.png" width={"200px"} className="img-fluid shadow rounded"/>
                                 </div>
 
                             </div>
@@ -230,7 +230,7 @@ export default function About() {
                 </div>
             </div>
             <div className="mx-auto text-center" style={{maxWidth: "800px", marginTop: '100px'}}>
-                <p className="fs-4 text-center text-dGreen font-bold">GlowMakers</p>
+                <p className="fs-4 text-center text-dGreen font-bold">GlowMaker</p>
                 <p className="font-bold text-dGreen fs-30">Liên hệ</p>
             </div>
             <div className="container-fluid">
