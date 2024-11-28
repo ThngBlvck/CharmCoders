@@ -339,7 +339,7 @@ export default function Products() {
                             </div>
                         ))
                     ) : (
-                        <p className="text-center fs-30 text-dGreen">Không có sản
+                        <p className="text-center fs-24 text-dGreen">Không có sản
                             phẩm!</p>
                     )}
                 </div>
@@ -356,8 +356,6 @@ export default function Products() {
                         </button>
                     ))}
                 </div>
-
-                )
             </div>
 
         </>

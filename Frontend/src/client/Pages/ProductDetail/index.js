@@ -271,21 +271,36 @@ const ProductDetail = () => {
                                 </div>
                                 {/* Nội dung chi tiết sản phẩm */}
                                 <div className="col-md-7 d-flex flex-column align-content-start">
+                                    {/* Tên sản phẩm */}
                                     <p className="mb-2 text-dGreen fs-26 font-bold">
-                                        <Skeleton height={20} width="100%"/>
+                                        <Skeleton width={200} height={30}/>
                                     </p>
+
                                     {/* Giá sản phẩm */}
                                     <div className="mb-2 text-dGreen">
-                                        <Skeleton height={20} width="100%"/>
+                                        <Skeleton width={100} height={20}/>
+                                        <div className="d-flex flex-row align-items-center">
+                                            <Skeleton width={100} height={20} className="mr-2"/>
+                                            <Skeleton width={100} height={20}/>
+                                        </div>
                                     </div>
-                                    {/* Chọn số lượng và nút hành động */}
+
+                                    {/* Input số lượng */}
                                     <div className="mt-2 d-flex justify-content-start align-items-center mb-3">
-                                        <Skeleton height={20} width="100%"/>
+                                        <span className="text-dGreen fs-16">
+                                            <Skeleton width={100} height={20}/>
+                                        </span>
+                                        <Skeleton
+                                            width={50}
+                                            height={35}
+                                            className="mx-2 rounded fs-16 w-16"
+                                        />
                                     </div>
+
                                     {/* Nút thêm vào giỏ và mua ngay */}
                                     <div className="d-flex justify-content-start">
-                                        <Skeleton height={40} width="40%"/>
-                                        <Skeleton height={40} width="40%"/>
+                                        <Skeleton width={100} height={40} className="mr-2"/>
+                                        <Skeleton width={100} height={40}/>
                                     </div>
                                 </div>
                                 {/* Thông tin chi tiết sản phẩm */}
@@ -336,7 +351,7 @@ const ProductDetail = () => {
                                                 </div>
                                             ))
                                         ) : (
-                                            <Skeleton height={60} width="100%" />
+                                            <Skeleton height={60} width="100%"/>
                                         )}
                                     </div>
 
@@ -377,7 +392,7 @@ const ProductDetail = () => {
                                         </div>
                                     ))
                                 ) : (
-                                    <Skeleton height={60} width="100%" />
+                                    <Skeleton height={60} width="100%"/>
                                 )}
                             </div>
                         </div>
