@@ -274,7 +274,7 @@ export default function Profile() {
                                         Đổi mật khẩu
                                     </button>
                                 </NavLink>
-                                <button className="btn-huy mt-3 mx-2 font-semibold bg-danger rounded btn-20 shadow"
+                                <button className="btn-huy mt-3 mx-2 font-semibold rounded btn-20 shadow"
                                         onClick={() => handleDeleteAccount()}>
                                     Xóa tài khoản
                                 </button>

@@ -117,9 +117,9 @@ export default function About() {
                     {/* Cam kết 1 */}
                     <div className="col-3 d-flex justify-content-center">
                         <div className="p-4 d-flex flex-column align-items-center border w-100 greenPt rounded">
-                            <img src="https://via.placeholder.com/150x150" alt="Thanh toán khi nhận hàng"
+                            <img src="hand.png" alt="Thanh toán khi nhận hàng"
                                  className="img-fluid mb-3 rounded"
-                                 style={{width: '150px', objectFit: 'cover'}}/>
+                                 style={{width: '100px', objectFit: 'cover'}}/>
                             <p className="font-bold text-dGreen">Thanh toán khi nhận hàng</p>
                         </div>
                     </div>
@@ -127,9 +127,9 @@ export default function About() {
                     {/* Cam kết 2 */}
                     <div className="col-3 d-flex justify-content-center">
                         <div className="p-4 d-flex flex-column align-items-center border w-100 greenPt rounded">
-                            <img src="https://via.placeholder.com/150x150" alt="Thương hiệu uy tín toàn cầu"
+                            <img src="uy-tin.png" alt="Thương hiệu uy tín toàn cầu"
                                  className="img-fluid mb-3 rounded"
-                                 style={{width: '150px', objectFit: 'cover'}}/>
+                                 style={{width: '100px', objectFit: 'cover'}}/>
                             <p className="font-bold text-dGreen">Thương hiệu uy tín toàn cầu</p>
                         </div>
                     </div>
@@ -137,9 +137,9 @@ export default function About() {
                     {/* Cam kết 3 */}
                     <div className="col-3 d-flex justify-content-center">
                         <div className="p-4 d-flex flex-column align-items-center border w-100 greenPt rounded">
-                            <img src="https://via.placeholder.com/150x150" alt="30 ngày đổi trả miễn phí"
+                            <img src="30days.png" alt="30 ngày đổi trả miễn phí"
                                  className="img-fluid mb-3 rounded"
-                                 style={{width: '150px', objectFit: 'cover'}}/>
+                                 style={{width: '100px', objectFit: 'cover'}}/>
                             <p className="font-bold text-dGreen">30 ngày đổi trả miễn phí</p>
                         </div>
                     </div>
@@ -147,9 +147,9 @@ export default function About() {
                     {/* Cam kết 4 */}
                     <div className="col-3 d-flex justify-content-center">
                         <div className="p-4 d-flex flex-column align-items-center border w-100 greenPt rounded">
-                            <img src="https://via.placeholder.com/150x150" alt="Sản phẩm chính hãng 100%"
+                            <img src="100.png" alt="Sản phẩm chính hãng 100%"
                                  className="img-fluid mb-3 rounded"
-                                 style={{width: '150px', objectFit: 'cover'}}/>
+                                 style={{width: '100px', objectFit: 'cover'}}/>
                             <p className="font-bold text-dGreen">Sản phẩm chính hãng 100%</p>
                         </div>
                     </div>

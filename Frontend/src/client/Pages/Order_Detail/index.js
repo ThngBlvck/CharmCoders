@@ -284,12 +284,12 @@ export default function OrderDetail() {
                                 <div className="mb-3">
                                     <span className="text-dGreen">Phương thức thanh toán:</span> <span
                                     className="statusStyle">
-                                {order?.payment_method === 1 ? 'Thanh toán khi nhận hàng'
-                                    : order?.payment_method === 2 ? 'Thanh toán chuyển khoản'
-                                        : 'Không xác định'}</span>
+                                    {order?.payment_method === 1 ? 'Thanh toán khi nhận hàng'
+                                        : order?.payment_method === 2 ? 'Thanh toán chuyển khoản'
+                                            : 'Không xác định'}</span>
                                 </div>
                                 <div>
-                                    {order?.status !== 1 && order?.status !== 2 && order?.status !== 3 && order?.status !== 4 && (
+                                    {order?.status !== 1 && order?.status !== 2 && order?.status !== 3 && order?.status !== 4 && order?.payment_method !== 2 && (
                                         <button
                                             className="btn-huy font-semibold fs-16 rounded shadow"
                                             onClick={handleCancel}
