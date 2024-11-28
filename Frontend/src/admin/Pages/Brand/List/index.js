@@ -89,25 +89,41 @@ export default function Brand({ color }) {
     };
 
     const handleDeleteClick = async (brand) => {
-        const confirmDelete = await Swal.fire({
+        // Lần xác nhận đầu tiên
+        const firstConfirm = await Swal.fire({
             title: `Bạn có chắc chắn muốn xóa nhãn hàng "${brand.name}" không?`,
+            text: "Hãy kiểm tra lại trước khi thực hiện hành động này.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Có',
             cancelButtonText: 'Không',
         });
 
-        if (confirmDelete.isConfirmed) {
-            try {
-                await deleteBrand(brand.id);
-                Swal.fire('Thành công', 'Xóa nhãn hàng thành công.', 'success');
-                fetchBrands();
-            } catch (err) {
-                console.error('Error deleting brand:', err);
-                Swal.fire('Lỗi', 'Lỗi khi xóa nhãn hàng. Vui lòng thử lại.', 'error');
+        if (firstConfirm.isConfirmed) {
+            // Lần xác nhận thứ hai
+            const secondConfirm = await Swal.fire({
+                title: `Xác nhận lần nữa: Bạn thực sự muốn xóa nhãn hàng "${brand.name}"?`,
+                text: "Hành động này không thể hoàn tác.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Chắc chắn',
+                cancelButtonText: 'Hủy',
+            });
+
+            if (secondConfirm.isConfirmed) {
+                try {
+                    await deleteBrand(brand.id); // Xóa nhãn hàng
+                    Swal.fire('Thành công', 'Xóa nhãn hàng thành công.', 'success');
+                    fetchBrands(); // Tải lại danh sách nhãn hàng sau khi xóa
+                } catch (err) {
+                    console.error('Error deleting brand:', err);
+                    Swal.fire('Lỗi', 'Lỗi khi xóa nhãn hàng. Vui lòng thử lại.', 'error');
+                }
             }
         }
     };
+
+
 
     const handleBulkDelete = async () => {
         if (selectedBrands.size === 0) {
@@ -115,27 +131,47 @@ export default function Brand({ color }) {
             return;
         }
 
-        const confirmBulkDelete = await Swal.fire({
+        // Lần xác nhận đầu tiên
+        const firstConfirm = await Swal.fire({
             title: `Bạn có chắc chắn muốn xóa ${selectedBrands.size} nhãn hàng đã chọn không?`,
+            text: "Hãy kiểm tra lại trước khi thực hiện hành động này.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Có',
             cancelButtonText: 'Không',
         });
 
-        if (confirmBulkDelete.isConfirmed) {
-            for (let brandId of selectedBrands) {
-                try {
+        if (!firstConfirm.isConfirmed) {
+            return; // Người dùng hủy bỏ lần xác nhận đầu tiên
+        }
+
+        // Lần xác nhận thứ hai
+        const secondConfirm = await Swal.fire({
+            title: `Xác nhận lần nữa: Bạn thực sự muốn xóa ${selectedBrands.size} nhãn hàng đã chọn?`,
+            text: "Hành động này không thể hoàn tác.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Chắc chắn',
+            cancelButtonText: 'Hủy',
+        });
+
+        if (secondConfirm.isConfirmed) {
+            try {
+                // Duyệt qua danh sách các nhãn hàng được chọn và xóa từng nhãn hàng
+                for (let brandId of selectedBrands) {
                     await deleteBrand(brandId);
-                } catch (err) {
-                    console.error('Error deleting brand:', err);
                 }
+
+                Swal.fire('Thành công', 'Đã xóa nhãn hàng đã chọn.', 'success');
+                fetchBrands(); // Tải lại danh sách nhãn hàng sau khi xóa
+                setSelectedBrands(new Set()); // Xóa trạng thái lựa chọn
+            } catch (err) {
+                console.error('Error deleting selected brands:', err);
+                Swal.fire('Lỗi', 'Xảy ra lỗi khi xóa các nhãn hàng. Vui lòng thử lại.', 'error');
             }
-            Swal.fire('Thành công', 'Đã xóa nhãn hàng đã chọn.', 'success');
-            fetchBrands(); // Refresh the list after deletion
-            setSelectedBrands(new Set()); // Clear selection
         }
     };
+
 
     const handleSelectBrand = (id) => {
         const updatedSelection = new Set(selectedBrands);
@@ -149,12 +185,16 @@ export default function Brand({ color }) {
 
     const handleSelectAll = (event) => {
         if (event.target.checked) {
-            const allBrandIds = brands.map(brand => brand.id);
+            const allBrandIds = brands.map((brand) => brand.id);
             setSelectedBrands(new Set(allBrandIds));
         } else {
             setSelectedBrands(new Set());
         }
     };
+
+// Tính trạng thái checkbox "Chọn tất cả"
+    const isAllSelected = brands.length > 0 && selectedBrands.size === brands.length;
+
 
     const handlePageChange = (page) => {
         if (page > 0 && page <= Math.ceil(brands.length / brandsPerPage)) {
@@ -249,38 +289,37 @@ export default function Brand({ color }) {
                         <table className="items-center w-full bg-transparent border-collapse table-fixed">
                             <thead>
                             <tr>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}>
                                     <input
                                         type="checkbox"
                                         onChange={handleSelectAll}
-                                        checked={selectedBrands.length === setDisplayedBrands.length}
+                                        checked={isAllSelected}
                                     />
-                                    <span className="ml-2">Chọn tất cả</span>
                                 </th>
 
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}
                                 >STT
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "15%"}}
                                 >Hình ảnh
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "25%"}}
                                 >Tên nhãn hàng
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}
                                 >Trạng Thái
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " +
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}
                                 >Hành động
@@ -291,28 +330,28 @@ export default function Brand({ color }) {
                             {displayedBrands.length > 0 ? (
                                 displayedBrands.map((brand, index) => (
                                     <tr key={brand.id}>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4 text-left">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedBrands.has(brand.id)}
                                                 onChange={() => handleSelectBrand(brand.id)}
                                             />
                                         </td>
-                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+                                        <th className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
                                         <span className="ml-3 font-bold">
                                             {index + 1}
                                         </span>
                                         </th>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             <img src={brand.image} className="w-16 h-16 object-cover center"/>
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             {brand.name}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             {renderStatus(brand.status)}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
                                             <button
                                                 className="text-blue-500 hover:text-blue-700 px-2"
                                                 onClick={() => handleEditClick(brand.id)}

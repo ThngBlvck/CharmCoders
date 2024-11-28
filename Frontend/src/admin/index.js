@@ -41,6 +41,10 @@ import Brand from "./Pages/Brand/List";
 import AddBrand from "./Pages/Brand/Add";
 import EditBrand from "./Pages/Brand/Edit";
 
+import Banner from "./Pages/Banner/List";
+import AddBanner from "./Pages/Banner/Add";
+import EditBanner from "./Pages/Banner/Edit";
+
 // Other sections
 import Comment from "./Pages/Comment/List";
 import Role from "./Pages/Role/List";
@@ -49,6 +53,7 @@ import OrderDetail from "./Pages/Order/OrderDetail";
 import EditOrder from "./Pages/Order/Edit";
 import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
+import Reviews from "./Pages/Review/List";
 import "../assets/styles/tailwind.css"
 
 export default function Admin() {
@@ -105,6 +110,12 @@ export default function Admin() {
                         <Route path="role" element={<Role />} />
                         <Route path="role/add" element={<AddRole />} />
                         <Route path="role/edit/:id" element={<EditRole />} />
+
+                        <Route path="banner" element={<Banner />} />
+                        <Route path="banner/add" element={<AddBanner />} />
+                        <Route path="banner/edit/:id" element={<EditBanner />} />
+
+                        <Route path="review" element={<Reviews />} />
 
                         {/* Default and 404 Route */}
                         <Route path="/" element={<Navigate to="/admin/dashboard" />} />

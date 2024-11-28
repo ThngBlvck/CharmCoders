@@ -923,6 +923,18 @@
 .text-dGreen {
     color: #1a611a !important;
 }
+.text-dGreen-comment {
+    color: black !important; /* Màu chữ đen */
+    background-color: #29a329 !important; /* Nền xanh */
+}
+
+
+.text-dGreen-comment {
+    color: black !important; /* Màu chữ đen */
+    background-color: #29a329 !important; /* Nền xanh */
+}
+
+
 
 .text-del {
     color: #cd3232;
@@ -965,8 +977,8 @@
 
 .butn-chat:hover,
 .butn-top:hover {
-    background-color: #29a629 !important;
-    color: #edfced !important;
+    background-color: #29a629;
+    color: #edfced;
 }
 
 .butn:hover {
@@ -993,6 +1005,20 @@
     align-items: center !important;
 }
 
+.btn-tkp {
+    background-color: #2bab2b !important;
+    color: white !important;
+    width: 40%;
+    height: 40px;
+}
+
+.btn-tkp {
+    background-color: #2bab2b !important;
+    color: white !important;
+    width: 40%;
+    height: 40px;
+}
+
 .btn-tk {
     background-color: #32CD32;
     color: white;
@@ -1012,7 +1038,7 @@
 }
 
 .btn-huy:hover {
-    background-color: #ab2b2b !important;
+    background-color: #ab2b2b;
 }
 
 .btn-nhan {
@@ -1325,6 +1351,15 @@ input[type="range"]::-ms-thumb {
     white-space: normal;
     max-height: 3em;
 }
+.headerRowStyle .btn-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* Kích thước biểu tượng */
+    margin-right: 580px; /* Khoảng cách giữa nút và mã đơn hàng */
+    padding: 0; /* Loại bỏ padding mặc định */
+}
+
  .user_img {
      width: 250px;
      height: 250px;
@@ -1337,6 +1372,33 @@ input[type="range"]::-ms-thumb {
      object-fit: cover;
      margin-left: 140px;
  }
+.headerRowStyle .btn-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* Kích thước biểu tượng */
+    margin-right: 580px; /* Khoảng cách giữa nút và mã đơn hàng */
+    padding: 0; /* Loại bỏ padding mặc định */
+}
+
+
+
+.btn-edit-phone {
+    background: none;
+    border: none;
+    color: #45a049;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-edit-phone i {
+    margin-left: 8px;
+}
+
+.btn-edit-phone:hover {
+    color: #387e3a;
+}
 
  .logo-footer {
      height: 80px;

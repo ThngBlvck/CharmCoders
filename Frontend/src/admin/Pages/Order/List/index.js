@@ -193,23 +193,23 @@ export default function Order({ color }) {
                         <table className="items-center w-full bg-transparent border-collapse table-fixed">
                             <thead>
                             <tr>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}>
                                     STT
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}>
                                     Mã đơn hàng
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "20%"}}>
                                     Tên người dùng
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}>
                                     Trạng Thái
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-xs uppercase font-semibold text-left " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
+                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "10%"}}>
                                     Hành động
                                 </th>
@@ -219,19 +219,19 @@ export default function Order({ color }) {
                             {displayedOrders.length > 0 ? (
                                 displayedOrders.map((order, index) => (
                                     <tr key={order.id}>
-                                        <th className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-left flex items-center">
+                                        <th className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4 text-left flex items-center">
                                             <span
-                                                className={"ml-3 font-bold " + (color === "light" ? "text-blueGray-600" : "text-white")}>
+                                                className={"ml-3 font-bold text-center " + (color === "light" ? "text-blueGray-600" : "text-white")}>
                                                 {index + 1}
                                             </span>
                                         </th>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
                                             {order.order_id}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
                                             {order.user_name}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
                                             {(() => {
                                                 switch (order.status) {
                                                     case 0:

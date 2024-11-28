@@ -1,14 +1,15 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import Swal from 'sweetalert2';
-import { getOneBlogCategory, updateBlogCategory } from '../../../../services/BlogCategory';
-import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
+import Swal from "sweetalert2";
+import { getOneBlogCategory, updateBlogCategory } from "../../../../services/BlogCategory";
+import { PulseLoader } from "react-spinners";
 
-export default function BlogCategoryEdit() {
+export default function BlogCategoryEdit({ color = "light" }) {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true); // Thêm state loading
+    const [loading, setLoading] = useState(true);
 
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
         defaultValues: {
@@ -22,7 +23,7 @@ export default function BlogCategoryEdit() {
     }, [id]);
 
     const fetchCategoryData = async (id) => {
-        setLoading(true)
+        setLoading(true);
         try {
             const result = await getOneBlogCategory(id);
             if (result) {
@@ -37,7 +38,7 @@ export default function BlogCategoryEdit() {
             Swal.fire('Error', 'Lỗi khi tải danh mục. Vui lòng thử lại.', 'error');
             navigate('/admin/category_blog');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
@@ -60,14 +61,15 @@ export default function BlogCategoryEdit() {
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex items-center">
-                    <h3 className="font-semibold text-lg text-blueGray-700">
-                        Chỉnh sửa danh mục bài viết
+                    <h3 className={`font-bold text-2xl text-lg ${color === "light" ? "text-blueGray-700" : "text-white"}`}
+                        style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        CẬP NHẬT DANH MỤC BÀI VIẾT
                     </h3>
                 </div>
             </div>
             {loading ? (
                 <div className="flex justify-center items-center py-4">
-                    <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                    <PulseLoader color="#4A90E2" loading={loading} size={15} />
                 </div>
             ) : (
                 <div className="block w-full overflow-x-auto px-4 py-4">
@@ -78,7 +80,7 @@ export default function BlogCategoryEdit() {
                             </label>
                             <input
                                 type="text"
-                                {...register("name", {required: "Tên danh mục là bắt buộc"})}
+                                {...register("name", { required: "Tên danh mục là bắt buộc" })}
                                 className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
                                 placeholder="Nhập tên danh mục"
                             />
@@ -90,7 +92,7 @@ export default function BlogCategoryEdit() {
                                 Trạng thái
                             </label>
                             <select
-                                {...register("status", {required: "Vui lòng chọn trạng thái"})}
+                                {...register("status", { required: "Vui lòng chọn trạng thái" })}
                                 className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
                             >
                                 <option value="">Chọn trạng thái</option>
@@ -110,7 +112,7 @@ export default function BlogCategoryEdit() {
                             </button>
                             <button
                                 type="button"
-                                className={`bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                                className="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                 onClick={() => navigate('/admin/category_blog')}
                             >
                                 Hủy bỏ
@@ -122,3 +124,11 @@ export default function BlogCategoryEdit() {
         </div>
     );
 }
+
+BlogCategoryEdit.propTypes = {
+    color: PropTypes.oneOf(["light", "dark"]),
+};
+
+BlogCategoryEdit.defaultProps = {
+    color: "light",
+};

@@ -181,6 +181,20 @@ export default function Sidebar() {
                             <li className="items-center">
                                 <Link
                                     className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/review"
+                                            ? "text-lightBlue-500 hover:text-lightBlue-600"
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
+                                    to="/admin/review"
+                                >
+                                    <i className={`fas fas fa-star mr-2 text-sm ${location.pathname === "/admin/review" ? "opacity-75" : "text-blueGray-300"}`}></i>
+                                    Đánh giá
+                                </Link>
+                            </li>
+
+                            <li className="items-center">
+                                <Link
+                                    className={`text-xs uppercase py-3 font-bold block ${
                                         location.pathname === "/admin/role"
                                             ? "text-lightBlue-500 hover:text-lightBlue-600"
                                             : "text-blueGray-700 hover:text-blueGray-500"
@@ -189,6 +203,19 @@ export default function Sidebar() {
                                 >
                                     <i className={`fas fa-user-tag mr-2 text-sm ${location.pathname === "/admin/role" ? "opacity-75" : "text-blueGray-300"}`}></i>
                                     Vai trò
+                                </Link>
+                            </li>
+                            <li className="items-center">
+                                <Link
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/banner"
+                                            ? "text-lightBlue-500 hover:text-lightBlue-600"
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
+                                    to="/admin/banner"
+                                >
+                                    <i className={`fas fa-file-image mr-2 text-sm ${location.pathname === "/admin/banner" ? "opacity-75" : "text-blueGray-300"}`}></i>
+                                    Hình nền
                                 </Link>
                             </li>
                         </ul>

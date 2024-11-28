@@ -1,11 +1,11 @@
 import request from '../../api';
 import axios from 'axios';
 
-const URL_Product = 'admin/products';
+const URL_Post = 'admin/blog';
 const URL_Search = 'admin/search';  // Change URL if needed
 const URL_Comments = 'client/comments'; // Ensure this matches your API
 const URL_User = "client/users";
-
+const URL_Product = 'admin/product';
 // Fetch a user by ID
 export const getUser = async (id) => {
     return request({
@@ -15,20 +15,29 @@ export const getUser = async (id) => {
 };
 
 // Fetch comments for a specific product ID
-export const getCommentsByProductId = async (productId) => {
+export const getCommentsByBlogId = async (blogId) => {
     return request({
         method: 'GET',
-        path: `client/comments/product/${productId}`, // Update path to match the new route
+        path: `client/comments/blog/${blogId}`, // Update path to match the new route
     });
 };
 
+
 export const addComment = async (data) => {
-    return request({
-        method: 'POST',
-        path: URL_Comments,
-        data,
-    });
+    try {
+        const response = await request({
+            method: 'POST',
+            path: URL_Comments,
+            data,
+        });
+        console.log('Add Comment response:', response);  // Log response here
+        return response;
+    } catch (error) {
+        console.error('Error in addComment:', error);  // Log any error in the addComment request
+        throw error;  // Re-throw the error so it can be caught in the calling function
+    }
 };
+
 
 // Fetch all comments
 export const getComments = async () => {
@@ -54,17 +63,6 @@ export const searchProduct = (query) => {
     });
 };
 
-// Function to get all products with optional query
-export const getProduct = (query = '') => {
-    return request({
-        method: 'GET',
-        path: `${URL_Product}`,
-        params: {
-            query: query,  // Pass search query as query parameters
-        },
-    });
-};
-
 // Function to get one product by ID
 export const getOneProduct = (id) => {
     return request({
@@ -73,43 +71,42 @@ export const getOneProduct = (id) => {
     });
 };
 
-// Function to post a new product
-export const postProduct = (data) => {
+// Function to get all products with optional query
+export const getPost = (query = '') => {
     return request({
-        method: 'POST',
-        path: `${URL_Product}`,
-        data,
+        method: 'GET',
+        path: `${URL_Post}`,
+        params: {
+            query: query,  // Pass search query as query parameters
+        },
     });
 };
 
-// Function to update a product by ID
-export const updateProduct = (id, data) => {
-    return request({
-        method: 'POST',
-        path: `${URL_Product}/${id}?_method=PUT`,
-        data,
-    });
-};
 
-// Function to delete a product by ID
-export const deleteProduct = (id) => {
-    return request({
-        method: 'DELETE',
-        path: `${URL_Product}/${id}`,
-    });
-};
-
-// Function to get product names and associated user names
-export const getProductWithUserNames = async () => {
+// Function to get product names and associated user_name
+export const getBlogWithUserNames = async () => {
     try {
-        const products = await getProduct();
-        // Assuming each product has a 'name' and a 'user' object with 'name' property
-        return products.map(product => ({
-            productName: product.name,
-            userName: product.user ? product.user.name : 'Unknown User',  // Handle case where user might not be defined
-        }));
+        // Lấy danh sách các bài viết từ API
+        const blogs = await getPost();
+
+        // Kiểm tra nếu dữ liệu không phải là mảng
+        if (!Array.isArray(blogs)) {
+            throw new Error('Dữ liệu không phải là một mảng.');
+        }
+
+        // Chuyển mảng bài viết thành mảng các đối tượng chứa tên bài viết và tên người dùng
+        return blogs.map(blog => {
+            // Kiểm tra xem blog có đủ dữ liệu cần thiết không
+            const blogTitle = blog.title || 'Không có tiêu đề';
+            const user_name = blog.user_name && blog.user_name ? blog.user_name : 'Người dùng không xác định';
+
+            return {
+                blogTitle: blogTitle,  // Tiêu đề bài viết
+                user_name: user_name,    // Tên tác giả
+            };
+        });
     } catch (error) {
-        console.error('Failed to fetch products with user names', error);
-        throw error;  // Re-throw error after logging
+        console.error('Lỗi khi lấy danh sách bài viết với tên người dùng:', error.message);
+        throw error;  // Ném lại lỗi sau khi đã ghi log
     }
 };

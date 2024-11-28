@@ -3,6 +3,7 @@ import {Routes, Route, Navigate,useLocation} from "react-router-dom";
 import {CartProvider} from './components/Cart';
 import Footer from "./components/Footer";
 import Home from "./Pages/Home";
+import Contact from "./Pages/Contact";
 import About from "./Pages/About";
 import Products from "./Pages/Products";
 import ProductDetail from "./Pages/ProductDetail";
@@ -24,13 +25,16 @@ import Edit_Profile from "./Pages/Edit_Profile";
 import Add_Address from "./Pages/Address/Add_Address";
 import Edit_Address from "./Pages/Address/Edit_Address";
 import ChangePassword from "./Pages/Change_Password";
-
+import ChangePhone from "./Pages/ChangePhone";
 import GoogleCallback from "./Pages/GoogleCallback";
 import OrderDetail from "./Pages/Order_Detail";
 import FacebookCallback from "./Pages/FacebookCallback";
 import {ToastContainer} from "react-toastify";
 import PaymentResult from "./Pages/payment-result";
 
+import "../assets/styles/css/bootstrap.min.css"
+import "../assets/styles/css/style.css"
+import "../assets/styles/css/productdt/index.css"
 
 
 
@@ -57,6 +61,7 @@ export default function Client() {
                 <Routes>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/about" element={<About/>}/>
+                    <Route path="/contact" element={<Contact/>}/>
                     <Route path="/products" element={<Products/>}/>
                     <Route path="/products/:id" element={<ProductDetail/>}/>
                     <Route path="/profile" element={<Profile/>}/>
@@ -83,6 +88,10 @@ export default function Client() {
 
                     <Route path="/add-address" element={<Add_Address/>} />
                     <Route path="/edit-address/:id" element={<Edit_Address/>} />
+
+                    <Route path="/edit_phone" element={<ChangePhone/>} />
+
+
 
                     <Route path="/payment-result" element={<PaymentResult/>} />
 

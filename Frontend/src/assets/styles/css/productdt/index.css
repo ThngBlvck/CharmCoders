@@ -1,2 +1,212 @@
 @import "~slick-carousel/slick/slick.css";
 @import "~slick-carousel/slick/slick-theme.css";
+
+
+
+
+.reviews {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.reviews h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.review-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.review-item {
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.review-username {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.review-rating {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.filled-star {
+    color: gold;
+    margin-right: 5px;
+}
+
+.empty-star {
+    color: lightgray;
+    margin-right: 5px;
+}
+
+.review-comment {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    padding-top: 10px;
+}
+
+.reviews p {
+    font-size: 16px;
+    text-align: center;
+    color: #777;
+}
+
+.review-form {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.review-form h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.rating-input span {
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.filled-star {
+    color: gold;
+}
+
+.empty-star {
+    color: lightgray;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    height: 100px;
+    resize: none;
+}
+
+.btn-submit {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    background-color: #45a049;
+}
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.review-comment {
+    margin-top: 10px;
+}
+
+.btn-edit {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #45a049;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.btn-edit:hover {
+    color: #39833c;
+}
+
+
+/* Nếu bạn muốn áp dụng riêng cho form hoặc các phần tử cụ thể */
+.review-form, .review-item, .review-list, .review-username, .form-label, .form-textarea {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Cập nhật các lớp CSS khác nếu cần */
+.form-textarea {
+    font-family: 'Roboto', sans-serif;
+}
+
+
+/* Nút Cập nhật */
+.btn-submit {
+    background-color: #28a745; /* Màu xanh */
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.btn-submit:disabled {
+    background-color: #cccccc; /* Màu xám khi disabled */
+    cursor: not-allowed;
+}
+
+/* Nút Hủy */
+.btn-cancel {
+    background-color: #dc3545; /* Màu đỏ */
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Nhóm nút */
+.button-group {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 10px;
+}
+
+/* Hiệu ứng hover cho các nút */
+.btn-submit:hover {
+    background-color: #218838; /* Đậm hơn khi hover */
+}
+
+.btn-cancel:hover {
+    background-color: #c82333; /* Đậm hơn khi hover */
+}
