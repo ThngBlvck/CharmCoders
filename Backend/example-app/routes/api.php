@@ -17,8 +17,7 @@ use App\Http\Controllers\Admin\{
     ReportExportController,
     AttributeController,
     AttributeValueController,
-    VariantController,
-    BannerController
+    VariantController
 };
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
@@ -66,12 +65,11 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('attributes/{attributeId}/values', AttributeValueController::class);
     Route::get('/{id}/variants', [ProductController::class, 'showVariants']);
     Route::get('products/{id}/variants', [ProductController::class, 'showVariants']);
-    Route::apiResource('banners', BannerController::class);
     Route::middleware('auth:api')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
         Route::apiResource('products/{productId}/variants', VariantController::class);
-
+ Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
     });
     Route::middleware('auth:api')->post('request-export-report', [ReportExportController::class, 'export']);
     Route::apiResource('employee', UserController::class);
@@ -98,7 +96,7 @@ Route::prefix('client')->group(function () {
                 Route::get('/payment-return', [PaymentController::class, 'paymentReturn']);
                 Route::get('/user', [UserController::class, 'getUser'])->middleware('auth:api');
                 Route::apiResource('comments', CommentController::class);
-                Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
+
     });
         Route::get('comments/blog/{blogId}', [CommentController::class, 'getCommentsByBlogId']);
         Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
@@ -127,18 +125,17 @@ Route::prefix('client')->group(function () {
         Route::post('/send-otp', [PhoneController::class, 'sendOtp'])->middleware('auth:api');
         // Route xác thực OTP yêu cầu xác thực người dùng
         Route::post('/verify-otp', [PhoneController::class, 'verifyOtp']) ->middleware('auth:api');
-        Route::get('review/{product_id}', [ReviewController::class, 'GetRatingByProductId']);
-
+         Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
+        Route::get('review1/{product_id}', [ReviewController::class, 'GetRatingByProductId']);
         Route::get('/reviews/{id}', [ReviewController::class, 'getReviewById']);
 
-    Route::middleware('auth:api')->delete('/user/delete', [UserController::class, 'deleteUser']);
+
 });
 
 // General user route (outside of client prefix)
 Route::middleware('auth:api')->get('/user', [UserController::class, 'getUser']);
 Route::middleware('auth:api')->apiResource('comments', CommentController::class);
- Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
-
+Route::middleware('auth:api')->apiResource('review', CommentController::class);
 // Password reset routes
 
 
