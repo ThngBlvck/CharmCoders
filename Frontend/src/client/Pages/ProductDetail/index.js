@@ -55,11 +55,11 @@ const ProductDetail = () => {
 
     const sliderSettings = {
         dots: false,
-        infinite: relatedProducts.length >= 5, // Chỉ cho phép infinite nếu có 5 item trở lên
+        infinite: relatedProducts.length > 1, // Chỉ cho phép infinite nếu có nhiều hơn 1 item
         speed: 500,
-        slidesToShow: Math.min(relatedProducts.length, 5), // Luôn luôn hiển thị 5 item
+        slidesToShow: relatedProducts.length === 1 ? 1 : Math.min(relatedProducts.length, 5), // Nếu chỉ có 1 item, hiển thị 1 item
         slidesToScroll: 1,
-        arrows: false,
+        arrows: relatedProducts.length > 1, // Chỉ hiển thị nút điều hướng nếu có nhiều hơn 1 sản phẩm
         autoplay: relatedProducts.length >= 5, // Chỉ tự động chạy khi có 5 item trở lên
         autoplaySpeed: 2000,
         responsive: [
@@ -77,6 +77,9 @@ const ProductDetail = () => {
             },
         ],
     };
+
+
+
 
 
     const fetchOneProduct = async () => {
@@ -213,94 +216,46 @@ const ProductDetail = () => {
             return;
         }
 
-        // Kiểm tra xem có đủ đánh giá và nhận xét không
+        // Kiểm tra đánh giá và nhận xét
         if (rating === 0 || comment === "") {
             toast.error("Vui lòng cung cấp cả đánh giá sao và nhận xét.");
             setIsSubmitting(false);
             return;
         }
 
-        const reviewData = {
-            rating,
-            comment,
-            product_id: product.id,
-            user_id: userId,
-        };
+        const reviewData = { rating, comment, product_id: product.id, user_id: userId };
 
-        try {
-            let response;
-
-            // Nếu có reviewId, gọi API cập nhật đánh giá
-            if (editingReviewId) {
-                response = await updateReview(editingReviewId, reviewData);
-                if (response && response.review) {
-                    const updatedReviews = reviews.map((review) =>
-                        review.id === editingReviewId ? response.review : review
-                    );
-                    setReviews(updatedReviews);
-                    setEditingReview(false);
-                    setEditingReviewId(null);
-                    setRating(0);
-                    setComment("");
-                    toast.success("Đánh giá đã được chỉnh sửa thành công!");
-                }
-            } else {
-                // Nếu không có reviewId, gọi API thêm mới đánh giá
-                response = await addReview(reviewData);
-
-                // Xử lý các lỗi từ backend theo status code
-                if (response) {
-                    switch (response.status) {
-                        case 403:
-                            // Kiểm tra lỗi từ backend "Bạn chưa mua sản phẩm này hoặc hóa đơn chưa hoàn tất."
-                            if (response.data && response.data.message === 'Bạn chưa mua sản phẩm này hoặc hóa đơn chưa hoàn tất.') {
-                                toast.error("Bạn chưa mua sản phẩm này hoặc hóa đơn chưa hoàn tất.");
-                            } else if (response.data && response.data.message === 'Bạn đã đánh giá sản phẩm này rồi.') {
-                                toast.error("Bạn đã đánh giá sản phẩm này rồi.");
-                            } else {
-                                toast.error("Có lỗi xảy ra khi gửi đánh giá.");
-                            }
-                            break;
-                        case 500:
-                            toast.error("Lỗi máy chủ. Vui lòng thử lại sau.");
-                            break;
-                        default:
-                            toast.error("Có lỗi xảy ra khi gửi đánh giá.");
-                            break;
-                    }
-                } else if (response && response.review) {
+        let response;
+        if (editingReviewId) {
+            // Cập nhật đánh giá
+            response = await updateReview(editingReviewId, reviewData);
+            if (response && response.review) {
+                setReviews(reviews.map((review) => review.id === editingReviewId ? response.review : review));
+                setEditingReview(false);
+                setEditingReviewId(null);
+                setRating(0);
+                setComment("");
+                toast.success("Đánh giá đã được chỉnh sửa thành công!");
+            }
+        } else {
+            // Thêm mới đánh giá
+            response = await addReview(reviewData);
+            if (response) {
+                if (response.status === 403 && response.data?.message === 'Bạn đã đánh giá sản phẩm này rồi.') {
+                    // Không hiển thị toast lỗi
+                } else if (response.status === 500) {
+                    // Không hiển thị toast lỗi
+                } else if (response.review) {
                     setReviews([...reviews, response.review]);
                     setRating(0);
                     setComment("");
                     toast.success("Đánh giá thành công!");
                 }
             }
-        } catch (error) {
-            console.error("Có lỗi khi gửi hoặc chỉnh sửa đánh giá:", error);
-
-            // Bắt lỗi nếu có từ server, xử lý theo status code
-            if (error.response) {
-                switch (error.response.status) {
-                    case 403:
-                        toast.error("Bạn chưa mua sản phẩm này hoặc hóa đơn chưa hoàn tất.");
-                        break;
-                    case 500:
-                        toast.error("Lỗi máy chủ. Vui lòng thử lại sau.");
-                        break;
-                    default:
-                        toast.error("Có lỗi xảy ra khi gửi hoặc chỉnh sửa đánh giá.");
-                        break;
-                }
-            } else {
-                toast.error("Có lỗi xảy ra khi gửi hoặc chỉnh sửa đánh giá.");
-            }
-        } finally {
-            setIsSubmitting(false);
         }
+
+        setIsSubmitting(false);
     };
-
-
-
 
 
 
@@ -535,6 +490,7 @@ const ProductDetail = () => {
                                 </div>
                             </div>
 
+                            {/* Form đánh giá */}
                             <div className="reviews font-semibold mt-3 mb-2 text-dGreen">
                                 <h2 className="text-dGreen form-label">Đánh giá</h2>
 
@@ -703,16 +659,19 @@ const ProductDetail = () => {
                             </div>
                         </div>
                     </div>
+
                     {/* Sản phẩm liên quan */}
-                    <div className="related-products mt-5 position-relative">
+                    <div className="related-products mt-5 position-relative border rounded p-3">
                         <p className="fs-20 font-bold text-dGreen mb-2">
                             Sản phẩm liên quan
                         </p>
 
                         {/* Nút điều hướng Trái */}
-                        <button onClick={() => sliderRef.current.slickPrev()} className="btn-slide-pro-left">
-                            <FontAwesomeIcon icon={faChevronLeft}/>
-                        </button>
+                        {relatedProducts.length > 1 && (
+                            <button onClick={() => sliderRef.current.slickPrev()} className="btn-slide-pro-left">
+                                <FontAwesomeIcon icon={faChevronLeft}/>
+                            </button>
+                        )}
 
                         {/* Slider */}
                         <Slider ref={sliderRef} {...sliderSettings}>
@@ -721,39 +680,38 @@ const ProductDetail = () => {
                                     <div key={relatedProduct.id} style={{padding: '10px'}}>
                                         <div
                                             className="p-3 border rounded bg-white shadow text-center d-flex flex-column justify-between pro-lq"
-                                            onClick={() =>
-                                                navigate(`/products/${relatedProduct.id}`)
-                                            }>
-                                            <img src={relatedProduct.image} alt={relatedProduct.name}
-                                                 className="object-fit-cover mb-1 rounded img-pro-lq"/>
-                                            <p className="fs-14 text-dGreen font-semibold">
-                                                {relatedProduct.name}
-                                            </p>
+                                            onClick={() => navigate(`/products/${relatedProduct.id}`)}
+                                        >
+                                            <img
+                                                src={relatedProduct.image}
+                                                alt={relatedProduct.name}
+                                                className="object-fit-cover mb-1 rounded img-pro-lq"
+                                            />
+                                            <p className="fs-14 text-dGreen font-semibold">{relatedProduct.name}</p>
                                             <div className="d-flex align-items-center justify-content-between">
                                                 {relatedProduct.sale_price && relatedProduct.sale_price < relatedProduct.unit_price ? (
-                                                    // Khi có giá sale
                                                     <>
                                                         {/* Giá gốc bị gạch ngang */}
                                                         <p className="fs-12 text-dGreen font-semibold m-0 text-decoration-line-through mr-1 flex-1">
-                                                            {relatedProduct.unit_price.toLocaleString("vi-VN", {
-                                                                style: "currency",
-                                                                currency: "VND",
+                                                            {relatedProduct.unit_price.toLocaleString('vi-VN', {
+                                                                style: 'currency',
+                                                                currency: 'VND',
                                                             })}
                                                         </p>
                                                         {/* Giá sale */}
                                                         <p className="fs-14 salePr font-semibold m-0 flex-1">
-                                                            {relatedProduct.sale_price.toLocaleString("vi-VN", {
-                                                                style: "currency",
-                                                                currency: "VND",
+                                                            {relatedProduct.sale_price.toLocaleString('vi-VN', {
+                                                                style: 'currency',
+                                                                currency: 'VND',
                                                             })}
                                                         </p>
                                                     </>
                                                 ) : (
                                                     // Khi không có giá sale
                                                     <p className="fs-14 text-dGreen font-semibold m-0 text-center flex-1">
-                                                        {relatedProduct.unit_price.toLocaleString("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
+                                                        {relatedProduct.unit_price.toLocaleString('vi-VN', {
+                                                            style: 'currency',
+                                                            currency: 'VND',
                                                         })}
                                                     </p>
                                                 )}
@@ -762,17 +720,19 @@ const ProductDetail = () => {
                                     </div>
                                 ))
                             ) : (
-                                <p className="fs-14 text-dGreen text-center">
-                                    Không có sản phẩm liên quan.
-                                </p>
+                                <p className="fs-14 text-dGreen text-center">Không có sản phẩm liên quan.</p>
                             )}
                         </Slider>
 
                         {/* Nút điều hướng Phải */}
-                        <button onClick={() => sliderRef.current.slickNext()} className="btn-slide-pro-right">
-                            <FontAwesomeIcon icon={faChevronRight}/>
-                        </button>
+                        {relatedProducts.length > 1 && (
+                            <button onClick={() => sliderRef.current.slickNext()} className="btn-slide-pro-right">
+                                <FontAwesomeIcon icon={faChevronRight}/>
+                            </button>
+                        )}
                     </div>
+
+
                 </div>
             ) : (
                 <p className="text-dGreen fs-20 text-center">Sản phẩm không tồn tại.</p>
