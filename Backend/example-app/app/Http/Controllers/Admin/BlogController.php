@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Blog;
 use App\Http\Requests\Admin\StoreBlogRequest;
+use Illuminate\Support\Facades\Storage;
 
 class BlogController extends Controller
 {
@@ -96,4 +97,39 @@ class BlogController extends Controller
             'blogs' => $blogs,
         ], 200);
     }
+
+
+    public function upload(Request $request)
+    {
+        // Kiểm tra nếu yêu cầu có file 'upload'
+        if ($request->hasFile('upload')) {
+            try {
+                $file = $request->file('upload');
+
+                // Kiểm tra loại file nếu cần (chỉ cho phép ảnh)
+                $validExtensions = ['jpg', 'jpeg', 'png'];
+                if (!in_array($file->getClientOriginalExtension(), $validExtensions)) {
+                    return response()->json(['error' => 'Invalid file type'], 400);
+                }
+
+                // Lưu file vào thư mục 'uploads'
+                $path = $file->store('uploads', 'public'); // Lưu vào thư mục public
+
+                // Tạo URL truy cập file
+                $url = asset('storage/' . $path);
+
+                return response()->json([
+                    'url' => $url,
+                ], 200);
+
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'File upload failed: ' . $e->getMessage()
+                ], 500);
+            }
+        }
+
+        return response()->json(['error' => 'No file provided'], 400);
+    }
+
 }

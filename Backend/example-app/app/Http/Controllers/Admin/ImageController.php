@@ -6,57 +6,98 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreImageRequest;
 use App\Models\Image;
 use Illuminate\Support\Facades\Storage;
-use Request;
+use Illuminate\Http\Request;
 
 class ImageController extends Controller
 {
     /**
-     * Lưu trữ các hình ảnh được tải lên
+     * Lấy danh sách hình ảnh
      */
-
     public function index()
     {
-        $image = Image::all();
-        return response()->json($image);
+        $images = Image::all();
+        return response()->json($images);
     }
 
-    public function store(StoreImageRequest $request)
+    /**
+     * Lấy thông tin hình ảnh theo ID
+     */
+
+    /**
+     * Lưu trữ hình ảnh
+     */
+    public function store(Request $request)
     {
-        // Lấy product_id từ request
-        $productId = $request->input('product_id');
+        $request->validate([
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,svg',  // Kiểm tra định dạng ảnh
+        ]);
 
-        // Kiểm tra xem có ảnh được upload không
-        if ($request->hasFile('images')) {
-            $images = $request->file('images'); // Lấy mảng ảnh
+        // Đảm bảo thư mục `products` tồn tại trong public
+        if (!Storage::disk('public')->exists('images/products')) {
+            Storage::disk('public')->makeDirectory('images/products');
+        }
 
-            foreach ($images as $image) {
-                // Lưu từng ảnh vào thư mục 'public/images/products'
-                $path = $image->store('public/images/products');
+        $imagePaths = [];
+        foreach ($request->file('images') as $image) {
+            // Kiểm tra nếu file hợp lệ
+            if ($image->isValid()) {
+                // Lưu ảnh vào thư mục 'public/images/products'
+                $path = $image->store('images/products', 'public');
 
-                // Lưu thông tin ảnh vào database (bảng images)
-                Image::create([
-                    'product_id' => $productId,  // Liên kết với product_id
-                    'name' => $path,  // Đường dẫn ảnh
+                // Tạo đường dẫn URL cho ảnh
+                $imageUrl = asset('storage/' . $path);
+
+                // Lưu thông tin vào bảng Image
+                $imagePaths[] = Image::create([
+                    'product_id' => $request->input('product_id'),
+                    'image' => $imageUrl, // Lưu URL thay vì đường dẫn file
                 ]);
             }
         }
 
         return response()->json([
+            'image_paths' => $imagePaths,
             'success' => true,
             'message' => 'Hình ảnh đã được tải lên thành công.'
-        ], 200);
+        ], 201);
     }
 
+
+    /**
+     * Lấy thông tin hình ảnh theo ID
+     *//**
+     * Lấy thông tin hình ảnh theo ID
+     */
     public function show($id)
-    {
-        $image = Image::findOrFail($id);
-        return response()->json($image);
-    }
-
-    public function update(StoreImageRequest $request, $id)
     {
         // Tìm hình ảnh theo ID
         $image = Image::findOrFail($id);
+
+        // Trả về thông tin hình ảnh
+        return response()->json([
+            'success' => true,
+            'message' => 'Thông tin hình ảnh đã được lấy thành công.',
+            'image' => $image
+        ], 200);
+    }
+
+    /**
+     * Cập nhật hình ảnh
+     */
+    public function update(StoreImageRequest $request, $id)
+    {
+        // Kiểm tra xem sản phẩm có ID $id có tồn tại không
+        $image = Image::findOrFail($id);
+
+        // Kiểm tra xem ID của sản phẩm có trùng với product_id trong request không
+        $productId = $request->input('product_id');
+        if ($image->product_id != $productId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID sản phẩm không khớp.'
+            ], 400);
+        }
 
         // Kiểm tra xem có ảnh mới được upload không
         if ($request->hasFile('images')) {
@@ -64,25 +105,33 @@ class ImageController extends Controller
             $newImages = $request->file('images');
 
             // Xóa ảnh cũ khỏi hệ thống tệp
-            Storage::delete($image->name);
+            Storage::delete($image->image); // Sử dụng cột `image`
 
-            // Cập nhật thông tin ảnh trong cơ sở dữ liệu
+            $imagePaths = [];
             foreach ($newImages as $newImage) {
                 // Lưu ảnh mới vào thư mục 'public/images/products'
-                $path = $newImage->store('public/images/products');
+                $path = $newImage->store('images/products', 'public');
+
+                // Tạo URL cho ảnh mới
+                $imageUrl = asset('storage/' . $path);
 
                 // Cập nhật thông tin ảnh trong cơ sở dữ liệu
                 $image->update([
-                    'name' => $path,  // Đường dẫn ảnh mới 
+                    'image' => $imageUrl,  // Lưu URL thay vì đường dẫn file
                 ]);
+
+                // Thêm URL vào mảng để trả về
+                $imagePaths[] = $imageUrl;
             }
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Hình ảnh đã được cập nhật thành công.'
+            'message' => 'Hình ảnh đã được cập nhật thành công.',
+            'image_paths' => $imagePaths  // Trả về URL của các ảnh đã được cập nhật
         ], 200);
     }
+
 
     /**
      * Xóa hình ảnh
@@ -92,7 +141,7 @@ class ImageController extends Controller
         $image = Image::findOrFail($id);
 
         // Xóa ảnh khỏi hệ thống tệp
-        Storage::delete($image->name);
+        Storage::delete($image->image); // Sử dụng cột `image`
 
         // Xóa record khỏi database
         $image->delete();
@@ -102,5 +151,4 @@ class ImageController extends Controller
             'message' => 'Hình ảnh đã được xóa thành công.'
         ], 200);
     }
-
 }
