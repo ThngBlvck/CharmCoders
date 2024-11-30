@@ -271,10 +271,13 @@ const ProductDetail = () => {
 
 
     const handleCancelEdit = () => {
-        setEditingReview(null); // Hủy chỉnh sửa
-        setRating(0);
-        setComment('');
+        setEditingReview(false); // Reset edit state
+        setEditingReviewId(null); // Clear the editing review ID
+        setRating(0); // Reset rating
+        setComment(''); // Reset comment
+        setIsSubmitting(false); // Re-enable submit button
     };
+
 
 
     return (
