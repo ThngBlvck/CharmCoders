@@ -67,14 +67,16 @@ class ProductController extends Controller
     public function getHotProducts()
     {
         $hotProducts = Product::select('id', 'name', 'sale_price', 'unit_price', 'image')  // Chỉ chọn các cột 'name', 'sale_price', và 'image'
+            ->where('purchase_count', '>=', 10)  // Lọc sản phẩm có số lượt mua >= 10
             ->orderBy('purchase_count', 'desc')  // Sắp xếp theo số lượt mua giảm dần
-            ->take(5)  // Lấy 10 sản phẩm hot nhất
+            ->take(5)  // Lấy 5 sản phẩm hot nhất
             ->get();
 
         return response()->json([
             'hot_products' => $hotProducts,
         ]);
     }
+
 
 
 

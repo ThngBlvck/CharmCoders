@@ -200,64 +200,64 @@ const ProductDetail = () => {
 
         const userId = localStorage.getItem("userId");
 
-        // Kiểm tra đăng nhập
-        if (!token) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Yêu cầu đăng nhập',
-                text: 'Bạn cần đăng nhập để bình luận.',
-                confirmButtonText: 'Đăng nhập',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    navigate("/login");
-                }
-            });
-            setIsSubmitting(false);
-            return;
-        }
-
-        // Kiểm tra đánh giá và nhận xét
-        if (rating === 0 || comment === "") {
-            toast.error("Vui lòng cung cấp cả đánh giá sao và nhận xét.");
-            setIsSubmitting(false);
-            return;
-        }
-
-        const reviewData = { rating, comment, product_id: product.id, user_id: userId };
-
-        let response;
-        if (editingReviewId) {
-            // Cập nhật đánh giá
-            response = await updateReview(editingReviewId, reviewData);
-            if (response && response.review) {
-                setReviews(reviews.map((review) => review.id === editingReviewId ? response.review : review));
-                setEditingReview(false);
-                setEditingReviewId(null);
-                setRating(0);
-                setComment("");
-                toast.success("Đánh giá đã được chỉnh sửa thành công!");
+        try {
+            // Kiểm tra đăng nhập
+            if (!token) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Yêu cầu đăng nhập',
+                    text: 'Bạn cần đăng nhập để bình luận. Vui lòng đăng nhập để tiếp tục.',
+                    confirmButtonText: 'Đăng nhập',
+                }).then(() => navigate("/login"));
+                setIsSubmitting(false);
+                return;
             }
-        } else {
-            // Thêm mới đánh giá
-            response = await addReview(reviewData);
-            if (response) {
-                if (response.status === 403 && response.data?.message === 'Bạn đã đánh giá sản phẩm này rồi.') {
-                    // Không hiển thị toast lỗi
-                } else if (response.status === 500) {
-                    // Không hiển thị toast lỗi
-                } else if (response.review) {
+
+            // Kiểm tra đánh giá và nhận xét
+            if (rating === 0 || comment === "") {
+                toast.error("Vui lòng cung cấp cả đánh giá sao và nhận xét để tiếp tục.");
+                setIsSubmitting(false);
+                return;
+            }
+
+            const reviewData = { rating, comment, product_id: product.id, user_id: userId };
+            let response;
+
+            if (editingReviewId) {
+                // Cập nhật đánh giá
+                response = await updateReview(editingReviewId, reviewData);
+                if (response && response.review) {
+                    setReviews(reviews.map((review) => review.id === editingReviewId ? response.review : review));
+                    resetForm();
+                    toast.success("Đánh giá đã được chỉnh sửa thành công!");
+                } else {
+                    throw new Error("Cập nhật đánh giá thất bại.");  // Manually throw an error for failed update
+                }
+            } else {
+                // Thêm mới đánh giá
+                response = await addReview(reviewData);
+                if (response?.review) {
                     setReviews([...reviews, response.review]);
-                    setRating(0);
-                    setComment("");
-                    toast.success("Đánh giá thành công!");
+                    resetForm();
+                    toast.success("Đánh giá thành công! Cảm ơn bạn đã chia sẻ ý kiến.");
+                } else {
+                    throw new Error("Thêm mới đánh giá thất bại.");  // Manually throw an error for failed addition
                 }
             }
+        } catch (error) {
+            console.error("Error during review submission:", error);
+            toast.error(`${error.message || 'Vui lòng thử lại sau.'}`);  // Display specific error message
+        } finally {
+            setIsSubmitting(false);
         }
-
-        setIsSubmitting(false);
     };
 
-
+    const resetForm = () => {
+        setEditingReview(false);
+        setEditingReviewId(null);
+        setRating(0);
+        setComment("");
+    };
 
 
     const handleEditReview = (reviewId) => {
