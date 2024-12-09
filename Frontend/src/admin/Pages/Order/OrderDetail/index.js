@@ -3,11 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getOrderByIdAd } from "../../../../services/Order";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import {PulseLoader} from "react-spinners";
 
 export default function OrderDetail() {
     const { id } = useParams();
     const [orderData, setOrderData] = useState(null);
     const [showAllProducts, setShowAllProducts] = useState(false); // State để điều khiển hiển thị sản phẩm
+    const [loading, setLoading] = useState(true); // Thêm state loading
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -15,28 +17,32 @@ export default function OrderDetail() {
     }, [id]);
 
     const fetchOrderDetails = async () => {
+        setLoading(true);
         try {
             const result = await getOrderByIdAd(id);
             setOrderData(result.data);
         } catch (error) {
             console.error("Lỗi khi lấy chi tiết đơn hàng:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white px-6 py-6">
-            {orderData ? (
+            {loading ? (
+                <div className="flex justify-center items-center py-4">
+                    <PulseLoader color="#4A90E2" loading={loading} size={15} />
+                </div>
+            ) : orderData ? (
                 <div className="bg-white shadow-md rounded-lg p-6">
-                    {/* Thông tin khách hàng */}
                     <div className="mb-6">
-                        <h3 className="font-bold text-2xl text-blueGray-700"
-                            style={{ fontFamily: "Roboto, sans-serif" }}>
+                        <h3 className="font-bold text-2xl text-blueGray-700" style={{ fontFamily: "Roboto, sans-serif" }}>
                             Chi Tiết Đơn Hàng: #{orderData.id}
                         </h3>
                         {orderData.user && (
                             <div className="mt-4">
-                                <h2 className="font-bold text-2xl text-blueGray-700"
-                                    style={{ fontFamily: "Roboto, sans-serif" }}>Thông Tin Khách Hàng:</h2>
+                                <h2 className="font-bold text-2xl text-blueGray-700" style={{ fontFamily: "Roboto, sans-serif" }}>Thông Tin Khách Hàng:</h2>
                                 <p className="text-lg font-semibold mb-2">Tên Người Dùng: {orderData.user.name}</p>
                                 <p className="text-lg font-semibold mb-2">Số Điện Thoại: {orderData.phone}</p>
                             </div>
@@ -54,15 +60,12 @@ export default function OrderDetail() {
                         </div>
                     </div>
 
-                    {/* Sản phẩm trong đơn hàng */}
                     <div>
-                        <h4 className="font-bold text-2xl text-blueGray-700 mb-4"
-                            style={{ fontFamily: "Roboto, sans-serif" }}>
+                        <h4 className="font-bold text-2xl text-blueGray-700 mb-4" style={{ fontFamily: "Roboto, sans-serif" }}>
                             Sản phẩm trong đơn hàng:
                         </h4>
                         {orderData.details && orderData.details.length > 0 ? (
                             <>
-                                {/* Hiển thị sản phẩm dựa trên trạng thái "showAllProducts" */}
                                 {orderData.details
                                     .slice(0, showAllProducts ? orderData.details.length : 2)
                                     .map((detail) => (
@@ -81,8 +84,6 @@ export default function OrderDetail() {
                                             </div>
                                         </div>
                                     ))}
-
-                                {/* Nút xem thêm / thu gọn */}
                                 {orderData.details.length > 2 && (
                                     <div className="mt-4 text-center">
                                         <button
@@ -98,20 +99,15 @@ export default function OrderDetail() {
                             <p>Không có sản phẩm nào trong đơn hàng.</p>
                         )}
 
-                        {/* Tổng số tiền */}
                         <p className="text-lg font-bold mt-6">
                             Tổng số tiền: {orderData.total_amount.toLocaleString()} VND
                         </p>
                     </div>
                 </div>
             ) : (
-                <div className="text-center">
-                    <FontAwesomeIcon icon={faSpinner} spin size="2x" />
-                    <p>Vui lòng chờ...</p>
-                </div>
+                <p>Không có dữ liệu đơn hàng.</p>
             )}
 
-            {/* Nút Quay lại */}
             <div className="mt-6 text-center">
                 <button
                     onClick={() => navigate(-1)}
