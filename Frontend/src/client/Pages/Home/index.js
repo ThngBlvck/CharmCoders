@@ -144,6 +144,78 @@ export default function Home() {
                 </div>
             ) : (
                 <>
+                    <div className="container-fluid px-0 shadow">
+                        <div id="carouselExample" className="carousel slide" data-bs-ride="carousel">
+                            {/* Indicators */}
+                            <div className="carousel-indicators">
+                                <button
+                                    type="button"
+                                    data-bs-target="#carouselExample"
+                                    data-bs-slide-to="0"
+                                    className="active"
+                                    aria-current="true"
+                                    aria-label="Slide 1"
+                                ></button>
+                                <button
+                                    type="button"
+                                    data-bs-target="#carouselExample"
+                                    data-bs-slide-to="1"
+                                    aria-label="Slide 2"
+                                ></button>
+                                <button
+                                    type="button"
+                                    data-bs-target="#carouselExample"
+                                    data-bs-slide-to="2"
+                                    aria-label="Slide 3"
+                                ></button>
+                            </div>
+
+                            {/* Carousel Items */}
+                            <div className="carousel-inner">
+                                <div className="carousel-item active">
+                                    <img
+                                        src="banner.png"
+                                        className="d-block w-100 mw-slider"
+                                        alt="Slide 1"
+                                    />
+                                </div>
+                                <div className="carousel-item">
+                                    <img
+                                        src="banner.png"
+                                        className="d-block w-100 mw-slider"
+                                        alt="Slide 2"
+                                    />
+                                </div>
+                                <div className="carousel-item">
+                                    <img
+                                        src="banner.png"
+                                        className="d-block w-100 mw-slider"
+                                        alt="Slide 3"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Controls */}
+                            <button
+                                className="carousel-control-prev"
+                                type="button"
+                                data-bs-target="#carouselExample"
+                                data-bs-slide="prev"
+                            >
+                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span className="visually-hidden">Previous</span>
+                            </button>
+                            <button
+                                className="carousel-control-next"
+                                type="button"
+                                data-bs-target="#carouselExample"
+                                data-bs-slide="next"
+                            >
+                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span className="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
                     <div className="container-fluid py-1 d-flex">
                         <div className="container py-5">
                             <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
@@ -152,7 +224,7 @@ export default function Home() {
                                     nhất</p>
                             </div>
                             <div className="row g-4">
-                            <div className="row">
+                                <div className="row">
                                     {products && products.length > 0 ? (
                                         products.map((product, index) => (
                                             <div key={product.id} className="col-md-6 col-lg-3 mb-3">
@@ -244,7 +316,8 @@ export default function Home() {
                                 <div className="col-lg-5">
                                     <div className="video">
                                         <img src="toner.png" className="img-fluid rounded"/>
-                                        <div className="position-absolute rounded border-top border-start border-white bottom-0 right-0">
+                                        <div
+                                            className="position-absolute rounded border-top border-start border-white bottom-0 right-0">
                                             <img src="toner.png" width={"200px"} className="img-fluid rounded"/>
                                         </div>
 
@@ -282,10 +355,10 @@ export default function Home() {
                                 hiệu</p>
                             <Slider className="mb-5 position-relative" {...sliderSettings}>
                                 {loading ? (
-                                    Array.from({ length: 5 }).map((_, index) => (
+                                    Array.from({length: 5}).map((_, index) => (
                                         <div key={index} className="text-center">
-                                            <Skeleton width={150} height={150} circle={true} />
-                                            <Skeleton height={20} width={100} className="mt-2" />
+                                            <Skeleton width={150} height={150} circle={true}/>
+                                            <Skeleton height={20} width={100} className="mt-2"/>
                                         </div>
                                     ))
                                 ) : brands.length > 0 ? (

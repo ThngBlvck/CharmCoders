@@ -158,15 +158,13 @@ export default function Footer() {
             {/* Chat Modal */}
             {showChatModal && (
                 <div className="modal fade show" style={{display: "block"}} tabIndex="-1" role="dialog">
-                    <div className="modal-dialog" role="document" style={{bottom: "-380px", right: "-565px"}}>
+                    <div className="modal-dialog" role="document" style={{bottom: "-180px", right: "-380px"}}>
                         <div className="modal-content">
                             <div className="modal-header">
-                                <p className="modal-title text-primary font-semibold"
-                                   style={{fontSize: "16px"}}>GlowMakers</p>
+                                <p className="modal-title text-dGreen font-semibold fs-16">GlowMaker</p>
                                 <p className="modal-title text-dGreen fs-16">Giờ hoạt động:
                                     08:00 - 22:00</p>
-                                <i className="fa fa-times ic text-dGreen fs-20" aria-hidden="true" onClick={toggleChatModal}
-                                   style={{cursor: "pointer"}}></i>
+                                <i className="fa fa-times ic text-dGreen fs-20 cursor-pointer" aria-hidden="true" onClick={toggleChatModal}></i>
                             </div>
                             <div className="modal-body" style={{maxHeight: '400px', overflowY: 'auto'}}>
                                 <div className="chat-window"

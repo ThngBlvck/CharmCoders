@@ -97,7 +97,7 @@ export default function OrderManagement() {
                     {status: 0, label: "Đang chờ xác nhận"},
                     {status: 1, label: "Đang chuẩn bị hàng"},
                     {status: 2, label: "Đang giao"},
-                    {status: 3, label: "Đã giao"},
+                    {status: 3, label: "Đã nhận"},
                     {status: 4, label: "Đã hủy"},
                 ].map((filter) => (
                     <button
@@ -145,13 +145,13 @@ export default function OrderManagement() {
                                 <div className="headerStyle">
                                     <div className="headerRowStyle row">
                                         <div className="d-flex justify-start col-8">
+                                            <strong className="text-dGreen">Mã đơn hàng: {order.order_id}</strong>
                                             <button
-                                                className="btn-copy text-dGreen mr-2"
+                                                className="btn-copy text-dGreen ml-2"
                                                 onClick={() => handleCopyOrderId(order.order_id)}
                                             >
                                                 <FontAwesomeIcon icon={faCopy}/>
                                             </button>
-                                            <strong className="text-dGreen">Mã đơn hàng: {order.order_id}</strong>
                                         </div>
                                         <div className="d-flex justify-end col-4">
                                             <strong className="text-dGreen">Trạng thái đơn hàng: <span
@@ -160,7 +160,7 @@ export default function OrderManagement() {
                                                     {order.status === 0 ? "Đang chờ xác nhận"
                                                         : order.status === 1 ? "Đang chuẩn bị hàng"
                                                             : order.status === 2 ? "Đang giao"
-                                                                : order.status === 3 ? "Đã giao"
+                                                                : order.status === 3 ? "Đã nhận"
                                                                     : order.status === 4 ? "Đã hủy"
                                                                         : order.status === 5 ? 'Đã thanh toán'
                                                                             : 'Không xác định'}

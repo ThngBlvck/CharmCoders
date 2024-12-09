@@ -161,8 +161,7 @@
 /*** Carousel Start ***/
 .carousel-item {
     position: relative;
-    min-height: 100vh
-    
+    min-height: 50vh
 }
 
 .carousel-item img {
@@ -952,12 +951,21 @@
     background-color: #ebfceb !important;
 }
 
-.ic {
+.ic,
+.ic-info {
     color: #5acc5a;
 }
 
 .ic:hover {
     color: #5fd95f;
+}
+
+.ic-warn {
+    color: #cd8f32;
+}
+
+.ic-danger {
+    color: #cd3232;
 }
 
 .butn {
@@ -1424,4 +1432,16 @@ input[type="range"]::-ms-thumb {
     background-color: #d1e7dd;
     color: #0f5132;
     border-radius: 8px;
+}
+
+.dropdown-menu {
+    display: block; /* Thay vì none */
+    position: absolute;
+    z-index: 1000;
+    top: 265px;
+}
+
+.mw-slider {
+    width: 100%;
+    max-height: 500px;
 }

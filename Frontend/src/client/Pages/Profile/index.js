@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
 import {NavLink, useLocation, useNavigate} from "react-router-dom";
@@ -17,6 +17,8 @@ export default function Profile() {
     const [loading, setLoading] = useState(false); // Thêm state loading
     const [orders, setOrders] = useState([]);
     const [addresses, setAddresses] = useState([]);
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const dropdownRef = useRef(null);
     const navigate = useNavigate();
     const queryParams = new URLSearchParams(location.search);
     // State quản lý thông tin người dùng
@@ -94,6 +96,44 @@ export default function Profile() {
         }
     };
 
+    // Toggle trạng thái hiển thị drop-down
+    const toggleDropdown = () => {
+        setIsDropdownVisible((prev) => !prev);
+    };
+
+    // Ẩn drop-down khi nhấp ra ngoài vùng
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target) &&
+                event.target !== document.querySelector('.fa-gear') // Đảm bảo biểu tượng gear không bị nhầm
+            ) {
+                setIsDropdownVisible(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        // Ngăn chặn sự kiện click từ dropdown bị bắt ngoài
+        const handleDropdownClick = (event) => {
+            event.stopPropagation(); // Ngăn chặn sự kiện bị dropdown bắt trước.
+        };
+
+        // Gắn sự kiện click vào dropdown
+        if (dropdownRef.current) {
+            dropdownRef.current.addEventListener('click', handleDropdownClick);
+        }
+
+        // Cleanup: Xóa sự kiện khi component unmount
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            if (dropdownRef.current) {
+                dropdownRef.current.removeEventListener('click', handleDropdownClick);
+            }
+        };
+    }, []);
+
     useEffect(() => {
         const fetchOrders = async () => {
             setLoading(true);
@@ -116,7 +156,7 @@ export default function Profile() {
     }, []);
 
     // Hàm xử lý xóa
-    const handleDeleteAccount = async () => {
+    const handleDeleteAccount = async (event) => {
         // Kiểm tra nếu có đơn hàng với status là 0, 1, hoặc 2 và hiển thị thông báo tương ứng
         const pendingOrder = orders.find(order => [0, 1, 2].includes(order.status));
 
@@ -210,11 +250,6 @@ export default function Profile() {
                         {!loading && (
                             <div className="text-center">
                                 <p className="font-semibold text-dGreen">{user.name.length > 30 ? user.name.substring(0, 20) + "..." : user.name}</p>
-                                <NavLink to={`/edit-profile`}>
-                                    <button className="btn-tk w-40 mt-3 font-semibold rounded shadow">
-                                        Chỉnh sửa thông tin
-                                    </button>
-                                </NavLink>
                             </div>
                         )}
                     </div>
@@ -238,6 +273,41 @@ export default function Profile() {
                                 </>
                             ) : (
                                 <form className="row">
+                                    {!loading && (
+                                        <div className="d-flex justify-end">
+                                            <i className="fa-solid fa-gear ic fs-20 cursor-pointer" onClick={toggleDropdown}></i>
+                                            {isDropdownVisible && (
+                                                <ul className="dropdown-menu show bg-white shadow-md rounded py-2 absolute"
+                                                    ref={dropdownRef}>
+                                                    <li className="py-2 px-4">
+                                                        <NavLink to={`/edit-profile`} className="text-dGreen flex items-center font-semibold">
+                                                            <i className="fas fa-pencil-alt mr-3 ic-info"></i> Sửa thông tin
+                                                        </NavLink>
+                                                    </li>
+                                                    <li className="py-2 px-4">
+                                                        <NavLink to={`/edit_phone`} className="w-full text-dGreen text-left font-semibold">
+                                                            <i className="fa-solid fa-phone mr-3 ic-info"></i>Sửa số điện thoại
+                                                        </NavLink>
+                                                    </li>
+                                                    <li className="py-2 px-4">
+                                                        <NavLink to="/change_password"
+                                                                 className="text-dGreen flex items-center font-semibold">
+                                                            <i className="fa-solid fa-key mr-3 ic-warn"></i>Đổi mật khẩu
+                                                        </NavLink>
+                                                    </li>
+                                                    <li className="py-2 px-4">
+                                                        <button className="w-full text-dGreen text-left font-semibold"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                handleDeleteAccount();
+                                                            }}>
+                                                            <i className="fa-solid fa-trash mr-3 ic-danger"></i>Xóa tài khoản
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            )}
+                                        </div>
+                                    )}
                                     <p className="font-semibold mb-4 text-center text-dGreen fs-26">Thông tin cá
                                         nhân</p>
                                     <div className="form-group mb-4 col-12">
@@ -257,29 +327,11 @@ export default function Profile() {
                                         <label className="font-semibold mb-2 text-dGreen fs-20">
                                             <span>Số điện thoại:</span>
                                         </label>
-                                        <NavLink to={`/edit_phone`}>
-                                            <button className="btn-edit-phone">
-                                                <i className="fas fa-pencil-alt"></i> {/* Edit icon */}
-                                            </button>
-                                        </NavLink>
                                         <span className="text-dGreen fs-20 ml-4">{user.phone}</span>
                                     </div>
                                 </form>
                             )}
                         </div>
-                        {!loading && (
-                            <div>
-                                <NavLink to={`/change_password`}>
-                                    <button className="btn-tk mt-3 mx-2 font-semibold rounded btn-20 shadow">
-                                        Đổi mật khẩu
-                                    </button>
-                                </NavLink>
-                                <button className="btn-huy mt-3 mx-2 font-semibold rounded btn-20 shadow"
-                                        onClick={() => handleDeleteAccount()}>
-                                    Xóa tài khoản
-                                </button>
-                            </div>
-                        )}
                     </div>
                 </div>
                 <div className="shadow rounded mt-4">
@@ -312,9 +364,7 @@ export default function Profile() {
                                     Địa chỉ
                                 </p>
                                 <NavLink to={`/add-address`} className="butn w-40 py-3 px-3 mr-4 mt-3 rounded font-semibold shadow">
-
-                                        Thêm địa chỉ
-
+                                    Thêm địa chỉ
                                 </NavLink>
                             </div>
                             {addresses.length > 0 ? (
