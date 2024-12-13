@@ -64,13 +64,18 @@ import Chat from "./Pages/Chat/index";
 export default function Admin() {
     const location = useLocation();
     const isLoginPage = location.pathname === "/admin/login";
+    const isChatPage = location.pathname === "/admin/chat";
 
     return (
         <>
-            {!isLoginPage && <Sidebar />}
-            <div className={`relative ${!isLoginPage ? "md:ml-64 bg-blueGray-100" : "bg-white"}`}>
-                {!isLoginPage && <Navbar />}
-                {!isLoginPage && <HeaderStats />}
+            {!isLoginPage && !isChatPage && <Sidebar />}
+            <div
+                className={`relative ${
+                    !isLoginPage && !isChatPage ? "md:ml-64 bg-blueGray-100" : "bg-white"
+                }`}
+            >
+                {!isLoginPage && !isChatPage && <Navbar />}
+                {!isLoginPage && !isChatPage && <HeaderStats />}
                 <div className="px-4 md:px-10 mx-auto w-full -m-24">
                     <Routes>
                         <Route path="dashboard" element={<Dashboard />} />
@@ -131,12 +136,12 @@ export default function Admin() {
                         <Route path="/" element={<Navigate to="/admin/dashboard" />} />
                         <Route path="/404" element={<Page404 />} />
                         <Route path="*" element={<Navigate to="/404" />} />
-
                     </Routes>
-                    {!isLoginPage && <Footer />}
+                    {!isLoginPage && !isChatPage && <Footer />}
                 </div>
             </div>
         </>
     );
 }
+
 

@@ -19,7 +19,6 @@ use App\Http\Controllers\Admin\{
     AttributeController,
     AttributeValueController,
     VariantController,
-    BannerController
 };
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
