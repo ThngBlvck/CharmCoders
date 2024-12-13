@@ -15,6 +15,7 @@ class OrderController extends Controller
         // Lấy danh sách đơn hàng kết hợp với thông tin người dùng (dùng leftJoin)
         $orders = Order::leftJoin('users', 'orders.user_id', '=', 'users.id')
             ->select('orders.*', 'users.name as user_name') // Chọn tất cả thông tin đơn hàng và tên người dùng
+            ->orderBy('orders.created_at', 'desc')
             ->get();
 
         // Xử lý dữ liệu nếu cần, ví dụ, nếu tên người dùng không có thì gán giá trị mặc định
@@ -49,6 +50,14 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
             $oldStatus = $order->status;
             $newStatus = $validated['status'];
+
+            // Kiểm tra trạng thái mới phải lớn hơn trạng thái cũ
+            if ($newStatus <= $oldStatus) {
+                return response()->json([
+                    'message' => 'Không thể cập nhật trạng thái lùi về hoặc giữ nguyên trạng thái cũ.',
+                ], 400); // HTTP 400 Bad Request
+            }
+
             $order->update(['status' => $newStatus]);
 
             $updatedProducts = [];
@@ -99,6 +108,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
 
 
     public function export()
