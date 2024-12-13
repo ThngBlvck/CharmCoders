@@ -218,6 +218,19 @@ export default function Sidebar() {
                                     Hình nền
                                 </Link>
                             </li>
+                            <li className="items-center">
+                                <Link
+                                    className={`text-xs uppercase py-3 font-bold block ${
+                                        location.pathname === "/admin/alblum"
+                                            ? "text-lightBlue-500 hover:text-lightBlue-600"
+                                            : "text-blueGray-700 hover:text-blueGray-500"
+                                    }`}
+                                    to="/admin/album"
+                                >
+                                    <i className={`fas fa-image mr-2 text-sm ${location.pathname === "/admin/alblum" ? "opacity-75" : "text-blueGray-300"}`}></i>
+                                    Alblum Hình
+                                </Link>
+                            </li>
                         </ul>
 
                         {/* Auth Layout Pages */}

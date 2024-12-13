@@ -45,6 +45,10 @@ import Banner from "./Pages/Banner/List";
 import AddBanner from "./Pages/Banner/Add";
 import EditBanner from "./Pages/Banner/Edit";
 
+import Album from "./Pages/Album/List";
+import AddAlbum from "./Pages/Album/Add";
+import EditAlbum from "./Pages/Album/Edit"
+
 // Other sections
 import Comment from "./Pages/Comment/List";
 import Role from "./Pages/Role/List";
@@ -115,6 +119,10 @@ export default function Admin() {
                         <Route path="banner/add" element={<AddBanner />} />
                         <Route path="banner/edit/:id" element={<EditBanner />} />
 
+                        <Route path="album" element={<Album />} />
+                        <Route path="album/add" element={<AddAlbum />} />
+                        <Route path="album/edit/:id" element={<EditAlbum />} />
+
                         <Route path="review" element={<Reviews />} />
 
                         {/* Default and 404 Route */}
@@ -128,3 +136,4 @@ export default function Admin() {
         </>
     );
 }
+

@@ -326,7 +326,9 @@ export default function Order({ color }) {
         </>
     );
 }
-
+Order.defaultProps = {
+    color: "light",
+};
 Order.propTypes = {
     color: PropTypes.string.isRequired
 };
