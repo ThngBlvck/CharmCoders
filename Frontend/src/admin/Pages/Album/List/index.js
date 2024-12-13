@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { NavLink, useNavigate } from "react-router-dom";
-import { getImage, deleteImage } from '../../../../services/Alblum'; // Đảm bảo đường dẫn đúng
+import { getImage, deleteImage } from '../../../../services/Album'; // Đảm bảo đường dẫn đúng
 import { getOneProduct } from '../../../../services/Product'; // API lấy thông tin sản phẩm
 import Swal from 'sweetalert2';
 import { PulseLoader } from "react-spinners";
