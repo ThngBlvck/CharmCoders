@@ -37,4 +37,5 @@ class Product extends Model
     {
         return $this->sale_price ?? $this->unit_price;
     }
+
 }

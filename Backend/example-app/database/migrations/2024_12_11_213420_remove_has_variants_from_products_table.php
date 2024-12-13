@@ -10,19 +10,18 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('attributes', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('has_variants');
         });
     }
-
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('attributes');
+        Schema::table('products', function (Blueprint $table) {
+            $table->boolean('has_variants')->default(false)->after('status');
+        });
     }
 };
