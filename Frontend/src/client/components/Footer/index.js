@@ -20,7 +20,7 @@ const Footer = () => {
     const [userMessage, setUserMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [userInfo, setUserInfo] = useState({});
-    const [receiverId, setReceiverId] = useState(4); // Assume admin has receiverId 4
+    const [receiverId, setReceiverId] = useState(26); // Assume admin has receiverId 4
 
     // Fetch user information
     const fetchUserData = async () => {

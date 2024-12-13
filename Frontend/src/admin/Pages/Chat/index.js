@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getListSender, getMessages, sendMessage } from "../../../services/Message";
 import { useUser } from '../../../contexts/UserContext';
+import { useNavigate } from "react-router-dom";
 import Pusher from 'pusher-js';
 
 Pusher.logToConsole = true;
@@ -16,8 +17,8 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const { user } = useUser();
+  const navigate = useNavigate();
 
-  // Lấy danh sách liên hệ
   useEffect(() => {
     const fetchContacts = async () => {
       try {
@@ -36,7 +37,6 @@ const ChatPage = () => {
     fetchContacts();
   }, []);
 
-  // Lắng nghe sự kiện Pusher
   useEffect(() => {
     if (user.user_id && selectedContact?.sender?.id) {
       const channelName = `chat.${Math.min(user.user_id, selectedContact.sender.id)}_${Math.max(user.user_id, selectedContact.sender.id)}`;
@@ -45,7 +45,7 @@ const ChatPage = () => {
       const handleMessageEvent = (data) => {
         setMessages((prevMessages) => {
           const isDuplicate = prevMessages.some(
-            (msg) => msg.message === data.message && msg.sender_id === data.sender.id
+              (msg) => msg.message === data.message && msg.sender_id === data.sender.id
           );
           if (!isDuplicate) {
             return [
@@ -105,70 +105,80 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 font-sans">
-      {/* Danh sách liên hệ */}
-      <div className="w-1/4 bg-indigo-600 text-white shadow-lg">
-        <div className="p-4 text-lg font-bold border-b">Danh sách liên hệ</div>
-        <ul className="overflow-y-auto h-full">
-          {contacts.map((contact) => (
-            <li
-              key={contact.id}
-              onClick={() => handleSelectContact(contact)}
-              className={`p-4 cursor-pointer hover:bg-indigo-500 transition ${selectedContact?.sender.id === contact.sender.id ? "bg-indigo-500" : ""
-                }`}
-            >
-              <div className="flex items-center">
-                <img
-                  src={contact.sender.image}
-                  alt={contact.sender.name}
-                  className="w-12 h-12 rounded-full mr-4"
-                />
-                <div>
-                  <div className="font-bold">{contact.sender.name}</div>
-                  <div className="text-sm text-indigo-200">{contact.latest_message || "Không có tin nhắn"}</div>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <div className="flex h-screen bg-gray-100 font-sans relative">
+        {/* Danh sách liên hệ */}
+        <div className="w-1/4 bg-indigo-600 text-white shadow-lg">
+          <div className="p-4 text-lg font-bold border-b">Danh sách liên hệ</div>
+          <ul className="overflow-y-auto h-full">
+            {contacts.map((contact) => (
+                <li
+                    key={contact.id}
+                    onClick={() => handleSelectContact(contact)}
+                    className={`p-4 cursor-pointer hover:bg-indigo-500 transition ${selectedContact?.sender.id === contact.sender.id ? "bg-indigo-500" : ""
+                    }`}
+                >
+                  <div className="flex items-center">
+                    <img
+                        src={contact.sender.image}
+                        alt={contact.sender.name}
+                        className="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                      <div className="font-bold">{contact.sender.name}</div>
+                      <div className="text-sm text-indigo-200">{contact.latest_message || "Không có tin nhắn"}</div>
+                    </div>
+                  </div>
+                </li>
+            ))}
+          </ul>
+        </div>
 
-      {/* Nội dung chat */}
-      <div className="w-3/4 flex flex-col">
-        <div className="p-4 bg-indigo-500 text-white font-bold">
-          {selectedContact?.sender.name || "Chọn một liên hệ"}
+        {/* Nội dung chat */}
+        <div className="w-3/4 flex flex-col">
+          <div className="p-4 bg-indigo-500 text-white font-bold">
+            {selectedContact?.sender.name || "Chọn một liên hệ"}
+          </div>
+          <div className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-2">
+            {messages.map((message, index) => (
+                <div
+                    key={index}
+                    className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                      className={`p-3 rounded-lg max-w-md shadow ${message.isUser ? "bg-indigo-500 text-white" : "bg-gray-300"
+                      }`}
+                  >
+                    <p>{message.message}</p>
+                    <span className="text-xs text-gray-500">{message.create_at}</span>
+                  </div>
+                </div>
+            ))}
+          </div>
+          <div className="p-4 bg-gray-200 flex items-center justify-between">
+            <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                placeholder="Nhập tin nhắn..."
+                className="flex-grow p-2 border rounded"
+            />
+            <button onClick={handleSendMessage} className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded">
+              Gửi
+            </button>
+          </div>
         </div>
-        <div className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-2">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`p-3 rounded-lg max-w-md shadow ${message.isUser ? "bg-indigo-500 text-white" : "bg-gray-300"
-                  }`}
-              >
-                <p>{message.message}</p>
-                <span className="text-xs text-gray-500">{message.create_at}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="p-4 bg-gray-200 flex items-center">
-          <input
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="Nhập tin nhắn..."
-            className="flex-grow p-2 border rounded"
-          />
-          <button onClick={handleSendMessage} className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded">
-            Gửi
+
+        {/* Nút Quay lại Admin */}
+        <div className="absolute bottom-4 left-4">
+          <button
+              onClick={() => navigate("/admin/dashboard")}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition"
+          >
+            ⬅️ Quay lại Admin
           </button>
         </div>
       </div>
-    </div>
   );
 };
 
