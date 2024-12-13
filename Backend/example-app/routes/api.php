@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\{
     BlogController,
     RoleController,
     BrandController,
+    BannerController,
     CommentController,
     AuthController,
     OrderController,
@@ -53,6 +54,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('role', RoleController::class);
     Route::apiResource('products', ProductController::class);
+    Route::apiResource('banners', BannerController::class);
     Route::get('product/search', [ProductController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::get('category/search', [CategoryController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::get('user/search', [UserController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
