@@ -18,7 +18,8 @@ use App\Http\Controllers\Admin\{
     ReportExportController,
     AttributeController,
     AttributeValueController,
-    VariantController
+    VariantController,
+    BannerController
 };
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
@@ -32,7 +33,8 @@ use App\Http\Controllers\Client\{
     MomoPaymentController,
     ShippingController,
     PhoneController,
-    ReviewController
+    ReviewController,
+    MessageController
 };
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -62,7 +64,7 @@ Route::prefix('admin')->group(function () {
     Route::get('brand/search', [BrandController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::get('blog/search', [BlogController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::get('blogCategory/search', [BlogCategoryController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
-    Route::apiResource('image', ImageController::class);// http://localhost:8000/api/client/search?query=teneanpham
+    Route::apiResource('image', ImageController::class); // http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('attributes', AttributeController::class);
     Route::apiResource('attributes/{attributeId}/values', AttributeValueController::class);
     Route::get('/{id}/variants', [ProductController::class, 'showVariants']);
@@ -75,6 +77,11 @@ Route::prefix('admin')->group(function () {
     });
     Route::middleware('auth:api')->post('request-export-report', [ReportExportController::class, 'export']);
     Route::apiResource('employee', UserController::class);
+    Route::middleware(['auth:api'])->group(function () {
+        Route::get('/users-messages', [MessageController::class, 'getUsersWhoSentMessages']);
+        Route::post('/send-message', [MessageController::class, 'sendMessageByAdmin']);
+    });
+
 });
 
 // Authentication routes
@@ -131,7 +138,10 @@ Route::prefix('client')->group(function () {
         Route::get('review1/{product_id}', [ReviewController::class, 'GetRatingByProductId']);
         Route::get('/reviews/{id}', [ReviewController::class, 'getReviewById']);
 
+    Route::middleware('auth:api')->delete('/user/delete', [UserController::class, 'deleteUser']);
 
+    Route::middleware('auth:api')->post('/send-message', [MessageController::class, 'sendMessage']);
+    Route::middleware('auth:api')->get('/messages/{receiver_id}', [MessageController::class, 'getMessages']);
 });
 
 // General user route (outside of client prefix)

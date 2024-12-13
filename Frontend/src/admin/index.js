@@ -59,6 +59,7 @@ import AddRole from "./Pages/Role/Add";
 import EditRole from "./Pages/Role/Edit";
 import Reviews from "./Pages/Review/List";
 import "../assets/styles/tailwind.css"
+import Chat from "./Pages/Chat/index";
 
 export default function Admin() {
     const location = useLocation();
@@ -114,6 +115,7 @@ export default function Admin() {
                         <Route path="role" element={<Role />} />
                         <Route path="role/add" element={<AddRole />} />
                         <Route path="role/edit/:id" element={<EditRole />} />
+                        <Route path="chat" element={<Chat />} />
 
                         <Route path="banner" element={<Banner />} />
                         <Route path="banner/add" element={<AddBanner />} />
@@ -129,6 +131,7 @@ export default function Admin() {
                         <Route path="/" element={<Navigate to="/admin/dashboard" />} />
                         <Route path="/404" element={<Page404 />} />
                         <Route path="*" element={<Navigate to="/404" />} />
+
                     </Routes>
                     {!isLoginPage && <Footer />}
                 </div>
