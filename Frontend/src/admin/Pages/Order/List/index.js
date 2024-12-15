@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { getOrderAdmin, searchOrder } from '../../../../services/Order';
+import { getOrderAdmin, searchOrder, updateOrder } from '../../../../services/Order';
 import { PulseLoader } from 'react-spinners'; // Import PulseLoader từ react-spinners
 import { getUserInfo } from '../../../../services/User';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import Swal from 'sweetalert2';
 
 export default function Order({ color }) {
     const [orders, setOrders] = useState([]);
@@ -13,7 +14,7 @@ export default function Order({ color }) {
     const [loading, setLoading] = useState(true);
     const [displayedOrders, setDisplayedOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [statusFilter, setStatusFilter] = useState("0"); // State lưu trữ filter theo status
+    const [statusFilter, setStatusFilter] = useState(""); // State lưu trữ filter theo status
     const ordersPerPage = 5;
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -61,22 +62,14 @@ export default function Order({ color }) {
                     if (statusFilter === "") return true;
                     return order.status === parseInt(statusFilter);
                 });
-                // Lấy tên người dùng cho từng đơn hàng
-                const ordersWithUserNames = await Promise.all(filteredOrders.map(async (order) => {
-                    const userName = await fetchUserInfo(order.user_id);
-                    return { ...order, user_name: userName };
-                }));
-                setOrders(ordersWithUserNames);
+                // Dữ liệu đã có user_name từ API trả về, không cần gọi lại API để lấy thông tin người dùng
+                setOrders(filteredOrders);
             } else if (result && result.orders && Array.isArray(result.orders)) {
                 const filteredOrders = result.orders.filter(order => {
                     if (statusFilter === "") return true;
                     return order.status === parseInt(statusFilter);
                 });
-                const ordersWithUserNames = await Promise.all(filteredOrders.map(async (order) => {
-                    const userName = await fetchUserInfo(order.user_id);
-                    return { ...order, user_name: userName };
-                }));
-                setOrders(ordersWithUserNames);
+                setOrders(filteredOrders);
             } else {
                 setOrders([]);
             }
@@ -88,25 +81,12 @@ export default function Order({ color }) {
         }
     };
 
-    const fetchUserInfo = async (userId) => {
-        try {
-            const userInfo = await getUserInfo(userId);
-            return userInfo.name;
-        } catch (err) {
-            console.error('Lỗi khi lấy thông tin người dùng:', err);
-            return 'Người dùng không xác định';
-        }
-    };
 
     const formatVND = (amount) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
             currency: 'VND',
         }).format(amount);
-    };
-
-    const handleEditOrder = (orderId) => {
-        navigate(`/admin/order/edit/${orderId}`);
     };
 
     const handleViewOrder = (orderId) => {
@@ -150,6 +130,53 @@ export default function Order({ color }) {
         return pages;
     };
 
+    const handleStatusChange = async (id,status) => {
+        const result = await Swal.fire({
+            title: "Xác nhận thay đổi trạng thái?",
+            text: "Bạn có chắc muốn cập nhật trạng thái này không?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Đồng ý",
+            cancelButtonText: "Hủy",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await updateOrder(id, status); // Gọi API với id và status mới
+
+                if (response.success) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Thất bại",
+                        text: "Cập nhật trạng thái thất bại!",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+
+                    // Cập nhật trạng thái trong danh sách đơn hàng
+                    setOrders((prevOrders) =>
+                        prevOrders.map((order) =>
+                            order.id === id ? { ...order, status: status } : order
+                        )
+                    );
+                } else {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Thành công",
+                        text: response.message || "Cập nhật trạng thái thành công!",
+                    });
+                }
+            } catch (error) {
+                console.error("Lỗi khi cập nhật trạng thái:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Lỗi",
+                    text: "Đã xảy ra lỗi khi cập nhật trạng thái!",
+                });
+            }
+        }
+    };
+
     return (
         <>
             <div
@@ -175,19 +202,27 @@ export default function Order({ color }) {
                     />
                 </div>
                 {/* Dropdown lọc theo status, nằm ở góc phải */}
-                <div className="absolute right-4 top-4">
-                    <select
-                        className="border border-gray-300 rounded px-3 py-2 text-base shadow appearance-none focus:outline-none focus:shadow-outline"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                    >
-                        <option value="">Chọn trạng thái</option>
-                        <option value="0">Đang chờ xác nhận</option>
-                        <option value="1">Đang chuẩn bị hàng</option>
-                        <option value="2">Đang giao</option>
-                        <option value="3">Đã nhận hàng</option>
-                        <option value="4">Đã hủy</option>
-                    </select>
+                <div className="mb-4 px-4 flex justify-start space-x-2">
+                    {[
+                        {value: "", label: "Tất cả"},
+                        {value: "0", label: "Đang chờ xác nhận"},
+                        {value: "1", label: "Đang chuẩn bị hàng"},
+                        {value: "2", label: "Đang giao"},
+                        {value: "3", label: "Đã nhận hàng"},
+                        {value: "4", label: "Đã hủy"}
+                    ].map((status) => (
+                        <button
+                            key={status.value}
+                            className={`px-3 py-2 text-sm font-medium rounded shadow ${
+                                statusFilter === status.value
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-100 text-gray-800"
+                            } hover:bg-blue-300`}
+                            onClick={() => setStatusFilter(status.value)}
+                        >
+                            {status.label}
+                        </button>
+                    ))}
                 </div>
                 {loading ? (
                     <div className="flex justify-center items-center py-4">
@@ -222,7 +257,7 @@ export default function Order({ color }) {
                                     <tr key={order.id}>
                                         <th className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4 text-left flex items-center">
                                                 <span
-                                                    className={"ml-3 font-bold text-center " + (color === "light" ? "text-blueGray-600" : "text-white")}>
+                                                    className={"ml-3 font-bold align-middle text-center " + (color === "light" ? "text-blueGray-600" : "text-white")}>
                                                     {index + 1}
                                                 </span>
                                         </th>
@@ -233,37 +268,43 @@ export default function Order({ color }) {
                                             {order.user_name}
                                         </td>
                                         <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
-                                            {(() => {
-                                                switch (order.status) {
-                                                    case 0:
-                                                        return "Đang chờ xác nhận";
-                                                    case 1:
-                                                        return "Đang chuẩn bị hàng";
-                                                    case 2:
-                                                        return "Đang giao";
-                                                    case 3:
-                                                        return "Đã nhận hàng";
-                                                    case 4:
-                                                        return "Đã hủy";
-                                                    default:
-                                                        return "Không xác định";
-                                                }
-                                            })()}
+                                            {order.status === 2 || order.status === 3 || order.status === 4 ? (
+                                                // Display text if the order is "Đang giao", "Đã nhận hàng", or "Đã hủy"
+                                                <span>{order.status === 2 ? "Đang giao" : order.status === 3 ? "Đã nhận hàng" : "Đã hủy"}</span>
+                                            ) : (
+                                                // Display the dropdown if the order is not in the statuses that should be non-editable
+                                                <select
+                                                    value={order.status}
+                                                    onChange={(e) => handleStatusChange(order.id, parseInt(e.target.value))}
+                                                    className="border rounded px-2 py-1 text-lg shadow focus:outline-none"
+                                                >
+                                                    {order.status === 0 && (
+                                                        <>
+                                                            <option value="0">Đang chờ xác nhận</option>
+                                                            <option value="1">Đang chuẩn bị hàng</option>
+                                                            <option value="4">Đã hủy</option>
+                                                        </>
+                                                    )}
+                                                    {order.status === 1 && (
+                                                        <>
+                                                            <option value="1">Đang chuẩn bị hàng</option>
+                                                            <option value="2">Đang giao</option>
+                                                        </>
+                                                    )}
+                                                </select>
+                                            )}
                                         </td>
-                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4">
-                                            <button
-                                                className="text-blue-500 hover:text-blue-700 px-2"
-                                                onClick={() => handleEditOrder(order.id)}
-                                            >
-                                                <i className="fas fa-pen text-xl"></i>
-                                            </button>
+
+
+                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4 text-center">
                                             <button
                                                 className="text-blue-500 hover:text-blue-700 ml-2 px-2"
                                                 onClick={() => handleViewOrder(order.id)}
                                             >
-                                                <i className="fas fa-eye text-xl"></i>
+                                                <i className="fas fa-eye text-xl "></i><span className="text-center text-xl ">Xem chi tiết</span>
                                             </button>
                                         </td>
+
                                     </tr>
                                 ))
                             ) : (

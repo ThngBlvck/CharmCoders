@@ -16,9 +16,6 @@ use App\Http\Controllers\Admin\{
     ProductController,
     UserController,
     ReportExportController,
-    AttributeController,
-    AttributeValueController,
-    VariantController,
 };
 use App\Http\Controllers\Client\{
     OrderController as OrderClient,
@@ -64,8 +61,6 @@ Route::prefix('admin')->group(function () {
     Route::get('blog/search', [BlogController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::get('blogCategory/search', [BlogCategoryController::class, 'search']); //http://localhost:8000/api/client/search?query=teneanpham
     Route::apiResource('image', ImageController::class); // http://localhost:8000/api/client/search?query=teneanpham
-    Route::apiResource('attributes', AttributeController::class);
-    Route::apiResource('attributes/{attributeId}/values', AttributeValueController::class);
     Route::get('/{id}/variants', [ProductController::class, 'showVariants']);
     Route::get('products/{id}/variants', [ProductController::class, 'showVariants']);
     Route::middleware('auth:api')->group(function () {
