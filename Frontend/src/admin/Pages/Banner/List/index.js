@@ -130,11 +130,10 @@ export default function Banner({ color }) {
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex justify-between items-center">
                     <h3
-                        className={
-                            "font-bold text-2xl text-lg " +
-                            (color === "light" ? "text-blueGray-700" : "text-white")
-                        }
+                        className="font-bold text-2xl text-blueGray-700"
+                        style={{ fontFamily: "Roboto, sans-serif" }}
                     >
+
                         - DANH SÁCH BANNER -
                     </h3>
                     <NavLink

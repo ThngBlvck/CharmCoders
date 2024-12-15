@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getOrderByIdAd } from "../../../../services/Order";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import {PulseLoader} from "react-spinners";
+import { PulseLoader } from "react-spinners";
 
 export default function OrderDetail() {
     const { id } = useParams();
@@ -37,8 +37,8 @@ export default function OrderDetail() {
             ) : orderData ? (
                 <div className="bg-white rounded-lg p-6">
                     <div className="mb-6">
-                        <h3 className="font-bold text-3xl text-blueGray-700" style={{ fontFamily: "Roboto, sans-serif" }}>
-                            Chi Tiết Đơn Hàng: #{orderData.id}
+                        <h3 className="font-bold text-4xl text-center text-blueGray-700" style={{ fontFamily: "Roboto, sans-serif" }}>
+                            Chi Tiết Đơn Hàng
                         </h3>
                         {orderData.user && (
                             <div className="mt-4">
@@ -58,6 +58,10 @@ export default function OrderDetail() {
                                         : "Không xác định"}
                             </span>
                         </div>
+                        {/* Display the created_at date and time */}
+                        <p className="text-lg font-semibold mb-2">
+                            Thời gian đặt hàng: {new Date(orderData.created_at).toLocaleString('vi-VN')}
+                        </p>
                     </div>
 
                     <div>
