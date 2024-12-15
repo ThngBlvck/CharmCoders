@@ -29,15 +29,15 @@ export default function OrderDetail() {
     };
 
     return (
-        <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white px-6 py-6">
+        <div className="relative flex flex-col min-w-0 break-words w-full mb-6 rounded bg-white px-6 py-6">
             {loading ? (
                 <div className="flex justify-center items-center py-4">
                     <PulseLoader color="#4A90E2" loading={loading} size={15} />
                 </div>
             ) : orderData ? (
-                <div className="bg-white shadow-md rounded-lg p-6">
+                <div className="bg-white rounded-lg p-6">
                     <div className="mb-6">
-                        <h3 className="font-bold text-2xl text-blueGray-700" style={{ fontFamily: "Roboto, sans-serif" }}>
+                        <h3 className="font-bold text-3xl text-blueGray-700" style={{ fontFamily: "Roboto, sans-serif" }}>
                             Chi Tiết Đơn Hàng: #{orderData.id}
                         </h3>
                         {orderData.user && (

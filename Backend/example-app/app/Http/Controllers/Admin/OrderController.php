@@ -18,10 +18,7 @@ class OrderController extends Controller
             ->get();
 
         // Xử lý dữ liệu nếu cần, ví dụ, nếu tên người dùng không có thì gán giá trị mặc định
-        $orders->transform(function ($order) {
-            $order->user_name = $order->user_name ?? 'Người dùng không xác định'; // Gán tên mặc định nếu không có tên người dùng
-            return $order;
-        });
+
 
         // Trả về danh sách đơn hàng dưới dạng JSON
         return response()->json($orders);
@@ -76,7 +73,7 @@ class OrderController extends Controller
                         $product->increment('purchase_count', $detail->quantity);
                         $updatedProducts[] = [
                             'product_id' => $product->id,
-                            'product_name' => $product->name,
+'product_name' => $product->name,
                             'updated_purchase_count' => $product->purchase_count,
                         ];
                     }
@@ -126,8 +123,11 @@ class OrderController extends Controller
             ], 400);
         }
 
-        // Tìm kiếm đơn hàng dựa trên order_id
-        $orders = Order::where('order_id', $query)->get();
+        // Tìm kiếm đơn hàng dựa trên order_id, kết hợp với thông tin người dùng (sử dụng Eager Loading hoặc Join)
+        $orders = Order::leftJoin('users', 'orders.user_id', '=', 'users.id')
+            ->where('orders.order_id', $query)
+            ->select('orders.*', 'users.name as user_name') // Lấy thông tin đơn hàng và tên người dùng
+            ->get();
 
         // Nếu không tìm thấy đơn hàng nào
         if ($orders->isEmpty()) {
@@ -143,6 +143,7 @@ class OrderController extends Controller
             'orders' => $orders,
         ], 200);
     }
+
 
 
 }
