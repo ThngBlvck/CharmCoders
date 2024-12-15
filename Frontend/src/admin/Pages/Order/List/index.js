@@ -185,7 +185,8 @@ export default function Order({ color }) {
                 <div className="rounded-t mb-0 px-4 py-3 border-0">
                     <div className="flex flex-wrap items-center">
                         <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                            <h3 className={"font-bold text-2xl text-lg " + (color === "light" ? "text-blueGray-700" : "text-white")}>
+                            <h3 className="font-bold text-2xl text-blueGray-700"
+                                style={{ fontFamily: "Roboto, sans-serif" }}>
                                 - DANH SÁCH ĐƠN HÀNG -
                             </h3>
                         </div>
