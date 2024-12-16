@@ -23,6 +23,7 @@ const EditPhone = () => {
     };
 
     // Handle "Gửi mã" button click
+// Handle sending OTP
     const handleSendCode = async () => {
         try {
             // Gửi yêu cầu gửi mã OTP
@@ -50,14 +51,19 @@ const EditPhone = () => {
         }
     };
 
-    // Verify OTP
+// Handle submitting OTP for verification
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             // Gửi yêu cầu xác minh mã OTP
             const response = await verifyOtp({ phone, otp });
             if (response?.status === 200) {
-                navigate("/profile")
+                toast.success("Mã OTP xác minh thành công!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: true,
+                });
+                navigate("/profile");
             } else {
                 throw new Error(response?.message || "Mã OTP không hợp lệ.");
             }
@@ -72,6 +78,7 @@ const EditPhone = () => {
             );
         }
     };
+
 
     // Effect để đếm ngược thời gian
     useEffect(() => {
