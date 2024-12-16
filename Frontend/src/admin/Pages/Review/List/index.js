@@ -7,6 +7,7 @@ import { PulseLoader } from 'react-spinners'; // Import PulseLoader từ react-s
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import "../../../../assets/styles/css/ReviewDT/index.css";
 
 export default function Reviews({ color }) {
     const [reviews, setReviews] = useState([]); // To hold reviews data
@@ -15,7 +16,7 @@ export default function Reviews({ color }) {
     const reviewsPerPage = 5; // Number of reviews per page
     const [displayedReviews, setDisplayedReviews] = useState([]); // Reviews to be displayed on the current page
     const [searchTerm, setSearchTerm] = useState(""); // Search term for filtering reviews
-
+    const [expandedComments, setExpandedComments] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -128,15 +129,36 @@ export default function Reviews({ color }) {
         return pages;
     };
 
-    const truncateComment = (comment) => {
-        const words = comment.split(' '); // Chia comment thành mảng từ
-        if (words.length > 30) {
-            return words.slice(0, 30).join(' ') + '...'; // Chỉ lấy 30 từ đầu và thêm "..."
-        }
-        return comment; // Nếu comment có dưới 30 từ, hiển thị nguyên văn
+    const truncateComment = (comment, reviewId) => {
+        const maxLength = 30; // Đặt độ dài tối đa cho phần hiển thị
+        const truncated = comment.length > maxLength ? comment.slice(0, maxLength) + '...' : comment;
+
+        return (
+            <div className="comment-container">
+                <div className="comment-text">
+                    {expandedComments.includes(reviewId) ? comment : truncated}
+                </div>
+
+                {comment.length > maxLength && (
+                    <button
+                        onClick={() => handleToggleExpand(reviewId)}
+                        className="text-blue-500 hover:text-blue-700 font-semibold transition duration-300 ease-in-out"
+                    >
+                        {expandedComments.includes(reviewId) ? 'Thu gọn' : 'Mở rộng'}
+                    </button>
+                )}
+            </div>
+
+        );
     };
 
-
+    const handleToggleExpand = (reviewId) => {
+        setExpandedComments(prevState =>
+            prevState.includes(reviewId)
+                ? prevState.filter(id => id !== reviewId)
+                : [...prevState, reviewId]
+        );
+    };
 
     return (
         <>
@@ -181,13 +203,16 @@ export default function Reviews({ color }) {
                             <thead>
                             <tr>
                                 <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
-                                    style={{width: '5%'}}>STT
+                                    style={{width: '10%'}}>STT
                                 </th>
                                 <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
                                     style={{width: '10%'}}>Đánh giá
                                 </th>
                                 <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
-                                    style={{width: '70%'}}>Nội dung
+                                    style={{width: '50%'}}>Nội dung
+                                </th>
+                                <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
+                                    style={{width: '15%'}}>Tên Sản phẩm
                                 </th>
                                 <th className="px-4 py-2 border text-xs uppercase font-semibold text-left"
                                     style={{width: '15%'}}>Người Đánh Giá
@@ -217,20 +242,23 @@ export default function Reviews({ color }) {
                                             </div>
                                         </td>
 
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
-                                            {truncateComment(reviews.comment)}
+                                        <td className="border-t-0 px-6 text-xl whitespace-normal p-4 word-wrap break-words">
+                                            {truncateComment(reviews.comment, reviews.id)}
                                         </td>
 
 
-                                        <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4">
+                                        <td className="border-t-0 px-6 text-xl whitespace-nowrap p-4">
+                                            {reviews.product_name}
+                                        </td>
+                                        <td className="border-t-0 px-6 text-xl whitespace-nowrap p-4">
                                             {reviews.user_name}
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                <td colSpan="6" className="text-center">
-                                        Không có nhãn hàng nào
+                                    <td colSpan="6" className="text-center">
+                                        Không có đánh giá nào
                                     </td>
                                 </tr>
                             )}
