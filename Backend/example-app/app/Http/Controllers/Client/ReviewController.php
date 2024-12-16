@@ -11,24 +11,25 @@ use App\Models\Order_detail;
 class ReviewController extends Controller
 {
 
-         public function index()
-         {
-             try {
-                 // Lấy tất cả các đánh giá kèm thông tin người dùng (rating, comment)
-                 $reviews = Review::join('products', 'reviews.product_id', '=', 'products.id')
-                                  ->join('users', 'reviews.user_id', '=', 'users.id')
-                                  ->select('reviews.rating', 'reviews.comment', 'users.name as user_name')  // Lấy rating, comment và tên người dùng
-                                  ->get();
+        public function index()
+        {
+            try {
+                // Lấy tất cả các đánh giá kèm thông tin người dùng (rating, comment) và tên sản phẩm
+                $reviews = Review::join('products', 'reviews.product_id', '=', 'products.id')
+                                 ->join('users', 'reviews.user_id', '=', 'users.id')
+                                 ->select('reviews.id','reviews.rating', 'reviews.comment', 'users.name as user_name', 'products.name as product_name')  // Thêm tên sản phẩm
+                                 ->get();
 
-                 if ($reviews->isEmpty()) {
-                     return response()->json(['message' => 'Không có đánh giá nào.'], 404);
-                 }
+                if ($reviews->isEmpty()) {
+                    return response()->json(['message' => 'Không có đánh giá nào.'], 404);
+                }
 
-                 return response()->json($reviews);
-             } catch (\Exception $e) {
-                 return response()->json(['message' => 'Có lỗi xảy ra: ' . $e->getMessage()], 500);
-             }
-         }
+                return response()->json($reviews);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Có lỗi xảy ra: ' . $e->getMessage()], 500);
+            }
+        }
+
 
 
 
@@ -118,7 +119,6 @@ public function getReviewById($id)
 
     return response()->json($review);
 }
-
 
 
 
