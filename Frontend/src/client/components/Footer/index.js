@@ -5,22 +5,22 @@ import { getUserInfo } from "../../../services/User";
 import { getMessages, sendMessage } from "../../../services/Message";
 import { NavLink } from "react-router-dom";
 import Pusher from 'pusher-js';
-
+import { useNavigate } from "react-router-dom";
 // Initialize Pusher
 Pusher.logToConsole = true;
 const pusher = new Pusher('f6f10b97ea3264514f53', {
     cluster: 'ap1',
     forceTLS: true,
-    debug: true
+  
 });
 
 const Footer = () => {
-    const [categories, setCategories] = useState([]);
+    const navigate = useNavigate(); 
     const [showChatModal, setShowChatModal] = useState(false);
     const [userMessage, setUserMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [userInfo, setUserInfo] = useState({});
-    const [receiverId, setReceiverId] = useState(26); // Assume admin has receiverId 4
+    const [receiverId, setReceiverId] = useState(4); 
 
     // Fetch user information
     const fetchUserData = async () => {
@@ -65,42 +65,51 @@ const Footer = () => {
     }, []);
 
     useEffect(() => {
-        // Đảm bảo userInfo.user_id và receiverId tồn tại trước khi lắng nghe sự kiện
         if (userInfo.user_id && receiverId) {
             const channelName = `chat.${Math.min(userInfo.user_id, receiverId)}_${Math.max(userInfo.user_id, receiverId)}`;
             const channel = pusher.subscribe(channelName);
-
+    
+            // Định nghĩa handler để xử lý sự kiện
             const handleMessageEvent = (data) => {
-                setChatMessages(prevMessages => {
-                    // Kiểm tra xem tin nhắn mới đã có trong danh sách chưa
-                    const isDuplicate = prevMessages.some(
-                        msg => msg.message === data.message && msg.sender_id === data.sender.id
-                    );
-                    if (!isDuplicate) {
-                        return [...prevMessages, {
-                            message: data.message,
-                            sender_id: data.sender.id,
-                            receiver: data.receiver,
-                        }];
-                    }
-                    return prevMessages;
-                });
+                setChatMessages((prevMessages) => [
+                    ...prevMessages,
+                    {
+                        message: data.message,
+                        sender_id: data.sender.id,
+                        receiver: data.receiver,
+                    },
+                ]);
             };
-
+    
+            // Bind sự kiện
             channel.bind('App\\Events\\MessageSent', handleMessageEvent);
-
-            // Cleanup khi component unmount hoặc dependency thay đổi
+    
+            // Cleanup: unbind và unsubscribe trước khi component unmount hoặc khi receiverId thay đổi
             return () => {
                 channel.unbind('App\\Events\\MessageSent', handleMessageEvent);
                 pusher.unsubscribe(channelName);
             };
         }
+      
     }, [userInfo.user_id, receiverId]);
-
+    
 
     // Function to open/close the chat modal
     const toggleChatModal = () => {
-        setShowChatModal(prevState => {
+        const token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+
+        if (userInfo.role === 2) {
+            navigate("/admin/chat");
+            return;
+        }
+
+        // Nếu có token, mở hoặc đóng modal chat
+        setShowChatModal((prevState) => {
             const newState = !prevState;
             if (newState) {
                 fetchMessages(); // Lấy tin nhắn cũ khi mở modal chat
@@ -108,6 +117,9 @@ const Footer = () => {
             return newState;
         });
     };
+
+    console.log(userInfo);
+
 
     return (
         <>

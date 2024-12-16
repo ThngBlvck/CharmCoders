@@ -76,11 +76,7 @@ public function getUsersWhoSentMessages()
         ->values()
         ->map(function ($message) use ($admin) {
             // Phát sự kiện MessageSent cho mỗi người gửi
-            broadcast(new MessageSent(
-                $message->message,
-                $message->sender,
-                $admin // Admin là người nhận
-            ))->toOthers();
+        
 
             return [
                 'sender' => $message->sender,
