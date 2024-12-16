@@ -30,35 +30,66 @@ export default function About() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Simple validation
+        // Đặt lại lỗi trước đó
+        setErrors({});
+
+        // Kiểm tra đơn giản
         const newErrors = {};
-        if (!formData.name) newErrors.name = "Vui lòng nhập tên.";
+
+        // Kiểm tra nếu tên trống
+        if (!formData.name) {
+            newErrors.name = "Vui lòng nhập tên.";
+        } else if (formData.name.length >= 100) {
+            newErrors.name = "Tên không được vượt quá 100 ký tự."; // Kiểm tra chiều dài tên
+        }
+
+
+        // Kiểm tra email với định dạng có đuôi miền 3 ký tự
         if (!formData.email) {
             newErrors.email = "Vui lòng nhập email.";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "Email không hợp lệ."; // Validate email format
+        } else {
+            // Biểu thức chính quy kiểm tra email với đuôi miền 3 ký tự
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3}$/;
+            if (!emailRegex.test(formData.email)) {
+                newErrors.email = "Email không hợp lệ."; // Kiểm tra định dạng email
+            }
         }
-        if (!formData.phone) newErrors.phone = "Vui lòng nhập số điện thoại.";
-        else if (!/^\d+$/.test(formData.phone)) {
-            newErrors.phone = "Số điện thoại chỉ được chứa chữ số."; // Validate phone format
-        }
-        if (!formData.message) newErrors.message = "Vui lòng nhập tin nhắn.";
 
+        // Kiểm tra định dạng số điện thoại (chỉ chứa chữ số)
+        if (!formData.phone) {
+            newErrors.phone = "Vui lòng nhập số điện thoại.";
+        } else if (!/^\d{10}$/.test(formData.phone)) {  // Kiểm tra 10 chữ số
+            newErrors.phone = "Số điện thoại phải chứa chính xác 10 chữ số."; // Kiểm tra 10 chữ số
+        }
+
+
+        // Kiểm tra nếu tin nhắn trống
+        if (!formData.message) {
+            newErrors.message = "Vui lòng nhập tin nhắn.";
+        } else if (formData.message.length >= 3000) {
+            newErrors.message = "Tin nhắn không được vượt quá 3000 ký tự.";
+        }
+
+        // Nếu có lỗi, thiết lập lỗi và ngừng gửi dữ liệu
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
 
+        // Gửi tin nhắn nếu không có lỗi
         try {
-            await sendContactMessage(formData); // Call the service
+            await sendContactMessage(formData); // Gọi dịch vụ gửi tin nhắn
             toast.success("Tin nhắn đã được gửi đi.");
             setFormData({ name: "", email: "", phone: "", message: "" }); // Reset form
-            setErrors({}); // Reset errors
         } catch (error) {
-            console.error("Error sending message:", error);
+            console.error("Lỗi khi gửi tin nhắn:", error);
             toast.error("Có lỗi xảy ra trong quá trình gửi tin nhắn.");
         }
     };
+
+
+
+
 
     return (
         <>
