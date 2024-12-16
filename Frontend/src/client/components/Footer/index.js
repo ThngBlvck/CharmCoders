@@ -11,16 +11,16 @@ Pusher.logToConsole = true;
 const pusher = new Pusher('f6f10b97ea3264514f53', {
     cluster: 'ap1',
     forceTLS: true,
-  
+
 });
 
 const Footer = () => {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const [showChatModal, setShowChatModal] = useState(false);
     const [userMessage, setUserMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [userInfo, setUserInfo] = useState({});
-    const [receiverId, setReceiverId] = useState(4); 
+    const [receiverId, setReceiverId] = useState(4);
 
     // Fetch user information
     const fetchUserData = async () => {
@@ -68,31 +68,47 @@ const Footer = () => {
         if (userInfo.user_id && receiverId) {
             const channelName = `chat.${Math.min(userInfo.user_id, receiverId)}_${Math.max(userInfo.user_id, receiverId)}`;
             const channel = pusher.subscribe(channelName);
-    
-            // Định nghĩa handler để xử lý sự kiện
+
             const handleMessageEvent = (data) => {
-                setChatMessages((prevMessages) => [
-                    ...prevMessages,
-                    {
-                        message: data.message,
-                        sender_id: data.sender.id,
-                        receiver: data.receiver,
-                    },
-                ]);
+                if (data.product) {
+                    setChatMessages((prevMessages) => [
+                        ...prevMessages,
+                        {
+                            message: data.message,
+                            sender_id: data.sender.id,
+                            receiver: data.receiver,
+                            product_id: data.product.id,
+                            product: data.product,
+                        },
+                    ]);
+                } else {
+                    setChatMessages((prevMessages) => [
+                        ...prevMessages,
+                        {
+                            message: data.message,
+                            sender_id: data.sender.id,
+                            receiver: data.receiver,
+                            product_id: null,
+                            product: null,
+                        },
+                    ]);
+                }
+                setShowChatModal(true);
             };
-    
+
+
             // Bind sự kiện
             channel.bind('App\\Events\\MessageSent', handleMessageEvent);
-    
+
             // Cleanup: unbind và unsubscribe trước khi component unmount hoặc khi receiverId thay đổi
             return () => {
                 channel.unbind('App\\Events\\MessageSent', handleMessageEvent);
                 pusher.unsubscribe(channelName);
             };
         }
-      
+
     }, [userInfo.user_id, receiverId]);
-    
+
 
     // Function to open/close the chat modal
     const toggleChatModal = () => {
@@ -118,7 +134,7 @@ const Footer = () => {
         });
     };
 
-    console.log(userInfo);
+
 
 
     return (
@@ -129,7 +145,7 @@ const Footer = () => {
                         <div className="col-3 col-lg-3 col-xl-3">
                             <div className="footer-item d-flex flex-column">
                                 <NavLink to={`/home`} className="navbar-brand">
-                                    <img src="logo_web.png" className="logo-footer"/>
+                                    <img src="logo_web.png" className="logo-footer" />
                                 </NavLink>
                                 <p className="font-bold title text-dGreen fs-16">Liên hệ
                                     chúng tôi</p>
@@ -215,22 +231,64 @@ const Footer = () => {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <p className="modal-title text-primary font-semibold" style={{ fontSize: "16px" }}>GlowMakers</p>
+                                <p className="modal-title text-dGreen font-semibold fs-16">GlowMaker</p>
+                                <p className="modal-title text-dGreen fs-16">Giờ hoạt động: 08:00 - 22:00</p>
                                 <i
-                                    className="fa fa-times ic text-dGreen fs-20"
+                                    className="fa fa-times ic text-dGreen fs-20 cursor-pointer"
                                     aria-hidden="true"
                                     onClick={toggleChatModal}
-                                    style={{ cursor: "pointer" }}
                                 ></i>
-                                <p className="modal-title text-dGreen font-semibold fs-16">GlowMaker</p>
-                                <p className="modal-title text-dGreen fs-16">Giờ hoạt động:
-                                    08:00 - 22:00</p>
-                                <i className="fa fa-times ic text-dGreen fs-20 cursor-pointer" aria-hidden="true" onClick={toggleChatModal}></i>
                             </div>
-                            <div className="modal-body" style={{ maxHeight: "400px", overflowY: "auto" }}>
-                                <div className="chat-window" style={{ maxHeight: "250px", overflowY: "auto", height: "250px" }}>
+                            <div className="modal-body" style={{ padding: "0 20px", maxHeight: "400px", overflowY: "auto" }}>
+                                <div className="chat-window" style={{ maxHeight: "250px", overflowY: "auto", height: "250px", marginBottom: "20px" }}>
                                     {chatMessages.map((msg, index) => (
-                                        <div key={index} className={`chat-message ${msg.sender_id === userInfo.user_id ? "user" : "admin"}`}>
-                                            <span>{msg.message}</span>
+                                        <div key={index} className={`chat-message ${msg.sender_id === userInfo.user_id ? "user" : "admin"}`} style={{ marginBottom: "10px", display: "flex", flexDirection: msg.sender_id === userInfo.user_id ? "row-reverse" : "row" }}>
+                                            {/* Tin nhắn */}
+                                            <div style={{
+                                                display: "inline-block",
+                                                maxWidth: "70%",
+                                                padding: "10px",
+                                                borderRadius: "12px",
+                                                backgroundColor: msg.sender_id === userInfo.user_id ? "#d4f7c7" : "#f1f1f1",
+                                                color: msg.sender_id === userInfo.user_id ? "#000" : "#333",
+                                                wordWrap: "break-word",
+                                                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                                            }}>
+                                                <span>{msg.message}</span>
+                                                {msg.product_id && (
+                                                    <a href={`/products/${msg.product_id}`} target="_blank" rel="noopener noreferrer">
+                                                        <div className="product-info" style={{
+                                                            marginTop: "10px", // Khoảng cách giữa tin nhắn và sản phẩm
+                                                            padding: "10px",
+                                                            backgroundColor: "#f8f9fa",
+                                                            borderRadius: "8px",
+                                                            border: "1px solid #ddd",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "space-between"
+                                                        }}>
+                                                            <img
+                                                                src={msg.product.image} // Hình ảnh sản phẩm
+                                                                alt="Product"
+                                                                style={{
+                                                                    width: "50px",
+                                                                    height: "50px",
+                                                                    objectFit: "cover",
+                                                                    marginRight: "10px",
+                                                                    borderRadius: "5px"
+                                                                }}
+                                                            />
+                                                            <div style={{ flex: 1 }}>
+                                                                <h6 style={{ margin: 0, fontSize: "14px", color: "#333" }}>{msg.product.name}</h6>
+                                                                <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>Giá: {msg.product.unit_price}</p>
+                                                                <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>Giảm giá: {msg.product.sale_price}</p>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                )}
+                                            </div>
+
+
                                         </div>
                                     ))}
                                 </div>
@@ -244,20 +302,29 @@ const Footer = () => {
                                     placeholder="Nhập nội dung tin nhắn..."
                                     value={userMessage}
                                     onChange={(e) => setUserMessage(e.target.value)}
-                                ></textarea>
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) { // Kiểm tra nếu phím Enter được nhấn mà không giữ Shift
+                                            e.preventDefault();  // Ngừng việc tạo dòng mới
+                                            handleSendMessage();  // Gửi tin nhắn
+                                        }
+                                    }}
+                                />
                             </div>
+
                             <div className="modal-footer d-flex justify-content-between align-items-center" style={{ margin: "0 10px" }}>
                                 <i
                                     className="fa fa-paper-plane ic text-dGreen fs-20"
                                     aria-hidden="true"
                                     onClick={handleSendMessage}
-                                    style={{ cursor: "pointer" }}
+                                    style={{ cursor: "pointer", padding: "10px", borderRadius: "50%", backgroundColor: "#d4f7c7" }}
                                 ></i>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
+
         </>
     );
 };
