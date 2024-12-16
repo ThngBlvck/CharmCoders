@@ -57,41 +57,32 @@ export default function ChangePassword() {
                 // Log the response from the backend
                 console.log("Password Change Response:", response);
 
-                // Check if the response indicates success
-                if (response.status === 200) {
-                    // Show success message
-                    toast.success("Mật khẩu của bạn đã được thay đổi thành công.");
-                    setFormData({
-                        current_password: "",
-                        new_password: "",
-                        new_password_confirmation: ""
-                    });
-                    navigate("/profile");
-                }
-            } catch (error) {
-                // Log the error object
-                console.error("Password Change Error:", error);
+                // Show success message from the backend response
+                toast.success(response?.data?.message || "Mật khẩu của bạn đã được thay đổi thành công!");
 
-                // Check if there's an error response and handle accordingly
-                if (error.response && error.response.status === 400) {
-                    const errorMessage = error.response.data.error;
-                    // Handle specific error for social login or other errors
-                    if (errorMessage === "Không thể thay đổi mật khẩu cho tài khoản đăng nhập qua mạng xã hội.") {
-                        toast.error(errorMessage);
-                    } else {
-                        // Handle other error messages
-                        toast.error(errorMessage || "Có lỗi xảy ra khi đổi mật khẩu.");
-                    }
-                } else {
-                    // Fallback for unexpected errors
-                    toast.error("Có lỗi xảy ra khi đổi mật khẩu.");
-                }
+                // Reset form fields after successful submission
+                setFormData({
+                    current_password: "",
+                    new_password: "",
+                    new_password_confirmation: ""
+                });
+                navigate("/profile");
+
+            } catch (error) {
+                console.error("Error during password change:", error);
+
+                // Show error message from the backend, fallback to default message if not available
+                toast.error(`${error?.response?.data?.message || error.message || 'Vui lòng thử lại sau.'}`);
             }
         } else {
             // If validation fails, show an error message
-            toast.error("Vui lòng kiểm tra lại các trường nhập liệu.");
+            toast.error("Vui lòng kiểm tra lại các trường nhập liệu và đảm bảo các mật khẩu khớp.");
         }
     };
+
+
+
+
 
 
 
