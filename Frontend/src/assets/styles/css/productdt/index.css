@@ -211,75 +211,34 @@
     background-color: #c82333; /* Đậm hơn khi hover */
 }
 
+/* Giữ nguyên kích thước slide */
 .related-products .slick-slide {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0; /* Không cho phép slide bị co giãn */
+    max-width: 100%; /* Giới hạn chiều rộng */
+    box-sizing: border-box;
 }
 
+/* Track của slider */
 .related-products .slick-track {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Căn giữa slide khi chỉ có 1 sản phẩm */
 }
 
-.related-products .slick-list {
-    display: flex;
-    justify-content: center;
-}
-
-.related-products .slick-slider {
-    max-width: 100%; /* Đảm bảo slider chiếm toàn bộ không gian có sẵn */
-}
-
-
-.related-products {
-    border: 1px solid #d1d1d1; /* Viền mỏng xung quanh */
-    border-radius: 8px; /* Bo tròn viền */
-    padding: 20px; /* Khoảng cách bên trong */
-    background-color: #fff; /* Màu nền trắng */
-}
-
-.related-products .slick-slide {
-    padding: 0 10px; /* Đảm bảo các phần tử sản phẩm có khoảng cách */
-}
-
-.related-products .slick-track {
-    display: flex;
-}
-
-.related-products .slick-list {
-    padding: 0;
-}
-
-.related-products .slick-prev,
-.related-products .slick-next {
-    background-color: #ffffff; /* Màu nền nút điều hướng */
-    border-radius: 50%; /* Hình tròn cho nút điều hướng */
-    padding: 10px;
-    border: none;
-}
-
-.related-products .btn-slide-pro-left,
-.related-products .btn-slide-pro-right {
-    position: absolute;
-    top: 50%;
-    z-index: 10;
-    background-color: rgb(57, 131, 60);
-    border: none;
-    padding: 8px;
-    border-radius: 50%;
-}
-
-.related-products .btn-slide-pro-left {
-    left: 10px;
-}
-
-.related-products .btn-slide-pro-right {
-    right: 10px;
-}
-
+/* Hình ảnh sản phẩm */
 .related-products .img-pro-lq {
-    max-height: 200px; /* Giới hạn chiều cao của hình ảnh để đảm bảo tất cả sản phẩm có kích thước đồng đều */
     width: 100%;
-    object-fit: cover;
+    max-width: 200px; /* Đặt giới hạn chiều rộng tối đa */
+    height: 100%;
+    object-fit: contain; /* Giữ tỷ lệ hình ảnh, không làm méo hình */
+    margin: 0 auto; /* Căn giữa hình ảnh */
 }
+
+
+
+
+
+
+

@@ -42,7 +42,8 @@ const ProductDetail = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingReviewId, setEditingReviewId] = useState(null);  // Store the id of the review being edited
     const [review_id, setReview_id] = useState(null);
-
+    const [visibleReviews, setVisibleReviews] = useState(2);
+    const [isExpanded, setIsExpanded] = useState(false);
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
         if (storedUserId) {
@@ -278,6 +279,17 @@ const ProductDetail = () => {
         setIsSubmitting(false); // Re-enable submit button
     };
 
+    // Hàm để load thêm đánh giá
+    const handleLoadMore = () => {
+        setVisibleReviews(reviews.length);  // Hiển thị tất cả đánh giá
+        setIsExpanded(true);  // Đánh dấu đã mở rộng
+    };
+
+// Hàm để ẩn bớt đánh giá
+    const handleCollapse = () => {
+        setVisibleReviews(2);  // Chỉ hiển thị 2 đánh giá đầu tiên
+        setIsExpanded(false);  // Đánh dấu đã thu gọn
+    };
 
 
     return (
@@ -515,8 +527,8 @@ const ProductDetail = () => {
                                                         className={index < rating ? "filled-star" : "empty-star"}
                                                         onClick={() => setRating(index + 1)}
                                                     >
-                            &#9733;
-                        </span>
+                                    &#9733;
+                                </span>
                                                 ))}
                                             </div>
                                         </div>
@@ -544,7 +556,7 @@ const ProductDetail = () => {
                                                 <button
                                                     type="button"
                                                     className="btn-cancel"
-                                                    onClick={handleCancelEdit} // Hủy chế độ chỉnh sửa
+                                                    onClick={handleCancelEdit}
                                                 >
                                                     Hủy
                                                 </button>
@@ -556,7 +568,7 @@ const ProductDetail = () => {
                                 {/* Hiển thị các đánh giá hiện tại */}
                                 {reviews.length ? (
                                     <ul className="review-list">
-                                        {reviews.map((review) => (
+                                        {reviews.slice(0, visibleReviews).map((review) => (
                                             <li key={review.id} className="review-item mt-3 mb-2">
                                                 <div className="d-flex justify-content-between review-header">
                                                     <div>
@@ -569,14 +581,14 @@ const ProductDetail = () => {
                                                                     key={index}
                                                                     className={index < review.rating ? "filled-star" : "empty-star"}
                                                                 >
-                                        &#9733;
-                                    </span>
+                                                &#9733;
+                                            </span>
                                                             ))}
                                                         </div>
                                                     </div>
                                                     <button
                                                         className="btn-edit"
-                                                        onClick={() => handleEditReview(review.id)} // Gọi hàm chỉnh sửa và truyền ID
+                                                        onClick={() => handleEditReview(review.id)}
                                                     >
                                                         <i className="fas fa-pencil-alt"></i>
                                                     </button>
@@ -588,6 +600,26 @@ const ProductDetail = () => {
                                 ) : (
                                     <p>Chưa có đánh giá nào.</p>
                                 )}
+
+                                <div className="mt-3">
+                                    {!isExpanded && visibleReviews < reviews.length && (
+                                        <button
+                                            onClick={handleLoadMore}
+                                            className="btn-load-more"
+                                        >
+                                            Xem thêm đánh giá
+                                        </button>
+                                    )}
+
+                                    {isExpanded && (
+                                        <button
+                                            onClick={handleCollapse}
+                                            className="btn-load-more"
+                                        >
+                                            Ẩn bớt
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
 

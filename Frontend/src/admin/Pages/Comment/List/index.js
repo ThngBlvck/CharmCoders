@@ -5,6 +5,8 @@ import Swal from 'sweetalert2';
 import { PulseLoader } from 'react-spinners';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import "../../../../assets/styles/css/ReviewDT/index.css";
+import { faTrash } from '@fortawesome/free-solid-svg-icons';  // Import icon "trash"
 
 export default function Comment({ color, userId }) {
     const [comments, setComments] = useState([]);
@@ -13,7 +15,7 @@ export default function Comment({ color, userId }) {
     const [loadingId, setLoadingId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 5;
-
+    const [expandedComments, setExpandedComments] = useState([]);
     useEffect(() => {
         fetchComments();
     }, []);
@@ -88,6 +90,38 @@ export default function Comment({ color, userId }) {
         currentPage * productsPerPage
     );
 
+    const truncateComment = (comment, commentId) => {
+        const maxLength = 30; // Đặt độ dài tối đa cho phần hiển thị
+        const truncated = comment.length > maxLength ? comment.slice(0, maxLength) + '...' : comment;
+
+        return (
+            <div className="comment-container">
+                <div className="comment-text">
+                    {expandedComments.includes(commentId) ? comment : truncated}
+                </div>
+
+                {comment.length > maxLength && (
+                    <button
+                        onClick={() => handleToggleExpand(commentId)}
+                        className="text-blue-500 hover:text-blue-700 font-semibold transition duration-300 ease-in-out"
+                    >
+                        {expandedComments.includes(commentId) ? 'Thu gọn' : 'Mở rộng'}
+                    </button>
+                )}
+            </div>
+
+        );
+    };
+
+    const handleToggleExpand = (commentId) => {
+        setExpandedComments(prevState =>
+            prevState.includes(commentId)
+                ? prevState.filter(id => id !== commentId)
+                : [...prevState, commentId]
+        );
+    };
+
+
     return (
         <div className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}>
             <div className="rounded-t mb-0 px-4 py-3 border-0 flex justify-between items-center">
@@ -104,27 +138,29 @@ export default function Comment({ color, userId }) {
                     <table className="items-center w-full bg-transparent border-collapse">
                         <thead>
                         <tr>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">STT</th>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Nội dung</th>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Tên bài viết</th>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Người bình luận</th>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">Hành động</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol" style={{width: '10%'}}>STT</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol" style={{width: '45%'}}>Nội dung</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol" style={{width: '25%'}}>Tên bài viết</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol" style={{width: '10%'}}>Người bình luận</th>
+                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibol" style={{width: '10%'}}>Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
                         {paginatedComments.map((comment, index) => (
                             <tr key={comment.id}>
-                                <td className="border-t-0 px-6 text-left">{index + 1}</td>
-                                <td className="border-t-0 px-6 text-left">{comment.content}</td>
-                                <td className="border-t-0 px-6 text-left">{comment.blogTitle}</td>
-                                <td className="border-t-0 px-6 text-left">{comment.user_name}</td>
-                                <td className="border-t-0 px-6 text-left">
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-center">{index + 1}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 ">
+                                    { truncateComment(comment.content, comment.id)}
+                                </td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-center">{comment.blogTitle}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-center">{comment.user_name}</td>
+                                <td className="border-t-0 px-6 align-middle text-xl whitespace-nowrap p-4 text-centerr">
                                     <button
                                         className={`text-red-500 hover:text-red-700 ${loadingId === comment.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         onClick={() => handleDelete(comment.id)}
                                         disabled={loadingId === comment.id}
                                     >
-                                        Xóa
+                                        <FontAwesomeIcon icon={faTrash} className="mr-2" />
                                     </button>
                                 </td>
                             </tr>
