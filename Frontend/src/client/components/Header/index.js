@@ -167,7 +167,7 @@ export default function Header() {
                 <div className="container-fluid px-0">
                     <nav className="navbar navbar-expand-xl bg-light">
                         <NavLink to={`/home`} className="navbar-brand">
-                            <img src="logo_web.png" className="logo-header"/>
+                            <img src="/logo_web.png" className="logo-header"/>
                         </NavLink>
                         <button className="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarCollapse">
