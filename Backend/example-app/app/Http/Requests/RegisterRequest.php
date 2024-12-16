@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
+
 class RegisterRequest extends FormRequest
 {
     public function authorize()
@@ -18,13 +19,7 @@ class RegisterRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,NULL,id,auth_provider,NULL',
-            'password' => [
-                'required',
-                'string',
-                'min:5',
-                'confirmed',
-                'regex:/^[a-zA-Z0-9]*$/', // Chỉ cho phép chữ cái và số
-            ],
+            'password' => 'required|string|min:5|confirmed',
         ];
     }
 
@@ -39,7 +34,6 @@ class RegisterRequest extends FormRequest
             'password.required' => 'Vui lòng nhập mật khẩu.',
             'password.min' => 'Mật khẩu phải có ít nhất 5 ký tự.',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
-            'password.regex' => 'Mật khẩu chỉ được phép chứa chữ cái và số, không được chứa ký tự đặc biệt.',
         ];
     }
 
@@ -51,4 +45,5 @@ class RegisterRequest extends FormRequest
             'errors' => $validator->errors(), // Chuyển đổi lỗi thành một mảng
         ], 422));
     }
+
 }
