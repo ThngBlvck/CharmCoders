@@ -13,7 +13,8 @@ class Message extends Model
     [
         'sender_id',
         'receiver_id',
-        'message'
+        'message',
+        'product_id'
     ];
 
     public function sender()
