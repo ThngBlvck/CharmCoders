@@ -4,6 +4,7 @@ import {getOneProduct, getRelatedProducts, getHotProducts} from "../../../servic
 import {getOneBrand} from "../../../services/Brand";
 import {getOneCategory} from "../../../services/Category";
 import {addToCart} from "../../../services/Cart";
+import {sendMessage} from "../../../services/Message";
 import {addReview, getReviews, updateReview,  getReviewById} from "../../../services/Review";
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -194,6 +195,19 @@ const ProductDetail = () => {
             toast.error("Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.");
         }
     };
+
+    const handleSendMessage = async (productId) => {
+    
+            try {
+                await sendMessage({
+                    product_id: productId,
+                    receiver_id: 4,
+                    message: 'Tôi cần tư vấn sản phẩm này'
+                });
+            } catch (error) {
+                console.error("Error sending message:", error);
+            }
+        };
 
     const handleSubmitReview = async (e) => {
         e.preventDefault();
@@ -474,6 +488,15 @@ const ProductDetail = () => {
                                                         <i className="fa fa-shopping-basket" aria-hidden="true"
                                                            style={{marginRight: "6px"}}></i>
                                                         Thêm vào giỏ
+                                                    </p>
+                                                </button>
+                                                <button className="butn mr-2 w-30 rounded font-semibold shadow"
+                                                        onClick={() =>
+                                                            handleSendMessage(product.id)}>
+                                                    <p>
+                                                        <i className="fa fa-shopping-basket" aria-hidden="true"
+                                                           style={{marginRight: "6px"}}></i>
+                                                        Tư vấn
                                                     </p>
                                                 </button>
                                             </>

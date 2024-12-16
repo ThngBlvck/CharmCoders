@@ -42,15 +42,31 @@ const ChatPage = () => {
       const channelName = `chat.${Math.min(user.user_id, selectedContact.sender.id)}_${Math.max(user.user_id, selectedContact.sender.id)}`;
       const channel = pusher.subscribe(channelName);
       channel.bind('App\\Events\\MessageSent', (data) => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            message: data.message,
-            sender_id: data.sender.id,
-            receiver: data.receiver,
-            isUser: data.sender.id === user.user_id,
-          },
-        ]);
+        if (data.product) {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              message: data.message,
+              sender_id: data.sender.id,
+              receiver: data.receiver,
+              productid: data.product_id,
+              product: data.product,
+              isUser: data.sender.id === user.user_id,
+            },
+          ]);
+        } else {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              message: data.message,
+              sender_id: data.sender.id,
+              receiver: data.receiver,
+              product_id: null,
+              product: null,
+              isUser: data.sender.id === user.user_id,
+            },
+          ]);
+        }
 
       });
 
@@ -143,8 +159,28 @@ const ChatPage = () => {
                   }`}
               >
                 <p>{message.message}</p>
-                <span className="text-xs text-gray-500">{message.create_at}</span>
+                {message.product && (
+                  <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
+                    <div
+                      className="mt-3 p-3 rounded-lg bg-gray-100 flex space-x-3"
+                      style={{ maxWidth: "300px" }}
+                    >
+                      <img
+                        src={message.product.image}
+                        alt="Product"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-sm text-gray-700">{message.product.name}</span>
+                        <span className="text-xs text-gray-500">Giá: {message.product.unit_price}</span>
+                      </div>
+                    </div>
+                  </a>
+                )}
+                {/* <span className="text-xs text-gray-500">{message.created_at}</span> */}
               </div>
+
+
             </div>
           ))}
         </div>
@@ -157,11 +193,15 @@ const ChatPage = () => {
             placeholder="Nhập tin nhắn..."
             className="flex-grow p-2 border rounded"
           />
-          <button onClick={handleSendMessage} className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded">
+          <button
+            onClick={handleSendMessage}
+            className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded"
+          >
             Gửi
           </button>
         </div>
       </div>
+
 
       {/* Nút Quay lại Admin */}
       <div className="absolute bottom-4 left-4">
