@@ -138,6 +138,7 @@ class UserController extends Controller
         if ($user->auth_provider !== null) {
             return response()->json([
                 'error' => 'Không thể thay đổi mật khẩu cho tài khoản đăng nhập qua mạng xã hội.',
+                'message' => 'Không thể thay đổi mật khẩu cho tài khoản đăng nhập qua mạng xã hội'
             ], 400);
         }
 
@@ -145,6 +146,7 @@ class UserController extends Controller
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'error' => 'Mật khẩu hiện tại không chính xác.',
+                'message' => 'Mật khẩu hiện tại không chính xác.'
             ], 400);
         }
 
@@ -156,6 +158,7 @@ class UserController extends Controller
             'message' => 'Mật khẩu đã được thay đổi thành công.',
         ], 200);
     }
+
 
     public function deleteUser()
     {
