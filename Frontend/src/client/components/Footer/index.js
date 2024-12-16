@@ -20,7 +20,7 @@ const Footer = () => {
     const [userMessage, setUserMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [userInfo, setUserInfo] = useState({});
-    const [receiverId, setReceiverId] = useState(4);
+    const [receiverId, setReceiverId] = useState(26);
 
     // Fetch user information
     const fetchUserData = async () => {
@@ -145,7 +145,7 @@ const Footer = () => {
                         <div className="col-3 col-lg-3 col-xl-3">
                             <div className="footer-item d-flex flex-column">
                                 <NavLink to={`/home`} className="navbar-brand">
-                                    <img src="logo_web.png" className="logo-footer" />
+                                    <img src="/logo_web.png" className="logo-footer" />
                                 </NavLink>
                                 <p className="font-bold title text-dGreen fs-16">Liên hệ
                                     chúng tôi</p>
@@ -230,7 +230,6 @@ const Footer = () => {
                     <div className="modal-dialog" role="document" style={{ bottom: "-180px", right: "-380px" }}>
                         <div className="modal-content">
                             <div className="modal-header">
-                                <p className="modal-title text-primary font-semibold" style={{ fontSize: "16px" }}>GlowMakers</p>
                                 <p className="modal-title text-dGreen font-semibold fs-16">GlowMaker</p>
                                 <p className="modal-title text-dGreen fs-16">Giờ hoạt động: 08:00 - 22:00</p>
                                 <i

@@ -91,18 +91,6 @@ const ProductDetail = () => {
             const result = await getOneProduct(id);
             setProduct(result);
 
-            // Lấy thương hiệu
-            if (result.brand_id) {
-                const brandResult = await getOneBrand(result.brand_id);
-                setBrandName(brandResult.name);
-            }
-
-            // Lấy danh mục
-            if (result.category_id) {
-                const categoryResult = await getOneCategory(result.category_id);
-                setCategoryName(categoryResult.name);
-            }
-
             // Fetch related products
             const relatedProductsResult = await getRelatedProducts(id);
             setRelatedProducts(relatedProductsResult.related_products);
@@ -201,7 +189,7 @@ const ProductDetail = () => {
             try {
                 await sendMessage({
                     product_id: productId,
-                    receiver_id: 4,
+                    receiver_id: 26,
                     message: 'Tôi cần tư vấn sản phẩm này'
                 });
             } catch (error) {
@@ -494,7 +482,7 @@ const ProductDetail = () => {
                                                         onClick={() =>
                                                             handleSendMessage(product.id)}>
                                                     <p>
-                                                        <i className="fa fa-shopping-basket" aria-hidden="true"
+                                                        <i className="fa fa-headset" aria-hidden="true"
                                                            style={{marginRight: "6px"}}></i>
                                                         Tư vấn
                                                     </p>
@@ -515,10 +503,15 @@ const ProductDetail = () => {
                                                 style: "currency",
                                                 currency: "VND",
                                             })}</span></li>
-                                        <li><span className="text-dGreen fs-16"><strong>Thương hiệu:</strong></span>
-                                            <span className="text-dGreen"> {categoryName}</span></li>
-                                        <li><span className="text-dGreen fs-16"><strong>Danh mục:</strong></span> <span
-                                            className="text-dGreen"> {brandName}</span></li>
+                                        <li>
+                                            <span className="text-dGreen fs-16"><strong>Thương hiệu:</strong></span>
+                                            <span className="text-dGreen">{product.brand?.name || "Đang cập nhật"}</span>
+                                        </li>
+                                        <li>
+                                            <span className="text-dGreen fs-16"><strong>Danh mục:</strong></span>
+                                            <span className="text-dGreen">{product.category?.name || "Đang cập nhật"}</span>
+                                        </li>
+
                                         <li><span className="text-dGreen -fs16"><strong>Mô tả sản phẩm:</strong>
                                             </span>{" "}
                                             <span
