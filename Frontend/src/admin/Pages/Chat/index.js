@@ -44,7 +44,7 @@ const ChatPage = () => {
               contact.latest_message = data.message;
             }
             return contact;
-          }).sort((a, b) => a.sender.id === data.sender.id ? -1 : 1); 
+          }).sort((a, b) => a.sender.id === data.sender.id ? -1 : 1);
         } else if (data.sender.id !== user.user_id) {
           return [
             {
@@ -55,7 +55,7 @@ const ChatPage = () => {
             ...prevContacts
           ];
         }
-        return prevContacts; 
+        return prevContacts;
       });
 
 
@@ -72,19 +72,39 @@ const ChatPage = () => {
     if (user.user_id && selectedContact?.sender?.id) {
       const channelName = `chat.${Math.min(user.user_id, selectedContact.sender.id)}_${Math.max(user.user_id, selectedContact.sender.id)}`;
       const channel = pusher.subscribe(channelName);
-
       channel.bind('App\\Events\\MessageSent', (data) => {
-        const newMessage = {
-          message: data.message,
-          sender_id: data.sender.id,
-          receiver: data.receiver,
-          product_id: data.product_id || null,
-          product: data.product || null,
-          isUser: data.sender.id === user.user_id,
-        };
+        if (data.product) {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              message: data.message,
+              sender_id: data.sender.id,
+              receiver: data.receiver,
+              productid: data.product_id,
+              product: data.product,
+              isUser: data.sender.id === user.user_id,
+            },
+          ]);
+        } else {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              message: data.message,
+              sender_id: data.sender.id,
+              receiver: data.receiver,
+              product_id: null,
+              product: null,
+              isUser: data.sender.id === user.user_id,
+            },
+          ]);
+        }
 
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
+
+
+
+
 
       return () => {
         channel.unbind('App\\Events\\MessageSent');
@@ -116,6 +136,7 @@ const ChatPage = () => {
         receiver_id: selectedContact.sender.id,
         message: newMessage,
       });
+
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -174,21 +195,41 @@ const ChatPage = () => {
               >
                 <p>{message.message}</p>
                 {message.product && (
-                  <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
-                    <div className="mt-3 p-3 rounded-lg bg-gray-100 flex space-x-3" style={{ maxWidth: "300px" }}>
-                      <img
-                        src={message.product.image}
-                        alt="Product"
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-sm text-gray-700">{message.product.name}</span>
-                        <span className="text-xs text-gray-500">Giá: {message.product.unit_price}</span>
+                    <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
+                      <div
+                          className="mt-3 p-4 rounded-lg bg-gray-50 flex space-x-4 items-center"
+                          style={{maxWidth: "350px"}}
+                      >
+                        <img
+                            src={message.product.image}
+                            alt="Product"
+                            className="w-20 h-20 object-cover rounded-md shadow-md" // Thêm shadow cho hình ảnh để nổi bật hơn
+                        />
+                        <div className="flex flex-col space-y-1">
+    <span
+        className="font-semibold text-lg text-gray-800"
+        style={{fontFamily: "Roboto, sans-serif"}} // Áp dụng font Roboto cho tên sản phẩm
+    >
+      {message.product.name}
+    </span>
+                          <span
+                              className="text-sm text-gray-600"
+                              style={{fontFamily: "Roboto, sans-serif"}} // Áp dụng font Roboto cho giá
+                          >
+      Giá:{" "}
+                            <span className="font-bold text-red-500">
+        {message.product.unit_price}₫
+      </span>
+    </span>
+                        </div>
                       </div>
-                    </div>
-                  </a>
+
+                    </a>
                 )}
+                {/* <span className="text-xs text-gray-500">{message.created_at}</span> */}
               </div>
+
+
             </div>
           ))}
           {/* This div will make the chat scroll to the bottom */}
@@ -201,16 +242,17 @@ const ChatPage = () => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             placeholder="Nhập tin nhắn..."
-            className="flex-grow p-2 border rounded-lg"
+            className="flex-grow p-2 border rounded"
           />
           <button
             onClick={handleSendMessage}
-            className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded-lg transition-all duration-300 hover:bg-indigo-600"
+            className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded"
           >
             Gửi
           </button>
         </div>
       </div>
+
 
       {/* Nút Quay lại Admin */}
       <div className="absolute bottom-4 left-4">
