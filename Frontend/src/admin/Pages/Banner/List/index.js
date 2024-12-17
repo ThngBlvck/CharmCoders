@@ -16,7 +16,7 @@ export default function Banner({ color }) {
     const [displayedBanners, setDisplayedBanners] = useState([]);
     const navigate = useNavigate();
 
-    const baseURL = "http://your-domain.com";
+    const baseURL = "http://localhost:8000";
 
     useEffect(() => {
         fetchBanners();
@@ -147,87 +147,87 @@ export default function Banner({ color }) {
 
             {loading ? (
                 <div className="flex justify-center items-center py-4">
-                    <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                    <PulseLoader color="#4A90E2" loading={loading} size={15} />
                 </div>
             ) : (
                 <div className="block w-full overflow-x-auto">
                     <table className="items-center w-full bg-transparent border-collapse">
                         <thead>
-                        <tr>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
-                                <input
-                                    type="checkbox"
-                                    onChange={(e) => {
-                                        if (e.target.checked) {
-                                            setSelectedBanners(banners.map((banner) => banner.id));
-                                        } else {
-                                            setSelectedBanners([]);
-                                        }
-                                    }}
-                                    checked={selectedBanners.length === banners.length && banners.length > 0}
-                                />
-                            </th>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
-                                STT
-                            </th>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
-                                Hình ảnh
-                            </th>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
-                                Trạng thái
-                            </th>
-                            <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
-                                Hành động
-                            </th>
-                        </tr>
+                            <tr>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
+                                    <input
+                                        type="checkbox"
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedBanners(banners.map((banner) => banner.id));
+                                            } else {
+                                                setSelectedBanners([]);
+                                            }
+                                        }}
+                                        checked={selectedBanners.length === banners.length && banners.length > 0}
+                                    />
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
+                                    STT
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
+                                    Hình ảnh
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
+                                    Trạng thái
+                                </th>
+                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
+                                    Hành động
+                                </th>
+                            </tr>
                         </thead>
                         <tbody>
-                        {displayedBanners.length > 0 ? (
-                            displayedBanners.map((banner, index) => (
-                                <tr key={banner.id}>
-                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedBanners.includes(banner.id)}
-                                            onChange={() => handleSelectBanner(banner.id)}
-                                        />
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                        {index + 1}
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                        <img
-                                            src={banner.image_path}
-                                            alt={banner.name}
-                                            className="w-16 h-16 object-cover"
-                                        />
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                        {renderStatus(banner.status)}
-                                    </td>
-                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                        <button
-                                            className="text-blue-500 hover:text-blue-700 px-2"
-                                            onClick={() => handleEditClick(banner.id)}
-                                        >
-                                            <i className="fas fa-pen text-xl"></i>
-                                        </button>
-                                        <button
-                                            className="text-red-500 hover:text-red-700 ml-2 px-2"
-                                            onClick={() => handleDeleteClick(banner)}
-                                        >
-                                            <i className="fas fa-trash text-xl"></i>
-                                        </button>
+                            {displayedBanners.length > 0 ? (
+                                displayedBanners.map((banner, index) => (
+                                    <tr key={banner.id}>
+                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedBanners.includes(banner.id)}
+                                                onChange={() => handleSelectBanner(banner.id)}
+                                            />
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                            {index + 1}
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                            <img
+                                                src={banner.image_path}
+                                                alt={banner.image_path}
+                                                className="w-16 h-16 object-cover"
+                                            />
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                            {renderStatus(banner.status)}
+                                        </td>
+                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700 px-2"
+                                                onClick={() => handleEditClick(banner.id)}
+                                            >
+                                                <i className="fas fa-pen text-xl"></i>
+                                            </button>
+                                            <button
+                                                className="text-red-500 hover:text-red-700 ml-2 px-2"
+                                                onClick={() => handleDeleteClick(banner)}
+                                            >
+                                                <i className="fas fa-trash text-xl"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center">
+                                        Không có banner nào.
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5" className="text-center">
-                                    Không có banner nào.
-                                </td>
-                            </tr>
-                        )}
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -249,14 +249,14 @@ export default function Banner({ color }) {
                     disabled={currentPage === 1}
                     className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed mx-2"
                 >
-                    <FontAwesomeIcon icon={faChevronLeft}/>
+                    <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === Math.ceil(banners.length / bannersPerPage)}
                     className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg disabled:bg-gray-300 disabled:cursor-not-allowed mx-2"
                 >
-                    <FontAwesomeIcon icon={faChevronRight}/>
+                    <FontAwesomeIcon icon={faChevronRight} />
                 </button>
             </div>
 

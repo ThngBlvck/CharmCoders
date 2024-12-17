@@ -21,32 +21,35 @@ class BannerController extends Controller
     }
 
     // Thêm nhiều ảnh
-   public function store(Request $request)
-   {
-       $request->validate([
-           'images' => 'required|array',
-           'images.*' => 'image|mimes:jpeg,png,jpg,svg',  // Kiểm tra định dạng ảnh
-       ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,svg', // Kiểm tra định dạng ảnh
+        ]);
 
-       // Đảm bảo thư mục `banners` tồn tại
-       if (!Storage::disk('public')->exists('banners')) {
-           Storage::disk('public')->makeDirectory('banners');
-       }
+        // Đảm bảo thư mục `images/banners` tồn tại
+        if (!Storage::disk('public')->exists('images/banners')) {
+            Storage::disk('public')->makeDirectory('images/banners');
+        }
 
-       $imagePaths = [];
-       foreach ($request->file('images') as $image) {
-           // Kiểm tra nếu file hợp lệ
-           if ($image->isValid()) {
-               $path = $image->store('banners', 'public');
-               $fullUrl = asset('storage/images/banners/' . $path); // Xây dựng URL đầy đủ
+        $imagePaths = [];
+        foreach ($request->file('images') as $image) {
+            // Kiểm tra nếu file hợp lệ
+            if ($image->isValid()) {
+                // Lưu file vào storage/app/public/images/banners
+                $path = $image->store('images/banners', 'public');
 
-               // Lưu thông tin vào bảng Banner
-               $imagePaths[] = Banner::create(['image_path' => $fullUrl]);
-           }
-       }
+                // Trả về đường dẫn URL công khai
+                $fullUrl = Storage::url($path);
 
-       return response()->json($imagePaths, 201);
-   }
+                // Lưu thông tin vào bảng Banner
+                $imagePaths[] = Banner::create(['image_path' => $fullUrl]);
+            }
+        }
+
+        return response()->json($imagePaths, 201);
+    }
 
 
     // Lấy thông tin chi tiết banner theo ID
