@@ -310,7 +310,9 @@ export default function UserList() {
                                             <span className="text-blueGray-600">{index + 1}</span>
                                         </div>
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.name}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">
+                                        {user.name.length > 20 ?"..." + user.name.substring(0, 20) : user.name}
+                                    </td>
                                     <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">
                                         <div className="flex justify-center items-center h-full">
                                             {user.image ? (
