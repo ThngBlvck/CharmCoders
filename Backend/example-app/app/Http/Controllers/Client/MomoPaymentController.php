@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Mail\OrderCreatedMail;
+use Illuminate\Support\Facades\Mail;
 
 class MomoPaymentController extends Controller
 {
@@ -84,7 +86,7 @@ class MomoPaymentController extends Controller
                 'updated_at' => now(),
                 'address' => $address,
                 'phone' => $user ? $user->phone : null,
-                'payment_method'=>2
+                'payment_method' => 2
             ];
 
             // Lưu đơn hàng vào bảng Order
@@ -95,8 +97,8 @@ class MomoPaymentController extends Controller
             foreach ($extradata as $item) {
                 // Truy vấn bảng Cart để lấy thông tin sản phẩm và số lượng
                 $cartItem = Cart::where('user_id', $item['user_id'])
-                                ->where('product_id', $item['product_id'])
-                                ->first();
+                    ->where('product_id', $item['product_id'])
+                    ->first();
 
                 if (!$cartItem) {
                     return response()->json(['message' => 'Sản phẩm không có trong giỏ hàng'], 404);
@@ -115,6 +117,7 @@ class MomoPaymentController extends Controller
                 // Xóa sản phẩm khỏi giỏ hàng sau khi thanh toán
                 $cartItem->delete();
             }
+            Mail::to($request->input('email'))->send(new OrderCreatedMail($order));
 
             // Lưu chi tiết đơn hàng vào bảng OrderDetail
             Order_detail::insert($orderDetails);
