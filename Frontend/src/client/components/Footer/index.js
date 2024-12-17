@@ -266,34 +266,77 @@ const Footer = () => {
                                             }}>
                                                 <span>{msg.message}</span>
                                                 {msg.product_id && (
-                                                    <a href={`/products/${msg.product_id}`} target="_blank" rel="noopener noreferrer">
-                                                        <div className="product-info" style={{
-                                                            marginTop: "10px", // Khoảng cách giữa tin nhắn và sản phẩm
-                                                            padding: "10px",
-                                                            backgroundColor: "#f8f9fa",
-                                                            borderRadius: "8px",
-                                                            border: "1px solid #ddd",
-                                                            display: "flex",
-                                                            alignItems: "center",
-                                                            justifyContent: "space-between"
-                                                        }}>
+                                                    <a href={`/products/${msg.product_id}`} target="_blank"
+                                                       rel="noopener noreferrer">
+                                                        <div
+                                                            className="product-info"
+                                                            style={{
+                                                                marginTop: "10px",
+                                                                padding: "10px",
+                                                                backgroundColor: "#f1f1f1", // Nền sản phẩm xám nhạt
+                                                                borderRadius: "8px",
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                justifyContent: "flex-start",
+                                                                fontFamily: "Roboto, sans-serif", // Áp dụng font Roboto
+                                                                color: "#333", // Chữ xám đậm
+                                                            }}
+                                                        >
                                                             <img
-                                                                src={msg.product.image} // Hình ảnh sản phẩm
+                                                                src={msg.product.image}
                                                                 alt="Product"
                                                                 style={{
-                                                                    width: "50px",
-                                                                    height: "50px",
+                                                                    width: "60px",
+                                                                    height: "60px",
                                                                     objectFit: "cover",
                                                                     marginRight: "10px",
-                                                                    borderRadius: "5px"
+                                                                    borderRadius: "5px",
+                                                                    border: "1px solid #ddd", // Đường viền nhẹ
                                                                 }}
                                                             />
-                                                            <div style={{ flex: 1 }}>
-                                                                <h6 style={{ margin: 0, fontSize: "14px", color: "#333" }}>{msg.product.name}</h6>
-                                                                <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>Giá: {msg.product.unit_price}</p>
-                                                                <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>Giảm giá: {msg.product.sale_price}</p>
+                                                            <div style={{flex: 1}}>
+                                                                <h6
+                                                                    style={{
+                                                                        margin: 0,
+                                                                        fontSize: "14px",
+                                                                        fontWeight: "600",
+                                                                        fontFamily: "Roboto, sans-serif", // Áp dụng font Roboto
+                                                                        color: "#333",
+                                                                    }}
+                                                                >
+                                                                    {msg.product.name}
+                                                                </h6>
+
+                                                                <div style={{
+                                                                    display: "flex",
+                                                                    alignItems: "center",
+                                                                    marginTop: "5px"
+                                                                }}>
+                                                                  <span
+                                                                      style={{
+                                                                          color: "#d32f2f", // Giá giảm màu đỏ đậm
+                                                                          fontSize: "16px",
+                                                                          fontWeight: "bold",
+                                                                          fontFamily: "Roboto, sans-serif", // Font Roboto
+                                                                          marginRight: "10px",
+                                                                      }}
+                                                                  >
+                                                                    {msg.product.sale_price}₫
+                                                                  </span>
+                                                                    <span
+                                                                        style={{
+                                                                            color: "#888",
+                                                                            textDecoration: "line-through",
+                                                                            fontSize: "12px",
+                                                                            fontFamily: "Roboto, sans-serif", // Font Roboto
+                                                                        }}
+                                                                    >
+                                                                    {msg.product.unit_price}₫
+                                                                  </span>
+                                                                </div>
                                                             </div>
                                                         </div>
+
                                                     </a>
                                                 )}
                                             </div>
@@ -321,7 +364,8 @@ const Footer = () => {
                                 />
                             </div>
 
-                            <div className="modal-footer d-flex justify-content-between align-items-center" style={{ margin: "0 10px" }}>
+                            <div className="modal-footer d-flex justify-content-between align-items-center"
+                                 style={{margin: "0 10px"}}>
                                 <i
                                     className="fa fa-paper-plane ic text-dGreen fs-20"
                                     aria-hidden="true"
