@@ -498,18 +498,18 @@ const ProductDetail = () => {
                                     <ul>
                                         <li><span className="text-dGreen fs-16"><strong>Tên sản phẩm:</strong></span>
                                             <span className="text-dGreen"> {product.name}</span></li>
-                                        <li><span className="text-dGreen fs-16"><strong>Giá sản phẩm:</strong></span>
+                                        <li><span className="text-dGreen fs-16"><strong>Giá gốc:</strong></span>
                                             <span className="text-dGreen"> {product.unit_price.toLocaleString("vi-VN", {
                                                 style: "currency",
                                                 currency: "VND",
                                             })}</span></li>
                                         <li>
                                             <span className="text-dGreen fs-16"><strong>Thương hiệu:</strong></span>
-                                            <span className="text-dGreen">{product.brand?.name || "Đang cập nhật"}</span>
+                                            <span className="text-dGreen"> {product.brand?.name || "Đang cập nhật"}</span>
                                         </li>
                                         <li>
                                             <span className="text-dGreen fs-16"><strong>Danh mục:</strong></span>
-                                            <span className="text-dGreen">{product.category?.name || "Đang cập nhật"}</span>
+                                            <span className="text-dGreen"> {product.category?.name || "Đang cập nhật"}</span>
                                         </li>
 
                                         <li><span className="text-dGreen -fs16"><strong>Mô tả sản phẩm:</strong>
