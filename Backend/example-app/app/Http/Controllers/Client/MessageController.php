@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Product;
+use App\Events\NewMessageReceived;
 
 class MessageController extends Controller
 {
@@ -43,6 +44,8 @@ class MessageController extends Controller
 
         // Broadcast sự kiện để client nhận được tin nhắn
         broadcast(new MessageSent($messageContent, $sender, $receiver, $product));
+        broadcast(new NewMessageReceived($sender, $messageContent));
+        
 
         return response()->json(['status' => 'Message sent', 'message' => $message]);
     }
