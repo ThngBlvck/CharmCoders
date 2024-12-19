@@ -281,6 +281,8 @@ const ProductDetail = () => {
         setIsSubmitting(false); // Re-enable submit button
     };
 
+
+
     // Hàm để load thêm đánh giá
     const handleLoadMore = () => {
         setVisibleReviews(reviews.length);  // Hiển thị tất cả đánh giá
@@ -293,6 +295,62 @@ const ProductDetail = () => {
         setIsExpanded(false);  // Đánh dấu đã thu gọn
     };
 
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // Quản lý trạng thái modal
+    const [selectedImage, setSelectedImage] = useState(''); // Ảnh được chọn để phóng to
+    const [showAllImages, setShowAllImages] = useState(false); // Trạng thái để hiển thị tất cả hình ảnh
+
+    const handleImageClick = (image) => {
+        setSelectedImage(image); // Cập nhật ảnh được chọn
+        setIsModalOpen(true); // Mở modal
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false); // Đóng modal
+    };
+
+    const toggleShowAllImages = () => {
+        setShowAllImages(!showAllImages);
+    };
+
+    // Kiểm tra nếu product hoặc product.images là null hoặc undefined
+    const images = product?.images || [];
+
+    const displayedImages = showAllImages ? images : images.slice(0, 4);
+
+
+    const settings = {
+        dots: false,           // Bỏ dấu chấm điều hướng
+        infinite: images.length > 1, // Chỉ cho phép infinite nếu có nhiều hơn 1 item
+        speed: 500,            // Tốc độ chuyển đổi giữa các hình ảnh
+        slidesToShow: images.length > 1 ? 4 : 1,  // Hiển thị 1 hình nếu chỉ có 1 item
+        slidesToScroll: 1,     // Cuộn 1 hình ảnh một lần
+        autoplay: images.length >= 4,
+        autoplaySpeed: 2000,   // Tốc độ tự động chuyển đổi (2 giây)
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1,
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                }
+            }
+        ]
+    };
 
     return (
         <div className="container my-5">
@@ -404,7 +462,64 @@ const ProductDetail = () => {
                             <div className="row">
                                 {/* Hình ảnh sản phẩm */}
                                 <div className="col-md-5">
-                                    <img src={product.image} alt="Product" className="img-fluid rounded img-product"/>
+                                    <div className="main-image mb-3">
+                                        <img
+                                            src={product?.image}
+                                            alt="Hình ảnh chính của sản phẩm"
+                                            className="img-fluid rounded img-product"
+                                        />
+                                    </div>
+                                    <div className="additional-images">
+                                        {images.length > 0 ? (
+                                            <Slider {...settings}>
+                                                {images.map((img, index) => (
+                                                    <div key={index}>
+                                                        <img
+                                                            src={img.image}
+                                                            alt={`Hình ảnh phụ ${index + 1}`}
+                                                            className="img-fluid rounded img-thumbnail"
+                                                            style={{
+                                                                width: '100%',
+                                                                height: 'auto',
+                                                                objectFit: 'cover',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                            onClick={() => handleImageClick(img.image)} // Xử lý sự kiện click
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </Slider>
+                                        ) : (
+                                            <p>Không có hình ảnh phụ nào.</p>
+                                        )}
+                                    </div>
+                                    {isModalOpen && (
+                                        <div
+                                            style={{
+                                                position: 'fixed',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                backgroundColor: 'rgba(255,255,255,0.62)',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                zIndex: 1000,
+                                            }}
+                                            onClick={closeModal} // Đóng modal khi nhấp bên ngoài
+                                        >
+                                            <img
+                                                src={selectedImage}
+                                                alt="Phóng to ảnh phụ"
+                                                style={{
+                                                    maxWidth: '90%',
+                                                    maxHeight: '90%',
+                                                    borderRadius: '8px',
+                                                }}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                                 {/* Nội dung chi tiết sản phẩm */}
                                 <div className="col-md-7 d-flex flex-column align-content-start">

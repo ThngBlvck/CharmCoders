@@ -240,5 +240,18 @@
 
 
 
+.img-fluid {
+    max-width: 100%;  /* Đảm bảo ảnh không vượt quá chiều rộng của container */
+    height: auto;     /* Giữ tỉ lệ của ảnh */
+}
+
+.additional-images .img {
+    max-width: 30%;  /* Đảm bảo ảnh không vượt quá chiều rộng của container */
+    height: 30%;     /* Giữ tỉ lệ của ảnh */
+}
 
 
+.img-thumbnail {
+    width: 100px;  /* Đặt chiều rộng tối đa cho ảnh */
+    height: 100px; /* Đặt chiều cao tối đa cho ảnh */
+}
