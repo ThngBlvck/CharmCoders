@@ -195,36 +195,22 @@ const ChatPage = () => {
               >
                 <p>{message.message}</p>
                 {message.product && (
-                    <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
-                      <div
-                          className="mt-3 p-4 rounded-lg bg-gray-50 flex space-x-4 items-center"
-                          style={{maxWidth: "350px"}}
-                      >
-                        <img
-                            src={message.product.image}
-                            alt="Product"
-                            className="w-20 h-20 object-cover rounded-md shadow-md" // Thêm shadow cho hình ảnh để nổi bật hơn
-                        />
-                        <div className="flex flex-col space-y-1">
-    <span
-        className="font-semibold text-lg text-gray-800"
-        style={{fontFamily: "Roboto, sans-serif"}} // Áp dụng font Roboto cho tên sản phẩm
-    >
-      {message.product.name}
-    </span>
-                          <span
-                              className="text-sm text-gray-600"
-                              style={{fontFamily: "Roboto, sans-serif"}} // Áp dụng font Roboto cho giá
-                          >
-      Giá:{" "}
-                            <span className="font-bold text-red-500">
-        {message.product.unit_price}₫
-      </span>
-    </span>
-                        </div>
+                  <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
+                    <div
+                      className="mt-3 p-3 rounded-lg bg-gray-100 flex space-x-3"
+                      style={{ maxWidth: "300px" }}
+                    >
+                      <img
+                        src={message.product.image}
+                        alt="Product"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-sm text-gray-700">{message.product.name}</span>
+                        <span className="text-xs text-gray-500">Giá: {message.product.unit_price}</span>
                       </div>
-
-                    </a>
+                    </div>
+                  </a>
                 )}
                 {/* <span className="text-xs text-gray-500">{message.created_at}</span> */}
               </div>
