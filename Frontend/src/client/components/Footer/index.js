@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
 import { getUserInfo } from "../../../services/User";
@@ -6,13 +6,7 @@ import { getMessages, sendMessage } from "../../../services/Message";
 import { NavLink } from "react-router-dom";
 import Pusher from 'pusher-js';
 import { useNavigate } from "react-router-dom";
-// Initialize Pusher
-Pusher.logToConsole = true;
-const pusher = new Pusher('f6f10b97ea3264514f53', {
-    cluster: 'ap1',
-    forceTLS: true,
-
-});
+import { getPusher } from "../../../contexts/Pusher";
 
 const Footer = () => {
     const navigate = useNavigate();
@@ -20,7 +14,19 @@ const Footer = () => {
     const [userMessage, setUserMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [userInfo, setUserInfo] = useState({});
-    const [receiverId, setReceiverId] = useState(26);
+    const [receiverId, setReceiverId] = useState(4);
+    const chatWindowRef = useRef(null);
+    const scrollToBottom = () => {
+        if (chatWindowRef.current) {
+            chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+        }
+    };
+
+    useEffect(() => {
+        scrollToBottom(); // Cuộn xuống mỗi khi tin nhắn thay đổi
+    }, [chatMessages]);
+
+
 
     // Fetch user information
     const fetchUserData = async () => {
@@ -54,7 +60,8 @@ const Footer = () => {
             });
 
             // Không cần thêm tin nhắn thủ công vào giao diện
-            setUserMessage(""); // Xóa trường input sau khi gửi thành công
+            setUserMessage("");
+            scrollToBottom();
         } catch (error) {
             console.error("Error sending message:", error);
         }
@@ -65,6 +72,7 @@ const Footer = () => {
     }, []);
 
     useEffect(() => {
+        const pusher = getPusher();
         if (userInfo.user_id && receiverId) {
             const channelName = `chat.${Math.min(userInfo.user_id, receiverId)}_${Math.max(userInfo.user_id, receiverId)}`;
             const channel = pusher.subscribe(channelName);
@@ -95,8 +103,6 @@ const Footer = () => {
                 }
                 setShowChatModal(true);
             };
-
-
             // Bind sự kiện
             channel.bind('App\\Events\\MessageSent', handleMessageEvent);
 
@@ -239,7 +245,12 @@ const Footer = () => {
                                 ></i>
                             </div>
                             <div className="modal-body" style={{ padding: "0 20px", maxHeight: "400px", overflowY: "auto" }}>
-                                <div className="chat-window" style={{ maxHeight: "250px", overflowY: "auto", height: "250px", marginBottom: "20px" }}>
+                                <div className="chat-window" style={{ maxHeight: "250px", overflowY: "auto", height: "250px", marginBottom: "20px" }} ref={(el) => {
+                                    chatWindowRef.current = el;
+                                    if (el) {
+                                        el.scrollTop = el.scrollHeight; // Đặt thanh cuộn ở cuối
+                                    }
+                                }}>
                                     {chatMessages.map((msg, index) => (
                                         <div key={index} className={`chat-message ${msg.sender_id === userInfo.user_id ? "user" : "admin"}`} style={{ marginBottom: "10px", display: "flex", flexDirection: msg.sender_id === userInfo.user_id ? "row-reverse" : "row" }}>
                                             {/* Tin nhắn */}

@@ -1,15 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getListSender, getMessages, sendMessage } from "../../../services/Message";
 import { useUser } from '../../../contexts/UserContext';
 import { useNavigate } from "react-router-dom";
-import Pusher from 'pusher-js';
-
-Pusher.logToConsole = true;
-const pusher = new Pusher('f6f10b97ea3264514f53', {
-  cluster: 'ap1',
-  forceTLS: true,
-
-});
+import { getPusher } from '../../../contexts/Pusher';
 
 const ChatPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -18,6 +11,9 @@ const ChatPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const { user } = useUser();
   const navigate = useNavigate();
+
+  // Create a reference to the messages container
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -35,46 +31,63 @@ const ChatPage = () => {
     };
 
     fetchContacts();
-  }, []);
 
-  useEffect(() => {
-    if (user.user_id && selectedContact?.sender?.id) {
-      const channelName = `chat.${Math.min(user.user_id, selectedContact.sender.id)}_${Math.max(user.user_id, selectedContact.sender.id)}`;
-      const channel = pusher.subscribe(channelName);
-      channel.bind('App\\Events\\MessageSent', (data) => {
-        if (data.product) {
-          setMessages((prevMessages) => [
-            ...prevMessages,
+    const pusher = getPusher();
+    const updatedMessage = 'messages';
+    const updatedMessageChanel = pusher.subscribe(updatedMessage);
+    updatedMessageChanel.bind('App\\Events\\NewMessageReceived', (data) => {
+      setContacts((prevContacts) => {
+        const senderExists = prevContacts.some(contact => contact.sender.id === data.sender.id);
+        if (senderExists) {
+          return prevContacts.map(contact => {
+            if (contact.sender.id === data.sender.id) {
+              contact.latest_message = data.message;
+            }
+            return contact;
+          }).sort((a, b) => a.sender.id === data.sender.id ? -1 : 1); 
+        } else if (data.sender.id !== user.user_id) {
+          return [
             {
-              message: data.message,
-              sender_id: data.sender.id,
-              receiver: data.receiver,
-              productid: data.product_id,
-              product: data.product,
-              isUser: data.sender.id === user.user_id,
+              sender: data.sender,
+              latest_message: data.message,
+              image: data.sender.image
             },
-          ]);
-        } else {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              message: data.message,
-              sender_id: data.sender.id,
-              receiver: data.receiver,
-              product_id: null,
-              product: null,
-              isUser: data.sender.id === user.user_id,
-            },
-          ]);
+            ...prevContacts
+          ];
         }
-
+        return prevContacts; 
       });
 
 
+    });
+    return () => {
+      updatedMessageChanel.unbind('App\Events\NewMessageReceived');
+      pusher.unsubscribe(updatedMessageChanel);
+    };
 
+  }, []);
 
+  useEffect(() => {
+    const pusher = getPusher();
+    if (user.user_id && selectedContact?.sender?.id) {
+      const channelName = `chat.${Math.min(user.user_id, selectedContact.sender.id)}_${Math.max(user.user_id, selectedContact.sender.id)}`;
+      const channel = pusher.subscribe(channelName);
+
+      channel.bind('App\\Events\\MessageSent', (data) => {
+        const newMessage = {
+          message: data.message,
+          sender_id: data.sender.id,
+          receiver: data.receiver,
+          product_id: data.product_id || null,
+          product: data.product || null,
+          isUser: data.sender.id === user.user_id,
+        };
+
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      });
 
       return () => {
+        channel.unbind('App\\Events\\MessageSent');
         pusher.unsubscribe(channelName);
       };
     }
@@ -103,7 +116,6 @@ const ChatPage = () => {
         receiver_id: selectedContact.sender.id,
         message: newMessage,
       });
-
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -114,27 +126,32 @@ const ChatPage = () => {
     fetchMessages(contact.sender.id);
   };
 
+  // Scroll to the bottom whenever messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
-    <div className="flex h-screen bg-gray-100 font-sans relative">
+    <div className="flex h-screen bg-gray-50 font-sans relative">
       {/* Danh sách liên hệ */}
-      <div className="w-1/4 bg-indigo-600 text-white shadow-lg">
+      <div className="w-full sm:w-1/4 bg-indigo-600 text-white shadow-lg">
         <div className="p-4 text-lg font-bold border-b">Danh sách liên hệ</div>
         <ul className="overflow-y-auto h-full">
           {contacts.map((contact) => (
             <li
               key={contact.id}
               onClick={() => handleSelectContact(contact)}
-              className={`p-4 cursor-pointer hover:bg-indigo-500 transition ${selectedContact?.sender.id === contact.sender.id ? "bg-indigo-500" : ""
+              className={`p-4 cursor-pointer hover:bg-indigo-500 transition-all duration-300 ${selectedContact?.sender.id === contact.sender.id ? "bg-indigo-500" : ""
                 }`}
             >
               <div className="flex items-center">
                 <img
-                  src={contact.sender.image}
+                  src={contact.sender.image || "/user_default.png"}
                   alt={contact.sender.name}
-                  className="w-12 h-12 rounded-full mr-4"
+                  className="w-12 h-12 rounded-full mr-4 bg-white"
                 />
                 <div>
-                  <div className="font-bold">{contact.sender.name}</div>
+                  <div className="font-semibold">{contact.sender.name}</div>
                   <div className="text-sm text-indigo-200">{contact.latest_message || "Không có tin nhắn"}</div>
                 </div>
               </div>
@@ -144,16 +161,13 @@ const ChatPage = () => {
       </div>
 
       {/* Nội dung chat */}
-      <div className="w-3/4 flex flex-col">
+      <div className="w-full sm:w-3/4 flex flex-col">
         <div className="p-4 bg-indigo-500 text-white font-bold">
           {selectedContact?.sender.name || "Chọn một liên hệ"}
         </div>
-        <div className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-2">
+        <div className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-4">
           {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
-            >
+            <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
               <div
                 className={`p-3 rounded-lg max-w-md shadow ${message.isUser ? "bg-indigo-500 text-white" : "bg-gray-300"
                   }`}
@@ -161,10 +175,7 @@ const ChatPage = () => {
                 <p>{message.message}</p>
                 {message.product && (
                   <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
-                    <div
-                      className="mt-3 p-3 rounded-lg bg-gray-100 flex space-x-3"
-                      style={{ maxWidth: "300px" }}
-                    >
+                    <div className="mt-3 p-3 rounded-lg bg-gray-100 flex space-x-3" style={{ maxWidth: "300px" }}>
                       <img
                         src={message.product.image}
                         alt="Product"
@@ -177,12 +188,11 @@ const ChatPage = () => {
                     </div>
                   </a>
                 )}
-                {/* <span className="text-xs text-gray-500">{message.created_at}</span> */}
               </div>
-
-
             </div>
           ))}
+          {/* This div will make the chat scroll to the bottom */}
+          <div ref={messagesEndRef} />
         </div>
         <div className="p-4 bg-gray-200 flex items-center justify-between">
           <input
@@ -191,23 +201,22 @@ const ChatPage = () => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             placeholder="Nhập tin nhắn..."
-            className="flex-grow p-2 border rounded"
+            className="flex-grow p-2 border rounded-lg"
           />
           <button
             onClick={handleSendMessage}
-            className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded"
+            className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded-lg transition-all duration-300 hover:bg-indigo-600"
           >
             Gửi
           </button>
         </div>
       </div>
 
-
       {/* Nút Quay lại Admin */}
       <div className="absolute bottom-4 left-4">
         <button
           onClick={() => navigate("/admin/dashboard")}
-          className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition"
+          className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300"
         >
           ⬅️ Quay lại Admin
         </button>

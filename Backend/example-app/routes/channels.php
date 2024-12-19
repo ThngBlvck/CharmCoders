@@ -8,3 +8,5 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
 
 Broadcast::channel('chat.{receiverId}', function ($receiverId, $senderId) {});
+Broadcast::channel('messages', function () {
+});
