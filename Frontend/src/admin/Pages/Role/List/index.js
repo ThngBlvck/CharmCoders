@@ -79,12 +79,6 @@ export default function Role({ color }) {
                                 <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
                                     style={{width: "30%"}}>Tên vai trò
                                 </th>
-                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "30%"}}>Trạng thái
-                                </th>
-                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol " + (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "10%"}}>Hành động
-                                </th>
                             </tr>
                             </thead>
                             <tbody>
@@ -96,17 +90,6 @@ export default function Role({ color }) {
                                         </th>
                                         <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
                                             {role.name}
-                                        </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
-                                            {renderStatus(role.status)}
-                                        </td>
-                                        <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
-                                            <button
-                                                className="text-blue-500 hover:text-blue-700 px-2"
-                                                onClick={() => handleEditClick(role.id)}
-                                            >
-                                                <i className="fas fa-pen text-xl"></i>
-                                            </button>
                                         </td>
                                     </tr>
                                 ))

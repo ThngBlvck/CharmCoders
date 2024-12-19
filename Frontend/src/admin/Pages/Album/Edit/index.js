@@ -41,7 +41,7 @@ export default function EditAlbum({ color = "light" }) {
                 const albumDetails = await getOneImage(id); // Lấy thông tin chi tiết album từ API
                 setAlbumImages(albumDetails?.images || []); // Đảm bảo albumImages luôn là một mảng
                 setProductId(albumDetails?.product_id || ""); // Đảm bảo productId luôn có giá trị hợp lệ
-                reset({ status: albumDetails?.status || "" }); // Đảm bảo status có giá trị hợp lệ
+                reset({ status: "1" }); // Đặt trạng thái mặc định là "1"
             } catch (err) {
                 console.error('Error fetching album details:', err);
                 Swal.fire('Lỗi', 'Không thể tải album', 'error');
@@ -69,8 +69,8 @@ export default function EditAlbum({ color = "light" }) {
     };
 
     const onSubmit = async (data) => {
-        if (!data.status) {
-            Swal.fire('Lỗi', 'Vui lòng chọn trạng thái.', 'error');
+        if (!productId) {
+            Swal.fire('Lỗi', 'Vui lòng chọn ID sản phẩm.', 'error');
             return;
         }
 
@@ -80,15 +80,10 @@ export default function EditAlbum({ color = "light" }) {
             return;
         }
 
-        if (!productId) {
-            Swal.fire('Lỗi', 'Vui lòng chọn ID sản phẩm.', 'error');
-            return;
-        }
-
         setLoading(true);
         try {
             const formData = new FormData();
-            formData.append("status", data.status);
+            formData.append("status", "1"); // Đặt giá trị status mặc định là 1
             formData.append("product_id", productId);
             formData.append("_method", "PUT");
 
@@ -214,35 +209,20 @@ export default function EditAlbum({ color = "light" }) {
                                     <p className="text-red-500 text-xs italic">{errors.product_id.message}</p>}
                             </div>
 
-                            <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                                <select
-                                    {...register("status", {required: "Vui lòng chọn trạng thái"})}
-                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                >
-                                    <option value="">Chọn trạng thái</option>
-                                    <option value="1">Hiển thị</option>
-                                    <option value="2">Ẩn</option>
-                                </select>
-                                {errors.status &&
-                                    <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
-                            </div>
-
                             {/* Nút Submit */}
                             <div className="flex items-center justify-between">
                                 <button
                                     type="submit"
-                                    className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-                                    disabled={isSubmitting}
+                                    className="bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                    disabled={loading}
                                 >
-                                    Cập nhật album
+                                    Cập nhật
                                 </button>
                             </div>
                         </form>
                     </div>
-                    )}
+                )}
             </div>
-
             <ToastContainer />
         </>
     );

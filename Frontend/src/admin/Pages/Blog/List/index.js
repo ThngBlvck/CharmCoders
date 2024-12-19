@@ -267,7 +267,6 @@ export default function BlogList({ color }) {
                                 <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Hình ảnh</th>
                                 <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Tiêu đề</th>
                                 <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Danh mục</th>
-                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Trạng thái</th>
                                 <th className="px-6 py-3 border border-solid text-center uppercase font-semibold ">Hành động</th>
                             </tr>
                             </thead>
@@ -300,9 +299,6 @@ export default function BlogList({ color }) {
 
                                         <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
                                             {blog.category_name}
-                                        </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
-                                            {blog.status === 1 ? 'Hiển thị' : 'Ẩn'}
                                         </td>
                                         <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
                                             <button

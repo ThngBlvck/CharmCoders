@@ -14,7 +14,6 @@ export default function BlogCategoryEdit({ color = "light" }) {
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
         defaultValues: {
             name: '',
-            status: '',
         },
     });
 
@@ -28,7 +27,6 @@ export default function BlogCategoryEdit({ color = "light" }) {
             const result = await getOneBlogCategory(id);
             if (result) {
                 setValue("name", result.name || '');
-                setValue("status", result.status || '');
             } else {
                 Swal.fire('Error', 'Không tìm thấy danh mục này.', 'error');
                 navigate('/admin/category_blog');
@@ -44,9 +42,10 @@ export default function BlogCategoryEdit({ color = "light" }) {
 
     const onSubmit = async (data) => {
         try {
+            // Set status to 1 (Hiển thị) by default
             await updateBlogCategory(id, {
                 name: data.name,
-                status: data.status,
+                status: 1, // Fixed value for "Hiển thị"
             });
             Swal.fire('Success', 'Cập nhật danh mục bài viết thành công.', 'success');
             navigate('/admin/category_blog');
@@ -54,7 +53,7 @@ export default function BlogCategoryEdit({ color = "light" }) {
             console.error('Error updating category:', err);
             Swal.fire('Error', 'Lỗi khi cập nhật danh mục. Vui lòng thử lại.', 'error');
         }
-        console.log('Dữ liệu gửi đi:', { name: data.name, status: data.status });
+        console.log('Dữ liệu gửi đi:', { name: data.name, status: 1 });
     };
 
     return (
@@ -85,21 +84,6 @@ export default function BlogCategoryEdit({ color = "light" }) {
                                 placeholder="Nhập tên danh mục"
                             />
                             {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block text-blueGray-600 text-sm font-bold mb-2">
-                                Trạng thái
-                            </label>
-                            <select
-                                {...register("status", { required: "Vui lòng chọn trạng thái" })}
-                                className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
-                            >
-                                <option value="">Chọn trạng thái</option>
-                                <option value="1">Hiển thị</option>
-                                <option value="0">Ẩn</option>
-                            </select>
-                            {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                         </div>
 
                         <div className="flex items-center justify-between">

@@ -268,9 +268,6 @@ export default function ProductCategory({ color = "light" }) {
                                 <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Tên
                                     danh mục
                                 </th>
-                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Trạng
-                                    thái
-                                </th>
                                 <th className="px-6 py-3 border border-solid text-x text-center uppercase font-bold text-left">Hành
                                     động
                                 </th>
@@ -293,9 +290,6 @@ export default function ProductCategory({ color = "light" }) {
                                         <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">{index + 1}</td>
                                         <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
                                         {category.name.length > 30 ? category.name.substring(0, 30) + "..." : category.name}
-                                        </td>
-                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                            {getStatusText(category.status)}
                                         </td>
                                         <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
                                             <button

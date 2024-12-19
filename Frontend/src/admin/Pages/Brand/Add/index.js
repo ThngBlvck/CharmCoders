@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { postBrand } from "../../../../services/Brand";
 import { useNavigate } from "react-router-dom";
@@ -25,16 +25,15 @@ export default function AddBrand({ color = "light" }) {
             return;
         }
 
-        if (!data.status) {
-            Swal.fire('Lỗi', 'Vui lòng chọn trạng thái.', 'error');
-            return;
-        }
-
         if (!data.image[0]) {
             Swal.fire('Lỗi', 'Vui lòng chọn hình ảnh.', 'error');
             return;
         }
-        setLoading(true)
+
+        // Set the status to 1 (Hiển thị) by default
+        data.status = 1;
+
+        setLoading(true);
         try {
             const formData = new FormData();
             formData.append("name", data.brandName);
@@ -52,7 +51,7 @@ export default function AddBrand({ color = "light" }) {
             console.error('Error adding brand:', err);
             Swal.fire('Lỗi', 'Lỗi khi thêm nhãn hàng. Vui lòng thử lại.', 'error');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
@@ -69,9 +68,9 @@ export default function AddBrand({ color = "light" }) {
                         </div>
                     </div>
                 </div>
-                { isSubmitting ? (
+                {isSubmitting ? (
                     <div className="flex justify-center items-center py-4">
-                        <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                        <PulseLoader color="#4A90E2" loading={loading} size={15} />
                     </div>
                 ) : (
                     <div className="p-4">
@@ -80,7 +79,7 @@ export default function AddBrand({ color = "light" }) {
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Tên nhãn hàng</label>
                                 <input
                                     type="text"
-                                    {...register("brandName", {required: "Tên nhãn hàng là bắt buộc"})}
+                                    {...register("brandName", { required: "Tên nhãn hàng là bắt buộc" })}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     placeholder="Nhập tên nhãn hàng"
                                 />
@@ -92,25 +91,11 @@ export default function AddBrand({ color = "light" }) {
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh nhãn hàng</label>
                                 <input
                                     type="file"
-                                    {...register("image", {required: "Vui lòng chọn hình ảnh"})}
+                                    {...register("image", { required: "Vui lòng chọn hình ảnh" })}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     accept="image/*"
                                 />
                                 {errors.image && <p className="text-red-500 text-xs italic">{errors.image.message}</p>}
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                                <select
-                                    {...register("status", {required: "Vui lòng chọn trạng thái"})}
-                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                >
-                                    <option value="">Chọn trạng thái</option>
-                                    <option value="1">Hiển thị</option>
-                                    <option value="2">Ẩn</option>
-                                </select>
-                                {errors.status &&
-                                    <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                             </div>
 
                             <div className="flex items-center justify-between">
@@ -133,7 +118,7 @@ export default function AddBrand({ color = "light" }) {
                     </div>
                 )}
             </div>
-            <ToastContainer/>
+            <ToastContainer />
         </>
     );
 }

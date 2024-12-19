@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import { getOneCategory, updateCategory } from "../../../../services/Category";
 import Swal from 'sweetalert2';
-import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
+import { PulseLoader } from "react-spinners"; // Hàm lấy danh sách danh mục
 
 export default function EditProductCategory({ color = "light" }) {
     const { id } = useParams(); // Lấy id danh mục từ URL
@@ -29,7 +29,7 @@ export default function EditProductCategory({ color = "light" }) {
 
                 if (response && response.name && response.status !== undefined) {
                     setValue("name", response.name);
-                    setValue("status", response.status === 1 ? "1" : "0"); // Chuyển đổi status về dạng chuỗi
+                    // Status is set to "1" (Hiện) by default and is not editable
                 } else {
                     console.error("Dữ liệu trả về từ API không hợp lệ");
                     navigate("/admin/category_product");
@@ -50,7 +50,7 @@ export default function EditProductCategory({ color = "light" }) {
         try {
             const response = await updateCategory(id, {
                 name: data.name,
-                status: data.status,
+                status: 1, // Status is always 1 (Hiện) now
             });
 
             console.log("Cập nhật danh mục thành công:", response);
@@ -104,19 +104,8 @@ export default function EditProductCategory({ color = "light" }) {
                             {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
                         </div>
 
-                        {/* Trạng thái */}
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                            <select
-                                {...register("status", {required: "Vui lòng chọn trạng thái"})}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            >
-                                <option value="">Chọn trạng thái</option>
-                                <option value="1">Hiện</option>
-                                <option value="0">Ẩn</option>
-                            </select>
-                            {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
-                        </div>
+                        {/* No status selection, status is fixed to 1 */}
+                        {/* Status is hardcoded as 1, so no select input */}
 
                         {/* Nút sửa */}
                         <div className="flex items-center justify-between">

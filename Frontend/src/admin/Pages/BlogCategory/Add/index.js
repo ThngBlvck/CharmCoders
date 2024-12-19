@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { postBlogCategory } from "../../../../services/BlogCategory"; // Import the service
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Swal from 'sweetalert2'; // Thêm thư viện sweetalert2
-import {PulseLoader} from "react-spinners"; // Hàm lấy danh sách danh mục
+import { PulseLoader } from "react-spinners"; // Hàm lấy danh sách danh mục
 
 export default function AddBlogCategory({ color = "light" }) {
     const {
@@ -27,20 +27,15 @@ export default function AddBlogCategory({ color = "light" }) {
             return;
         }
 
-        if (!data.status) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi',
-                text: 'Vui lòng chọn trạng thái.',
-            });
-            return;
-        }
+        // Setting the status to 1 (Hiển thị) by default
+        const categoryData = {
+            name: data.categoryName,
+            status: 1, // Fixed value for "Hiển thị"
+        };
+
         setLoading(true);
         try {
-            await postBlogCategory({
-                name: data.categoryName,
-                status: data.status,
-            });
+            await postBlogCategory(categoryData);
 
             Swal.fire({
                 icon: 'success',
@@ -101,20 +96,6 @@ export default function AddBlogCategory({ color = "light" }) {
                             )}
                         </div>
 
-                        {/* Trạng thái */}
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                            <select
-                                {...register("status", { required: "Vui lòng chọn trạng thái" })}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            >
-                                <option value="">Chọn trạng thái</option>
-                                <option value="1">Hiển thị</option>
-                                <option value="2">Ẩn</option>
-                            </select>
-                            {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
-                        </div>
-
                         {/* Nút thêm */}
                         <div className="flex items-center justify-between">
                             <button
@@ -128,8 +109,6 @@ export default function AddBlogCategory({ color = "light" }) {
                     </form>
                 </div>
             )}
-
-
         </div>
     );
 }
