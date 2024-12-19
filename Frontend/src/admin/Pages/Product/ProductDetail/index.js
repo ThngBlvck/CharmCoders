@@ -63,17 +63,22 @@ export default function ProductDetail() {
 
                         {/* Nội dung sản phẩm nằm bên phải */}
                         <div className="w-1/2 pl-4">
-                            <p className="text-lg font-semibold mb-2"><strong>Giá gốc:</strong> {product.unit_price.toLocaleString()} VND</p>
-                            <td className="text-lg font-semibold mb-2"><strong>Giá sale:</strong> {product.sale_price !== null ? product.sale_price.toLocaleString() + " VND" : " Không có"}
+                            <p className="text-lg font-semibold mb-2"><strong>Giá
+                                gốc:</strong> {product.unit_price.toLocaleString()} VND</p>
+                            <td className="text-lg font-semibold mb-2"><strong>Giá
+                                sale:</strong> {product.sale_price !== null ? product.sale_price.toLocaleString() + " VND" : " Không có"}
                             </td>
                             <p className="text-lg font-semibold mb-2"><strong>Số lượng:</strong> {product.quantity}</p>
                             <p className="text-lg font-semibold mb-2"><strong>Lượt xem:</strong> {product.views}</p>
+                            <p className="text-lg font-semibold mb-2"><strong>Lượt mua:</strong> {product.purchase_count}</p>
                             <p className="text-lg font-semibold mb-2"><strong>Trạng thái:</strong> {product.status === 1 ? "Còn Hàng" : "Hết Hàng"}</p>
-                            <p className="text-lg font-semibold mb-2"><strong>Nhãn hàng:</strong> {brandName}</p> {/* Hiển thị tên nhãn hàng */}
-                            <p className="text-lg font-semibold mb-2"><strong>Danh mục:</strong> {categoryName}</p> {/* Hiển thị tên danh mục */}
+                            <p className="text-lg font-semibold mb-2"><strong>Nhãn hàng:</strong> {brandName}
+                            </p> {/* Hiển thị tên nhãn hàng */}
+                            <p className="text-lg font-semibold mb-2"><strong>Danh mục:</strong> {categoryName}
+                            </p> {/* Hiển thị tên danh mục */}
                             <p className="text-lg font-semibold mb-2">
                                 <strong>Mô tả:</strong>
-                                    <span className={`inline ${showFullDescription ? "" : "max-h-12 overflow-hidden"}`}>
+                                <span className={`inline ${showFullDescription ? "" : "max-h-12 overflow-hidden"}`}>
                                     {showFullDescription ? product.content : ` ${product.content.substring(0, 100)} `}
                                 </span>
                             </p>

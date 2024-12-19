@@ -83,7 +83,18 @@ export default function EditProduct({ color = "light" }) {
             Swal.fire({
                 icon: 'error',
                 title: 'Có lỗi xảy ra',
-                text: 'Vui lòng điền tất cả các trường bắt buộc!',
+                text: 'Vui lòng điền tất cả các trường bắt buộc',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Kiểm tra giá giảm phải nhỏ hơn giá gốc
+        if (data.sale_price >= data.unit_price) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Có lỗi xảy ra',
+                text: 'Giá giảm phải nhỏ hơn giá gốc.',
                 confirmButtonText: 'OK'
             });
             return;
@@ -110,13 +121,11 @@ export default function EditProduct({ color = "light" }) {
                 formData.append('image', originalProduct.image); // Hình ảnh cũ từ CSDL
             }
 
-            formData.append("_method", "PUT");
-
             const response = await updateProduct(id, formData);
             console.log("Phản hồi từ API:", response);
             Swal.fire({
                 icon: 'success',
-                title: 'Cập nhật sản phẩm thành công!',
+                title: 'Cập nhật sản phẩm thành công',
                 confirmButtonText: 'OK'
             });
             navigate('/admin/product');
@@ -125,11 +134,12 @@ export default function EditProduct({ color = "light" }) {
             Swal.fire({
                 icon: 'error',
                 title: 'Có lỗi xảy ra',
-                text: error.response?.data.message || "Lỗi không xác định",
+                text: error.response?.data.message.name || "Lỗi không xác định",
                 confirmButtonText: 'OK'
             });
         }
     };
+
 
     const handleImageChange = (event) => {
         const file = event.target.files[0];
