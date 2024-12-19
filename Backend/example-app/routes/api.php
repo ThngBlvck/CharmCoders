@@ -72,7 +72,7 @@ Route::prefix('admin')->group(function () {
         Route::apiResource('orders', OrderController::class);
         Route::apiResource('cart', CartController::class);
         Route::apiResource('products/{productId}/variants', VariantController::class);
- Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
+        Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
     });
     Route::middleware('auth:api')->post('request-export-report', [ReportExportController::class, 'export']);
     Route::apiResource('employee', UserController::class);
@@ -93,49 +93,44 @@ Route::middleware(['web'])->group(function () {
 });
 Route::prefix('client')->group(function () {
     Route::middleware('auth:api')->group(function () {
-         Route::apiResource('orders', OrderClient::class);
-                Route::get('/getAllCart/{ids}', [CartClient::class, 'getCart']);
-                Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
-                Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
-                Route::get('/user', [UserController::class, 'getUser']);
+        Route::apiResource('orders', OrderClient::class);
+        Route::get('/getAllCart/{ids}', [CartClient::class, 'getCart']);
+        Route::post('/select-cart', [CheckoutController::class, 'showSelectedCartsByIds']);
+        Route::post('/buy-now', [CheckoutController::class, 'buyNow']);
+        Route::get('/user', [UserController::class, 'getUser']);
 
-                #payment
-                Route::post('/checkout', [PaymentController::class, 'checkout']);
-                Route::get('/payment-return', [PaymentController::class, 'paymentReturn']);
-                Route::get('/user', [UserController::class, 'getUser'])->middleware('auth:api');
-                Route::apiResource('comments', CommentController::class);
+        #payment
+        Route::post('/checkout', [PaymentController::class, 'checkout']);
+        Route::get('/payment-return', [PaymentController::class, 'paymentReturn']);
+        Route::get('/user', [UserController::class, 'getUser'])->middleware('auth:api');
+        Route::apiResource('comments', CommentController::class);
 
     });
-        Route::get('comments/blog/{blogId}', [CommentController::class, 'getCommentsByBlogId']);
-        Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
-        Route::get('products/hot', [ClientProductController::class, 'getHotProducts']);
-        Route::get('products/{product}/variants', [ProductController::class, 'showVariants']);
-        // Route để yêu cầu đặt lại mật khẩu qua API
+    Route::get('comments/blog/{blogId}', [CommentController::class, 'getCommentsByBlogId']);
+    Route::get('products/related/{id}', [ClientProductController::class, 'getRelatedProducts']);
+    Route::get('products/hot', [ClientProductController::class, 'getHotProducts']);
+    Route::get('products/{product}/variants', [ProductController::class, 'showVariants']);
+    // Route để yêu cầu đặt lại mật khẩu qua API
 
-        Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
-        Route::post('/contact/send', [MailController::class, 'sendMail']);
+    Route::get('/products/search', [ClientProductController::class, 'search']); //http://localhost:8000/api/client/products/search?query=teneanpham
+    Route::post('/contact/send', [MailController::class, 'sendMail']);
 
-        //profile user
-        Route::put('/profile', [UserController::class, 'profile'])->middleware('auth:api');
-        //adress
-        Route::apiResource('/address', AddressController::class)->middleware('auth:api');
-        //change password
-        Route::put('/changepassword', [UserController::class, 'changePassword'])->middleware('auth:api');
-        Route::post('/payment/momo', [MomoPaymentController::class, 'createPayment']);
-        Route::post('/payment-ipn', [MomoPaymentController::class, 'handleIPN']);
+    //profile user
+    Route::put('/profile', [UserController::class, 'profile'])->middleware('auth:api');
+    //adress
+    Route::apiResource('/address', AddressController::class)->middleware('auth:api');
+    //change password
+    Route::put('/changepassword', [UserController::class, 'changePassword'])->middleware('auth:api');
+    Route::post('/payment/momo', [MomoPaymentController::class, 'createPayment']);
+    Route::post('/payment-ipn', [MomoPaymentController::class, 'handleIPN']);
 
-        //giao hàng nhanh
-        Route::post('/shipping/fee', [ShippingController::class, 'calculateShippingFee']);
-        Route::post('/shipping/create', [ShippingController::class, 'createOrder']);
-        Route::get('/shipping/status/{orderCode}', [ShippingController::class, 'getOrderStatus']);
-
-        // Route gửi OTP yêu cầu xác thực người dùng
-        Route::post('/send-otp', [PhoneController::class, 'sendOtp'])->middleware('auth:api');
-        // Route xác thực OTP yêu cầu xác thực người dùng
-        Route::post('/verify-otp', [PhoneController::class, 'verifyOtp']) ->middleware('auth:api');
-         Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
-        Route::get('review1/{product_id}', [ReviewController::class, 'GetRatingByProductId']);
-        Route::get('/reviews/{id}', [ReviewController::class, 'getReviewById']);
+    // Route gửi OTP yêu cầu xác thực người dùng
+    Route::post('/send-otp', [PhoneController::class, 'sendOtp'])->middleware('auth:api');
+    // Route xác thực OTP yêu cầu xác thực người dùng
+    Route::post('/verify-otp', [PhoneController::class, 'verifyOtp'])->middleware('auth:api');
+    Route::apiResource('/review', ReviewController::class)->middleware('auth:api');
+    Route::get('review1/{product_id}', [ReviewController::class, 'GetRatingByProductId']);
+    Route::get('/reviews/{id}', [ReviewController::class, 'getReviewById']);
 
     Route::middleware('auth:api')->delete('/user/delete', [UserController::class, 'deleteUser']);
 
