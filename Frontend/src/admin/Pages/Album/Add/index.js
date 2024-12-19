@@ -55,12 +55,6 @@ export default function AddAlbum({ color = "light" }) {
     };
 
     const onSubmit = async (data) => {
-        if (!data.status) {
-            Swal.fire('Lỗi', 'Vui lòng chọn trạng thái.', 'error');
-            return;
-        }
-
-        // Kiểm tra ít nhất một hình ảnh được chọn
         if (!(selectedImages.length || albumImages.length)) {
             Swal.fire('Lỗi', 'Vui lòng chọn ít nhất một hình ảnh.', 'error');
             return;
@@ -74,7 +68,7 @@ export default function AddAlbum({ color = "light" }) {
         setLoading(true);
         try {
             const formData = new FormData();
-            formData.append("status", data.status);
+            formData.append("status", 1); // Gắn cứng status là 1 (Hiển thị)
             formData.append("product_id", productId);
 
             // Lặp qua tất cả các hình ảnh đã chọn và thêm vào FormData
@@ -104,7 +98,6 @@ export default function AddAlbum({ color = "light" }) {
             setLoading(false);
         }
     };
-
 
     return (
         <>
@@ -180,7 +173,7 @@ export default function AddAlbum({ color = "light" }) {
 
                             {/* Chọn ID sản phẩm từ danh sách */}
                             <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">ID Sản phẩm</label>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Sản phẩm</label>
                                 <select
                                     value={productId}
                                     onChange={(e) => setProductId(e.target.value)}
@@ -194,19 +187,6 @@ export default function AddAlbum({ color = "light" }) {
                                     ))}
                                 </select>
                                 {errors.product_id && <p className="text-red-500 text-xs italic">{errors.product_id.message}</p>}
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                                <select
-                                    {...register("status", { required: "Vui lòng chọn trạng thái" })}
-                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                >
-                                    <option value="">Chọn trạng thái</option>
-                                    <option value="1">Hiển thị</option>
-                                    <option value="2">Ẩn</option>
-                                </select>
-                                {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                             </div>
 
                             <div className="flex items-center justify-between">

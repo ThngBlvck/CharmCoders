@@ -43,7 +43,7 @@ export default function EditBlog({ color = "light" }) {
                         setValue("title", postResponse.title);
                         setContent(postResponse.content);
                         setValue("category_id", postResponse.categoryId);
-                        setValue("status", postResponse.status);
+                        // Remove status from the form since it's fixed to 1
                     } else {
                         Swal.fire("Lỗi!", "Lỗi khi tải bài viết. Vui lòng thử lại.", "error");
                     }
@@ -77,7 +77,7 @@ export default function EditBlog({ color = "light" }) {
             formData.append("title", data.title);
             formData.append("content", content);
             formData.append("category_id", data.categoryId);
-            formData.append("status", data.status); // Status will be sent as-is
+            formData.append("status", 1); // Hardcoded status as 1 (Hiển thị)
 
             if (image) {
                 formData.append("image", image); // Append the new image if selected
@@ -120,8 +120,7 @@ export default function EditBlog({ color = "light" }) {
                             <h3 className={
                                 "font-bold text-2xl text-lg " +
                                 (color === "light" ? "text-blueGray-700" : "text-white")
-                            } style={{ fontFamily: 'Roboto, sans-serif' }} // Áp dụng font chữ Roboto
-                            >
+                            } style={{ fontFamily: 'Roboto, sans-serif' }}>
                                 CẬP NHẬT BÀI VIẾT
                             </h3>
                         </div>
@@ -183,25 +182,10 @@ export default function EditBlog({ color = "light" }) {
                             />
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                            <select
-                                {...register("status", { required: "Vui lòng chọn trạng thái" })}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            >
-                                <option value="">Chọn trạng thái</option>
-                                <option value="1">Hiển thị</option>
-                                <option value="2">Ẩn</option>
-                            </select>
-                            {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
-                        </div>
-
                         <div className="flex items-center justify-between">
                             <button
                                 type="submit"
-                                className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                                }`}
+                                className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                                 disabled={isSubmitting}
                             >
                                 {isSubmitting ? "Đang lưu..." : id ? "Cập nhật bài viết" : "Thêm bài viết"}
