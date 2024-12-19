@@ -13,7 +13,7 @@ class BannerController extends Controller
     public function index()
     {
         $banners = Banner::all()->map(function ($banner) {
-            $banner->image_url = asset('storage/images/' . $banner->image_path);
+            $banner->image_url = asset($banner->image_path);
             return $banner;
         });
 

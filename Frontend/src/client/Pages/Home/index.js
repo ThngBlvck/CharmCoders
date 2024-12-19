@@ -14,11 +14,15 @@ import {toast} from "react-toastify";
 import Swal from "sweetalert2";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import {getBanner} from "../../../services/Banner";
+import {Swiper, SwiperSlide} from "swiper/react";
+import "swiper/swiper-bundle.css";
 
 export default function Home() {
     const {id} = useParams();
     const [products, setProducts] = useState([]);
     const [brands, setBrands] = useState([]);
+    const [banners, setBanners] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(false); // Thêm state loading
     const [cart, setCart] = useState({});
@@ -27,6 +31,7 @@ export default function Home() {
     useEffect(() => {
         fetchProducts();
         fetchBrands();
+        fetchBanners();
     }, [searchTerm, id]);
 
     const fetchProducts = async () => {
@@ -67,6 +72,18 @@ export default function Home() {
         setLoading(false); // Tắt trạng thái loading
     };
 
+
+    const fetchBanners = async () => {
+        try {
+            const bannersData = await getBanner();
+            console.log("Banners fetched:", bannersData);
+            setBanners(bannersData);
+        } catch (error) {
+            console.error("Failed to fetch banners:", error);
+        }
+    };
+
+
     const sliderSettings = {
         dots: false,
         infinite: brands.length >= 5, // Chỉ cho phép infinite nếu có 5 item trở lên
@@ -90,6 +107,16 @@ export default function Home() {
                 },
             },
         ],
+    };
+
+    const settings = {
+        infinite: true, // Chạy vòng lặp
+        speed: 500, // Thời gian chuyển hình
+        slidesToShow: 1, // Số lượng hình ảnh hiển thị mỗi lần
+        slidesToScroll: 1, // Số lượng hình ảnh chuyển khi ấn
+        autoplay: true, // Tự động chạy
+        autoplaySpeed: 3000, // Tốc độ tự động chuyển hình
+        arrows: true, // Hiển thị nút điều hướng
     };
 
     const handleBuyNow = async (productId, quantity) => {
@@ -144,78 +171,20 @@ export default function Home() {
                 </div>
             ) : (
                 <>
-                    <div className="container-fluid px-0 shadow">
-                        <div id="carouselExample" className="carousel slide" data-bs-ride="carousel">
-                            {/* Indicators */}
-                            <div className="carousel-indicators">
-                                <button
-                                    type="button"
-                                    data-bs-target="#carouselExample"
-                                    data-bs-slide-to="0"
-                                    className="active"
-                                    aria-current="true"
-                                    aria-label="Slide 1"
-                                ></button>
-                                <button
-                                    type="button"
-                                    data-bs-target="#carouselExample"
-                                    data-bs-slide-to="1"
-                                    aria-label="Slide 2"
-                                ></button>
-                                <button
-                                    type="button"
-                                    data-bs-target="#carouselExample"
-                                    data-bs-slide-to="2"
-                                    aria-label="Slide 3"
-                                ></button>
-                            </div>
-
-                            {/* Carousel Items */}
-                            <div className="carousel-inner">
-                                <div className="carousel-item active">
+                    <div className="container-fluid px-0">
+                        <Slider {...settings}>
+                            {banners.map((banner, index) => (
+                                <div key={index}>
                                     <img
-                                        src="banner.png"
+                                        src={banner.image_url}
                                         className="d-block w-100 mw-slider"
-                                        alt="Slide 1"
+                                        alt={banner.image_url}
                                     />
                                 </div>
-                                <div className="carousel-item">
-                                    <img
-                                        src="banner.png"
-                                        className="d-block w-100 mw-slider"
-                                        alt="Slide 2"
-                                    />
-                                </div>
-                                <div className="carousel-item">
-                                    <img
-                                        src="banner.png"
-                                        className="d-block w-100 mw-slider"
-                                        alt="Slide 3"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Controls */}
-                            <button
-                                className="carousel-control-prev"
-                                type="button"
-                                data-bs-target="#carouselExample"
-                                data-bs-slide="prev"
-                            >
-                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span className="visually-hidden">Previous</span>
-                            </button>
-                            <button
-                                className="carousel-control-next"
-                                type="button"
-                                data-bs-target="#carouselExample"
-                                data-bs-slide="next"
-                            >
-                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span className="visually-hidden">Next</span>
-                            </button>
-                        </div>
+                            ))}
+                        </Slider>
                     </div>
+
                     <div className="container-fluid py-1 d-flex">
                         <div className="container py-5">
                             <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
