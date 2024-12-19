@@ -26,6 +26,7 @@ class Order extends Model
         'payment_method',
         'phone',
         'order_id',
+        'shipping_fee'
     ];
 
 

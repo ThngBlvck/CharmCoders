@@ -11,7 +11,8 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
+use App\Mail\OrderCreatedMail;
+use Illuminate\Support\Facades\Mail;
 class OrderController extends Controller
 {
     // Tạo đơn hàng
@@ -22,7 +23,6 @@ class OrderController extends Controller
         try {
             // Lấy cart_ids từ request
             $cartIds = $request->input('cart_ids');
-
             if (is_string($cartIds)) {
                 $cartIds = json_decode($cartIds, true);
             }
@@ -46,7 +46,7 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Không tìm thấy sản phẩm nào trong giỏ hàng.'], 404);
             }
 
-            // Lấy danh sách sản phẩm để kiểm tra số lượng tồn kho
+            // Lấy danh sách sản phẩm để kiểm tra tồn kho
             $productIds = $cartItems->pluck('product_id')->toArray();
             $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
@@ -62,21 +62,25 @@ class OrderController extends Controller
                 }
 
                 // Cập nhật số lượt mua (purchase_count)
-                $product->increment('purchase_count', $item->quantity); // Tăng purchase_count theo số lượng sản phẩm đã mua
+                $product->increment('purchase_count', $item->quantity);
             }
 
-            // Tính tổng tiền
-            $totalAmount = $cartItems->sum(function ($item) use ($products) {
-                $product = $products->get($item->product_id);
+            // Tính tổng tiền sản phẩm
+            $totalAmount = $cartItems->sum(function ($item) {
                 return $item->quantity * $item->price;
             });
+
+            // Tính phí ship
+            $shippingFee = $totalAmount < 500000 ? 30000 : 50000;
+
 
             // Tạo đơn hàng
             $order = Order::create([
                 'order_id' => $request->input('order_id'),
-                'total_amount' => $totalAmount,
+                'total_amount' => $totalAmount + $shippingFee,
+                'shipping_fee' => $shippingFee,
                 'address' => $request->input('address'),
-                'status' => 0,
+                'status' => 0, // Trạng thái mặc định
                 'user_id' => $userId,
                 'payment_method' => $request->input('payment_method'),
                 'phone' => $request->input('phone'),
@@ -101,6 +105,9 @@ class OrderController extends Controller
 
             // Xóa các sản phẩm trong giỏ hàng
             Cart::whereIn('id', $cartIds)->delete();
+
+            // Gửi email xác nhận
+            Mail::to($request->input('email'))->send(new OrderCreatedMail($order));
 
             DB::commit();
 
