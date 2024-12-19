@@ -24,7 +24,7 @@ export default function AddProductCategory({ color = "light" }) {
 
             const response = await postCategory({
                 name: data.name,
-                status: data.status,
+                status: 1, // Set status to 1 (Hiện) by default
             });
 
             console.log("Phản hồi từ API:", response);
@@ -82,19 +82,8 @@ export default function AddProductCategory({ color = "light" }) {
                             {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
                         </div>
 
-                        {/* Trạng thái */}
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                            <select
-                                {...register("status", { required: "Vui lòng chọn trạng thái" })}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            >
-                                <option value="">Chọn trạng thái</option>
-                                <option value="1">Hiện</option>
-                                <option value="0">Ẩn</option>
-                            </select>
-                            {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
-                        </div>
+                        {/* No status selection, status is fixed to 1 */}
+                        {/* The status is hardcoded to 1, so no need for a select input */}
 
                         {/* Nút thêm */}
                         <div className="flex items-center justify-between">

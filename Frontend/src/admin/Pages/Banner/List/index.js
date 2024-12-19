@@ -174,9 +174,6 @@ export default function Banner({ color }) {
                                     Hình ảnh
                                 </th>
                                 <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
-                                    Trạng thái
-                                </th>
-                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
                                     Hành động
                                 </th>
                             </tr>
@@ -203,15 +200,6 @@ export default function Banner({ color }) {
                                             />
                                         </td>
                                         <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                            {renderStatus(banner.status)}
-                                        </td>
-                                        <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                            <button
-                                                className="text-blue-500 hover:text-blue-700 px-2"
-                                                onClick={() => handleEditClick(banner.id)}
-                                            >
-                                                <i className="fas fa-pen text-xl"></i>
-                                            </button>
                                             <button
                                                 className="text-red-500 hover:text-red-700 ml-2 px-2"
                                                 onClick={() => handleDeleteClick(banner)}

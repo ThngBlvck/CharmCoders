@@ -61,7 +61,7 @@ export default function AddBlog({ color = "light" }) {
         formData.append("title", data.title);
         formData.append("content", content);
         formData.append("category_id", data.categoryId);
-        formData.append("status", data.status);
+        formData.append("status", 1); // Hardcoded status to 1 (Hiển thị)
 
         // Append the image if one was uploaded
         if (image) {
@@ -95,8 +95,8 @@ export default function AddBlog({ color = "light" }) {
                 <div className="rounded-t mb-0 px-4 py-3 border-0">
                     <div className="flex flex-wrap items-center">
                         <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                            <h3 className={"font-bold text-2xl text-lg " + (color === "light" ? "text-blueGray-700" : "text-white")
-                            } style={{ fontFamily: 'Roboto, sans-serif' }} // Áp dụng font chữ Roboto
+                            <h3 className={"font-bold text-2xl text-lg " + (color === "light" ? "text-blueGray-700" : "text-white")}
+                                style={{ fontFamily: 'Roboto, sans-serif' }} // Áp dụng font chữ Roboto
                             >
                                 THÊM BÀI VIẾT MỚI
                             </h3>
@@ -149,20 +149,6 @@ export default function AddBlog({ color = "light" }) {
                                 )}
                             </select>
                             {errors.categoryId && <p className="text-red-500 text-xs italic">{errors.categoryId.message}</p>}
-                        </div>
-
-                        {/* Trạng thái */}
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
-                            <select
-                                {...register("status", { required: "Vui lòng chọn trạng thái" })}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            >
-                                <option value="">Chọn trạng thái</option>
-                                <option value="1">Hiển thị</option>
-                                <option value="2">Ẩn</option>
-                            </select>
-                            {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                         </div>
 
                         {/* Upload hình ảnh */}

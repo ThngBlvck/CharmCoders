@@ -13,7 +13,6 @@ export default function EditBrand() {
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
         defaultValues: {
             brandName: "",
-            status: "",
         },
     });
 
@@ -29,7 +28,7 @@ export default function EditBrand() {
             const result = await getOneBrand(id);
             if (result) {
                 setValue("brandName", result.name || "");
-                setValue("status", result.status || "");
+                // No need to set value for status, as it's fixed to 1
             } else {
                 Swal.fire("Lỗi", "Không tìm thấy nhãn hàng này.", "error");
                 navigate("/admin/brand");
@@ -47,7 +46,7 @@ export default function EditBrand() {
         try {
             const formData = new FormData();
             formData.append("name", data.brandName);
-            formData.append("status", data.status);
+            formData.append("status", 1); // Set status to 1 by default
             formData.append("_method", "PUT");
 
             await updateBrand(id, formData);
@@ -96,23 +95,6 @@ export default function EditBrand() {
                             )}
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-blueGray-600 text-sm font-bold mb-2">
-                                Trạng thái
-                            </label>
-                            <select
-                                {...register("status", { required: "Vui lòng chọn trạng thái" })}
-                                className="border border-solid px-3 py-2 rounded text-blueGray-600 w-full"
-                            >
-                                <option value="">Chọn trạng thái</option>
-                                <option value="1">Hiển thị</option>
-                                <option value="2">Ẩn</option>
-                            </select>
-                            {errors.status && (
-                                <p className="text-red-500 text-xs italic">{errors.status.message}</p>
-                            )}
-                        </div>
-
                         <div className="flex items-center justify-between">
                             <button
                                 type="submit"
@@ -141,6 +123,7 @@ export default function EditBrand() {
 EditBrand.propTypes = {
     color: PropTypes.oneOf(["light", "dark"]),
 };
+
 EditBrand.defaultProps = {
     color: "light",
 };

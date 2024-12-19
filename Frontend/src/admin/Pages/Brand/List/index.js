@@ -306,7 +306,7 @@ export default function Brand({ color }) {
                                 </th>
                                 <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "15%"}}
+                                    style={{width: "25%"}}
                                 >Hình ảnh
                                 </th>
                                 <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
@@ -316,12 +316,7 @@ export default function Brand({ color }) {
                                 </th>
                                 <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
                                     (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "10%"}}
-                                >Trạng Thái
-                                </th>
-                                <th className={"px-6 py-3 border border-solid text-center uppercase font-semibol" +
-                                    (color === "light" ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100" : "bg-lightBlue-800 text-lightBlue-300 border-lightBlue-700")}
-                                    style={{width: "10%"}}
+                                    style={{width: "25%"}}
                                 >Hành động
                                 </th>
                             </tr>
@@ -347,9 +342,6 @@ export default function Brand({ color }) {
                                         </td>
                                         <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             {brand.name}
-                                        </td>
-                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
-                                            {renderStatus(brand.status)}
                                         </td>
                                         <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
                                             <button
