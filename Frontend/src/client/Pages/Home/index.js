@@ -6,7 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
 import Slider from "react-slick";
 import {faSpinner} from '@fortawesome/free-solid-svg-icons';
-import {getProduct, searchProduct, getCheckoutData} from "../../../services/Product";
+import {getProduct, searchProduct, getCheckoutData, getHotProducts} from "../../../services/Product";
 import {getBrand} from '../../../services/Brand';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {addToCart} from "../../../services/Cart";
@@ -27,12 +27,31 @@ export default function Home() {
     const [loading, setLoading] = useState(false); // Thêm state loading
     const [cart, setCart] = useState({});
     const navigate = useNavigate();
-
+    const [hotProducts, setHotProducts] = useState([]); // Hot products data
     useEffect(() => {
         fetchProducts();
         fetchBrands();
         fetchBanners();
+        fetchHotProducts();
     }, [searchTerm, id]);
+
+    // Giả sử bạn đã có mã để lấy sản phẩm bán chạy, bạn có thể làm như sau:
+    const fetchHotProducts = async () => {
+        try {
+            // Fetch hot products
+            const hotProductsResult = await getHotProducts();
+            console.log(hotProductsResult); // Log kết quả để kiểm tra
+
+            if (hotProductsResult && hotProductsResult.hot_products) {
+                setHotProducts(hotProductsResult.hot_products);
+            } else {
+                toast.warning('Không tìm thấy sản phẩm hot.');
+            }
+        } catch (error) {
+            console.error("Lỗi khi fetch sản phẩm:", error);
+            toast.error('Có lỗi xảy ra khi lấy sản phẩm.');
+        }
+    };
 
     const fetchProducts = async () => {
         setLoading(true); // Bật trạng thái loading
@@ -189,8 +208,7 @@ export default function Home() {
                         <div className="container py-5">
                             <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
                                 <p className="fs-4 text-center text-dGreen font-bold">GlowMakers</p>
-                                <p className="font-bold text-dGreen fs-30">Các sản phẩm mới
-                                    nhất</p>
+                                <p className="font-bold text-dGreen fs-30">Sản phẩm mới</p>
                             </div>
                             <div className="row g-4">
                                 <div className="row">
@@ -261,6 +279,86 @@ export default function Home() {
                                                                 }}
                                                                 onClick={() => handleBuyNow(product.id, cart[product.id] || 1)}
                                                                 disabled={product.quantity === 0}  // Disable the button if out of stock
+                                                            >
+                                                                <p><i className="fa fa-shopping-cart" aria-hidden="true"
+                                                                      style={{marginRight: "6px"}}></i>Mua ngay</p>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-center fs-30 text-dGreen">Không có sản phẩm để hiển thị</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
+                                <p className="font-bold text-dGreen fs-30">Sản phẩm bán chạy</p>
+                            </div>
+                            <div className="row g-4">
+                                <div className="row">
+                                    {hotProducts && hotProducts.length > 0 ? (
+                                        hotProducts.map((hotProducts, index) => (
+                                            <div key={hotProducts.id} className="col-md-6 col-lg-3 mb-3">
+                                                <div className="card text-center bg-hover shadow rounded p-2">
+                                                    <NavLink to={`/products/${hotProducts.id}`}>
+                                                        <img
+                                                            src={hotProducts.image || "https://via.placeholder.com/500"}
+                                                            className="card-img-top img-fluid rounded img-pro"
+                                                            alt="Product"
+                                                        />
+                                                    </NavLink>
+                                                    <div className="card-body">
+                                                        <NavLink to={`/products/${hotProducts.id}`}>
+                                                            <p className="card-title font-semibold text-dGreen">
+                                                                {hotProducts.name.length > 30 ? hotProducts.name.substring(0, 20) + "..." : hotProducts.name}
+                                                            </p>
+                                                        </NavLink>
+
+                                                        <div
+                                                            className="d-flex justify-content-between align-items-center">
+                                                            {hotProducts.sale_price && hotProducts.sale_price < hotProducts.unit_price ? (
+                                                                <>
+                                                                    <p className="card-text mb-2 font-semibold text-dGreen text-decoration-line-through flex-1 fs-14">
+                                                                        {hotProducts.unit_price.toLocaleString("vi-VN", {
+                                                                            style: "currency",
+                                                                            currency: "VND"
+                                                                        })}
+                                                                    </p>
+                                                                    <p className="card-text mb-2 font-semibold salePr fs-16 flex-1">
+                                                                        {hotProducts.sale_price.toLocaleString("vi-VN", {
+                                                                            style: "currency",
+                                                                            currency: "VND"
+                                                                        })}
+                                                                    </p>
+                                                                </>
+                                                            ) : (
+                                                                <p className="card-text mb-2 font-semibold text-dGreen text-center flex-1 fs-16">
+                                                                    {hotProducts.unit_price.toLocaleString("vi-VN", {
+                                                                        style: "currency",
+                                                                        currency: "VND"
+                                                                    })}
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        {hotProducts.quantity === 0 ? (
+                                                            <p className="text-danger font-bold fs-16"
+                                                               style={{marginTop: '10px'}}>Hết hàng</p>
+                                                        ) : (
+                                                            <button
+                                                                className="butn mr-2 font-semibold w-100 fs-14 rounded"
+                                                                style={{
+                                                                    padding: '16px',
+                                                                    width: '140px',
+                                                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                                                    backgroundColor: hotProducts.quantity === 0 ? "#dcdcdc" : "#228B22",
+                                                                    color: hotProducts.quantity === 0 ? "black" : "white",
+                                                                    cursor: hotProducts.quantity === 0 ? "not-allowed" : "pointer"
+                                                                }}
+                                                                onClick={() => handleBuyNow(hotProducts.id, cart[hotProducts.id] || 1)}
+                                                                disabled={hotProducts.quantity === 0} // Disable the button if out of stock
                                                             >
                                                                 <p><i className="fa fa-shopping-cart" aria-hidden="true"
                                                                       style={{marginRight: "6px"}}></i>Mua ngay</p>

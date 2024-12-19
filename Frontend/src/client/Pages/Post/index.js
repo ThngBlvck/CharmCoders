@@ -76,57 +76,20 @@ export default function Post() {
 
     return (
         <div className="container py-2">
-            {/* Content */}
             <div className="d-flex row justify-content-between mt-4">
-                {/* Left column - Post categories */}
-                <div className="col-md-3">
-                    <p className="font-bold mb-3 text-dGreen fs-20">Danh mục bài viết</p>
-                    <ul className="list-group">
-                        {loading ? (
-                            <li className="list-group-item border-none">
-                                <Skeleton height={30} />
-                            </li>
-                        ) : (
-                        <li className={`list-group-item font-semibold d-flex align-items-center border-none cursor-pointer ${selectedCategory === "all" ? "active-category" : ""}`}
-                            onClick={() => handleCategoryClick("all")}>
-                            <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
-                            <p className="text-dGreen m-0">Tất cả bài viết</p>
-                        </li>
-                        )}
-                        {loading ? (
-                            // Skeleton for category list items
-                            <li className="list-group-item border-none">
-                                <Skeleton height={30} />
-                            </li>
-                        ) : (
-                            categories.map((category) => (
-                                <li className={`list-group-item font-semibold d-flex align-items-center border-none cursor-pointer ${selectedCategory === category.id ? "active-category" : ""}`}
-                                    key={category.id}
-                                    onClick={() => handleCategoryClick(category.id)}>
-                                    <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
-                                    <p className="text-dGreen" style={{ margin: 0 }}>{category.name}</p>
-                                </li>
-                            ))
-                        )}
-                    </ul>
-                </div>
-
-                {/* Right column - Posts and pagination */}
-                <div className="col-md-9 row">
+                {/* Left column - Posts and pagination */}
+                <div className="col-md-8 row">
                     <p className="font-bold mb-3 text-center text-dGreen fs-20">Danh sách bài viết</p>
                     {loading ? (
                         <div className="row">
-                            {/* Skeleton for the post list */}
                             {[...Array(6)].map((_, index) => (
                                 <div key={index} className="col-12 col-md-4 mb-4">
-                                    <div className="card bg-hover shadow"
-                                         style={{borderRadius: '15px', padding: '20px'}}>
-                                        {/* Skeleton for image */}
-                                        <Skeleton height={200} width="100%"/>
+                                    <div className="card bg-hover shadow" style={{borderRadius: '15px', padding: '20px'}}>
+                                        <Skeleton height={200} width="100%" />
                                         <div className="card-body">
-                                            <Skeleton height={20} width="80%"/>
-                                            <Skeleton height={20} width="60%"/>
-                                            <Skeleton height={20} width="50%"/>
+                                            <Skeleton height={20} width="80%" />
+                                            <Skeleton height={20} width="60%" />
+                                            <Skeleton height={20} width="50%" />
                                         </div>
                                     </div>
                                 </div>
@@ -136,16 +99,10 @@ export default function Post() {
                         currentPosts.length > 0 ? (
                             currentPosts.map((post) => (
                                 <div className="col-12 col-md-4 mb-4" key={post.id}>
-                                    <div className="card bg-hover shadow"
-                                         style={{borderRadius: '15px', padding: '20px'}}>
+                                    <div className="card bg-hover shadow" style={{borderRadius: '15px', padding: '20px'}}>
                                         <NavLink to={`/postdetail/${post.id}`}>
-                                            <img src={post.image} className="card-img-top img-fluid rounded"
-                                                 alt={post.title} style={{
-                                                width: '100%', // Đặt chiều rộng cố định
-                                                height: '200px', // Đặt chiều cao cố định
-                                                objectFit: 'cover', // Đảm bảo hình ảnh được cắt gọn để vừa khít ô
-                                                borderRadius: '10px' // Tùy chọn: Làm tròn góc ảnh
-                                            }}/>
+                                            <img src={post.image} className="card-img-top img-fluid rounded" alt={post.title}
+                                                 style={{width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px'}} />
                                         </NavLink>
                                         <div className="card-body">
                                             <NavLink to={`/postdetail/${post.id}`}>
@@ -153,7 +110,9 @@ export default function Post() {
                                                     {post.title.length > 30 ? post.title.substring(0, 20) + "..." : post.title}
                                                 </p>
                                             </NavLink>
-                                            <p className="card-text align-content-start text-dGreen" style={{ marginBottom: '1rem' }}>{post.summary}</p>
+                                            <p className="card-text align-content-start text-dGreen" style={{ marginBottom: '1rem' }}>
+                                                {post.summary}
+                                            </p>
                                             <button className="butn w-100 font-bold rounded shadow" onClick={() => navigate(`/postdetail/${post.id}`)}>
                                                 Xem chi tiết
                                             </button>
@@ -182,6 +141,38 @@ export default function Post() {
                             </nav>
                         </div>
                     )}
+                </div>
+
+                {/* Right column - Post categories */}
+                <div className="col-md-4">
+                    <p className="font-bold mb-3 text-dGreen fs-20">Danh mục bài viết</p>
+                    <ul className="list-group">
+                        {loading ? (
+                            <li className="list-group-item border-none">
+                                <Skeleton height={30} />
+                            </li>
+                        ) : (
+                            <li className={`list-group-item font-semibold d-flex align-items-center border-none cursor-pointer ${selectedCategory === "all" ? "active-category" : ""}`}
+                                onClick={() => handleCategoryClick("all")}>
+                                <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
+                                <p className="text-dGreen m-0">Tất cả bài viết</p>
+                            </li>
+                        )}
+                        {loading ? (
+                            <li className="list-group-item border-none">
+                                <Skeleton height={30} />
+                            </li>
+                        ) : (
+                            categories.map((category) => (
+                                <li className={`list-group-item font-semibold d-flex align-items-center border-none cursor-pointer ${selectedCategory === category.id ? "active-category" : ""}`}
+                                    key={category.id}
+                                    onClick={() => handleCategoryClick(category.id)}>
+                                    <i className="fa fa-list-alt text-dGreen" aria-hidden="true" style={{ marginRight: "6px" }}></i>
+                                    <p className="text-dGreen" style={{ margin: 0 }}>{category.name}</p>
+                                </li>
+                            ))
+                        )}
+                    </ul>
                 </div>
             </div>
         </div>
