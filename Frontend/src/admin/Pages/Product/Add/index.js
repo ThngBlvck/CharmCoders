@@ -11,16 +11,19 @@ export default function AddProduct({ color = "light" }) {
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting,isSubmitSuccessful  },
         reset,
-        setValue, // Thêm setValue vào hook
+        setValue,
         watch,
-    } = useForm();
+    } = useForm({
+        mode: "all", // Kiểm tra lỗi ngay lập tức
+    });
 
     const navigate = useNavigate();
     const [brands, setBrands] = useState([]); // State lưu trữ danh sách nhãn hàng
     const [categories, setCategories] = useState([]); // State lưu trữ danh sách danh mục
     const [loading, setLoading] = useState(true); // Thêm state loading
+    const [apiError, setApiError] = useState(""); // State lưu trữ lỗi từ API
 
     useEffect(() => {
         // Lấy danh sách nhãn hàng và danh mục khi component được render
@@ -59,6 +62,17 @@ export default function AddProduct({ color = "light" }) {
     }, [watch("quantity")]); // Theo dõi sự thay đổi của số lượng
 
     const onSubmit = async (data) => {
+        // Kiểm tra tất cả các trường
+        if (!data.name || !data.brand_id || !data.category_id || !data.unit_price || !data.sale_price || !data.quantity || !data.content || !data.image) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Có lỗi xảy ra',
+                text: "Vui lòng điền đầy đủ thông tin vào tất cả các trường.",
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
         try {
             console.log("Dữ liệu gửi đi:", data);
 
@@ -79,42 +93,43 @@ export default function AddProduct({ color = "light" }) {
             const response = await postProduct(formData);
 
             console.log("Phản hồi từ API:", response);
-            Swal.fire({
-                icon: 'success',
-                title: 'Thêm sản phẩm thành công!',
-                confirmButtonText: 'OK'
-            });
-            reset();
-            navigate('/admin/product'); // Điều hướng về trang danh sách sản phẩm
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thêm sản phẩm thành công',
+                    confirmButtonText: 'OK'
+                });
+                reset();
+                navigate('/admin/product'); // Điều hướng về trang danh sách sản phẩm
+            } else {
+                setApiError(response.message.name[0]); // Lưu lỗi từ API vào state
+            }
 
         } catch (error) {
             console.error("Có lỗi xảy ra khi thêm sản phẩm:", error);
             Swal.fire({
                 icon: 'error',
                 title: 'Có lỗi xảy ra',
-                text: error.message || "Lỗi không xác định",
+                text: error.message.errors || "Lỗi không xác định",
                 confirmButtonText: 'OK'
             });
         }
     };
 
     return (
-        <div
-            className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}
-        >
+        <div className={`relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ${color === "light" ? "bg-white" : "bg-lightBlue-900 text-white"}`}>
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex flex-wrap items-center">
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                        <h3 className="font-bold text-2xl text-blueGray-700"
-                            style={{ fontFamily: "Roboto, sans-serif" }}>
+                        <h3 className="font-bold text-2xl text-blueGray-700" style={{ fontFamily: "Roboto, sans-serif" }}>
                             THÊM SẢN PHẨM
                         </h3>
                     </div>
                 </div>
             </div>
-            { loading || isSubmitting ? (
+            {loading || isSubmitting ? (
                 <div className="flex justify-center items-center py-4">
-                    <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                    <PulseLoader color="#4A90E2" loading={loading} size={15} />
                 </div>
             ) : (
                 <div className="p-4">
@@ -131,6 +146,8 @@ export default function AddProduct({ color = "light" }) {
                                     placeholder="Nhập tên sản phẩm"
                                 />
                                 {errors.name && <p className="text-red-500 text-xs italic">{errors.name.message}</p>}
+                                {apiError &&
+                                    <p className="text-red-500 text-xs italic">{apiError}</p>} {/* Hiển thị lỗi từ API */}
                             </div>
 
                             {/* Nhãn hàng */}
@@ -145,15 +162,14 @@ export default function AddProduct({ color = "light" }) {
                                         <option key={brand.id} value={brand.id}>{brand.name}</option>
                                     ))}
                                 </select>
-                                {errors.brand_id &&
-                                    <p className="text-red-500 text-xs italic">{errors.brand_id.message}</p>}
+                                {errors.brand_id && <p className="text-red-500 text-xs italic">{errors.brand_id.message}</p>}
                             </div>
 
                             {/* Danh mục */}
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Danh mục</label>
                                 <select
-                                    {...register("category_id", {required: "Vui lòng chọn danh mục"})}
+                                    {...register("category_id", { required: "Vui lòng chọn danh mục" })}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 >
                                     <option value="">Chọn danh mục</option>
@@ -161,8 +177,7 @@ export default function AddProduct({ color = "light" }) {
                                         <option key={category.id} value={category.id}>{category.name}</option>
                                     ))}
                                 </select>
-                                {errors.category_id &&
-                                    <p className="text-red-500 text-xs italic">{errors.category_id.message}</p>}
+                                {errors.category_id && <p className="text-red-500 text-xs italic">{errors.category_id.message}</p>}
                             </div>
                         </div>
 
@@ -175,13 +190,12 @@ export default function AddProduct({ color = "light" }) {
                                     type="number"
                                     {...register("unit_price", {
                                         required: "Giá gốc là bắt buộc",
-                                        validate: value => value > 0 || "Giá gốc phải lớn hơn 0" // Kiểm tra giá gốc
+                                        validate: value => value > 0 || "Giá gốc phải lớn hơn 0"
                                     })}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     placeholder="Nhập giá gốc"
                                 />
-                                {errors.unit_price &&
-                                    <p className="text-red-500 text-xs italic">{errors.unit_price.message}</p>}
+                                {errors.unit_price && <p className="text-red-500 text-xs italic">{errors.unit_price.message}</p>}
                             </div>
 
                             {/* Giá sale */}
@@ -190,42 +204,38 @@ export default function AddProduct({ color = "light" }) {
                                 <input
                                     type="number"
                                     {...register("sale_price", {
-                                        validate: value => value < watch("unit_price") || "Giá sale phải nhỏ hơn giá gốc" // Kiểm tra giá sale
+                                        validate: value => value < watch("unit_price") || "Giá sale phải nhỏ hơn giá gốc"
                                     })}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     placeholder="Nhập giá sale (nếu có)"
                                 />
-                                {errors.sale_price &&
-                                    <p className="text-red-500 text-xs italic">{errors.sale_price.message}</p>}
+                                {errors.sale_price && <p className="text-red-500 text-xs italic">{errors.sale_price.message}</p>}
                             </div>
-
 
                             {/* Số lượng */}
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Số lượng</label>
                                 <input
                                     type="number"
-                                    {...register("quantity", {required: "Số lượng là bắt buộc"})}
+                                    {...register("quantity", { required: "Số lượng là bắt buộc" })}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     placeholder="Nhập số lượng"
                                 />
-                                {errors.quantity &&
-                                    <p className="text-red-500 text-xs italic">{errors.quantity.message}</p>}
+                                {errors.quantity && <p className="text-red-500 text-xs italic">{errors.quantity.message}</p>}
                             </div>
 
                             {/* Trạng thái */}
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Trạng thái</label>
                                 <select
-                                    {...register("status", {required: "Vui lòng chọn trạng thái"})}
+                                    {...register("status", { required: "Vui lòng chọn trạng thái" })}
                                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     disabled // Không cho phép sửa trạng thái từ đây
                                 >
                                     <option value="1">Còn hàng</option>
                                     <option value="0">Hết hàng</option>
                                 </select>
-                                {errors.status &&
-                                    <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
+                                {errors.status && <p className="text-red-500 text-xs italic">{errors.status.message}</p>}
                             </div>
                         </div>
 
@@ -233,39 +243,38 @@ export default function AddProduct({ color = "light" }) {
                         <div className="w-full px-2 mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Nội dung</label>
                             <textarea
-                                {...register("content", {required: "Nội dung là bắt buộc"})}
+                                {...register("content", { required: "Nội dung là bắt buộc" })}
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                placeholder="Nhập nội dung sản phẩm"
+                                rows="3"
+                                placeholder="Nhập nội dung"
                             ></textarea>
                             {errors.content && <p className="text-red-500 text-xs italic">{errors.content.message}</p>}
                         </div>
 
-                        {/* Hình ảnh sản phẩm */}
+                        {/* Hình ảnh */}
                         <div className="w-full px-2 mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2">Hình ảnh</label>
                             <input
                                 type="file"
-                                {...register("image", {required: "Hình ảnh là bắt buộc"})} // Thêm điều kiện bắt buộc
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                {...register("image", { required: "Hình ảnh là bắt buộc" })}
+                                className="w-full text-gray-700 py-2 px-3 border rounded leading-tight focus:outline-none focus:shadow-outline"
                             />
                             {errors.image && <p className="text-red-500 text-xs italic">{errors.image.message}</p>}
                         </div>
 
-
-                        {/* Nút submit */}
-                        <div className="w-full px-2">
+                        {/* Button Submit */}
+                        <div className="w-full px-2 mt-4">
                             <button
                                 type="submit"
-                                disabled={isSubmitting}
                                 className={`bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                                disabled={isSubmitting}
                             >
-                                {isSubmitting ? "Đang thêm..." : "Thêm sản phẩm"}
+                                {isSubmitting ? "Đang gửi..." : "Thêm sản phẩm"}
                             </button>
                         </div>
                     </form>
                 </div>
             )}
-
         </div>
     );
 }
