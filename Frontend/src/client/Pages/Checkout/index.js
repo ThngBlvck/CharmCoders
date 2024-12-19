@@ -17,11 +17,7 @@ import {getAddress} from "../../../services/Address";
 
 export default function Checkout() {
     const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        address: "",
-        paymentMethod: "cashOnDelivery", // Mặc định là thanh toán khi nhận hàng
+        name: "", email: "", phone: "", address: "", paymentMethod: "cashOnDelivery", // Mặc định là thanh toán khi nhận hàng
     });
     const {cartIds} = useParams();
     const [products, setProducts] = useState([]);
@@ -47,6 +43,7 @@ export default function Checkout() {
     const [errors, setErrors] = useState({});
     const [user_id, setUserId] = useState([]);
     const navigate = useNavigate();
+    const [shippingFee, setShippingFee] = useState(30000);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -227,8 +224,7 @@ export default function Checkout() {
                         const product = productResults.find(p => p.id === cart.product_id);
                         if (product) {
                             return {
-                                ...product,
-                                quantity: cart.quantity
+                                ...product, quantity: cart.quantity
                             };
                         }
                         return null; // Trả về null nếu không tìm thấy sản phẩm
@@ -302,8 +298,7 @@ export default function Checkout() {
     const handleChange = (e) => {
         const {name, value} = e.target;
         setFormData({
-            ...formData,
-            [name]: value,
+            ...formData, [name]: value,
         });
     };
 
@@ -402,9 +397,7 @@ export default function Checkout() {
                 description: "Thanh toán đơn hàng qua MoMo",
                 extraData: JSON.stringify(extradata),
                 customerInfo: {
-                    name: orderData.name,
-                    email: orderData.email,
-                    phone: orderData.phone,
+                    name: orderData.name, email: orderData.email, phone: orderData.phone,
                 },
             };
 
@@ -421,284 +414,246 @@ export default function Checkout() {
         }
     };
 
-    return (
-        <div className="container py-5">
-            <div className="row">
-                {/* Kiểm tra trạng thái đăng nhập */}
-                <>
-                    {/* Hiển thị sản phẩm */}
-                    <div className="col-md-6">
-                        <p className="mb-4 font-semibold text-dGreen fs-30">Sản phẩm của
-                            bạn</p>
-                        <div className="list-group">
-                            {loading ? (
-                                Array.from({length: 3}).map((_, index) => (
-                                    <div
-                                        key={index}
-                                        className="list-group-item d-flex justify-content-between align-items-center"
-                                    >
-                                        {/* Skeleton cho hình ảnh sản phẩm */}
-                                        <div className="d-flex align-items-center">
-                                            <Skeleton
-                                                className="me-3"
-                                                width={80}
-                                                height={80}
-                                                style={{borderRadius: "5px"}}
-                                            />
-                                            {/* Skeleton cho thông tin sản phẩm */}
-                                            <div>
-                                                <Skeleton width="70%" height={20} className="mb-2"/>
-                                                <Skeleton width="50%" height={15}/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                Array.isArray(products) && products.length > 0 ? (
-                                    products.map(item => (
-                                        <div key={item.id}
-                                             className="list-group-item d-flex justify-content-between align-items-center">
-                                            <div className="d-flex align-items-center">
-                                                <img src={item.image} alt={item.name}
-                                                     className="img-thumbnail me-3 img-checkout"/>
-                                                <div>
-                                                    <p className="text-dGreen name-checkout">
-                                                        {item.name.length > 100 ? item.name.substring(0, 100) + "..." : item.name}
-                                                    </p>
-                                                    <p className="mb-0 text-dGreen">
-                                                        {item.sale_price ? (
-                                                            <>
+    return (<div className="container py-5">
+        <div className="row">
+            {/* Kiểm tra trạng thái đăng nhập */}
+            <>
+                {/* Hiển thị sản phẩm */}
+                <div className="col-md-6">
+                    <p className="mb-4 font-semibold text-dGreen fs-30">Sản phẩm của
+                        bạn</p>
+                    <div className="list-group">
+                        {loading ? (Array.from({length: 3}).map((_, index) => (<div
+                            key={index}
+                            className="list-group-item d-flex justify-content-between align-items-center"
+                        >
+                            {/* Skeleton cho hình ảnh sản phẩm */}
+                            <div className="d-flex align-items-center">
+                                <Skeleton
+                                    className="me-3"
+                                    width={80}
+                                    height={80}
+                                    style={{borderRadius: "5px"}}
+                                />
+                                {/* Skeleton cho thông tin sản phẩm */}
+                                <div>
+                                    <Skeleton width="70%" height={20} className="mb-2"/>
+                                    <Skeleton width="50%" height={15}/>
+                                </div>
+                            </div>
+                        </div>))) : (Array.isArray(products) && products.length > 0 ? (products.map(item => (
+                            <div key={item.id}
+                                 className="list-group-item d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center">
+                                    <img src={item.image} alt={item.name}
+                                         className="img-thumbnail me-3 img-checkout"/>
+                                    <div>
+                                        <p className="text-dGreen name-checkout">
+                                            {item.name.length > 100 ? item.name.substring(0, 100) + "..." : item.name}
+                                        </p>
+                                        <p className="mb-0 text-dGreen">
+                                            {item.sale_price ? (<>
                                                             <span
                                                                 className="text-decoration-line-through text-dGreen fs-14">
                                                                 {item.unit_price.toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND"
+                                                                    style: "currency", currency: "VND"
                                                                 })}
                                                             </span>
-                                                                {" "}
-                                                                <span className="font-bold salePr fs-16">
+                                                {" "}
+                                                <span className="font-bold salePr fs-16">
                                                                 {item.sale_price.toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND"
+                                                                    style: "currency", currency: "VND"
                                                                 })}
                                                             </span>
-                                                            </>
-                                                        ) : (
-                                                            <span className="text-dGreen fs-16">
+                                            </>) : (<span className="text-dGreen fs-16">
                                                                 {item.unit_price.toLocaleString("vi-VN", {
-                                                                    style: "currency",
-                                                                    currency: "VND"
+                                                                    style: "currency", currency: "VND"
                                                                 })}
-                                                            </span>
-                                                        )}
-                                                        {" x "}{item.quantity}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-dGreen font-semibold fs-20">Không có sản phẩm nào.</p>
-                                )
-                            )}
-                        </div>
-
-                        <p className="mt-4 font-semibold text-dGreen">Thành
-                            tiền: {calculateTotal().toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                            })}</p>
-                        <span className="text-dGreen">(Tiết kiệm: {calculateSavings().toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND"
-                        })})</span>
+                                                            </span>)}
+                                            {" x "}{item.quantity}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>))) : (<p className="text-dGreen font-semibold fs-20">Không có sản phẩm nào.</p>))}
                     </div>
 
-                    {/* Form thông tin người dùng */}
-                    <div className="col-md-6">
-                        <p className="mb-4 font-semibold text-dGreen fs-30">Thông tin
-                            thanh toán</p>
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-3">
-                                <label className="form-label font-semibold text-dGreen">Họ và
-                                    Tên</label>
-                                <input
-                                    type="text"
-                                    className="form-control rounded text-dGreen"
-                                    name="name"
-                                    value={formData.name || ""}
-                                    onChange={handleChange}
+                    <p className="mt-4 font-semibold text-dGreen">Thành
+                        tiền: {calculateTotal().toLocaleString("vi-VN", {
+                            style: "currency", currency: "VND",
+                        })}</p>
+                    <span className="text-dGreen">(Tiết kiệm: {calculateSavings().toLocaleString("vi-VN", {
+                        style: "currency", currency: "VND"
+                    })})</span>
+                    <div className="mb-3">
+                        <label className="form-label font-semibold text-dGreen">Phí vận chuyển</label>
+                        <span className="text-dGreen font-semibold text-lg ms-2">{new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND'
+                        }).format(shippingFee || 0)}</span>
+                    </div>
+                </div>
+
+                {/* Form thông tin người dùng */}
+                <div className="col-md-6">
+                    <p className="mb-4 font-semibold text-dGreen fs-30">Thông tin
+                        thanh toán</p>
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <label className="form-label font-semibold text-dGreen">Họ và
+                                Tên</label>
+                            <input
+                                type="text"
+                                className="form-control rounded text-dGreen"
+                                name="name"
+                                value={formData.name || ""}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.name && <div className="text-danger mt-2">{errors.name}</div>}
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label font-semibold text-dGreen">Email</label>
+                            <input
+                                type="email"
+                                className="form-control rounded text-dGreen"
+                                name="email"
+                                value={formData.email || ""}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.email && <div className="text-danger mt-2">{errors.email}</div>}
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label font-semibold text-dGreen">Số điện
+                                thoại</label>
+                            <input
+                                type="tel"
+                                className="form-control rounded text-dGreen"
+                                name="phone"
+                                value={formData.phone || ""}
+                                onChange={handleChange}
+                                required
+                            />
+                            {errors.phone && <div className="text-danger mt-2">{errors.phone}</div>}
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label font-semibold text-dGreen">Địa chỉ</label>
+                            {addresses.length > 0 ? (<div className="form-group mb-2 flex-1 mr-1">
+                                <select
+                                    className="form-control rounded bg-white text-dGreen"
+                                    value={selectedAddress ? selectedAddress.id : ""}
+                                    onChange={handleAddressChange}
                                     required
-                                />
-                                {errors.name && <div className="text-danger mt-2">{errors.name}</div>}
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label font-semibold text-dGreen">Email</label>
-                                <input
-                                    type="email"
-                                    className="form-control rounded text-dGreen"
-                                    name="email"
-                                    value={formData.email || ""}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                {errors.email && <div className="text-danger mt-2">{errors.email}</div>}
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label font-semibold text-dGreen">Số điện
-                                    thoại</label>
-                                <input
-                                    type="tel"
-                                    className="form-control rounded text-dGreen"
-                                    name="phone"
-                                    value={formData.phone || ""}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                {errors.phone && <div className="text-danger mt-2">{errors.phone}</div>}
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label font-semibold text-dGreen">Địa chỉ</label>
-                                {addresses.length > 0 ? (
+                                >
+                                    <option value="" className="font-bold">Chọn Địa chỉ</option>
+                                    {addresses.map((address) => (<option key={address.id} value={address.id}>
+                                        {fullAddressUser(address)}
+                                    </option>))}
+                                </select>
+                                {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
+                            </div>) : (<div>
+                                <div className="d-flex justify-content-between">
                                     <div className="form-group mb-2 flex-1 mr-1">
                                         <select
                                             className="form-control rounded bg-white text-dGreen"
-                                            value={selectedAddress ? selectedAddress.id : ""}
-                                            onChange={handleAddressChange}
+                                            value={selectedProvince}
+                                            onChange={handleProvinceChange}
                                             required
                                         >
-                                            <option value="" className="font-bold">Chọn Địa chỉ</option>
-                                            {addresses.map((address) => (
-                                                <option key={address.id} value={address.id}>
-                                                    {fullAddressUser(address)}
-                                                </option>
-                                            ))}
+                                            <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
+                                            {provinces.map((province) => (
+                                                <option key={province.code} value={province.code}>
+                                                    {province.name}
+                                                </option>))}
                                         </select>
-                                        {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
                                     </div>
-                                ) : (
-                                    <div>
-                                        <div className="d-flex justify-content-between">
-                                            <div className="form-group mb-2 flex-1 mr-1">
-                                                <select
-                                                    className="form-control rounded bg-white text-dGreen"
-                                                    value={selectedProvince}
-                                                    onChange={handleProvinceChange}
-                                                    required
-                                                >
-                                                    <option value="" className="font-bold">Chọn Tỉnh/Thành</option>
-                                                    {provinces.map((province) => (
-                                                        <option key={province.code} value={province.code}>
-                                                            {province.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
 
-                                            <div className="form-group mb-2 flex-1 mr-1">
-                                                <select
-                                                    className="form-control rounded bg-white text-dGreen"
-                                                    value={selectedDistrict}
-                                                    onChange={handleDistrictChange}
-                                                    required
-                                                    disabled={!selectedProvince}
-                                                >
-                                                    <option value="" className="font-bold">Chọn Quận/Huyện</option>
-                                                    {districts.map((district) => (
-                                                        <option key={district.code} value={district.code}>
-                                                            {district.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            <div className="form-group mb-2" style={{flex: 1}}>
-                                                <select
-                                                    className="form-control rounded bg-white text-dGreen"
-                                                    value={selectedWard}
-                                                    onChange={handleWardChange}
-                                                    required
-                                                    disabled={!selectedDistrict}
-                                                >
-                                                    <option value="" className="font-bold">Chọn Xã/Phường</option>
-                                                    {wards.map((ward) => (
-                                                        <option key={ward.code} value={ward.code}>
-                                                            {ward.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <input
-                                            type="text"
-                                            className="form-control rounded text-dGreen"
-                                            name="address"
-                                            placeholder={"Vui lòng nhập địa chỉ nhà..."}
-                                            onChange={handleChange}
+                                    <div className="form-group mb-2 flex-1 mr-1">
+                                        <select
+                                            className="form-control rounded bg-white text-dGreen"
+                                            value={selectedDistrict}
+                                            onChange={handleDistrictChange}
                                             required
-                                        />
-                                        {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
+                                            disabled={!selectedProvince}
+                                        >
+                                            <option value="" className="font-bold">Chọn Quận/Huyện</option>
+                                            {districts.map((district) => (
+                                                <option key={district.code} value={district.code}>
+                                                    {district.name}
+                                                </option>))}
+                                        </select>
                                     </div>
-                                )}
-                            </div>
 
-                            {/* Phương thức thanh toán với icon */}
-                            <div className="mb-4">
-                                <label className="form-label font-semibold text-dGreen">Phương thức
-                                    thanh toán</label>
-                                <div className="d-flex">
-                                    <div className="form-check me-3">
-                                        <input
-                                            type="radio"
-                                            className="form-check-input"
-                                            name="paymentMethod"
-                                            value="1"
-                                            checked={formData.paymentMethod === "1"}
-                                            onChange={handleChange}
-                                        />
-                                        <label className="form-check-label text-dGreen">
-                                            Thanh toán khi nhận hàng
-                                        </label>
+                                    <div className="form-group mb-2" style={{flex: 1}}>
+                                        <select
+                                            className="form-control rounded bg-white text-dGreen"
+                                            value={selectedWard}
+                                            onChange={handleWardChange}
+                                            required
+                                            disabled={!selectedDistrict}
+                                        >
+                                            <option value="" className="font-bold">Chọn Xã/Phường</option>
+                                            {wards.map((ward) => (<option key={ward.code} value={ward.code}>
+                                                {ward.name}
+                                            </option>))}
+                                        </select>
                                     </div>
-                                    <div className="form-check me-3">
-                                        <input
-                                            type="radio"
-                                            className="form-check-input"
-                                            name="paymentMethod"
-                                            value="2"
-                                            checked={formData.paymentMethod === "2"}
-                                            onChange={handleChange}
-                                        />
-                                        <label className="form-check-label text-dGreen">
-                                            Thanh toán qua MoMo
-                                        </label>
-                                    </div>
-                                    {/*<div className="form-check">*/}
-                                    {/*    <input*/}
-                                    {/*        type="radio"*/}
-                                    {/*        className="form-check-input"*/}
-                                    {/*        name="paymentMethod"*/}
-                                    {/*        value="3"*/}
-                                    {/*        checked={formData.paymentMethod === "3"}*/}
-                                    {/*        onChange={handleChange}*/}
-                                    {/*    />*/}
-                                    {/*    <label className="form-check-label text-dGreen">*/}
-                                    {/*        <i className="fas fa-credit-card fa-2x"></i> Credit card*/}
-                                    {/*    </label>*/}
-                                    {/*</div>*/}
+                                </div>
+                                <input
+                                    type="text"
+                                    className="form-control rounded text-dGreen"
+                                    name="address"
+                                    placeholder={"Vui lòng nhập địa chỉ nhà..."}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                {errors.address && <div className="text-danger mt-2">{errors.address}</div>}
+                            </div>)}
+                        </div>
+                        {/* Phương thức thanh toán với icon */}
+                        <div className="mb-4">
+                            <label className="form-label font-semibold text-dGreen">Phương thức
+                                thanh toán</label>
+                            <div className="d-flex">
+                                <div className="form-check me-3">
+                                    <input
+                                        type="radio"
+                                        className="form-check-input"
+                                        name="paymentMethod"
+                                        value="1"
+                                        checked={formData.paymentMethod === "1"}
+                                        onChange={handleChange}
+                                    />
+                                    <label className="form-check-label text-dGreen">
+                                        Thanh toán khi nhận hàng
+                                    </label>
+                                </div>
+                                <div className="form-check me-3">
+                                    <input
+                                        type="radio"
+                                        className="form-check-input"
+                                        name="paymentMethod"
+                                        value="2"
+                                        checked={formData.paymentMethod === "2"}
+                                        onChange={handleChange}
+                                    />
+                                    <label className="form-check-label text-dGreen">
+                                        Thanh toán qua MoMo
+                                    </label>
                                 </div>
                             </div>
 
-                            <div className="d-flex justify-center">
-                                <button type="submit" className="butn w-40 rounded shadow" onClick={handleSubmit}>Xác
-                                    nhận thanh
-                                    toán
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </>
-            </div>
+                        </div>
+
+                        <div className="d-flex justify-center">
+                            <button type="submit" className="butn w-40 rounded shadow" onClick={handleSubmit}>Xác
+                                nhận thanh
+                                toán
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </>
         </div>
-    );
+    </div>);
 }
