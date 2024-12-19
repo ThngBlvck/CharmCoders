@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+
 class ProductController extends Controller
 {
     // Hiển thị danh sách sản phẩm
@@ -54,7 +55,7 @@ class ProductController extends Controller
     // Hiển thị chi tiết sản phẩm
     public function show($id)
     {
-        $product = Product::with(['brand', 'category'])->findOrFail($id);
+        $product = Product::with(['brand', 'category', 'images'])->findOrFail($id);
 
         // Tăng lượt xem sử dụng phương thức increment()
         $product->increment('views');
