@@ -37,6 +37,7 @@ export default function OrderDetail() {
                     userId: orderData.data.user_id,
                     details: orderData.data.details,
                     payment_method: orderData.data.payment_method,
+                    shipping_fee: 30000,
                 };
 
                 setOrder(order);
@@ -234,8 +235,6 @@ export default function OrderDetail() {
                             </div>
                         </div>
                     </div>
-
-
                 {/* Danh sách sản phẩm */}
                     <div className="bodyStyle">
                         {order?.details && order.details.length > 0 ? (
@@ -300,6 +299,11 @@ export default function OrderDetail() {
                                 </div>
                             </div>
                             <div>
+                                <div className="mb-3">
+                                    <span className="text-dGreen fs-20"
+                                          style={{marginRight: "10px"}}>Phí vận chuyển:</span>
+                                    <span className="totalAmountStyle fs-20 priceAmount">{order?.shipping_fee ? order.shipping_fee.toLocaleString("vi-VN", {style: "currency", currency: "VND"}) : 'N/A'}</span>
+                                </div>
                                 <div className="mb-3">
                                     <span className="text-dGreen fs-20" style={{marginRight: "10px"}}>Tổng tiền:</span>
                                     <span className="totalAmountStyle fs-20 priceAmount">
