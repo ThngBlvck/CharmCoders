@@ -11,6 +11,8 @@ const ChatPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const { user } = useUser();
   const navigate = useNavigate();
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [selectedImage, setSelectedImage] = useState([]);
 
   // Create a reference to the messages container
   const messagesEndRef = useRef(null);
@@ -83,6 +85,7 @@ const ChatPage = () => {
               productid: data.product_id,
               product: data.product,
               isUser: data.sender.id === user.user_id,
+              image: data.image
             },
           ]);
         } else {
@@ -95,6 +98,7 @@ const ChatPage = () => {
               product_id: null,
               product: null,
               isUser: data.sender.id === user.user_id,
+              image: data.image
             },
           ]);
         }
@@ -120,26 +124,44 @@ const ChatPage = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage && selectedImage.length === 0) {
+      return; // Không gửi nếu không có nội dung hoặc hình ảnh
+    }
 
     setNewMessage("");
+    setSelectedImages([]);
+    setSelectedImage([]); // Clear hình ảnh đã chọn
 
     try {
-      await sendMessage({
-        receiver_id: selectedContact.sender.id,
-        message: newMessage,
+      const formData = new FormData();
+      formData.append("receiver_id", selectedContact.sender.id);
+      formData.append("message", newMessage);
+      selectedImage.forEach((file) => {
+        formData.append("image", file);
       });
 
+      await sendMessage(formData); // Gửi `formData` lên server
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
+
 
   const handleSelectContact = (contact) => {
     setSelectedContact(contact);
     fetchMessages(contact.sender.id);
   };
 
+  const handleSelectImages = (event) => {
+    const files = Array.from(event.target.files);
+    setSelectedImage(files);
+    const imageUrls = files.map((file) => URL.createObjectURL(file));
+    setSelectedImages((prev) => [...prev, ...imageUrls]);
+  };
+
+  const handleRemoveImage = (index) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+  };
   // Scroll to the bottom whenever messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -176,58 +198,124 @@ const ChatPage = () => {
 
       {/* Nội dung chat */}
       <div className="w-full sm:w-3/4 flex flex-col">
-  <div className="p-4 bg-indigo-500 text-white font-bold">
-    {selectedContact?.sender.name || "Chọn một liên hệ"}
-  </div>
-  <div className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-4">
-    {messages.map((message, index) => (
-      <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
-        <div
-          className={`p-3 rounded-lg max-w-md shadow ${message.isUser ? "bg-indigo-500 text-white" : "bg-gray-300"}`}
-          style={{ wordWrap: "break-word", whiteSpace: "pre-wrap", maxWidth: "calc(100% - 100px)" }}
-        >
-          <p>{message.message}</p>
-          {message.product && (
-            <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
+        <div className="p-4 bg-indigo-500 text-white font-bold">
+          {selectedContact?.sender.name || "Chọn một liên hệ"}
+        </div>
+        <div className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-4">
+          {messages.map((message, index) => (
+            <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
               <div
-                className="mt-3 p-3 rounded-lg bg-gray-100 flex space-x-3"
-                style={{ maxWidth: "300px" }}
+                className={`p-3 rounded-lg max-w-md shadow ${message.isUser ? "bg-indigo-500 text-white" : "bg-gray-300"}`}
+                style={{ wordWrap: "break-word", whiteSpace: "pre-wrap", maxWidth: "calc(100% - 100px)" }}
               >
-                <img
-                  src={message.product.image}
-                  alt="Product"
-                  className="w-16 h-16 object-cover rounded"
-                />
-                <div className="flex flex-col">
-                  <span className="font-semibold text-sm text-gray-700">{message.product.name}</span>
-                  <span className="text-xs text-gray-500">Giá: {message.product.unit_price}</span>
-                </div>
+                <p>{message.message}</p>
+
+                {/* Hiển thị ảnh nếu có */}
+                {message.image && (
+                  <div className="mt-3">
+                    <img
+                      src={message.image} // Đảm bảo rằng 'message.image' chứa URL hợp lệ
+                      alt={`Message image`}
+                      className="w-40 h-40 object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+
+
+                {/* Hiển thị sản phẩm nếu có */}
+                {message.product && (
+                  <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
+                    <div className="mt-3 p-3 rounded-lg bg-gray-100 flex space-x-3" style={{ maxWidth: "300px" }}>
+                      <img
+                        src={message.product.image}
+                        alt="Product"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-sm text-gray-700">{message.product.name}</span>
+
+                        {/* Hiển thị giá sản phẩm với điều kiện có giảm giá hay không */}
+                        {message.product.sale_price ? (
+                          <>
+                            <span
+                              className="text-xs text-gray-500"
+                              style={{ textDecoration: "line-through" }} // Gạch ngang nếu có giảm giá
+                            >
+                              {message.product.unit_price}₫
+                            </span>
+                            <span className="text-xs text-red-500 font-semibold mt-1">
+                              {message.product.sale_price}₫
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-xs text-gray-500">
+                            Giá: {message.product.unit_price}₫
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </a>
+                )}
+
               </div>
-            </a>
-          )}
+            </div>
+          ))}
+
+          {/* Đảm bảo tự động cuộn đến tin nhắn mới */}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="p-4 bg-gray-200 flex flex-col space-y-2">
+          {/* Hiển thị ảnh đã chọn */}
+          <div className="flex space-x-2 overflow-x-auto">
+            {selectedImages.map((image, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={image}
+                  alt={`Selected ${index}`}
+                  className="w-20 h-20 object-cover rounded"
+                />
+                <button
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-sm"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              placeholder="Nhập tin nhắn..."
+              className="flex-grow p-2 border rounded"
+            />
+            <button
+              onClick={handleSendMessage}
+              className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded"
+            >
+              Gửi
+            </button>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleSelectImages}
+              className="hidden"
+              id="imageUpload"
+            />
+            <label
+              htmlFor="imageUpload"
+              className="px-4 py-2 bg-indigo-500 text-white rounded cursor-pointer"
+            >
+              <i className="fa fa-image text-dBlue fs-20"></i>
+            </label>
+          </div>
         </div>
       </div>
-    ))}
-    {/* This div will make the chat scroll to the bottom */}
-    <div ref={messagesEndRef} />
-  </div>
-  <div className="p-4 bg-gray-200 flex items-center justify-between">
-    <input
-      type="text"
-      value={newMessage}
-      onChange={(e) => setNewMessage(e.target.value)}
-      onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-      placeholder="Nhập tin nhắn..."
-      className="flex-grow p-2 border rounded"
-    />
-    <button
-      onClick={handleSendMessage}
-      className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded"
-    >
-      Gửi
-    </button>
-  </div>
-</div>
 
 
       {/* Nút Quay lại Admin */}
