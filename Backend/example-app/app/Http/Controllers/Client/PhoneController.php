@@ -32,10 +32,10 @@ class PhoneController extends Controller
             ->verifications
             ->create($phone, 'sms'); // Loại gửi qua SMS
 
-        return response()->json(['message' => 'OTP đã được gửi thành công!'], 200);
+        return response()->json(['message' => 'OTP đã được gửi thành công'], 200);
     } catch (\Exception $e) {
         \Log::error('Twilio OTP Error: ' . $e->getMessage());
-        return response()->json(['error' => 'Không thể gửi OTP, vui lòng thử lại.'], 500);
+        return response()->json(['errors' => ['phone' => ['Không thể gửi otp, vui lòng kiểm tra lại số điện thoại.']]], 500);
     }
 }
 
@@ -65,18 +65,27 @@ public function verifyOtp(VerifyOtpRequest $request)
                 'code' => $otp,
             ]);
 
+        // Nếu OTP hợp lệ
         if ($verificationCheck->status === 'approved') {
-            // Lưu số điện thoại đã xác minh
+            // Chuyển đổi số điện thoại từ +84 thành số bắt đầu bằng 0 trước khi lưu
+            if (substr($phone, 0, 3) === '+84') {
+                $phone = '0' . substr($phone, 3);
+            }
+
+            // Lưu số điện thoại đã xác minh vào cơ sở dữ liệu
             auth()->user()->update(['phone' => $phone]);
 
             return response()->json(['message' => 'Số điện thoại đã được xác minh thành công!'], 200);
         }
 
-        return response()->json(['error' => 'OTP không hợp lệ hoặc đã hết hạn.'], 400);
+        // OTP không hợp lệ
+        return response()->json(['errors' => ['otp' => ['OTP không hợp lệ.']]], 400);
     } catch (\Exception $e) {
+        // Log lỗi nếu có
         \Log::error('Twilio Verification Error: ' . $e->getMessage());
-        return response()->json(['error' => 'Không thể xác minh OTP, vui lòng thử lại.'], 500);
+        return response()->json(['errors' => ['otp' => ['Không thể xác minh OTP, vui lòng thử lại.']]], 500);
     }
 }
+
 
 }

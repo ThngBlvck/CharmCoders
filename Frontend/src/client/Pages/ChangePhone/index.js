@@ -1,97 +1,84 @@
 import React, { useState, useEffect } from "react";
-import { toast, ToastContainer } from "react-toastify"; // Import react-toastify
-import 'react-toastify/dist/ReactToastify.css'; // Import CSS của react-toastify
 import "../../../assets/styles/css/style.css";
 import { sendOtp, verifyOtp } from "../../../services/Phone";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const EditPhone = () => {
-    const [phone, setPhone] = useState(""); // Lưu số điện thoại
-    const [otp, setOtp] = useState(""); // Lưu mã OTP
-    const [isPhoneVerified, setIsPhoneVerified] = useState(false); // Kiểm tra trạng thái xác minh số điện thoại
-    const [countdown, setCountdown] = useState(0); // Thời gian đếm ngược
+    const [phone, setPhone] = useState("");
+    const [otp, setOtp] = useState("");
+    const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+    const [countdown, setCountdown] = useState(0);
+    const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
-
-    // Handle input change
     const handlePhoneChange = (e) => {
         setPhone(e.target.value);
+        setErrors((prev) => ({ ...prev, phone: null }));
     };
 
     const handleOtpChange = (e) => {
         setOtp(e.target.value);
+        setErrors((prev) => ({ ...prev, otp: null }));
     };
 
-    // Handle "Gửi mã" button click
-// Handle sending OTP
     const handleSendCode = async () => {
         try {
-            // Gửi yêu cầu gửi mã OTP
+            setErrors({});
             const response = await sendOtp({ phone });
-            if (response?.status === 200) {
-                toast.success("Mã OTP đã được gửi!", {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: true,
-                });
-                setIsPhoneVerified(true);
-                setCountdown(30); // Đếm ngược 30 giây
-            } else {
-                throw new Error(response?.message || "Không thể gửi mã OTP.");
-            }
+            setIsPhoneVerified(true);
+            const currentTime = new Date().getTime();
+            const endTime = currentTime + 30 * 1000; // Thêm 30 giây
+            localStorage.setItem('otpEndTime', endTime); // Lưu thời gian hết hạn
+            setCountdown(30);
+            toast.success("Gửi mã thành công!");
         } catch (error) {
-            console.error(error);
-            toast.error(
-                error.message || "Đã xảy ra lỗi khi gửi mã OTP. Vui lòng thử lại!",
-                {
-                    position: "top-right",
-                    autoClose: 5000,
-                }
-            );
+            if (error.errors) {
+                setErrors(error.errors);
+            } else {
+                setErrors({ general: "Đã xảy ra lỗi, vui lòng thử lại!" });
+            }
         }
     };
 
-// Handle submitting OTP for verification
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Gửi yêu cầu xác minh mã OTP
+            setErrors({});
             const response = await verifyOtp({ phone, otp });
-            if (response?.status === 200) {
-                toast.success("Mã OTP xác minh thành công!", {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: true,
-                });
-                navigate("/profile");
-            } else {
-                throw new Error(response?.message || "Mã OTP không hợp lệ.");
-            }
+            navigate("/profile");
         } catch (error) {
-            console.error(error);
-            toast.error(
-                error.message || "Đã xảy ra lỗi khi xác minh mã OTP. Vui lòng thử lại.",
-                {
-                    position: "top-right",
-                    autoClose: 5000,
-                }
-            );
+            if (error.errors) {
+                setErrors(error.errors);
+            } else {
+                setErrors({ general: "Đã xảy ra lỗi, vui lòng thử lại!" });
+            }
         }
     };
 
-
-    // Effect để đếm ngược thời gian
     useEffect(() => {
+        const storedEndTime = localStorage.getItem('otpEndTime');
+        const currentTime = new Date().getTime();
+    
+        if (storedEndTime) {
+            const remainingTime = Math.max(0, Math.floor((storedEndTime - currentTime) / 1000)); // Lấy giá trị giây và làm tròn xuống
+            setCountdown(remainingTime);
+        }
+    
         let timer;
         if (countdown > 0) {
             timer = setInterval(() => {
                 setCountdown((prev) => prev - 1);
             }, 1000);
         } else {
-            setIsPhoneVerified(false); // Sau khi hết thời gian, bật lại nút Gửi mã
+            setIsPhoneVerified(false);
+            localStorage.removeItem('otpEndTime'); // Xóa thời gian hết hạn khi hết countdown
         }
-        return () => clearInterval(timer); // Dọn dẹp khi component unmount
+    
+        return () => clearInterval(timer);
     }, [countdown]);
+    
 
     return (
         <div className="container py-5">
@@ -101,24 +88,33 @@ const EditPhone = () => {
                         <p className="font-semibold mb-4 text-center text-dGreen fs-26">
                             Chỉnh sửa số điện thoại
                         </p>
-
                         <form onSubmit={handleSubmit}>
-                            {/* Trường nhập Số điện thoại */}
+                            {errors.general && (
+                                <div className="alert alert-danger" role="alert">
+                                    {errors.general}
+                                </div>
+                            )}
+
                             <div className="form-group mb-4">
                                 <label className="font-semibold mb-2 text-dGreen fs-20">
                                     Số điện thoại:
                                 </label>
                                 <input
                                     type="text"
-                                    className="form-control rounded fs-20"
+                                    className={`form-control rounded fs-20 ${
+                                        errors.phone ? "is-invalid" : ""
+                                    }`}
                                     value={phone}
                                     onChange={handlePhoneChange}
                                     placeholder="Nhập số điện thoại"
-                                    required
                                 />
+                                {errors.phone && (
+                                    <small className="text-danger">
+                                        {errors.phone[0]}
+                                    </small>
+                                )}
                             </div>
 
-                            {/* Trường nhập OTP và nút Gửi mã */}
                             <div className="form-group mb-4">
                                 <label className="font-semibold mb-2 text-dGreen fs-20">
                                     Mã OTP:
@@ -126,11 +122,12 @@ const EditPhone = () => {
                                 <div className="d-flex">
                                     <input
                                         type="text"
-                                        className="form-control rounded fs-20"
+                                        className={`form-control rounded fs-20 ${
+                                            errors.otp ? "is-invalid" : ""
+                                        }`}
                                         value={otp}
                                         onChange={handleOtpChange}
                                         placeholder="Nhập mã OTP"
-                                        required
                                     />
                                     <button
                                         type="button"
@@ -138,14 +135,16 @@ const EditPhone = () => {
                                         onClick={handleSendCode}
                                         disabled={isPhoneVerified || countdown > 0}
                                     >
-                                        {countdown > 0
-                                            ? `${countdown} giây`
-                                            : "Gửi mã"}
+                                        {countdown > 0 ? `${countdown} giây` : "Gửi mã"}
                                     </button>
                                 </div>
+                                {errors.otp && (
+                                    <small className="text-danger">
+                                        {errors.otp[0]}
+                                    </small>
+                                )}
                             </div>
 
-                            {/* Nút Lưu */}
                             <div className="d-flex justify-content-between mt-4">
                                 <button
                                     type="submit"
@@ -158,8 +157,6 @@ const EditPhone = () => {
                     </div>
                 </div>
             </div>
-            {/* Toast container để hiển thị thông báo */}
-            <ToastContainer />
         </div>
     );
 };
