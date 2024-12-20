@@ -20,6 +20,8 @@ const Footer = () => {
             chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
         }
     };
+    const [selectedImages, setSelectedImages] = useState([]);
+    const [selectedImage, setSelectedImage] = useState([]);
 
     useEffect(() => {
         scrollToBottom(); // Cuộn xuống mỗi khi tin nhắn thay đổi
@@ -49,22 +51,25 @@ const Footer = () => {
 
     // Handle sending a message
     const handleSendMessage = async () => {
-        if (!userMessage.trim()) return; // Kiểm tra tin nhắn rỗng (có thể giữ lại kiểm tra này)
+        setUserMessage("");
+        setSelectedImages([]);
+        setSelectedImage([]); // Clear hình ảnh đã chọn
 
         try {
-            // Gửi tin nhắn qua API
-            await sendMessage({
-                message: userMessage,
-                receiver_id: receiverId,
+            const formData = new FormData();
+            formData.append("receiver_id", receiverId);
+            formData.append("message", userMessage);
+            selectedImage.forEach((file) => {
+                formData.append("image", file);
             });
 
-            // Không cần thêm tin nhắn thủ công vào giao diện
-            setUserMessage("");
-            scrollToBottom();
+            await sendMessage(formData); // Gửi `formData` lên server
         } catch (error) {
             console.error("Error sending message:", error);
         }
     };
+
+
 
     useEffect(() => {
         fetchUserData();
@@ -139,6 +144,17 @@ const Footer = () => {
             }
             return newState;
         });
+    };
+
+    const handleSelectImages = (event) => {
+        const files = Array.from(event.target.files);
+        setSelectedImage(files);
+        const imageUrls = files.map((file) => URL.createObjectURL(file));
+        setSelectedImages((prev) => [...prev, ...imageUrls]);
+    };
+
+    const handleRemoveImage = (index) => {
+        setSelectedImages((prev) => prev.filter((_, i) => i !== index));
     };
 
 
@@ -387,6 +403,23 @@ const Footer = () => {
                                         </div>
                                     ))}
                                 </div>
+                                <div className="flex space-x-2 overflow-x-auto">
+                                    {selectedImages.map((image, index) => (
+                                        <div key={index} className="relative">
+                                            <img
+                                                src={image}
+                                                alt={`Selected ${index}`}
+                                                className="w-20 h-20 object-cover rounded"
+                                            />
+                                            <button
+                                                onClick={() => handleRemoveImage(index)}
+                                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-sm"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
 
                                 <textarea
                                     className="form-control mt-3"
@@ -407,12 +440,32 @@ const Footer = () => {
                                         }
                                     }}
                                 />
+
                             </div>
 
                             <div
-                                className="modal-footer d-flex justify-content-between align-items-center"
+                                className="modal-footer d-flex justify-content-start align-items-center"
                                 style={{ margin: "0 10px" }}
                             >
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleSelectImages}
+                                    className="hidden"
+                                    id="imageUpload"
+                                />
+                                <label
+                                    htmlFor="imageUpload"
+                                >
+                                    <i className="fa fa-image text-dGreen fs-20"
+                                        style={{
+                                            cursor: "pointer",
+                                            padding: "10px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#d4f7c7",
+                                        }}></i>
+                                </label>
                                 <i
                                     className="fa fa-paper-plane ic text-dGreen fs-20"
                                     aria-hidden="true"
@@ -424,6 +477,7 @@ const Footer = () => {
                                         backgroundColor: "#d4f7c7",
                                     }}
                                 ></i>
+
                             </div>
                         </div>
                     </div>
