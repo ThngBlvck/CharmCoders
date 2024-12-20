@@ -20,8 +20,12 @@ const CardSocialTraffic = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const categoryResponse = await getCategory();
-                const productResponse = await getProduct();
+
+                // Gọi hai API song song
+                const [categoryResponse, productResponse] = await Promise.all([
+                    getCategory(),
+                    getProduct()
+                ]);
 
                 const category = categoryResponse || [];
                 const products = productResponse || [];
@@ -60,6 +64,7 @@ const CardSocialTraffic = () => {
 
         fetchData();
     }, []);
+
 
     // Logic for pagination
     const indexOfLastItem = currentPage * itemsPerPage;
