@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {Link, NavLink, useLocation, useNavigate, useParams} from "react-router-dom";
 import {makeMomoPayment} from '../../../services/Product'; // Import service
 import {getCartsByIds} from '../../../services/Cart';
 import {getProductsByIds} from "../../../services/Product";
@@ -380,16 +380,17 @@ export default function Checkout() {
     };
 
     const handleMomoPayment = async (orderData) => {
+        const fee = orderData.total_amount >= 500000 ? 50000 : 30000;
         const extradata = products.map(item => ({
             product_id: item.id,
             quantity: item.quantity,
             user_id: user_id,
             address: orderData.address,
-            price: item.unit_price
+            price: item.sale_price ? item.sale_price : item.unit_price,
         }));
         try {
             const orderInfo = {
-                amount: orderData.total_amount,
+                amount: orderData.total_amount + fee,
                 orderId: orderData.order_id,
                 description: "Thanh toán đơn hàng qua MoMo",
                 extraData: JSON.stringify(extradata),
@@ -528,21 +529,28 @@ export default function Checkout() {
                             />
                             {errors.email && <div className="text-danger mt-2">{errors.email}</div>}
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label font-semibold text-dGreen">Số điện
-                                thoại</label>
-                            <input
-                                type="tel"
-                                className="form-control rounded text-dGreen"
-                                name="phone"
-                                value={formData.phone || ""}
-                                onChange={handleChange}
-                                required
-                            />
-                            {errors.phone && <div className="text-danger mt-2">{errors.phone}</div>}
+                        <div className="mb-1 d-flex justify-between">
+                            <div>
+                                <label className="form-label font-semibold text-dGreen">Số điện thoại:</label>
+                                <label className="text-dGreen ml-2">{formData.phone ? formData.phone : "Chưa thêm số điện thoại"}</label>
+                            </div>
+                            <NavLink to={`/edit_phone`}>
+                                <div className="text-dGreen">
+                                    <i className="fa-solid fa-square-plus"></i> {formData.phone ? "Sửa số điện thoại" : "Thêm số điện thoại"}
+                                </div>
+                            </NavLink>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label font-semibold text-dGreen">Địa chỉ</label>
+                            <div className="d-flex justify-between">
+                            <div>
+                                    <label className="form-label font-semibold text-dGreen">Địa chỉ</label>
+                                </div>
+                                <NavLink to={`/add-address`}>
+                                    <div className="text-dGreen">
+                                        <i className="fa-solid fa-square-plus"></i> Thêm địa chỉ
+                                    </div>
+                                </NavLink>
+                            </div>
                             {addresses.length > 0 ? (<div className="form-group mb-2 flex-1 mr-1">
                                 <select
                                     className="form-control rounded bg-white text-dGreen"
