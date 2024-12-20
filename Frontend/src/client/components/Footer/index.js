@@ -13,7 +13,7 @@ const Footer = () => {
     const [userMessage, setUserMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [userInfo, setUserInfo] = useState({});
-    const [receiverId, setReceiverId] = useState(4);
+    const [receiverId, setReceiverId] = useState(13);
     const chatWindowRef = useRef(null);
     const scrollToBottom = () => {
         if (chatWindowRef.current) {
