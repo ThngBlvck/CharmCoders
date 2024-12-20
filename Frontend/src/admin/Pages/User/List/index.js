@@ -311,7 +311,7 @@ export default function UserList() {
                                         </div>
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">
-                                        {user.name.length > 20 ?"..." + user.name.substring(0, 20) : user.name}
+                                        {user.name.length > 10 ?"..." + user.name.substring(0, 10) : user.name}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">
                                         <div className="flex justify-center items-center h-full">
@@ -323,7 +323,7 @@ export default function UserList() {
                                             )}
                                         </div>
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.email}</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.email.length > 15? user.email.substring(0, 15) + "..." :user.email}</td>
                                     <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.phone}</td>
                                     <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{user.address}</td>
                                     <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4 ">{getRoleName(user.role_id)}</td>
