@@ -98,14 +98,7 @@ const ChatPage = () => {
             },
           ]);
         }
-
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
-
-
-
-
-
       return () => {
         channel.unbind('App\\Events\\MessageSent');
         pusher.unsubscribe(channelName);
@@ -183,75 +176,58 @@ const ChatPage = () => {
 
       {/* Nội dung chat */}
       <div className="w-full sm:w-3/4 flex flex-col">
-        <div className="p-4 bg-indigo-500 text-white font-bold">
-          {selectedContact?.sender.name || "Chọn một liên hệ"}
-        </div>
-        <div className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-4">
-          {messages.map((message, index) => (
-            <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
+  <div className="p-4 bg-indigo-500 text-white font-bold">
+    {selectedContact?.sender.name || "Chọn một liên hệ"}
+  </div>
+  <div className="flex-grow p-4 overflow-y-auto bg-gray-50 space-y-4">
+    {messages.map((message, index) => (
+      <div key={index} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
+        <div
+          className={`p-3 rounded-lg max-w-md shadow ${message.isUser ? "bg-indigo-500 text-white" : "bg-gray-300"}`}
+          style={{ wordWrap: "break-word", whiteSpace: "pre-wrap", maxWidth: "calc(100% - 100px)" }}
+        >
+          <p>{message.message}</p>
+          {message.product && (
+            <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
               <div
-                className={`p-3 rounded-lg max-w-md shadow ${message.isUser ? "bg-indigo-500 text-white" : "bg-gray-300"
-                  }`}
+                className="mt-3 p-3 rounded-lg bg-gray-100 flex space-x-3"
+                style={{ maxWidth: "300px" }}
               >
-                <p>{message.message}</p>
-                {message.product && (
-                    <a href={`/products/${message.product.id}`} target="_blank" rel="noopener noreferrer">
-                      <div
-                          className="mt-3 p-4 rounded-lg bg-gray-50 flex space-x-4 items-center"
-                          style={{maxWidth: "350px"}}
-                      >
-                        <img
-                            src={message.product.image}
-                            alt="Product"
-                            className="w-20 h-20 object-cover rounded-md shadow-md" // Thêm shadow cho hình ảnh để nổi bật hơn
-                        />
-                        <div className="flex flex-col space-y-1">
-    <span
-        className="font-semibold text-lg text-gray-800"
-        style={{fontFamily: "Roboto, sans-serif"}} // Áp dụng font Roboto cho tên sản phẩm
-    >
-      {message.product.name}
-    </span>
-                          <span
-                              className="text-sm text-gray-600"
-                              style={{fontFamily: "Roboto, sans-serif"}} // Áp dụng font Roboto cho giá
-                          >
-      Giá:{" "}
-                            <span className="font-bold text-red-500">
-        {message.product.unit_price}₫
-      </span>
-    </span>
-                        </div>
-                      </div>
-
-                    </a>
-                )}
-                {/* <span className="text-xs text-gray-500">{message.created_at}</span> */}
+                <img
+                  src={message.product.image}
+                  alt="Product"
+                  className="w-16 h-16 object-cover rounded"
+                />
+                <div className="flex flex-col">
+                  <span className="font-semibold text-sm text-gray-700">{message.product.name}</span>
+                  <span className="text-xs text-gray-500">Giá: {message.product.unit_price}</span>
+                </div>
               </div>
-
-
-            </div>
-          ))}
-          {/* This div will make the chat scroll to the bottom */}
-          <div ref={messagesEndRef} />
-        </div>
-        <div className="p-4 bg-gray-200 flex items-center justify-between">
-          <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-              placeholder="Nhập tin nhắn..."
-              className="flex-grow p-2 border rounded"
-          />
-          <button
-              onClick={handleSendMessage}
-              className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded"
-          >
-            Gửi
-          </button>
+            </a>
+          )}
         </div>
       </div>
+    ))}
+    {/* This div will make the chat scroll to the bottom */}
+    <div ref={messagesEndRef} />
+  </div>
+  <div className="p-4 bg-gray-200 flex items-center justify-between">
+    <input
+      type="text"
+      value={newMessage}
+      onChange={(e) => setNewMessage(e.target.value)}
+      onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+      placeholder="Nhập tin nhắn..."
+      className="flex-grow p-2 border rounded"
+    />
+    <button
+      onClick={handleSendMessage}
+      className="ml-2 px-4 py-2 bg-indigo-500 text-white rounded"
+    >
+      Gửi
+    </button>
+  </div>
+</div>
 
 
       {/* Nút Quay lại Admin */}
