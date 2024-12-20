@@ -294,7 +294,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
-                                <p className="font-bold text-dGreen fs-30">Sản phẩm bán chạy</p>
+                                <p className="font-bold text-dGreen fs-30 mt-5">Sản phẩm bán chạy</p>
                             </div>
                             <div className="row g-4">
                                 <div className="row">
