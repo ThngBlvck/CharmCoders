@@ -30,7 +30,7 @@ class ExportReportJob implements ShouldQueue
         $excelData = Excel::raw(new ReportExport, \Maatwebsite\Excel\Excel::XLSX);
 
         // Gửi email với file Excel đính kèm
-        $adminEmail = 'admin@example.com';
+        $adminEmail = 'glowmakers6996@gmail.com';
         Mail::to($adminEmail)->send(new ReportReadyMail($excelData));
     }
 
