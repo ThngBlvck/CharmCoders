@@ -232,20 +232,6 @@ export default function Sidebar() {
                                 </Link>
                             </li>
                         </ul>
-
-                        {/* Auth Layout Pages */}
-                        <hr className="my-4 md:min-w-full"/>
-                        <ul className="md:flex-col md:min-w-full flex flex-col list-none pl-4">
-                            <li className="items-center">
-                                <Link
-                                    className="text-xs uppercase py-3 font-bold block text-blueGray-700 hover:text-blueGray-500"
-                                    to="/auth/register"
-                                >
-                                    <i className="fas fa-sign-out mr-2 text-sm text-blueGray-300"></i>
-                                    Đăng xuất
-                                </Link>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </nav>

@@ -157,11 +157,11 @@ const Footer = () => {
                                     chúng tôi</p>
                                 <p className="text-dGreen fs-14">
                                     <i className="fas fa-envelope me-2 ic fs-14"></i>
-                                    glowmakers@gmail.com
+                                    glowmakers6996@gmail.com
                                 </p>
                                 <p className="text-dGreen fs-14" style={{ marginBottom: "1rem" }}>
                                     <i className="fas fa-phone me-2 ic fs-14"></i>
-                                    (+012) 3456 7890 123
+                                    (+84) 917 88 059
                                 </p>
                                 <p className="font-bold title text-dGreen fs-16">Phương thức thanh toán</p>
                                 <label className="form-check-label mb-2 text-dGreen">
