@@ -76,6 +76,8 @@ class MomoPaymentController extends Controller
             $address = $extradata[0]['address'];
             $user = User::find($user_id);
 
+            $shippingFee = $data['amount'] < 500000 ? 30000 : 50000;
+
             // Tạo đơn hàng mới
             $orderData = [
                 'order_id' => $data['orderId'],
@@ -86,7 +88,8 @@ class MomoPaymentController extends Controller
                 'updated_at' => now(),
                 'address' => $address,
                 'phone' => $user ? $user->phone : null,
-                'payment_method' => 2
+                'payment_method' => 2,
+                'shipping_fee' => $shippingFee,
             ];
 
             // Lưu đơn hàng vào bảng Order

@@ -43,7 +43,6 @@ export default function Checkout() {
     const [errors, setErrors] = useState({});
     const [user_id, setUserId] = useState([]);
     const navigate = useNavigate();
-    const [shippingFee, setShippingFee] = useState(30000);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -364,8 +363,6 @@ export default function Checkout() {
             cart_ids: cartIdsArray,  // Thêm cartIds từ URL vào orderData
         };
 
-        // Log dữ liệu orderData
-        console.log("Order Data:", orderData);
 
         // Kiểm tra phương thức thanh toán
         if (orderData.payment_method === "2") {
@@ -477,20 +474,28 @@ export default function Checkout() {
                             </div>))) : (<p className="text-dGreen font-semibold fs-20">Không có sản phẩm nào.</p>))}
                     </div>
 
-                    <p className="mt-4 font-semibold text-dGreen">Thành
-                        tiền: {calculateTotal().toLocaleString("vi-VN", {
+                    <p className="mt-4 font-semibold text-dGreen">Tổng cộng: {calculateTotal().toLocaleString("vi-VN", {
                             style: "currency", currency: "VND",
                         })}</p>
                     <span className="text-dGreen">(Tiết kiệm: {calculateSavings().toLocaleString("vi-VN", {
                         style: "currency", currency: "VND"
                     })})</span>
-                    <div className="mb-3">
-                        <label className="form-label font-semibold text-dGreen">Phí vận chuyển</label>
-                        <span className="text-dGreen font-semibold text-lg ms-2">{new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND'
-                        }).format(shippingFee || 0)}</span>
-                    </div>
+                    <p className="mt-2 font-semibold text-dGreen">
+                        Phí ship: {(
+                        calculateTotal() >= 500000 ? 50000 : 30000
+                    ).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                    })}
+                    </p>
+                    <p className="mt-2 font-semibold text-dGreen">
+                        Thành tiền: {(
+                        calculateTotal() + (calculateTotal() >= 500000 ? 50000 : 30000)
+                    ).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                    })}
+                    </p>
                 </div>
 
                 {/* Form thông tin người dùng */}

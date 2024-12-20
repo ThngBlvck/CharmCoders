@@ -130,7 +130,7 @@ export default function Order({ color }) {
         return pages;
     };
 
-    const handleStatusChange = async (id,status) => {
+    const handleStatusChange = async (id, status) => {
         const result = await Swal.fire({
             title: "Xác nhận thay đổi trạng thái?",
             text: "Bạn có chắc muốn cập nhật trạng thái này không?",
@@ -205,20 +205,19 @@ export default function Order({ color }) {
                 {/* Dropdown lọc theo status, nằm ở góc phải */}
                 <div className="mb-4 px-4 flex justify-start space-x-2">
                     {[
-                        {value: "", label: "Tất cả"},
-                        {value: "0", label: "Đang chờ xác nhận"},
-                        {value: "1", label: "Đang chuẩn bị hàng"},
-                        {value: "2", label: "Đang giao"},
-                        {value: "3", label: "Đã nhận hàng"},
-                        {value: "4", label: "Đã hủy"}
+                        { value: "", label: "Tất cả" },
+                        { value: "0", label: "Đang chờ xác nhận" },
+                        { value: "1", label: "Đang chuẩn bị hàng" },
+                        { value: "2", label: "Đang giao" },
+                        { value: "3", label: "Đã nhận hàng" },
+                        { value: "4", label: "Đã hủy" }
                     ].map((status) => (
                         <button
                             key={status.value}
-                            className={`px-3 py-2 text-sm font-medium rounded shadow ${
-                                statusFilter === status.value
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-100 text-gray-800"
-                            } hover:bg-blue-300`}
+                            className={`px-3 py-2 text-sm font-medium rounded shadow ${statusFilter === status.value
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-100 "
+                                } hover:bg-blue-300`}
                             onClick={() => setStatusFilter(status.value)}
                         >
                             {status.label}
@@ -227,94 +226,95 @@ export default function Order({ color }) {
                 </div>
                 {loading ? (
                     <div className="flex justify-center items-center py-4">
-                        <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                        <PulseLoader color="#4A90E2" loading={loading} size={15} />
                     </div>
                 ) : (
                     <div className="block w-full overflow-x-auto">
                         {/* Orders table */}
                         <table className="items-center w-full bg-transparent border-collapse table-fixed">
                             <thead>
-                            <tr>
-                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">
-                                    STT
-                                </th>
-                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">
-                                    Mã đơn hàng
-                                </th>
-                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">
-                                    Tên người dùng
-                                </th>
-                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">
-                                    Trạng Thái
-                                </th>
-                                <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
-                                    Thao tác
-                                </th>
-                            </tr>
+                                <tr>
+                                    <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">
+                                        STT
+                                    </th>
+                                    <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">
+                                        Mã đơn hàng
+                                    </th>
+                                    <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">
+                                        Tên người dùng
+                                    </th>
+                                    <th className="px-6 py-3 border border-solid text-center uppercase font-semibol">
+                                        Trạng Thái
+                                    </th>
+                                    <th className="px-6 py-3 border border-solid text-center uppercase font-semibold">
+                                        Thao tác
+                                    </th>
+                                </tr>
                             </thead>
                             <tbody>
-                            {displayedOrders.length > 0 ? (
-                                displayedOrders.map((order, index) => (
-                                    <tr key={order.id}>
-                                        <th className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4 text-left flex items-center">
+                                {displayedOrders.length > 0 ? (
+                                    displayedOrders.map((order, index) => (
+                                        <tr key={order.id}>
+                                            <th className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4 text-left flex items-center">
                                                 <span
                                                     className={"ml-3 font-bold align-middle text-center " + (color === "light" ? "text-blueGray-600" : "text-white")}>
                                                     {index + 1}
                                                 </span>
-                                        </th>
-                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
-                                            {order.order_id}
-                                        </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
-                                            {order.user_name}
-                                        </td>
-                                        <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
-                                            {order.status === 2 || order.status === 3 || order.status === 4 ? (
-                                                // Display text if the order is "Đang giao", "Đã nhận hàng", or "Đã hủy"
-                                                <span>{order.status === 2 ? "Đang giao" : order.status === 3 ? "Đã nhận hàng" : "Đã hủy"}</span>
-                                            ) : (
-                                                // Display the dropdown if the order is not in the statuses that should be non-editable
-                                                <select
-                                                    value={order.status}
-                                                    onChange={(e) => handleStatusChange(order.id, parseInt(e.target.value))}
-                                                    className="border rounded px-2 py-1 text-lg shadow focus:outline-none"
+                                            </th>
+                                            <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
+                                                {order.order_id}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
+                                                {order.user_name}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle text-xl text-center whitespace-nowrap p-4">
+                                                {order.status === 2 || order.status === 3 || order.status === 4 ? (
+                                                    // Display text if the order is "Đang giao", "Đã nhận hàng", or "Đã hủy"
+                                                    <span>{order.status === 2 ? "Đang giao" : order.status === 3 ? "Đã nhận hàng" : "Đã hủy"}</span>
+                                                ) : (
+                                                    // Display the dropdown if the order is not in the statuses that should be non-editable
+                                                    <select
+                                                        value={order.status}
+                                                        onChange={(e) => handleStatusChange(order.id, parseInt(e.target.value))}
+                                                        className="border rounded px-2 py-1 text-lg shadow focus:outline-none bg-white  w-full"
+                                                    >
+                                                        {order.status === 0 && (
+                                                            <>
+                                                                <option value="0" > Chờ xác nhận</option>
+                                                                <option value="1" > Chuẩn bị hàng</option>
+                                                                <option value="4" > Đã hủy</option>
+                                                            </>
+                                                        )}
+                                                        {order.status === 1 && (
+                                                            <>
+                                                                <option value="1" >Chuẩn bị hàng</option>
+                                                                <option value="2" >Đang giao</option>
+                                                            </>
+                                                        )}
+                                                    </select>
+
+                                                )}
+                                            </td>
+
+
+                                            <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4 text-center">
+                                                <button
+                                                    className="text-blue-500 hover:text-blue-700 ml-2 px-2"
+                                                    onClick={() => handleViewOrder(order.id)}
                                                 >
-                                                    {order.status === 0 && (
-                                                        <>
-                                                            <option value="0">Đang chờ xác nhận</option>
-                                                            <option value="1">Đang chuẩn bị hàng</option>
-                                                            <option value="4">Đã hủy</option>
-                                                        </>
-                                                    )}
-                                                    {order.status === 1 && (
-                                                        <>
-                                                            <option value="1">Đang chuẩn bị hàng</option>
-                                                            <option value="2">Đang giao</option>
-                                                        </>
-                                                    )}
-                                                </select>
-                                            )}
+                                                    <i className="fas fa-eye text-xl "></i><span className="text-center text-xl ">Xem chi tiết</span>
+                                                </button>
+                                            </td>
+
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="text-center">
+                                            Không có đơn hàng nào
                                         </td>
-
-
-                                        <td className="border-t-0 px-6 align-middle text-xs whitespace-nowrap p-4 text-center">
-                                            <button
-                                                className="text-blue-500 hover:text-blue-700 ml-2 px-2"
-                                                onClick={() => handleViewOrder(order.id)}
-                                            >
-                                                <i className="fas fa-eye text-xl "></i><span className="text-center text-xl ">Xem chi tiết</span>
-                                            </button>
-                                        </td>
-
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="5" className="text-center">
-                                        Không có đơn hàng nào
-                                    </td>
-                                </tr>
-                            )}
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -326,7 +326,7 @@ export default function Order({ color }) {
                         disabled={currentPage === 1}
                         className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
                     >
-                        <FontAwesomeIcon icon={faChevronLeft}/>
+                        <FontAwesomeIcon icon={faChevronLeft} />
                     </button>
 
                     {/* Danh sách số trang */}
@@ -343,11 +343,10 @@ export default function Order({ color }) {
                                 <button
                                     key={page}
                                     onClick={() => handlePageChange(page)}
-                                    className={`w-10 h-10 flex items-center justify-center border rounded-full text-sm font-bold shadow ${
-                                        currentPage === page
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-100 text-gray-800"
-                                    } hover:bg-blue-300 hover:shadow-lg transition duration-200`}
+                                    className={`w-10 h-10 flex items-center justify-center border rounded-full text-sm font-bold shadow ${currentPage === page
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-100 text-gray-800"
+                                        } hover:bg-blue-300 hover:shadow-lg transition duration-200`}
                                 >
                                     {page}
                                 </button>
@@ -361,7 +360,7 @@ export default function Order({ color }) {
                         disabled={currentPage === Math.ceil(orders.length / ordersPerPage)}
                         className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:shadow-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-200 mx-4"
                     >
-                        <FontAwesomeIcon icon={faChevronRight}/>
+                        <FontAwesomeIcon icon={faChevronRight} />
                     </button>
                 </div>
             </div>

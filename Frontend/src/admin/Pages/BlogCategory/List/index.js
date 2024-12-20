@@ -254,9 +254,6 @@ export default function BlogCategory({ color }) {
                                 <th className="px-6 py-3 border border-solid text-x text-center uppercase font-semibold text-left">Tên
                                     danh mục
                                 </th>
-                                <th className="px-6 py-3 border border-solid text-x text-center uppercase font-semibold text-left">Trạng
-                                    Thái
-                                </th>
                                 <th className="px-6 py-3 border border-solid text-x text-center uppercase font-semibold text-left">Hành
                                     động
                                 </th>
@@ -275,9 +272,6 @@ export default function BlogCategory({ color }) {
                                         </td>
                                         <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">{index + 1}</td>
                                         <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">{category.name}</td>
-                                        <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
-                                            {category.status === 1 ? "Hiển thị" : "Ẩn"}
-                                        </td>
                                         <td className="border-t-0 px-6 align-middle text-center whitespace-nowrap p-4">
                                             <button
                                                 className="text-blue-500 hover:text-blue-700 px-2 transition duration-150 ease-in-out"

@@ -155,9 +155,9 @@ export default function Header() {
                                     className="fas fa-map-marker-alt ic me-2"></i>Toà nhà FPT Polytechnic,
                                     Đ. Số 22, Thường Thạnh, Cái Răng, Cần Thơ</a>
                                 <a href="#" className="me-4 text-header-dGreen"><i
-                                    className="fas fa-phone-alt ic me-2"></i>+01234567890</a>
+                                    className="fas fa-phone-alt ic me-2"></i>+0941788059</a>
                                 <a href="#" className="text-header-dGreen"><i
-                                    className="fas fa-envelope ic me-2"></i>glowmakers@gmail.com</a>
+                                    className="fas fa-envelope ic me-2"></i>glowmakers6996@gmail.com</a>
                             </div>
                         </div>
                     </div>
