@@ -240,37 +240,53 @@ export default function OrderDetail() {
                     <div className="bodyStyle">
                         {order?.details && order.details.length > 0 ? (
                             order.details.map((detail) => (
-                                <div key={detail.id} className="product-item productRowStyle">
-                                    <div className="d-flex productDetailsStyle">
-                                        <div className="imageContainerStyle">
+                                <div key={detail.id}
+                                     className="product-item productRowStyle p-4 shadow-sm rounded mb-4">
+                                    <div className="d-flex align-items-center">
+                                        {/* Hình ảnh sản phẩm */}
+                                        <div className="imageContainerStyle me-4">
                                             <NavLink to={`/products/${detail.product.id}`}>
                                                 <img
                                                     src={detail.product.image || "https://via.placeholder.com/100"}
                                                     alt={detail.product.name}
-                                                    className="imageStyle"
+                                                    className="imageStyle rounded border"
+                                                    style={{width: "100px", height: "100px", objectFit: "cover"}}
                                                 />
                                             </NavLink>
                                         </div>
-                                        <div className="product-info">
-                                            <NavLink to={`/products/${detail.product.id}`}>
-                                                <div className="product-name productNameStyle text-dGreen">
-                                                    {detail.product.name}
+                                        {/* Thông tin sản phẩm */}
+                                        <div className="flex-grow-1">
+                                            <NavLink to={`/products/${detail.product.id}`}
+                                                     className="text-decoration-none">
+                                                <div className="product-name productNameStyle text-dGreen fw-bold mb-2">
+                                                    Tên sản phẩm: {detail.product.name}
                                                 </div>
                                             </NavLink>
-                                            <div className="product-quantity quantityStyle text-dGreen">
-                                                x {detail.quantity}
+                                            <div className="product-quantity quantityStyle text-dGreen mb-2">
+                                                Số lượng: x {detail.quantity}
+                                            </div>
+                                            <div className="product-price text-dGreen fw-semibold fs-5">
+                                                Giá:{" "}
+                                                {detail.price && detail.quantity && !isNaN(detail.price) && !isNaN(detail.quantity)
+                                                    ? (detail.price * detail.quantity).toLocaleString("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    })
+                                                    : "N/A"}
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="product-price text-right priceStyle">
-                                        {detail.price && detail.quantity && !isNaN(detail.price) && !isNaN(detail.quantity) ?
-                                            (detail.price * detail.quantity).toLocaleString("vi-VN", {
-                                                style: "currency",
-                                                currency: "VND",
-                                            }) : 'N/A'}
-                                    </div>
-
+                                    {/* Liên kết đi đến sản phẩm để đánh giá */}
+                                    {order?.status === 3 && (
+                                        <div className="text-center mt-3">
+                                            <NavLink to={`/products/${detail.product.id}`}
+                                                     className="btn-review font-semibold fs-14 text-dGreen px-4 py-2 rounded">
+                                                Đi đến sản phẩm để đánh giá
+                                            </NavLink>
+                                        </div>
+                                    )}
                                 </div>
+
 
                             ))
                         ) : (
