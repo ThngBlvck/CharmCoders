@@ -20,14 +20,16 @@ class MessageSent implements ShouldBroadcastNow
     public $receiver;
     public $channelName; 
     public $product; 
+    public $image;
 
     // Khởi tạo sự kiện
-    public function __construct($message, $sender, $receiver,$product)
+    public function __construct($message, $sender, $receiver,$product, $image)
     {
         $this->message = $message;
         $this->sender = $sender;
         $this->receiver = $receiver;
         $this->product = $product;
+        $this->image = $image;
 
         // Tạo tên kênh cố định cho admin và user
         $this->channelName = 'chat.' . min($sender->id, $receiver->id) . '_' . max($sender->id, $receiver->id);
@@ -47,6 +49,7 @@ class MessageSent implements ShouldBroadcastNow
             'sender' => $this->sender,
             'receiver' => $this->receiver,
             'product' => $this->product,
+            'image' => $this->image
         ];
     }
 
