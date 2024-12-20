@@ -25,7 +25,7 @@ class SendOtpRequest extends FormRequest
     {
         return [
             'phone.required' => 'Số điện thoại là bắt buộc.',
-            'phone.digits_between' => 'Số điện thoại phải từ 10 đến 15 chữ số.',
+            'phone.digits_between' => 'Số điện thoại không hợp lệ.',
         ];
     }
 
@@ -33,7 +33,8 @@ class SendOtpRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => $validator->errors(),
+            'message' => 'Dữ liệu không hợp lệ.',
+            'errors' => $validator->errors(),
         ], 422));
     }
 }
