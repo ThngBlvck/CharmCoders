@@ -62,7 +62,7 @@ export default function Sidebar() {
                                     to="/admin/dashboard"
                                 >
                                     <i className={`fas fa-tv mr-2 text-sm ${location.pathname === "/admin/dashboard" ? "opacity-75" : "text-blueGray-300"}`}></i>
-                                    Dashboard
+                                    Thống Kê
                                 </Link>
                             </li>
 

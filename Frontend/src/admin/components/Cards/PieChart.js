@@ -28,9 +28,10 @@ export default function BeautifulPieChart() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true)
-                const brandResponse = await getBrand();
-                const productResponse = await getProduct();
+                setLoading(true);
+
+                // Gọi hai API đồng thời
+                const [brandResponse, productResponse] = await Promise.all([getBrand(), getProduct()]);
 
                 console.log("Brand Response:", brandResponse);
                 console.log("Product Response:", productResponse);
@@ -42,14 +43,11 @@ export default function BeautifulPieChart() {
                     throw new Error("API response does not contain the expected data structure.");
                 }
 
-                // Xử lý dữ liệu series và labels
-                const series = brands.map((brand) => {
-                    return products.filter((product) => product.brand_id === brand.id).length;
-                });
-
+                const series = brands.map((brand) =>
+                    products.filter((product) => product.brand_id === brand.id).length
+                );
                 const labels = brands.map((brand) => brand.name);
 
-                // Lấy danh sách màu không trùng lặp tương ứng với số lượng nhãn
                 const colors = getUniqueColors(labels.length);
 
                 setChartData({ series, labels, colors });
@@ -110,22 +108,24 @@ export default function BeautifulPieChart() {
 
 
     return (
-        <div className="w-full flex justify-center items-center h-full">
-            <div className={"w-full font-bold text-center text-black"}>Thống Kê Nhãn Hàng</div>
-            {loading ? (
-                <div className="flex justify-center items-center py-4">
-                    <PulseLoader color="#4A90E2" loading={loading} size={15}/>
-                </div>
-            ) : (
-            <div className="w-full flex justify-center items-center">
-                <Chart
-                options={chartConfig.options}
-                series={chartConfig.series}
-                type="pie"
-                width="600"
-            />
-            </div>
+        <div>
+            <div className={"w-full mt-3 font-bold text-center text-black"}>Thống Kê Nhãn Hàng</div>
+            <div className="w-full flex justify-center items-center h-full">
+
+                {loading ? (
+                    <div className="flex justify-center items-center py-4">
+                        <PulseLoader color="#4A90E2" loading={loading} size={15}/>
+                    </div>
+                ) : (
+                    <div className="w-full flex justify-center items-center">
+                        <Chart
+                            options={chartConfig.options}
+                            series={chartConfig.series}
+                            type="pie"
+                            width="600"
+                        />
+                    </div>
                 )}
-        </div>
-    );
+            </div>
+        </div>);
 }

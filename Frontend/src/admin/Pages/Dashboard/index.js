@@ -1,67 +1,71 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getProduct } from "../../../services/Product";
+import { getOrder } from "../../../services/Order";
 
 // components
 import PieChart from "../../components/Cards/PieChart";
-import CardLineChart from "../../components/Cards/CardLineChart";
-import CardBarChart from "../../components/Cards/CardBarChart";
-import CardPageVisits from "../../components/Cards/CardPageVisits";
 import CardSocialTraffic from "../../components/Cards/CardSocialTraffic";
 import CardStats from "../../components/Cards/CardStats";
 
 export default function Dashboard() {
+    const [totalRevenue, setTotalRevenue] = useState(0); // Tổng số tiền (đơn hàng status = 3)
+    const [totalProducts, setTotalProducts] = useState(0); // Tổng số lượng sản phẩm
+    const [totalPurchases, setTotalPurchases] = useState(0); // Tổng số lượt mua sản phẩm
+
+    useEffect(() => {
+        // Gọi API đồng thời
+        Promise.all([getOrder(), getProduct()])
+            .then(([ordersResponse, productsResponse]) => {
+                // Xử lý dữ liệu đơn hàng
+                const completedOrders = ordersResponse.data.filter(order => order.status === 3);
+                const revenue = completedOrders.reduce((sum, order) => sum + order.total_amount, 0);
+                setTotalRevenue(revenue);
+
+                // Xử lý dữ liệu sản phẩm
+                const totalProductCount = productsResponse.reduce((sum, product) => sum + product.quantity, 0);
+                setTotalProducts(totalProductCount);
+
+                const totalProductPurchases = productsResponse.reduce((sum, product) => sum + product.purchase_count, 0);
+                setTotalPurchases(totalProductPurchases);
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+    }, []);
+
     return (
         <>
             <div className="flex flex-wrap justify-center">
                 <div className="px-4 md:px-10 mx-auto w-full">
                     <div>
                         {/* Card stats */}
-                        <div className="flex flex-wrap">
-                            <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
+                        <div className="flex flex-wrap justify-between gap-4">
+                            <div className="w-full sm:w-5/12 lg:w-1/4 xl:w-1/4">
                                 <CardStats
-                                    statSubtitle="TRAFFIC"
-                                    statTitle="350,897"
-                                    statArrow="up"
-                                    statPercent="3.48"
+                                    statSubtitle="Tổng số Tiền từ các đơn hàng"
+                                    statTitle={new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(totalRevenue)}
                                     statPercentColor="text-emerald-500"
-                                    statDescripiron="Since last month"
-                                    statIconName="far fa-chart-bar"
-                                    statIconColor="bg-red-500"
+                                    statIconName="fas fa-dollar-sign"
+                                    statIconColor="bg-green-500"
+                                />
+
+                            </div>
+                            <div className="w-full sm:w-5/12 lg:w-1/4 xl:w-1/4 flex justify-center items-center">
+                                <CardStats
+                                    statSubtitle="Số lượng sản phẩm trong kho"
+                                    statTitle={totalProducts}
+                                    statPercentColor="text-blue-500"
+                                    statIconName="fas fa-boxes"
+                                    statIconColor="bg-blue-500"
                                 />
                             </div>
-                            <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
+                            <div className="w-full sm:w-5/12 lg:w-1/4 xl:w-1/4">
                                 <CardStats
-                                    statSubtitle="NEW USERS"
-                                    statTitle="2,356"
-                                    statArrow="down"
-                                    statPercent="3.48"
-                                    statPercentColor="text-red-500"
-                                    statDescripiron="Since last week"
-                                    statIconName="fas fa-chart-pie"
-                                    statIconColor="bg-orange-500"
-                                />
-                            </div>
-                            <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
-                                <CardStats
-                                    statSubtitle="SALES"
-                                    statTitle="924"
-                                    statArrow="down"
-                                    statPercent="1.10"
+                                    statSubtitle="Tổng số lượng lượt mua "
+                                    statTitle={totalPurchases}
                                     statPercentColor="text-orange-500"
-                                    statDescripiron="Since yesterday"
-                                    statIconName="fas fa-users"
-                                    statIconColor="bg-pink-500"
-                                />
-                            </div>
-                            <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
-                                <CardStats
-                                    statSubtitle="PERFORMANCE"
-                                    statTitle="49,65%"
-                                    statArrow="up"
-                                    statPercent="12"
-                                    statPercentColor="text-emerald-500"
-                                    statDescripiron="Since last month"
-                                    statIconName="fas fa-percent"
-                                    statIconColor="bg-lightBlue-500"
+                                    statIconName="fas fa-shopping-cart"
+                                    statIconColor="bg-orange-500"
                                 />
                             </div>
                         </div>
@@ -70,12 +74,11 @@ export default function Dashboard() {
             </div>
             <div className="flex flex-wrap justify-center mt-4">
                 <div className="w-full xl:w-1/2 px-5">
-                    <PieChart/>
+                    <PieChart />
                 </div>
                 <div className="w-full xl:w-1/2 px-5">
-                    <CardSocialTraffic/>
+                    <CardSocialTraffic />
                 </div>
-
             </div>
         </>
     );
