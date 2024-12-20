@@ -61,8 +61,6 @@ class OrderController extends Controller
                     return response()->json(['message' => "Sản phẩm {$product->name} không đủ số lượng trong kho."], 409);
                 }
 
-                // Cập nhật số lượt mua (purchase_count)
-                $product->increment('purchase_count', $item->quantity);
             }
 
             // Tính tổng tiền sản phẩm

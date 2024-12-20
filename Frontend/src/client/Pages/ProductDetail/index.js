@@ -83,39 +83,33 @@ const ProductDetail = () => {
 
 
 
-
     const fetchOneProduct = async () => {
         setLoadingProduct(true);
+        setLoadingReviews(true);
+
         try {
-            // Lấy chi tiết sản phẩm
-            const result = await getOneProduct(id);
-            setProduct(result);
+            // Gọi API đồng thời
+            const [productResult, relatedProductsResult, hotProductsResult, reviewsResult] = await Promise.all([
+                getOneProduct(id),          // API lấy chi tiết sản phẩm
+                getRelatedProducts(id),     // API lấy sản phẩm liên quan
+                getHotProducts(),           // API lấy sản phẩm hot
+                getReviews(id),             // API lấy đánh giá sản phẩm
+            ]);
 
-            // Fetch related products
-            const relatedProductsResult = await getRelatedProducts(id);
-            setRelatedProducts(relatedProductsResult.related_products);
-
-            // Fetch hot products
-            const hotProductsResult = await getHotProducts();
-            if (hotProductsResult && hotProductsResult.hot_products) {
-                setHotProducts(hotProductsResult.hot_products);
-            } else {
-                toast.warning('Không tìm thấy sản phẩm hot.');
-            }
-
-            // Fetch product reviews
-            const reviewsData = await getReviews(id);
-            setReviews(reviewsData);
+            // Cập nhật state với kết quả trả về
+            setProduct(productResult);
+            setRelatedProducts(relatedProductsResult.related_products || []);
+            setHotProducts(hotProductsResult?.hot_products || []);
+            setReviews(reviewsResult || []);
 
         } catch (error) {
-            // toast.error('There was an error loading the product.');
             console.error('Error fetching product details:', error);
+            toast.error('Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.');
         } finally {
             setLoadingProduct(false);
-            setLoadingReviews(false);  // Set reviews loading state to false after data is fetched
+            setLoadingReviews(false);
         }
     };
-
 
 
     const handleQuantityChange = (e) => {
@@ -526,6 +520,11 @@ const ProductDetail = () => {
                                     <p className="mb-2 text-dGreen fs-26 font-bold">
                                         {product.name}
                                     </p>
+
+                                    <p className="mb-2 text-dGreen">
+                                        <strong>Lượt mua: {product.purchase_count}</strong>
+                                    </p>
+
                                     {/* Giá sản phẩm */}
                                     <div className="mb-2 text-dGreen">
                                         <strong>Giá: </strong>
@@ -759,7 +758,7 @@ const ProductDetail = () => {
                         <div className="col-md-3">
                             <div className="hot-products-section p-3 border rounded shadow bg-white">
                                 <p className="fs-20 font-bold text-dGreen mb-2 text-center">
-                                    Sản phẩm hot
+                                    Sản phẩm bán chạy
                                 </p>
                                 {hotProducts?.length > 0 ? (
                                     hotProducts.map((hotProduct) => (
@@ -819,7 +818,7 @@ const ProductDetail = () => {
                                     ))
                                 ) : (
                                     <p className="fs-14 text-dGreen text-center">
-                                        Không có sản phẩm hot.
+                                        Không có sản phẩm bán chạy.
                                     </p>
                                 )}
                             </div>
