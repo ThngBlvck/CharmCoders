@@ -186,6 +186,60 @@ export default function About() {
                     </div>
                 </div>
             </div>
+            <div className="mx-auto text-center" style={{maxWidth: "800px", marginTop: '100px'}}>
+                <p className="fs-4 text-center text-dGreen font-bold">GlowMaker</p>
+                <p className="font-bold text-dGreen fs-30">Liên hệ</p>
+            </div>
+            <div className="container-fluid">
+                <div className="container py-5">
+                    <div className="row g-4 align-items-center">
+                        <div className="col-12">
+                            <div className="row g-4">
+                                {/* Address Box */}
+                                <div className="col-md-4 d-flex justify-content-center">
+                                    <div
+                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-green p-4 rounded"
+                                        style={{minHeight: "200px"}}>
+                                        <i className="fas fa-map-marker-alt fa-2x text-dGreen mb-3"></i>
+                                        <div>
+                                            <p className="text-center mb-3 text-dGreen">Địa chỉ</p>
+                                            <p className="mb-0 text-center text-dGreen">Toà nhà FPT
+                                                Polytechnic, Đ. Số 22, Thường
+                                                Thạnh, Cái Răng, Cần Thơ</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Email Box */}
+                                <div className="col-md-4 d-flex justify-content-center">
+                                    <div
+                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-green p-4 rounded"
+                                        style={{minHeight: "200px"}}>
+                                        <i className="fas fa-envelope fa-2x text-dGreen mb-3"></i>
+                                        <div>
+                                            <p className="text-center mb-3 text-dGreen">Email</p>
+                                            <p className="mb-0 text-center text-dGreen">glowmakers@gmail.com</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Phone Number Box */}
+                                <div className="col-md-4 d-flex justify-content-center">
+                                    <div
+                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-green p-4 rounded"
+                                        style={{minHeight: "200px"}}>
+                                        <i className="fas fa-phone fa-2x text-dGreen mb-3"></i>
+                                        <div>
+                                            <p className="text-center mb-3 text-dGreen">Số điện thoại</p>
+                                            <p className="mb-0 text-center text-dGreen">0123456789</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div className="container-fluid py-5" style={{backgroundColor: "white", marginTop: "2rem"}}>
                 <div className="container greenPt pt-1 shadow rounded">
                     <div className="row g-4 align-items-center">
@@ -260,60 +314,8 @@ export default function About() {
                     </div>
                 </div>
             </div>
-            <div className="mx-auto text-center" style={{maxWidth: "800px", marginTop: '100px'}}>
-                <p className="fs-4 text-center text-dGreen font-bold">GlowMaker</p>
-                <p className="font-bold text-dGreen fs-30">Liên hệ</p>
-            </div>
-            <div className="container-fluid">
-                <div className="container py-5">
-                    <div className="row g-4 align-items-center">
-                        <div className="col-12">
-                            <div className="row g-4">
-                                {/* Address Box */}
-                                <div className="col-md-4 d-flex justify-content-center">
-                                    <div
-                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-green p-4 rounded"
-                                        style={{minHeight: "200px"}}>
-                                        <i className="fas fa-map-marker-alt fa-2x text-dGreen mb-3"></i>
-                                        <div>
-                                            <p className="text-center mb-3 text-dGreen">Địa chỉ</p>
-                                            <p className="mb-0 text-center text-dGreen">Toà nhà FPT
-                                                Polytechnic, Đ. Số 22, Thường
-                                                Thạnh, Cái Răng, Cần Thơ</p>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                {/* Email Box */}
-                                <div className="col-md-4 d-flex justify-content-center">
-                                    <div
-                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-green p-4 rounded"
-                                        style={{minHeight: "200px"}}>
-                                        <i className="fas fa-envelope fa-2x text-dGreen mb-3"></i>
-                                        <div>
-                                            <p className="text-center mb-3 text-dGreen">Email</p>
-                                            <p className="mb-0 text-center text-dGreen">glowmakers@gmail.com</p>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                {/* Phone Number Box */}
-                                <div className="col-md-4 d-flex justify-content-center">
-                                    <div
-                                        className="d-inline-flex flex-column align-items-center bg-light w-100 border border-green p-4 rounded"
-                                        style={{minHeight: "200px"}}>
-                                        <i className="fas fa-phone fa-2x text-dGreen mb-3"></i>
-                                        <div>
-                                            <p className="text-center mb-3 text-dGreen">Số điện thoại</p>
-                                            <p className="mb-0 text-center text-dGreen">0123456789</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div className="col-md-12 col-lg-12 col-xl-12">
                 <div className="d-flex flex-column">
                     <div className="mx-auto text-center" style={{maxWidth: "800px", marginTop: '100px'}}>
