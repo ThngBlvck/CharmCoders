@@ -123,6 +123,7 @@ class MomoPaymentController extends Controller
             // Lưu chi tiết đơn hàng vào bảng OrderDetail
             Order_detail::insert($orderDetails);
 
+            Mail::to($user->email)->send(new OrderCreatedMail($order));
             return response()->json(['message' => 'Thanh toán thành công và tạo đơn hàng mới'], 200);
         }
 
