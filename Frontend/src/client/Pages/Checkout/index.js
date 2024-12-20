@@ -387,6 +387,7 @@ export default function Checkout() {
             user_id: user_id,
             address: orderData.address,
             price: item.sale_price ? item.sale_price : item.unit_price,
+            email: orderData.email,
         }));
         try {
             const orderInfo = {
