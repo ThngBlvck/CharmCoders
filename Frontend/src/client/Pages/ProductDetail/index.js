@@ -189,7 +189,7 @@ const ProductDetail = () => {
             try {
                 await sendMessage({
                     product_id: productId,
-                    receiver_id: 26,
+                    receiver_id: 13,
                     message: 'Tôi cần tư vấn sản phẩm này'
                 });
             } catch (error) {

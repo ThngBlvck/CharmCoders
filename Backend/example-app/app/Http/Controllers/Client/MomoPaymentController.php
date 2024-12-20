@@ -77,7 +77,6 @@ class MomoPaymentController extends Controller
             $user = User::find($user_id);
 
             $shippingFee = $data['amount'] < 500000 ? 30000 : 50000;
-
             // Tạo đơn hàng mới
             $orderData = [
                 'order_id' => $data['orderId'],
@@ -120,7 +119,6 @@ class MomoPaymentController extends Controller
                 // Xóa sản phẩm khỏi giỏ hàng sau khi thanh toán
                 $cartItem->delete();
             }
-            Mail::to($request->input('email'))->send(new OrderCreatedMail($order));
 
             // Lưu chi tiết đơn hàng vào bảng OrderDetail
             Order_detail::insert($orderDetails);
