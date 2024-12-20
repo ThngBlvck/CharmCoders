@@ -4,7 +4,6 @@ import "../../../assets/styles/css/bootstrap.min.css";
 import { getUserInfo } from "../../../services/User";
 import { getMessages, sendMessage } from "../../../services/Message";
 import { NavLink } from "react-router-dom";
-import Pusher from 'pusher-js';
 import { useNavigate } from "react-router-dom";
 import { getPusher } from "../../../contexts/Pusher";
 
@@ -21,6 +20,8 @@ const Footer = () => {
             chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
         }
     };
+    const [selectedImages, setSelectedImages] = useState([]);
+    const [selectedImage, setSelectedImage] = useState([]);
 
     useEffect(() => {
         scrollToBottom(); // Cuộn xuống mỗi khi tin nhắn thay đổi
@@ -50,22 +51,25 @@ const Footer = () => {
 
     // Handle sending a message
     const handleSendMessage = async () => {
-        if (!userMessage.trim()) return; // Kiểm tra tin nhắn rỗng (có thể giữ lại kiểm tra này)
+        setUserMessage("");
+        setSelectedImages([]);
+        setSelectedImage([]); // Clear hình ảnh đã chọn
 
         try {
-            // Gửi tin nhắn qua API
-            await sendMessage({
-                message: userMessage,
-                receiver_id: receiverId,
+            const formData = new FormData();
+            formData.append("receiver_id", receiverId);
+            formData.append("message", userMessage);
+            selectedImage.forEach((file) => {
+                formData.append("image", file);
             });
 
-            // Không cần thêm tin nhắn thủ công vào giao diện
-            setUserMessage("");
-            scrollToBottom();
+            await sendMessage(formData); // Gửi `formData` lên server
         } catch (error) {
             console.error("Error sending message:", error);
         }
     };
+
+
 
     useEffect(() => {
         fetchUserData();
@@ -87,6 +91,7 @@ const Footer = () => {
                             receiver: data.receiver,
                             product_id: data.product.id,
                             product: data.product,
+                            image: data.image,
                         },
                     ]);
                 } else {
@@ -98,6 +103,7 @@ const Footer = () => {
                             receiver: data.receiver,
                             product_id: null,
                             product: null,
+                            image: data.image,
                         },
                     ]);
                 }
@@ -138,6 +144,17 @@ const Footer = () => {
             }
             return newState;
         });
+    };
+
+    const handleSelectImages = (event) => {
+        const files = Array.from(event.target.files);
+        setSelectedImage(files);
+        const imageUrls = files.map((file) => URL.createObjectURL(file));
+        setSelectedImages((prev) => [...prev, ...imageUrls]);
+    };
+
+    const handleRemoveImage = (index) => {
+        setSelectedImages((prev) => prev.filter((_, i) => i !== index));
     };
 
 
@@ -245,41 +262,61 @@ const Footer = () => {
                                 ></i>
                             </div>
                             <div className="modal-body" style={{ padding: "0 20px", maxHeight: "400px", overflowY: "auto" }}>
-                                <div className="chat-window" style={{ maxHeight: "250px", overflowY: "auto", height: "250px", marginBottom: "20px" }} ref={(el) => {
-                                    chatWindowRef.current = el;
-                                    if (el) {
-                                        el.scrollTop = el.scrollHeight; // Đặt thanh cuộn ở cuối
-                                    }
-                                }}>
+                                <div
+                                    className="chat-window"
+                                    style={{
+                                        maxHeight: "250px",
+                                        overflowY: "auto",
+                                        height: "250px",
+                                        marginBottom: "20px",
+                                    }}
+                                    ref={(el) => {
+                                        chatWindowRef.current = el;
+                                        if (el) {
+                                            el.scrollTop = el.scrollHeight; // Đặt thanh cuộn ở cuối
+                                        }
+                                    }}
+                                >
                                     {chatMessages.map((msg, index) => (
-                                        <div key={index} className={`chat-message ${msg.sender_id === userInfo.user_id ? "user" : "admin"}`} style={{ marginBottom: "10px", display: "flex", flexDirection: msg.sender_id === userInfo.user_id ? "row-reverse" : "row" }}>
+                                        <div
+                                            key={index}
+                                            className={`chat-message ${msg.sender_id === userInfo.user_id ? "user" : "admin"}`}
+                                            style={{
+                                                marginBottom: "10px",
+                                                display: "flex",
+                                                flexDirection: msg.sender_id === userInfo.user_id ? "row-reverse" : "row",
+                                            }}
+                                        >
                                             {/* Tin nhắn */}
-                                            <div style={{
-                                                display: "inline-block",
-                                                maxWidth: "70%",
-                                                padding: "10px",
-                                                borderRadius: "12px",
-                                                backgroundColor: msg.sender_id === userInfo.user_id ? "#d4f7c7" : "#f1f1f1",
-                                                color: msg.sender_id === userInfo.user_id ? "#000" : "#333",
-                                                wordWrap: "break-word",
-                                                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                                            }}>
+                                            <div
+                                                style={{
+                                                    display: "inline-block",
+                                                    maxWidth: "70%",
+                                                    padding: "10px",
+                                                    borderRadius: "12px",
+                                                    backgroundColor: msg.sender_id === userInfo.user_id ? "#d4f7c7" : "#f1f1f1",
+                                                    color: msg.sender_id === userInfo.user_id ? "#000" : "#333",
+                                                    wordWrap: "break-word",
+                                                    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                                                }}
+                                            >
                                                 <span>{msg.message}</span>
+
+                                                {/* Hiển thị sản phẩm nếu có */}
                                                 {msg.product_id && (
-                                                    <a href={`/products/${msg.product_id}`} target="_blank"
-                                                       rel="noopener noreferrer">
+                                                    <a href={`/products/${msg.product_id}`} target="_blank" rel="noopener noreferrer">
                                                         <div
                                                             className="product-info"
                                                             style={{
                                                                 marginTop: "10px",
                                                                 padding: "10px",
-                                                                backgroundColor: "#f1f1f1", // Nền sản phẩm xám nhạt
+                                                                backgroundColor: "#f1f1f1",
                                                                 borderRadius: "8px",
                                                                 display: "flex",
                                                                 alignItems: "center",
                                                                 justifyContent: "flex-start",
-                                                                fontFamily: "Roboto, sans-serif", // Áp dụng font Roboto
-                                                                color: "#333", // Chữ xám đậm
+                                                                fontFamily: "Roboto, sans-serif",
+                                                                color: "#333",
                                                             }}
                                                         >
                                                             <img
@@ -291,57 +328,95 @@ const Footer = () => {
                                                                     objectFit: "cover",
                                                                     marginRight: "10px",
                                                                     borderRadius: "5px",
-                                                                    border: "1px solid #ddd", // Đường viền nhẹ
+                                                                    border: "1px solid #ddd",
                                                                 }}
                                                             />
-                                                            <div style={{flex: 1}}>
+                                                            <div style={{ flex: 1 }}>
                                                                 <h6
                                                                     style={{
                                                                         margin: 0,
                                                                         fontSize: "14px",
                                                                         fontWeight: "600",
-                                                                        fontFamily: "Roboto, sans-serif", // Áp dụng font Roboto
+                                                                        fontFamily: "Roboto, sans-serif",
                                                                         color: "#333",
                                                                     }}
                                                                 >
                                                                     {msg.product.name}
                                                                 </h6>
 
-                                                                <div style={{
-                                                                    display: "flex",
-                                                                    alignItems: "center",
-                                                                    marginTop: "5px"
-                                                                }}>
-                                                                  <span
-                                                                      style={{
-                                                                          color: "#d32f2f", // Giá giảm màu đỏ đậm
-                                                                          fontSize: "16px",
-                                                                          fontWeight: "bold",
-                                                                          fontFamily: "Roboto, sans-serif", // Font Roboto
-                                                                          marginRight: "10px",
-                                                                      }}
-                                                                  >
-                                                                    {msg.product.sale_price}₫
-                                                                  </span>
+                                                                <div
+                                                                    style={{
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        marginTop: "5px",
+                                                                    }}
+                                                                >
+                                                                    {msg.product.sale_price && (
+                                                                        <span
+                                                                            style={{
+                                                                                color: "#d32f2f", // Màu đỏ cho giá giảm
+                                                                                fontSize: "16px",
+                                                                                fontWeight: "bold",
+                                                                                fontFamily: "Roboto, sans-serif",
+                                                                                marginRight: "10px",
+                                                                            }}
+                                                                        >
+                                                                            {msg.product.sale_price}₫
+                                                                        </span>
+                                                                    )}
+
                                                                     <span
                                                                         style={{
                                                                             color: "#888",
-                                                                            textDecoration: "line-through",
+                                                                            textDecoration: msg.product.sale_price ? "line-through" : "none", // Gạch ngang nếu có giảm giá
                                                                             fontSize: "12px",
-                                                                            fontFamily: "Roboto, sans-serif", // Font Roboto
+                                                                            fontFamily: "Roboto, sans-serif",
                                                                         }}
                                                                     >
-                                                                    {msg.product.unit_price}₫
-                                                                  </span>
+                                                                        {msg.product.unit_price}₫
+                                                                    </span>
+
+
                                                                 </div>
                                                             </div>
                                                         </div>
-
                                                     </a>
                                                 )}
+
+                                                {/* Hiển thị hình ảnh nếu có */}
+                                                {msg.image && (
+                                                    <div className="mt-3">
+                                                        <img
+                                                            src={msg.image}
+                                                            alt="Message image"
+                                                            style={{
+                                                                width: "150px",
+                                                                height: "150px",
+                                                                objectFit: "cover",
+                                                                borderRadius: "10px",
+                                                                border: "1px solid #ddd", // Thêm đường viền nhẹ
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
-
-
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex space-x-2 overflow-x-auto">
+                                    {selectedImages.map((image, index) => (
+                                        <div key={index} className="relative">
+                                            <img
+                                                src={image}
+                                                alt={`Selected ${index}`}
+                                                className="w-20 h-20 object-cover rounded"
+                                            />
+                                            <button
+                                                onClick={() => handleRemoveImage(index)}
+                                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-sm"
+                                            >
+                                                ×
+                                            </button>
                                         </div>
                                     ))}
                                 </div>
@@ -350,37 +425,68 @@ const Footer = () => {
                                     className="form-control mt-3"
                                     rows="4"
                                     style={{
-                                        resize: "none", maxHeight: "100px", overflow: "auto", width: "100%",
+                                        resize: "none",
+                                        maxHeight: "100px",
+                                        overflow: "auto",
+                                        width: "100%",
                                     }}
                                     placeholder="Nhập nội dung tin nhắn..."
                                     value={userMessage}
                                     onChange={(e) => setUserMessage(e.target.value)}
                                     onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && !e.shiftKey) { // Kiểm tra nếu phím Enter được nhấn mà không giữ Shift
-                                            e.preventDefault();  // Ngừng việc tạo dòng mới
-                                            handleSendMessage();  // Gửi tin nhắn
+                                        if (e.key === "Enter" && !e.shiftKey) {
+                                            e.preventDefault(); // Ngừng việc tạo dòng mới
+                                            handleSendMessage(); // Gửi tin nhắn
                                         }
                                     }}
                                 />
+
                             </div>
 
-                            <div className="modal-footer d-flex justify-content-between align-items-center"
-                                 style={{margin: "0 10px"}}>
+                            <div
+                                className="modal-footer d-flex justify-content-start align-items-center"
+                                style={{ margin: "0 10px" }}
+                            >
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleSelectImages}
+                                    className="hidden"
+                                    id="imageUpload"
+                                />
+                                <label
+                                    htmlFor="imageUpload"
+                                >
+                                    <i className="fa fa-image text-dGreen fs-20"
+                                        style={{
+                                            cursor: "pointer",
+                                            padding: "10px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#d4f7c7",
+                                        }}></i>
+                                </label>
                                 <i
                                     className="fa fa-paper-plane ic text-dGreen fs-20"
                                     aria-hidden="true"
                                     onClick={handleSendMessage}
-                                    style={{ cursor: "pointer", padding: "10px", borderRadius: "50%", backgroundColor: "#d4f7c7" }}
+                                    style={{
+                                        cursor: "pointer",
+                                        padding: "10px",
+                                        borderRadius: "50%",
+                                        backgroundColor: "#d4f7c7",
+                                    }}
                                 ></i>
+
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-
         </>
     );
 };
+
 
 export default Footer;

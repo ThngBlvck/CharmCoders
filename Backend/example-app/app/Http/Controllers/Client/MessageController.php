@@ -16,39 +16,58 @@ class MessageController extends Controller
     // Gửi tin nhắn
     public function sendMessage(Request $request)
     {
+        // Kiểm tra các trường hợp bắt buộc
         $request->validate([
             'receiver_id' => 'required|exists:users,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Kiểm tra ảnh nếu có
         ]);
 
-        // Kiểm tra nếu cả `message` và `product_id` cùng trống
-        if (!$request->filled('message') && !$request->filled('product_id')) {
-            return response()->json(['error' => 'Tin nhắn hoặc ID sản phẩm là bắt buộc.'], 422);
+        // Kiểm tra nếu cả `message`, `product_id` và `image` đều trống
+        if (
+            !$request->has('message') && // Chỉ kiểm tra sự tồn tại, không bắt buộc phải có nội dung
+            !$request->filled('product_id') && // Kiểm tra ID sản phẩm có giá trị
+            !$request->hasFile('image') // Kiểm tra file ảnh
+        ) {
+            return response()->json(['error' => 'Tin nhắn, ID sản phẩm hoặc ảnh là bắt buộc.'], 422);
         }
 
         $sender = Auth::user();
         $receiver = User::findOrFail($request->receiver_id);
-        if ($request->product_id) {
+        $product = null;
+
+        // Kiểm tra nếu có `product_id` thì tìm sản phẩm
+        if ($request->filled('product_id')) {
             $product = Product::findOrFail($request->product_id);
-        } else {
-            $product = null;
         }
+
+        // Xử lý ảnh nếu có
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imagePath = $image->store('images/message', 'public');
+
+            // Convert đường dẫn thành URL đầy đủ
+            $imagePath = asset('storage/' . $imagePath);
+        }
+
         $messageContent = $request->message;
 
         // Lưu tin nhắn vào cơ sở dữ liệu
         $message = Message::create([
             'sender_id' => $sender->id,
             'receiver_id' => $receiver->id,
-            'message' => $request->message, // Lưu nội dung tin nhắn nếu có
+            'message' => $messageContent, // Lưu nội dung tin nhắn nếu có
             'product_id' => $request->product_id, // Lưu ID sản phẩm nếu có
+            'image' => $imagePath, // Lưu đường dẫn ảnh nếu có
         ]);
 
         // Broadcast sự kiện để client nhận được tin nhắn
-        broadcast(new MessageSent($messageContent, $sender, $receiver, $product));
+        broadcast(new MessageSent($messageContent, $sender, $receiver, $product, $imagePath));
         broadcast(new NewMessageReceived($sender, $messageContent));
-        
 
         return response()->json(['status' => 'Message sent', 'message' => $message]);
     }
+
 
     // Lấy danh sách tin nhắn giữa 2 người
 
