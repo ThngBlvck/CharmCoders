@@ -99,15 +99,26 @@ const EditPhone = () => {
                                 <label className="font-semibold mb-2 text-dGreen fs-20">
                                     Số điện thoại:
                                 </label>
-                                <input
-                                    type="text"
-                                    className={`form-control rounded fs-20 ${
-                                        errors.phone ? "is-invalid" : ""
-                                    }`}
-                                    value={phone}
-                                    onChange={handlePhoneChange}
-                                    placeholder="Nhập số điện thoại"
-                                />
+                                <div className="d-flex">
+                                    <input
+                                        type="text"
+                                        className={`form-control rounded fs-20 ${
+                                            errors.phone ? "is-invalid" : ""
+                                        }`}
+                                        value={phone}
+                                        onChange={handlePhoneChange}
+                                        placeholder="Nhập số điện thoại"
+                                    />
+
+                                    <button
+                                        type="button"
+                                        className="butn w-40 font-semibold ms-3 rounded"
+                                        onClick={handleSendCode}
+                                        disabled={isPhoneVerified || countdown > 0}
+                                    >
+                                        {countdown > 0 ? `${countdown} giây` : "Gửi mã"}
+                                    </button>
+                                </div>
                                 {errors.phone && (
                                     <small className="text-danger">
                                         {errors.phone[0]}
@@ -129,14 +140,7 @@ const EditPhone = () => {
                                         onChange={handleOtpChange}
                                         placeholder="Nhập mã OTP"
                                     />
-                                    <button
-                                        type="button"
-                                        className="butn w-40 font-semibold ms-3 rounded"
-                                        onClick={handleSendCode}
-                                        disabled={isPhoneVerified || countdown > 0}
-                                    >
-                                        {countdown > 0 ? `${countdown} giây` : "Gửi mã"}
-                                    </button>
+
                                 </div>
                                 {errors.otp && (
                                     <small className="text-danger">
