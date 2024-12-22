@@ -273,9 +273,9 @@ export default function ProductCategoryList() {
                                             <img src={product.image} alt={product.name} className="h-12 w-12 rounded"/>
                                         </div>
                                     </td>
-                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">{product.unit_price.toLocaleString()} VND</td>
+                                    <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">{product.unit_price.toLocaleString()} đ</td>
                                     <td className="border-t-0 px-6 align-middle text-x text-center whitespace-nowrap p-4">
-                                        {product.sale_price !== null ? product.sale_price.toLocaleString() + " VND" : "Không có"}
+                                        {product.sale_price !== null ? product.sale_price.toLocaleString() + "đ" : "Không có"}
                                     </td>
                                     <td className="border-t-0 px-6 align-middle text-xs text-center whitespace-nowrap p-4">
                                         <button className="text-blue-500 hover:text-blue-700 px-2"

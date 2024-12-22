@@ -84,7 +84,7 @@ export default function OrderDetail() {
                                             <div className="ml-4 flex-1">
                                                 <p className="text-lg font-semibold">Tên sản phẩm: {detail.product.name}</p>
                                                 <p className="text-lg font-semibold">Số lượng: {detail.quantity}</p>
-                                                <p className="text-lg font-semibold">Giá: {detail.price.toLocaleString()} VND</p>
+                                                <p className="text-lg font-semibold">Giá: {detail.price.toLocaleString()}đ</p>
                                             </div>
                                         </div>
                                     ))}
