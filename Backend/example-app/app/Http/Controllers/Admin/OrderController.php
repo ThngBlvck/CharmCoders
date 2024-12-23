@@ -8,6 +8,9 @@ use App\Models\Order;
 use App\Models\Order_detail;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use App\Mail\OrderCancelled;
+use Illuminate\Support\Facades\Mail;
+
 class OrderController extends Controller
 {
     public function index()
@@ -35,10 +38,12 @@ class OrderController extends Controller
             'message' => 'Chi tiết đơn hàng được lấy thành công.',
         ], 200);
     }
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'status' => 'required|integer',
+            'cancellation_reason' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -55,15 +60,23 @@ class OrderController extends Controller
                 ], 400); // HTTP 400 Bad Request
             }
 
+            // Cập nhật trạng thái đơn hàng
             $order->update(['status' => $newStatus]);
-
             $updatedProducts = [];
 
+            // Lưu lý do hủy vào cơ sở dữ liệu nếu trạng thái là 4 (hủy đơn)
+            // Lưu lý do hủy vào cơ sở dữ liệu nếu trạng thái là 4 (hủy đơn)
             if ($newStatus == 4 && $oldStatus != 4) {
+                $order->update([
+                    'cancellation_reason' => $validated['cancellation_reason'], // Lưu lý do hủy vào cơ sở dữ liệu
+                ]);
+
+                // Cập nhật lại số lượng sản phẩm sau khi hủy đơn
                 $orderDetails = Order_detail::where('order_id', $id)->get();
                 foreach ($orderDetails as $detail) {
                     $product = Product::find($detail->product_id);
                     if ($product) {
+                        // Tăng lại số lượng sản phẩm đã bán khi hủy đơn
                         $product->increment('quantity', $detail->quantity);
                         $updatedProducts[] = [
                             'product_id' => $product->id,
@@ -72,17 +85,25 @@ class OrderController extends Controller
                         ];
                     }
                 }
+
+                // Gửi email thông báo hủy đơn chỉ khi lý do hủy không phải null
+                if (!is_null($validated['cancellation_reason'])) {
+                    Mail::to($order->email)->send(new OrderCancelled($order)); // Gửi thông báo hủy đơn
+                }
             }
 
+
+            // Xử lý khi đơn hoàn thành (status = 3)
             if ($newStatus == 3 && $oldStatus != 3) {
                 $orderDetails = Order_detail::where('order_id', $id)->get();
                 foreach ($orderDetails as $detail) {
                     $product = Product::find($detail->product_id);
                     if ($product) {
+                        // Cập nhật số lượng sản phẩm đã bán khi đơn hàng hoàn thành
                         $product->increment('purchase_count', $detail->quantity);
                         $updatedProducts[] = [
                             'product_id' => $product->id,
-'product_name' => $product->name,
+                            'product_name' => $product->name,
                             'updated_purchase_count' => $product->purchase_count,
                         ];
                     }
@@ -92,6 +113,7 @@ class OrderController extends Controller
             DB::commit();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
                 'order' => $order,
                 'updated_products' => $updatedProducts,
@@ -105,6 +127,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
 
 
 
