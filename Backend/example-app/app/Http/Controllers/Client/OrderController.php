@@ -71,7 +71,7 @@ class OrderController extends Controller
             // Tính phí ship
             $shippingFee = $totalAmount < 500000 ? 30000 : 50000;
 
-
+            $email = $request->input('email');
             // Tạo đơn hàng
             $order = Order::create([
                 'order_id' => $request->input('order_id'),
@@ -82,6 +82,7 @@ class OrderController extends Controller
                 'user_id' => $userId,
                 'payment_method' => $request->input('payment_method'),
                 'phone' => $request->input('phone'),
+                'email' => $email, // Sửa lại ở đây
             ]);
 
             // Lưu chi tiết đơn hàng và cập nhật kho
@@ -105,7 +106,7 @@ class OrderController extends Controller
             Cart::whereIn('id', $cartIds)->delete();
 
             // Gửi email xác nhận
-            Mail::to($request->input('email'))->send(new OrderCreatedMail($order));
+            Mail::to($email)->send(new OrderCreatedMail($order));
 
             DB::commit();
 
@@ -122,6 +123,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
 
 
 

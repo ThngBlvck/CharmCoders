@@ -26,12 +26,13 @@ export const getOrderByIdAd = (id) => {
         path: `${URL_Order_Admin}/${id}`,
     });
 };
-export const updateOrder = (id, status) => {
+export const updateOrder = (id, status, cancellationReason) => {
     return request({
         method: 'PUT',
         path: `${URL_Update_Order}/${id}`,
         data: {
             status: status, // Truyền status là chuỗi thay vì đối tượng
+            cancellation_reason: cancellationReason || null
         },
     });
 };

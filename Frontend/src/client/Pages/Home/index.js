@@ -1,25 +1,24 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import "../../../assets/styles/css/style.css";
 import "../../../assets/styles/css/bootstrap.min.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import {NavLink, useNavigate, useParams} from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import Slider from "react-slick";
-import {faSpinner} from '@fortawesome/free-solid-svg-icons';
-import {getProduct, searchProduct, getCheckoutData, getHotProducts} from "../../../services/Product";
-import {getBrand} from '../../../services/Brand';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {addToCart} from "../../../services/Cart";
-import {toast} from "react-toastify";
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { getProduct, searchProduct, getCheckoutData, getHotProducts } from "../../../services/Product";
+import { getBrand } from '../../../services/Brand';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { addToCart } from "../../../services/Cart";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import {getBanner} from "../../../services/Banner";
-import {Swiper, SwiperSlide} from "swiper/react";
-import "swiper/swiper-bundle.css";
+import { getBanner } from "../../../services/Banner";
+
 
 export default function Home() {
-    const {id} = useParams();
+    const { id } = useParams();
     const [products, setProducts] = useState([]);
     const [brands, setBrands] = useState([]);
     const [banners, setBanners] = useState([]);
@@ -170,22 +169,22 @@ export default function Home() {
         <>
             {loading ? (
                 <div className="row">
-                    {Array.from({length: 8}).map((_, index) => (
+                    {Array.from({ length: 8 }).map((_, index) => (
                         <div key={index} className="col-md-6 col-lg-3 mb-3">
                             <div className="card text-center p-2 shadow rounded">
-                                <Skeleton height={150} className="img-fluid rounded img-pro"/>
+                                <Skeleton height={150} className="img-fluid rounded img-pro" />
                                 <div className="card-body">
-                                    <Skeleton height={20} width="80%" style={{marginBottom: "10px"}}/>
-                                    <Skeleton height={20} width="60%"/>
+                                    <Skeleton height={20} width="80%" style={{ marginBottom: "10px" }} />
+                                    <Skeleton height={20} width="60%" />
                                 </div>
                             </div>
                         </div>
                     ))}
                     <div className="container-fluid about py-2 shadow mb-3 mt-3 rounded">
-                        <Skeleton height={300} width="100%"/>
+                        <Skeleton height={300} width="100%" />
                     </div>
                     <div className="container-fluid about py-2 shadow mb-3 mt-3 rounded">
-                        <Skeleton height={300} width="100%"/>
+                        <Skeleton height={300} width="100%" />
                     </div>
                 </div>
             ) : (
@@ -206,7 +205,7 @@ export default function Home() {
 
                     <div className="container-fluid py-1 d-flex">
                         <div className="container py-5">
-                            <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
+                            <div className="mx-auto text-center mb-5" style={{ maxWidth: "800px" }}>
                                 <p className="fs-4 text-center text-dGreen font-bold">GlowMakers</p>
                                 <p className="font-bold text-dGreen fs-30">Sản phẩm mới</p>
                             </div>
@@ -264,7 +263,7 @@ export default function Home() {
 
                                                         {product.quantity === 0 ? (
                                                             <p className="text-danger font-bold fs-16"
-                                                               style={{marginTop: '10px'}}>Hết
+                                                                style={{ marginTop: '10px' }}>Hết
                                                                 hàng</p>
                                                         ) : (
                                                             <button
@@ -281,7 +280,7 @@ export default function Home() {
                                                                 disabled={product.quantity === 0}  // Disable the button if out of stock
                                                             >
                                                                 <p><i className="fa fa-shopping-cart" aria-hidden="true"
-                                                                      style={{marginRight: "6px"}}></i>Mua ngay</p>
+                                                                    style={{ marginRight: "6px" }}></i>Mua ngay</p>
                                                             </button>
                                                         )}
                                                     </div>
@@ -293,8 +292,8 @@ export default function Home() {
                                     )}
                                 </div>
                             </div>
-                            <div className="mx-auto text-center mb-5" style={{maxWidth: "800px"}}>
-                                <p className="font-bold text-dGreen fs-30 mt-5">Sản phẩm bán chạy</p>
+                            <div className="mx-auto text-center mb-5" style={{ maxWidth: "800px" }}>
+                                <p className="font-bold text-dGreen fs-30">Sản phẩm bán chạy</p>
                             </div>
                             <div className="row g-4">
                                 <div className="row">
@@ -345,7 +344,7 @@ export default function Home() {
 
                                                         {hotProducts.quantity === 0 ? (
                                                             <p className="text-danger font-bold fs-16"
-                                                               style={{marginTop: '10px'}}>Hết hàng</p>
+                                                                style={{ marginTop: '10px' }}>Hết hàng</p>
                                                         ) : (
                                                             <button
                                                                 className="butn mr-2 font-semibold w-100 fs-14 rounded"
@@ -361,7 +360,7 @@ export default function Home() {
                                                                 disabled={hotProducts.quantity === 0} // Disable the button if out of stock
                                                             >
                                                                 <p><i className="fa fa-shopping-cart" aria-hidden="true"
-                                                                      style={{marginRight: "6px"}}></i>Mua ngay</p>
+                                                                    style={{ marginRight: "6px" }}></i>Mua ngay</p>
                                                             </button>
                                                         )}
                                                     </div>
@@ -382,10 +381,10 @@ export default function Home() {
                                 {/* Hình ảnh bên trái */}
                                 <div className="col-lg-5">
                                     <div className="video">
-                                        <img src="toner.png" className="img-fluid rounded"/>
+                                        <img src="toner.png" className="img-fluid rounded" />
                                         <div
                                             className="position-absolute rounded border-top border-start border-white bottom-0 right-0">
-                                            <img src="toner.png" width={"200px"} className="img-fluid rounded"/>
+                                            <img src="toner.png" width={"200px"} className="img-fluid rounded" />
                                         </div>
 
                                     </div>
@@ -407,7 +406,7 @@ export default function Home() {
                                             xuất từ thiên nhiên, phù hợp cho mọi loại da...
                                         </p>
                                         <NavLink to="/about"
-                                                 className="butn w-25 rounded py-3 px-5 font-semibold shadow">
+                                            className="butn w-25 rounded py-3 px-5 font-semibold shadow">
                                             Xem thêm
                                         </NavLink>
                                     </div>
@@ -422,16 +421,16 @@ export default function Home() {
                                 hiệu</p>
                             <Slider className="mb-5 position-relative" {...sliderSettings}>
                                 {loading ? (
-                                    Array.from({length: 5}).map((_, index) => (
+                                    Array.from({ length: 5 }).map((_, index) => (
                                         <div key={index} className="text-center">
-                                            <Skeleton width={150} height={150} circle={true}/>
-                                            <Skeleton height={20} width={100} className="mt-2"/>
+                                            <Skeleton width={150} height={150} circle={true} />
+                                            <Skeleton height={20} width={100} className="mt-2" />
                                         </div>
                                     ))
                                 ) : brands.length > 0 ? (
                                     brands.map((brand) => (
                                         <div key={brand.id}
-                                             className="text-center d-flex flex-column align-items-center card-style">
+                                            className="text-center d-flex flex-column align-items-center card-style">
                                             <div className="brand-card w-100 bg-white" style={{
                                                 padding: "15px",
                                                 borderRadius: "15px",
@@ -446,12 +445,12 @@ export default function Home() {
                                                 minWidth: "100px", // Đảm bảo độ rộng tối thiểu
                                             }}>
                                                 <img src={brand.image || "https://via.placeholder.com/200"}
-                                                     alt={brand.name} className="img-fluid rounded"
-                                                     style={{
-                                                         maxWidth: "100%", // Đảm bảo không vượt quá chiều rộng của ô
-                                                         maxHeight: "100%", // Đảm bảo không vượt quá chiều cao của ô
-                                                         objectFit: "contain" // Giữ nguyên tỷ lệ của hình ảnh
-                                                     }}/>
+                                                    alt={brand.name} className="img-fluid rounded"
+                                                    style={{
+                                                        maxWidth: "100%", // Đảm bảo không vượt quá chiều rộng của ô
+                                                        maxHeight: "100%", // Đảm bảo không vượt quá chiều cao của ô
+                                                        objectFit: "contain" // Giữ nguyên tỷ lệ của hình ảnh
+                                                    }} />
                                             </div>
                                             <p className="mt-2 text-dGreen fs-16" style={{
                                                 fontWeight: "bold",

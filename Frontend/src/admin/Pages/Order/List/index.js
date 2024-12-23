@@ -130,7 +130,36 @@ export default function Order({ color }) {
         return pages;
     };
 
+
     const handleStatusChange = async (id, status) => {
+        let cancellationReason = null;
+
+        if (status === 4) {
+            // Hiển thị hộp thoại nhập lý do hủy
+            const { value: reason } = await Swal.fire({
+                title: "Nhập lý do hủy đơn",
+                input: "textarea",
+                inputPlaceholder: "Hãy nhập lý do hủy đơn...",
+                inputValidator: (value) => {
+                    if (!value) {
+                        return "Bạn phải nhập lý do hủy!";
+                    }
+                },
+                showCancelButton: true,
+                confirmButtonText: "Gửi",
+                cancelButtonText: "Hủy",
+            });
+
+            if (!reason) {
+                // Người dùng hủy bỏ nhập lý do
+                return;
+            }
+
+            // Gán lý do hủy đơn hàng
+            cancellationReason = reason;
+        }
+
+        // Xác nhận cập nhật trạng thái
         const result = await Swal.fire({
             title: "Xác nhận thay đổi trạng thái?",
             text: "Bạn có chắc muốn cập nhật trạng thái này không?",
@@ -142,28 +171,31 @@ export default function Order({ color }) {
 
         if (result.isConfirmed) {
             try {
-                const response = await updateOrder(id, status); // Gọi API với id và status mới
+                // Gọi API để cập nhật trạng thái
+                const response = await updateOrder(id, status, cancellationReason);
 
                 if (response.success) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Thất bại",
-                        text: "Cập nhật trạng thái thất bại!",
-                        timer: 2000,
-                        showConfirmButton: false,
-                    });
-
-                    // Cập nhật trạng thái trong danh sách đơn hàng
-                    setOrders((prevOrders) =>
-                        prevOrders.map((order) =>
-                            order.id === id ? { ...order, status: status } : order
-                        )
-                    );
-                } else {
                     Swal.fire({
                         icon: "success",
                         title: "Thành công",
                         text: response.message || "Cập nhật trạng thái thành công!",
+                    });
+
+                    // Cập nhật danh sách đơn hàng
+                    setOrders((prevOrders) =>
+                        prevOrders.map((order) =>
+                            order.id === id
+                                ? { ...order, status: status, cancellation_reason: cancellationReason }
+                                : order
+                        )
+                    );
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Thất bại",
+                        text: response.message || "Cập nhật trạng thái thất bại!",
+                        timer: 2000,
+                        showConfirmButton: false,
                     });
                 }
             } catch (error) {
@@ -176,6 +208,11 @@ export default function Order({ color }) {
             }
         }
     };
+
+
+
+
+
 
     return (
         <>
@@ -290,7 +327,8 @@ export default function Order({ color }) {
                                                                 <option value="1" >Chuẩn bị hàng</option>
                                                                 <option value="2" >Đang giao</option>
                                                             </>
-                                                        )}
+                                                        )}\
+
                                                     </select>
 
                                                 )}
